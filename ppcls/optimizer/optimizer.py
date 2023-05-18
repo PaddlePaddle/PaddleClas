@@ -341,7 +341,6 @@ class AdamW(object):
         parameter_group_names = {}
         parameter_group_vars = {}
         for name, param in model.named_parameters():
-            print(param.stop_gradient)
             if param.stop_gradient:
                 continue
             

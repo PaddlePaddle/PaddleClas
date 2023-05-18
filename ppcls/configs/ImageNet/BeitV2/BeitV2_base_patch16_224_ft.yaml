@@ -4,7 +4,7 @@ Global:
   pretrained_model: null
   output_dir: ./output/
   device: gpu
-  save_interval: 50
+  save_interval: 1
   eval_during_train: True
   eval_interval: 1
   epochs: 100
@@ -15,7 +15,14 @@ Global:
   save_inference_dir: ./inference
   to_static: False
   seed: 0
-  distributed: 4
+  distributed: 8
+
+AMP:
+  scale_loss: 65536.0
+  use_dynamic_loss_scaling: True
+  incr_every_n_steps: 2000
+  # O1: mixed fp16
+  level: O1
 
 # model architecture
 Arch:

@@ -49,7 +49,6 @@ class VQKD(nn.Layer):
                  **kwargs
                  ):
         super().__init__()
-        print(kwargs)
         if decoder_config['in_chans'] != embed_dim:
             print(f"Rewrite the in_chans in decoder from {decoder_config['in_chans']} to {embed_dim}")
             decoder_config['in_chans'] = embed_dim

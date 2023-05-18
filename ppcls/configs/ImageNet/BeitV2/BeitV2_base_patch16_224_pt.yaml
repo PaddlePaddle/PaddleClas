@@ -2,7 +2,7 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: ./output/beitv2_clip_dist
+  output_dir: ./output/
   device: gpu
   save_interval: 1
   eval_during_train: False
@@ -16,7 +16,7 @@ Global:
   save_inference_dir: ./inference
   to_static: False
   seed: 0
-  distributed: 4
+  distributed: 8
 
 AMP:
   scale_loss: 65536.0
@@ -29,7 +29,7 @@ AMP:
 Arch:
   name: "Beitv2Model"
   drop_path_rate : 0.1
-  class_num: &class_num 1000
+  class_num: 1000
   is_beitv2: True
   # if not null, its lengths should be same as models
   pretrained_list:
@@ -42,7 +42,7 @@ Arch:
     - Teacher:
         name: vqkd_encoder_base_decoder_3x768x12_clip
         pretrained: True
-        pretrained_weight: /home/aistudio/weight/vqkd.pdparams
+        pretrained_weight: ./dataset/vqkd.pdparams
         as_tokenzer: False
         img_size: 224
         n_code: 8192
@@ -50,7 +50,7 @@ Arch:
     - Student:
         name: beit_base_patch16_224_8k_vocab_cls_pt
         pretrained: True
-        pretrained_weight: /home/aistudio/weight/pretrain_model.pdparams
+        pretrained_weight: ./dataset/pretrain_model.pdparams
         drop_path_rate: 0.1
         use_shared_rel_pos_bias: True
         use_abs_pos_emb: False
@@ -75,14 +75,14 @@ Optimizer:
   beta1: 0.9
   beta2: 0.98
   momentum: 0.9
-  weight_decay: 1e-4
-  epsilon: 1e-8
+  weight_decay: 0.05
   #multi precision: True
   no_weight_decay_name: pos_embed cls_token .bias norm gamma
+  one_dim_param_no_weight_decay: True
   # Ir自定义
   lr:
     name: Cosine
-    learning_rate: 0.0015
+    learning_rate: 1.5e-3
     T_max: 200
     eta_min: 1e-5
     warmup_steps: 10
@@ -94,8 +94,8 @@ DataLoader:
   Train:
     dataset:
       name: BEiT_ImageNet
-      image_root: /home/aistudio/data/data89857/ILSVRC2012mini/
-      cls_label_path: /home/aistudio/data/data89857/ILSVRC2012mini/train_list.txt
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True,
@@ -135,31 +135,3 @@ DataLoader:
     loader:
       num_workers: 4
       use_shared_memory: True
-
-  Eval:
-    dataset: 
-      name: ImageNetDataset
-      image_root: /home/aistudio/data/data89857/ILSVRC2012mini/val/
-      cls_label_path: /home/aistudio/data/data89857/ILSVRC2012mini/val_list.txt
-      transform_ops:
-        - DecodeImage:
-            to_rgb: True
-            channel_first: False
-        - ResizeImage:
-            resize_short: 256
-        - CropImage:
-            size: 224
-        - NormalizeImage:
-            scale: 1.0/255.0
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
-            order: ''
-    sampler:
-      name: DistributedBatchSampler
-      batch_size: 256
-      drop_last: False
-      shuffle: False
-    loader:
-      num_workers: 8
-      use_shared_memory: True
-

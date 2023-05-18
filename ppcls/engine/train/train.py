@@ -70,7 +70,8 @@ def train_epoch(engine, epoch_id, print_batch_step):
             scaled.backward()
             if (iter_id + 1) % engine.update_freq == 0:
                 for i in range(len(engine.optimizer)):
-                    engine.scaler.minimize(engine.optimizer[i], scaled)
+                    engine.scaler.step(engine.optimizer[i])
+                    engine.scaler.update()
         else:
             loss.backward()
             if (iter_id + 1) % engine.update_freq == 0:
