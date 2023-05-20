@@ -13,7 +13,7 @@ Global:
   # used for static mode and model export
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
-  update_freq: 4   #修改
+  update_freq: 8   #修改
 #  distributed: True  #修改
 
 # model architecture
@@ -22,7 +22,8 @@ Arch:
   class_num: 1000
   use_sync_bn: True  #修改
 
-
+EMA:
+  decay: 0.9999
 
  
 # loss function config for traing/eval process
@@ -71,16 +72,16 @@ DataLoader:
         - DecodeImage: #添加
             to_rgb: True
             channel_first: False
-        - RandomResizedCrop: #修改
-            size: [224, 224]
-            scale: [0.08, 1.0]
+        - RandCropImage:
+            size: 224
             interpolation: bicubic
+            backend: pil
         - RandomHorizontalFlip:  #修改
             prob: 0.5
-        - RandAugment:        #修改
-            num_layers: 2
-            magnitude: 9  # 修改    这个应就是9
-#        - ToTensor:          #修改
+        - TimmAutoAugment:
+            config_str: rand-m9-mstd0.5-inc1
+            interpolation: bicubic
+            img_size: 224
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -105,7 +106,7 @@ DataLoader:
               prob: 0.5
     sampler:
       name: DistributedBatchSampler
-      batch_size: 4       #修改
+      batch_size: 128       #修改
       drop_last: True      #修改
       shuffle: True
     loader:
@@ -118,15 +119,20 @@ DataLoader:
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
-        - Resize:   #修改
-            size: 256
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - ResizeImage:
+            resize_short: 256
             interpolation: bicubic
+            backend: pil
         - CenterCrop:  #修改
             size: 224
-        - ToTensor:    #修改
-        - Normalize:  #还是 Noemalizeimage ？？？？
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
+        - NormalizeImage:
+          scale: 1.0/255.0
+          mean: [ 0.485, 0.456, 0.406 ]
+          std: [ 0.229, 0.224, 0.225 ]
+          order: ''
     sampler:
       name: DistributedBatchSampler
       batch_size: 128
