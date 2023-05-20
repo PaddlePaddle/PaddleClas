@@ -44,8 +44,8 @@ class MoCoImageNetDataset(CommonDataset):
             view_trans2=None, ):
         self.delimiter = delimiter if delimiter is not None else " "
         self.relabel = relabel
-        super(ImageNetDataset, self).__init__(image_root, cls_label_path,
-                                              transform_ops)
+        super(MoCoImageNetDataset, self).__init__(image_root, cls_label_path,
+                                                  transform_ops)
 
         self.return_label = return_label
         self.return_two_sample = return_two_sample
