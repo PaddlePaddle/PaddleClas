@@ -1,7 +1,6 @@
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: /root/paddlejob/workspace/code/moco_v2_bs_256_epoch_200
   output_dir: ./output/ 
   seed: 0
   device: gpu
@@ -24,6 +23,7 @@ Global:
 
 Arch:
   name: moco_clas
+  pretrained_model: ./pretrain/moco_v2_bs_256_epoch_200
   backbone:
     name: ResNet50
     stop_layer_name: avg_pool
@@ -55,7 +55,7 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-      name: ImageNetDataset
+      name: MoCoImageNetDataset
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       return_label: True
@@ -83,7 +83,7 @@ DataLoader:
 
   Eval:
     dataset:
-      name: ImageNetDataset
+      name: MoCoImageNetDataset
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       return_label: True

@@ -2,7 +2,7 @@
 Global:
   checkpoints: null
   pretrained_model: null
-  output_dir: /home/aistudio/work/PaddleClas/output/ 
+  output_dir: ./output/ 
   device: gpu
   save_interval: 50
   # train_epoch_iter_two_samples
@@ -60,7 +60,7 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-      name: ImageNetDataset
+      name: MoCoImageNetDataset
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/train_list.txt
       return_label: False
