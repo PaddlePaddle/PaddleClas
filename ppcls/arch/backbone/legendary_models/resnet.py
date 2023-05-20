@@ -395,7 +395,7 @@ class ResNet(TheseusLayer):
             weight_attr=ParamAttr(initializer=Uniform(-stdv, stdv)))
 
         self.data_format = data_format
-        # super().init_res init_net
+
         super().init_net(
             stages_pattern,
             return_patterns=return_patterns,
