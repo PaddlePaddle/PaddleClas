@@ -57,9 +57,9 @@ class ClasHead(nn.Layer):
 def _load_pretrained(pretrained_config, model, use_ssld=False):
     if pretrained_config is not None:
         if pretrained_config.startswith("http"):
-            load_dygraph_pretrain_from_url(model.base_model, pretrained_config)
+            load_dygraph_pretrain_from_url(model, pretrained_config)
         else:
-            load_dygraph_pretrain(model.base_model, pretrained_config)
+            load_dygraph_pretrain(model, pretrained_config)
 
 
 class Classification(nn.Layer):
