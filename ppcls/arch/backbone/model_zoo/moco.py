@@ -20,7 +20,7 @@ from __future__ import print_function
 
 import paddle
 import paddle.nn as nn
-from ppcls.arch.init_weight import kaiming_init, constant_init, normal_init
+from ppcls.utils.initializer import kaiming_normal_, constant_, normal_
 from ..legendary_models import *
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
@@ -190,14 +190,14 @@ class MoCo(nn.Layer):
             "Undefined init_linear: {}".format(init_linear)
         for m in self.sublayers():
             if isinstance(m, nn.Conv2D):
-                kaiming_init(m, mode='fan_out', nonlinearity='relu')
+                kaiming_normal_(m, mode='fan_out', nonlinearity='relu')
             elif isinstance(m, (nn.layer.norm._BatchNormBase, nn.GroupNorm)):
-                constant_init(m, 1)
+                constant_(m, 1)
             elif isinstance(m, nn.Linear):
                 if init_linear == 'normal':
-                    normal_init(m, std=std, bias=bias)
+                    normal_(m, std=std, bias=bias)
                 else:
-                    kaiming_init(m, mode='fan_in', nonlinearity='relu')
+                    kaiming_normal_(m, mode='fan_in', nonlinearity='relu')
 
     @paddle.no_grad()
     def _momentum_update_key_encoder(self):

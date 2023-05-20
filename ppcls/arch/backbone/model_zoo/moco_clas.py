@@ -21,7 +21,7 @@ from __future__ import print_function
 import paddle
 import paddle.nn as nn
 from ....utils import logger
-from ppcls.arch.init_weight import normal_init
+from ppcls.utils.initializer import normal_
 from ..legendary_models import *
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
@@ -44,7 +44,7 @@ class ClasHead(nn.Layer):
             self.avg_pool = nn.AdaptiveAvgPool2D((1, 1))
         self.fc = nn.Linear(in_channels, class_num)
         # reset_parameters(self.fc_cls)
-        normal_init(self.fc, mean=0.0, std=0.01, bias=0.0)
+        normal_(self.fc, mean=0.0, std=0.01, bias=0.0)
 
     def forward(self, x):
         if self.with_avg_pool:
@@ -137,6 +137,7 @@ def moco_clas(backbone, head, pretrained=False, use_ssld=False):
     head_name = head_config.pop('name')
     head = eval(head_name)(**head_config)
     model = Classification(backbone=backbone, head=head)
+    # load pretrain_weight
     _load_pretrained(
         pretrained, model, MODEL_URLS["moco_clas"], use_ssld=use_ssld)
     return model
