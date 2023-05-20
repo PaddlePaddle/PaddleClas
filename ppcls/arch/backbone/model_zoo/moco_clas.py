@@ -54,17 +54,12 @@ class ClasHead(nn.Layer):
         return x
 
 
-def _load_pretrained(pretrained, model, model_url, use_ssld=False):
-    if pretrained is False:
-        pass
-    elif pretrained is True:
-        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
-    elif isinstance(pretrained, str):
-        load_dygraph_pretrain(model, pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type."
-        )
+def _load_pretrained(pretrained_config, model, use_ssld=False):
+    if pretrained_config is not None:
+        if pretrained_config.startswith("http"):
+            load_dygraph_pretrain_from_url(model.base_model, pretrained_config)
+        else:
+            load_dygraph_pretrain(model.base_model, pretrained_config)
 
 
 class Classification(nn.Layer):
@@ -137,7 +132,8 @@ def moco_clas(backbone, head, pretrained=False, use_ssld=False):
     head_name = head_config.pop('name')
     head = eval(head_name)(**head_config)
     model = Classification(backbone=backbone, head=head)
-    # load pretrain_weight
-    _load_pretrained(
-        pretrained, model, MODEL_URLS["moco_clas"], use_ssld=use_ssld)
+
+    # load pretrain_moco_model weight
+    pretrained_config = backbone_config.pop('pretrained_model')
+    _load_pretrained(pretrained_config, model, use_ssld=use_ssld)
     return model
