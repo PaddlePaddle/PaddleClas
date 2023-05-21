@@ -1,26 +1,23 @@
-# global configs
 Global:
   checkpoints: null
   pretrained_model: null
   output_dir: ./output/
   device: gpu
-  save_interval: 10                  #修改
+  save_interval: 10                 
   eval_during_train: True
   eval_interval: 1
-  epochs: 300                      #修改
+  epochs: 300                     
   print_batch_step: 10
   use_visualdl: False
-  # used for static mode and model export
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
-  update_freq: 8   #修改
-#  distributed: True  #修改
+  update_freq: 4
+  distributed: True  
 
-# model architecture
 Arch:
-  name: replknet    #修改
+  name: replknet    
   class_num: 1000
-  use_sync_bn: True  #修改
+  use_sync_bn: True  
 
 EMA:
   decay: 0.9999
@@ -29,7 +26,7 @@ EMA:
 # loss function config for traing/eval process
 Loss:
   Train:
-    - SoftTargetCrossEntropy:   #修改
+    - SoftTargetCrossEntropy:   
         weight: 1.0
   Eval:
     - CELoss:
@@ -37,27 +34,26 @@ Loss:
 
 
 Optimizer:
-  name: AdamW               #修改
-  beta1: 0.9               #修改
-  beta2: 0.999             #修改
-  epsilon: 1e-8            #修改
-  weight_decay: 0.05      #修改
-  clip: None  #修改
+  name: AdamW               
+  beta1: 0.9               
+  beta2: 0.999             
+  epsilon: 1e-8            
+  weight_decay: 0.05      
+  clip: None  
   lr:
-    # for 8 cards
     name: Cosine
-    learning_rate: 0.004  #修改
-    eta_min: 1e-06       #修改
-    warmup_epoch: 10     #修改
-    warmup_start_lr: 1e-06  #修改
-    by_epoch: True    #修改
+    learning_rate: 0.004  
+    eta_min: 1e-06      
+    warmup_epoch: 10     
+    warmup_start_lr: 1e-06  
+    by_epoch: True    
     last_epoch: 0
 
-AMP:   #修改
-  scale_loss: 32768.0   #修改
+AMP:   
+  scale_loss: 32768.0  
   use_dynamic_loss_scaling: True
   # O1: mixed fp16
-  level: O1     #修改
+  level: O1     
 
 
 
@@ -69,14 +65,14 @@ DataLoader:
       image_root:  ./dataset/ILSVRC2012/
       cls_label_path:  ./dataset/ILSVRC2012/train_list.txt
       transform_ops:
-        - DecodeImage: #添加
+        - DecodeImage: 
             to_rgb: True
             channel_first: False
         - RandCropImage:
             size: 224
             interpolation: bicubic
             backend: pil
-        - RandomHorizontalFlip:  #修改
+        - RandomHorizontalFlip:  
             prob: 0.5
         - TimmAutoAugment:
             config_str: rand-m9-mstd0.5-inc1
@@ -88,15 +84,15 @@ DataLoader:
             std: [0.229, 0.224, 0.225]
             order: ''
         - RandomErasing:
-            EPSILON: 0.25      #prob
-            sl: 0.02        #min_area
-            sh: 1.0/3.0     #max_area
-            r1: 0.3         #min_aspect
-            attempt: 10     #10
-            use_log_aspect: True   #True
-            mode: pixel     #mode
+            EPSILON: 0.25      
+            sl: 0.02        
+            sh: 1.0/3.0    
+            r1: 0.3        
+            attempt: 10    
+            use_log_aspect: True   
+            mode: pixel     
 
-      batch_transform_ops:  #修改
+      batch_transform_ops:  
         - OpSampler:
             MixupOperator:
               alpha: 0.8
@@ -106,11 +102,11 @@ DataLoader:
               prob: 0.5
     sampler:
       name: DistributedBatchSampler
-      batch_size: 128       #修改
-      drop_last: True      #修改
+      batch_size: 64       
+      drop_last: True      
       shuffle: True
     loader:
-      num_workers: 4   #修改
+      num_workers: 4   
       use_shared_memory: True
 
   Eval:
@@ -126,23 +122,23 @@ DataLoader:
             resize_short: 256
             interpolation: bicubic
             backend: pil
-        - CenterCrop:  #修改
+        - CenterCrop: 
             size: 224
         - NormalizeImage:
-          scale: 1.0/255.0
-          mean: [ 0.485, 0.456, 0.406 ]
-          std: [ 0.229, 0.224, 0.225 ]
-          order: ''
+            scale: 1.0/255.0
+            mean: [ 0.485, 0.456, 0.406 ]
+            std: [ 0.229, 0.224, 0.225 ]
+            order: ''
     sampler:
       name: DistributedBatchSampler
-      batch_size: 128
+      batch_size: 64
       drop_last: False
       shuffle: False
     loader:
-      num_workers: 4   #修改
+      num_workers: 4 
       use_shared_memory: True
 
-Infer:   #预测样例
+Infer: 
   infer_imgs: docs/images/inference_deployment/whl_demo.jpg
     batch_size: 10
     transforms:
