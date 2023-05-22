@@ -20,7 +20,7 @@ distill_train:null
 to_static_train:-o Global.to_static=True
 null:null
 ##
-===========================eval_params=========================== 
+===========================eval_params===========================
 eval:tools/eval.py -c ppcls/configs/ImageNet/ResNet/ResNet50.yaml
 null:null
 ##
@@ -54,3 +54,4 @@ null:null
 batch_size:128|256
 fp_items:ampfp16
 epoch:1
+model_type:norm_train

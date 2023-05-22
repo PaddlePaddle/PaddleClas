@@ -60,7 +60,7 @@ class BatchOperator(object):
 
 
 class MixupOperator(BatchOperator):
-    """ Mixup operator 
+    """ Mixup operator
     reference: https://arxiv.org/abs/1710.09412
 
     """
@@ -155,9 +155,9 @@ class CutmixOperator(BatchOperator):
 
 
 class FmixOperator(BatchOperator):
-    """ Fmix operator 
+    """ Fmix operator
     reference: https://arxiv.org/abs/2002.12047
-    
+
     """
 
     def __init__(self,

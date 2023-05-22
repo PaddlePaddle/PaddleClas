@@ -99,6 +99,8 @@ class UnifiedResize(object):
         elif backend.lower() == "pil":
             if isinstance(interpolation, str):
                 interpolation = _pil_interp_from_str[interpolation.lower()]
+            elif interpolation is None:
+                interpolation = Image.BILINEAR
             self.resize_func = partial(
                 _pil_resize, resample=interpolation, return_numpy=return_numpy)
         else:
@@ -188,7 +190,7 @@ class DecodeImage(object):
         elif isinstance(img, bytes):
             if self.backend == "pil":
                 data = io.BytesIO(img)
-                img = Image.open(data)
+                img = Image.open(data).convert("RGB")
             else:
                 data = np.frombuffer(img, dtype="uint8")
                 img = cv2.imdecode(data, 1)
@@ -197,7 +199,7 @@ class DecodeImage(object):
 
         if self.to_np:
             if self.backend == "pil":
-                assert img.mode == "RGB", f"invalid shape of image[{img.shape}]"
+                assert img.mode == "RGB", f"invalid mode of image[{img.mode}]"
                 img = np.asarray(img)[:, :, ::-1]  # BRG
 
             if self.to_rgb:
@@ -319,6 +321,25 @@ class CropImage(object):
         return img[h_start:h_end, w_start:w_end, :]
 
 
+class CropImageAtRatio(object):
+    """ crop image with specified size and padding"""
+
+    def __init__(self, size: int, pad: int, interpolation="bilinear"):
+        self.size = size
+        self.ratio = size / (size + pad)
+        self.interpolation = interpolation
+
+    def __call__(self, img):
+        height, width = img.shape[:2]
+        crop_size = int(self.ratio * min(height, width))
+
+        y = (height - crop_size) // 2
+        x = (width - crop_size) // 2
+
+        crop_img = img[y:y + crop_size, x:x + crop_size, :]
+        return F.resize(crop_img, [self.size, self.size], self.interpolation)
+
+
 class Padv2(object):
     def __init__(self,
                  size=None,
@@ -420,17 +441,21 @@ class RandCropImage(object):
 
     def __init__(self,
                  size,
+                 progress_size=None,
                  scale=None,
                  ratio=None,
                  interpolation=None,
+                 use_log_aspect=False,
                  backend="cv2"):
         if type(size) is int:
             self.size = (size, size)  # (h, w)
         else:
             self.size = size
 
+        self.progress_size = progress_size
         self.scale = [0.08, 1.0] if scale is None else scale
         self.ratio = [3. / 4., 4. / 3.] if ratio is None else ratio
+        self.use_log_aspect = use_log_aspect
 
         self._resize_func = UnifiedResize(
             interpolation=interpolation, backend=backend)
@@ -441,21 +466,21 @@ class RandCropImage(object):
         scale = self.scale
         ratio = self.ratio
 
-        aspect_ratio = math.sqrt(random.uniform(*ratio))
-        w = 1. * aspect_ratio
-        h = 1. / aspect_ratio
+        if self.use_log_aspect:
+            log_ratio = list(map(math.log, ratio))
+            aspect_ratio = math.exp(random.uniform(*log_ratio))
+        else:
+            aspect_ratio = random.uniform(*ratio)
 
         img_h, img_w = img.shape[:2]
-
-        bound = min((float(img_w) / img_h) / (w**2),
-                    (float(img_h) / img_w) / (h**2))
+        bound = min((float(img_w) / img_h) / aspect_ratio,
+                    (float(img_h) / img_w) * aspect_ratio)
         scale_max = min(scale[1], bound)
         scale_min = min(scale[0], bound)
 
         target_area = img_w * img_h * random.uniform(scale_min, scale_max)
-        target_size = math.sqrt(target_area)
-        w = int(target_size * w)
-        h = int(target_size * h)
+        w = int(math.sqrt(target_area * aspect_ratio))
+        h = int(math.sqrt(target_area / aspect_ratio))
 
         i = random.randint(0, img_w - w)
         j = random.randint(0, img_h - h)
@@ -721,8 +746,8 @@ class Pad(object):
         # Process fill color for affine transforms
         major_found, minor_found = (int(v)
                                     for v in PILLOW_VERSION.split('.')[:2])
-        major_required, minor_required = (int(v) for v in
-                                          min_pil_version.split('.')[:2])
+        major_required, minor_required = (
+            int(v) for v in min_pil_version.split('.')[:2])
         if major_found < major_required or (major_found == major_required and
                                             minor_found < minor_required):
             if fill is None:

@@ -103,6 +103,7 @@ class MultiScaleSampler(Sampler):
                 random.seed(self.seed)
             else:
                 random.seed(self.epoch)
+            self.epoch += 1
             random.shuffle(self.img_indices)
             random.shuffle(self.img_batch_pairs)
             indices_rank_i = self.img_indices[self.rank:len(self.img_indices):

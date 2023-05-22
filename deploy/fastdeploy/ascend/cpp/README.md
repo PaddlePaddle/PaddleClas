@@ -1,0 +1,1 @@
+../../../../docs/zh_CN/fastdeploy/ascend/cpp/README.md

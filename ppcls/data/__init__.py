@@ -32,16 +32,18 @@ from ppcls.data.dataloader.logo_dataset import LogoDataset
 from ppcls.data.dataloader.icartoon_dataset import ICartoonDataset
 from ppcls.data.dataloader.mix_dataset import MixDataset
 from ppcls.data.dataloader.multi_scale_dataset import MultiScaleDataset
-from ppcls.data.dataloader.person_dataset import Market1501, MSMT17
+from ppcls.data.dataloader.person_dataset import Market1501, MSMT17, DukeMTMC
 from ppcls.data.dataloader.face_dataset import FiveValidationDataset, AdaFaceDataset
 from ppcls.data.dataloader.custom_label_dataset import CustomLabelDataset
 from ppcls.data.dataloader.cifar import Cifar10, Cifar100
+from ppcls.data.dataloader.metabin_sampler import DomainShuffleBatchSampler, NaiveIdentityBatchSampler
 
 # sampler
 from ppcls.data.dataloader.DistributedRandomIdentitySampler import DistributedRandomIdentitySampler
 from ppcls.data.dataloader.pk_sampler import PKSampler
 from ppcls.data.dataloader.mix_sampler import MixSampler
 from ppcls.data.dataloader.multi_scale_sampler import MultiScaleSampler
+from ppcls.data.dataloader.ra_sampler import RASampler
 from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
 
@@ -124,7 +126,8 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
         shuffle = config_sampler["shuffle"]
     else:
         sampler_name = config_sampler.pop("name")
-        sampler_argspec = inspect.getargspec(eval(sampler_name).__init__).args
+        sampler_argspec = inspect.getfullargspec(eval(sampler_name)
+                                                 .__init__).args
         if "total_epochs" in sampler_argspec:
             config_sampler.update({"total_epochs": epochs})
         batch_sampler = eval(sampler_name)(dataset, **config_sampler)

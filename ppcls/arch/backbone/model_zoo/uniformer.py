@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Code was based on https://github.com/bytedance/UniFormer/blob/main/classification/uniformer.py
+# Code was based on https://github.com/Sense-X/UniFormer
 # reference: https://arxiv.org/abs/2201.09450
 
 from collections import OrderedDict

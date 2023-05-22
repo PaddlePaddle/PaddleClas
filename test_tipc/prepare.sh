@@ -178,9 +178,9 @@ if [[ $model_name == *ShiTu* ]]; then
     fi
 fi
 
-if [[ $FILENAME == *use_dali* ]]; then
+if [[ ${FILENAME} == *ultra* ]] || [[ ${FILENAME} == *dali* ]]; then
     python_name=$(func_parser_value "${lines[2]}")
-    ${python_name} -m pip install --extra-index-url https://developer.download.nvidia.com/compute/redist/nightly --upgrade nvidia-dali-nightly-cuda102
+    ${python_name} -m pip install https://paddle-wheel.bj.bcebos.com/benchmark/nvidia_dali_cuda110-1.25.0-7922357-py3-none-manylinux2014_x86_64.whl
 fi
 
 if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_infer" ]]; then
@@ -197,6 +197,11 @@ if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_inf
         cd tipc_shitu_demo_data
         ln -s demo_test.txt val_list.txt
         cd ../../
+    elif [[ ${model_name} =~ "MetaBIN_ResNet50" ]]; then
+        cd dataset
+        wget -nc https://paddleclas.bj.bcebos.com/data/TIPC/duke_market.zip --no-check-certificate
+        unzip duke_market.zip
+        cd ../
     else
         # pretrain lite train data
         cd dataset
@@ -324,7 +329,7 @@ if [[ ${MODE} = "paddle2onnx_infer" ]]; then
     python_name=$(func_parser_value "${lines[2]}")
     inference_model_url=$(func_parser_value "${lines[10]}")
     tar_name=$(func_get_url_file_name "$inference_model_url")
-    
+
     ${python_name} -m pip install onnx
     ${python_name} -m pip install paddle2onnx
     ${python_name} -m pip install onnxruntime
@@ -368,13 +373,10 @@ if [[ ${MODE} = "benchmark_train" ]]; then
         ln -s demo_test.txt val_list.txt
     else
         rm -rf ILSVRC2012
-        wget -nc https://paddle-imagenet-models-name.bj.bcebos.com/data/ImageNet1k/ILSVRC2012_val.tar
-        tar xf ILSVRC2012_val.tar
-        ln -s ILSVRC2012_val ILSVRC2012
-        cd ILSVRC2012
-        rm -rf train_list.txt
-        ln -s val_list.txt train_list.txt
+        wget -nc https://paddleclas.bj.bcebos.com/data/TIPC/ILSVRC2012_benchmark.tar
+        tar xf ILSVRC2012_benchmark.tar
+        mv ILSVRC2012_benchmark ILSVRC2012
     fi
-    cd ../../
+    cd ../
 
 fi

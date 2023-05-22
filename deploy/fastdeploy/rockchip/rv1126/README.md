@@ -1,0 +1,1 @@
+../../../../docs/zh_CN/fastdeploy/rockchip/rv1126/README.md

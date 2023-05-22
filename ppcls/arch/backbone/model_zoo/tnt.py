@@ -54,7 +54,7 @@ def drop_path(x, drop_prob=0., training=False):
     """
     if drop_prob == 0. or not training:
         return x
-    keep_prob = paddle.to_tensor(1 - drop_prob)
+    keep_prob = paddle.to_tensor(1 - drop_prob, dtype=x.dtype)
     shape = (paddle.shape(x)[0], ) + (1, ) * (x.ndim - 1)
     random_tensor = paddle.add(keep_prob, paddle.rand(shape, dtype=x.dtype))
     random_tensor = paddle.floor(random_tensor)  # binarize
@@ -350,7 +350,9 @@ class TNT(nn.Layer):
                     pixel_embed.reshape((-1, self.num_patches, pixel_embed.
                                          shape[-1] * pixel_embed.shape[-2])))))
         patch_embed = paddle.concat(
-            (self.cls_token.expand((B, -1, -1)), patch_embed), axis=1)
+            (self.cls_token.expand((B, -1, -1)).astype(patch_embed.dtype),
+             patch_embed),
+            axis=1)
         patch_embed = patch_embed + self.patch_pos
         patch_embed = self.pos_drop(patch_embed)
         for blk in self.blocks:

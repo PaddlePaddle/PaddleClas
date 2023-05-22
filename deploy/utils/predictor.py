@@ -63,7 +63,7 @@ class Predictor(object):
         if args.get("use_gpu", False):
             config.enable_use_gpu(args.gpu_mem, 0)
         elif args.get("use_npu", False):
-            config.enable_npu()
+            config.enable_custom_device('npu')
         elif args.get("use_xpu", False):
             config.enable_xpu()
         else:

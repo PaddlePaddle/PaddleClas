@@ -26,6 +26,7 @@ import collections
 import re
 import copy
 
+from ..base.theseus_layer import TheseusLayer
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
@@ -59,6 +60,7 @@ GlobalParams = collections.namedtuple('GlobalParams', [
     'width_coefficient',
     'depth_coefficient',
     'depth_divisor',
+    'depth_trunc',
     'min_depth',
     'drop_connect_rate',
 ])
@@ -76,6 +78,7 @@ def efficientnet_params(model_name):
     """ Map EfficientNet model name to parameter coefficients. """
     params_dict = {
         # Coefficients:   width,depth,resolution,dropout
+        'efficientnet-b0-small': (1.0, 1.0, 224, 0.2),
         'efficientnet-b0': (1.0, 1.0, 224, 0.2),
         'efficientnet-b1': (1.0, 1.1, 240, 0.2),
         'efficientnet-b2': (1.1, 1.2, 260, 0.3),
@@ -113,6 +116,7 @@ def efficientnet(width_coefficient=None,
         width_coefficient=width_coefficient,
         depth_coefficient=depth_coefficient,
         depth_divisor=8,
+        depth_trunc='ceil',
         min_depth=None)
 
     return blocks_args, global_params
@@ -153,7 +157,10 @@ def round_repeats(repeats, global_params):
     multiplier = global_params.depth_coefficient
     if not multiplier:
         return repeats
-    return int(math.ceil(multiplier * repeats))
+    if global_params.depth_trunc == 'round':
+        return max(1, round(multiplier * repeats))
+    else:
+        return int(math.ceil(multiplier * repeats))
 
 
 class BlockDecoder(object):
@@ -289,7 +296,7 @@ def _drop_connect(inputs, prob, is_test):
     return output
 
 
-class Conv2ds(nn.Layer):
+class Conv2ds(TheseusLayer):
     def __init__(self,
                  input_channels,
                  output_channels,
@@ -313,10 +320,10 @@ class Conv2ds(nn.Layer):
             padding = ((stride - 1) + dilation * (filter_size - 1)) // 2
             return padding
 
-        inps = 1 if model_name == None and cur_stage == None else inp_shape[
-            model_name][cur_stage]
         self.need_crop = False
         if padding_type == "SAME":
+            inps = 1 if model_name == None and cur_stage == None else inp_shape[
+                model_name][cur_stage]
             top_padding, bottom_padding = cal_padding(inps, stride,
                                                       filter_size)
             left_padding, right_padding = cal_padding(inps, stride,
@@ -361,13 +368,14 @@ class Conv2ds(nn.Layer):
         return x
 
 
-class ConvBNLayer(nn.Layer):
+class ConvBNLayer(TheseusLayer):
     def __init__(self,
                  input_channels,
                  filter_size,
                  output_channels,
                  stride=1,
                  num_groups=1,
+                 global_params=None,
                  padding_type="SAME",
                  conv_act=None,
                  bn_act="swish",
@@ -396,12 +404,14 @@ class ConvBNLayer(nn.Layer):
         if use_bn is True:
             bn_name = name + bn_name
             param_attr, bias_attr = init_batch_norm_layer(bn_name)
+            momentum = global_params.batch_norm_momentum
+            epsilon = global_params.batch_norm_epsilon
 
             self._bn = BatchNorm(
                 num_channels=output_channels,
                 act=bn_act,
-                momentum=0.99,
-                epsilon=0.001,
+                momentum=momentum,
+                epsilon=epsilon,
                 moving_mean_name=bn_name + "_mean",
                 moving_variance_name=bn_name + "_variance",
                 param_attr=param_attr,
@@ -416,10 +426,11 @@ class ConvBNLayer(nn.Layer):
             return self._conv(inputs)
 
 
-class ExpandConvNorm(nn.Layer):
+class ExpandConvNorm(TheseusLayer):
     def __init__(self,
                  input_channels,
                  block_args,
+                 global_params,
                  padding_type,
                  name=None,
                  model_name=None,
@@ -434,6 +445,7 @@ class ExpandConvNorm(nn.Layer):
                 input_channels,
                 1,
                 self.oup,
+                global_params=global_params,
                 bn_act=None,
                 padding_type=padding_type,
                 name=name,
@@ -449,10 +461,11 @@ class ExpandConvNorm(nn.Layer):
             return inputs
 
 
-class DepthwiseConvNorm(nn.Layer):
+class DepthwiseConvNorm(TheseusLayer):
     def __init__(self,
                  input_channels,
                  block_args,
+                 global_params,
                  padding_type,
                  name=None,
                  model_name=None,
@@ -471,6 +484,7 @@ class DepthwiseConvNorm(nn.Layer):
             oup,
             self.s,
             num_groups=input_channels,
+            global_params=global_params,
             bn_act=None,
             padding_type=padding_type,
             name=name,
@@ -483,22 +497,24 @@ class DepthwiseConvNorm(nn.Layer):
         return self._conv(inputs)
 
 
-class ProjectConvNorm(nn.Layer):
+class ProjectConvNorm(TheseusLayer):
     def __init__(self,
                  input_channels,
                  block_args,
+                 global_params,
                  padding_type,
                  name=None,
                  model_name=None,
                  cur_stage=None):
         super(ProjectConvNorm, self).__init__()
 
-        final_oup = block_args.output_filters
+        self.final_oup = block_args.output_filters
 
         self._conv = ConvBNLayer(
             input_channels,
             1,
-            final_oup,
+            self.final_oup,
+            global_params=global_params,
             bn_act=None,
             padding_type=padding_type,
             name=name,
@@ -511,7 +527,7 @@ class ProjectConvNorm(nn.Layer):
         return self._conv(inputs)
 
 
-class SEBlock(nn.Layer):
+class SEBlock(TheseusLayer):
     def __init__(self,
                  input_channels,
                  num_squeezed_channels,
@@ -549,10 +565,11 @@ class SEBlock(nn.Layer):
         return out
 
 
-class MbConvBlock(nn.Layer):
+class MbConvBlock(TheseusLayer):
     def __init__(self,
                  input_channels,
                  block_args,
+                 global_params,
                  padding_type,
                  use_se,
                  name=None,
@@ -573,6 +590,7 @@ class MbConvBlock(nn.Layer):
             self._ecn = ExpandConvNorm(
                 input_channels,
                 block_args,
+                global_params,
                 padding_type=padding_type,
                 name=name,
                 model_name=model_name,
@@ -581,6 +599,7 @@ class MbConvBlock(nn.Layer):
         self._dcn = DepthwiseConvNorm(
             input_channels * block_args.expand_ratio,
             block_args,
+            global_params,
             padding_type=padding_type,
             name=name,
             model_name=model_name,
@@ -601,10 +620,13 @@ class MbConvBlock(nn.Layer):
         self._pcn = ProjectConvNorm(
             input_channels * block_args.expand_ratio,
             block_args,
+            global_params,
             padding_type=padding_type,
             name=name,
             model_name=model_name,
             cur_stage=cur_stage)
+
+        self.final_oup = self._pcn.final_oup
 
     def forward(self, inputs):
         x = inputs
@@ -627,22 +649,24 @@ class MbConvBlock(nn.Layer):
         return x
 
 
-class ConvStemNorm(nn.Layer):
+class ConvStemNorm(TheseusLayer):
     def __init__(self,
                  input_channels,
                  padding_type,
                  _global_params,
                  name=None,
                  model_name=None,
+                 fix_stem=False,
                  cur_stage=None):
         super(ConvStemNorm, self).__init__()
 
-        output_channels = round_filters(32, _global_params)
+        output_channels = 32 if fix_stem else round_filters(32, _global_params)
         self._conv = ConvBNLayer(
             input_channels,
             filter_size=3,
             output_channels=output_channels,
             stride=2,
+            global_params=_global_params,
             bn_act=None,
             padding_type=padding_type,
             name="",
@@ -655,14 +679,15 @@ class ConvStemNorm(nn.Layer):
         return self._conv(inputs)
 
 
-class ExtractFeatures(nn.Layer):
+class ExtractFeatures(TheseusLayer):
     def __init__(self,
                  input_channels,
                  _block_args,
                  _global_params,
                  padding_type,
                  use_se,
-                 model_name=None):
+                 model_name=None,
+                 fix_stem=False):
         super(ExtractFeatures, self).__init__()
 
         self._global_params = _global_params
@@ -672,6 +697,7 @@ class ExtractFeatures(nn.Layer):
             padding_type=padding_type,
             _global_params=_global_params,
             model_name=model_name,
+            fix_stem=fix_stem,
             cur_stage=0)
 
         self.block_args_copy = copy.deepcopy(_block_args)
@@ -688,12 +714,14 @@ class ExtractFeatures(nn.Layer):
             for _ in range(block_arg.num_repeat - 1):
                 block_size += 1
 
+        self.final_oup = None
         self.conv_seq = []
         cur_stage = 1
-        for block_args in _block_args:
+        for block_idx, block_args in enumerate(_block_args):
+            if not (fix_stem and block_idx == 0):
+                block_args = block_args._replace(input_filters=round_filters(
+                    block_args.input_filters, _global_params))
             block_args = block_args._replace(
-                input_filters=round_filters(block_args.input_filters,
-                                            _global_params),
                 output_filters=round_filters(block_args.output_filters,
                                              _global_params),
                 num_repeat=round_repeats(block_args.num_repeat,
@@ -708,6 +736,7 @@ class ExtractFeatures(nn.Layer):
                 MbConvBlock(
                     block_args.input_filters,
                     block_args=block_args,
+                    global_params=_global_params,
                     padding_type=padding_type,
                     use_se=use_se,
                     name="_blocks." + str(idx) + ".",
@@ -715,6 +744,7 @@ class ExtractFeatures(nn.Layer):
                     model_name=model_name,
                     cur_stage=cur_stage))
             self.conv_seq.append(_mc_block)
+            self.final_oup = _mc_block.final_oup
             idx += 1
             if block_args.num_repeat > 1:
                 block_args = block_args._replace(
@@ -728,6 +758,7 @@ class ExtractFeatures(nn.Layer):
                     MbConvBlock(
                         block_args.input_filters,
                         block_args,
+                        global_params=_global_params,
                         padding_type=padding_type,
                         use_se=use_se,
                         name="_blocks." + str(idx) + ".",
@@ -735,6 +766,7 @@ class ExtractFeatures(nn.Layer):
                         model_name=model_name,
                         cur_stage=cur_stage))
                 self.conv_seq.append(_mc_block)
+                self.final_oup = _mc_block.final_oup
                 idx += 1
             cur_stage += 1
 
@@ -746,19 +778,22 @@ class ExtractFeatures(nn.Layer):
         return x
 
 
-class EfficientNet(nn.Layer):
+class EfficientNet(TheseusLayer):
     def __init__(self,
+                 block_args,
+                 global_params,
                  name="b0",
                  padding_type="SAME",
-                 override_params=None,
                  use_se=True,
+                 fix_stem=False,
+                 num_features=None,
                  class_num=1000):
         super(EfficientNet, self).__init__()
 
-        model_name = 'efficientnet-' + name
         self.name = name
-        self._block_args, self._global_params = get_model_params(
-            model_name, override_params)
+        self.fix_stem = fix_stem
+        self._block_args = block_args
+        self._global_params = global_params
         self.padding_type = padding_type
         self.use_se = use_se
 
@@ -768,27 +803,16 @@ class EfficientNet(nn.Layer):
             self._global_params,
             self.padding_type,
             self.use_se,
-            model_name=self.name)
+            model_name=self.name,
+            fix_stem=self.fix_stem)
 
-        output_channels = round_filters(1280, self._global_params)
-        if name == "b0_small" or name == "b0" or name == "b1":
-            oup = 320
-        elif name == "b2":
-            oup = 352
-        elif name == "b3":
-            oup = 384
-        elif name == "b4":
-            oup = 448
-        elif name == "b5":
-            oup = 512
-        elif name == "b6":
-            oup = 576
-        elif name == "b7":
-            oup = 640
+        output_channels = num_features or round_filters(1280,
+                                                        self._global_params)
         self._conv = ConvBNLayer(
-            oup,
+            self._ef.final_oup,
             1,
             output_channels,
+            global_params=self._global_params,
             bn_act="swish",
             padding_type=self.padding_type,
             name="",
@@ -839,10 +863,13 @@ def EfficientNetB0_small(padding_type='DYNAMIC',
                          pretrained=False,
                          use_ssld=False,
                          **kwargs):
+    block_args, global_params = get_model_params("efficientnet-b0-small",
+                                                 override_params)
     model = EfficientNet(
+        block_args,
+        global_params,
         name='b0',
         padding_type=padding_type,
-        override_params=override_params,
         use_se=use_se,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB0_small"])
@@ -855,10 +882,13 @@ def EfficientNetB0(padding_type='SAME',
                    pretrained=False,
                    use_ssld=False,
                    **kwargs):
+    block_args, global_params = get_model_params("efficientnet-b0",
+                                                 override_params)
     model = EfficientNet(
+        block_args,
+        global_params,
         name='b0',
         padding_type=padding_type,
-        override_params=override_params,
         use_se=use_se,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB0"])
@@ -871,10 +901,13 @@ def EfficientNetB1(padding_type='SAME',
                    pretrained=False,
                    use_ssld=False,
                    **kwargs):
+    block_args, global_params = get_model_params("efficientnet-b1",
+                                                 override_params)
     model = EfficientNet(
+        block_args,
+        global_params,
         name='b1',
         padding_type=padding_type,
-        override_params=override_params,
         use_se=use_se,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB1"])
@@ -887,10 +920,13 @@ def EfficientNetB2(padding_type='SAME',
                    pretrained=False,
                    use_ssld=False,
                    **kwargs):
+    block_args, global_params = get_model_params("efficientnet-b2",
+                                                 override_params)
     model = EfficientNet(
+        block_args,
+        global_params,
         name='b2',
         padding_type=padding_type,
-        override_params=override_params,
         use_se=use_se,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB2"])
@@ -903,10 +939,13 @@ def EfficientNetB3(padding_type='SAME',
                    pretrained=False,
                    use_ssld=False,
                    **kwargs):
+    block_args, global_params = get_model_params("efficientnet-b3",
+                                                 override_params)
     model = EfficientNet(
+        block_args,
+        global_params,
         name='b3',
         padding_type=padding_type,
-        override_params=override_params,
         use_se=use_se,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB3"])
@@ -919,10 +958,13 @@ def EfficientNetB4(padding_type='SAME',
                    pretrained=False,
                    use_ssld=False,
                    **kwargs):
+    block_args, global_params = get_model_params("efficientnet-b4",
+                                                 override_params)
     model = EfficientNet(
+        block_args,
+        global_params,
         name='b4',
         padding_type=padding_type,
-        override_params=override_params,
         use_se=use_se,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB4"])
@@ -935,10 +977,13 @@ def EfficientNetB5(padding_type='SAME',
                    pretrained=False,
                    use_ssld=False,
                    **kwargs):
+    block_args, global_params = get_model_params("efficientnet-b5",
+                                                 override_params)
     model = EfficientNet(
+        block_args,
+        global_params,
         name='b5',
         padding_type=padding_type,
-        override_params=override_params,
         use_se=use_se,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB5"])
@@ -951,10 +996,13 @@ def EfficientNetB6(padding_type='SAME',
                    pretrained=False,
                    use_ssld=False,
                    **kwargs):
+    block_args, global_params = get_model_params("efficientnet-b6",
+                                                 override_params)
     model = EfficientNet(
+        block_args,
+        global_params,
         name='b6',
         padding_type=padding_type,
-        override_params=override_params,
         use_se=use_se,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB6"])
@@ -967,10 +1015,13 @@ def EfficientNetB7(padding_type='SAME',
                    pretrained=False,
                    use_ssld=False,
                    **kwargs):
+    block_args, global_params = get_model_params("efficientnet-b7",
+                                                 override_params)
     model = EfficientNet(
+        block_args,
+        global_params,
         name='b7',
         padding_type=padding_type,
-        override_params=override_params,
         use_se=use_se,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["EfficientNetB7"])

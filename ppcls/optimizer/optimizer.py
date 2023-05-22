@@ -20,6 +20,7 @@ import inspect
 
 from paddle import optimizer as optim
 from ppcls.utils import logger
+from functools import partial
 
 
 class SGD(object):
@@ -95,7 +96,8 @@ class Momentum(object):
                  grad_clip=None,
                  use_nesterov=False,
                  multi_precision=True,
-                 no_weight_decay_name=None):
+                 no_weight_decay_name=None,
+                 one_dim_param_no_weight_decay=False):
         super().__init__()
         self.learning_rate = learning_rate
         self.momentum = momentum
@@ -105,30 +107,32 @@ class Momentum(object):
         self.use_nesterov = use_nesterov
         self.no_weight_decay_name_list = no_weight_decay_name.split(
         ) if no_weight_decay_name else []
+        self.one_dim_param_no_weight_decay = one_dim_param_no_weight_decay
 
     def __call__(self, model_list):
         # model_list is None in static graph
         parameters = None
-        if len(self.no_weight_decay_name_list) > 0:
-            params_with_decay = []
-            params_without_decay = []
-            for m in model_list:
-                params = [p for n, p in m.named_parameters() \
-                          if not any(nd in n for nd in self.no_weight_decay_name_list)]
-                params_with_decay.extend(params)
-                params = [p for n, p in m.named_parameters() \
-                          if any(nd in n for nd in self.no_weight_decay_name_list)]
-                params_without_decay.extend(params)
-            parameters = [{
-                "params": params_with_decay,
-                "weight_decay": self.weight_decay
-            }, {
-                "params": params_without_decay,
-                "weight_decay": 0.0
-            }]
-        else:
-            parameters = sum([m.parameters() for m in model_list],
-                             []) if model_list else None
+        if model_list:
+            # TODO(gaotingquan): to avoid cause issues for unset no_weight_decay models
+            if len(self.no_weight_decay_name_list) > 0:
+                params_with_decay = []
+                params_without_decay = []
+                for m in model_list:
+                    for n, p in m.named_parameters():
+                        if any(nd in n for nd in self.no_weight_decay_name_list) \
+                            or (self.one_dim_param_no_weight_decay and len(p.shape) == 1):
+                            params_without_decay.append(p)
+                        else:
+                            params_with_decay.append(p)
+                parameters = [{
+                    "params": params_with_decay,
+                    "weight_decay": self.weight_decay
+                }, {
+                    "params": params_without_decay,
+                    "weight_decay": 0.0
+                }]
+            else:
+                parameters = sum([m.parameters() for m in model_list], [])
         opt = optim.Momentum(
             learning_rate=self.learning_rate,
             momentum=self.momentum,
@@ -211,7 +215,9 @@ class RMSProp(object):
                  epsilon=1e-6,
                  weight_decay=None,
                  grad_clip=None,
-                 multi_precision=False):
+                 multi_precision=False,
+                 no_weight_decay_name=None,
+                 one_dim_param_no_weight_decay=False):
         super().__init__()
         self.learning_rate = learning_rate
         self.momentum = momentum
@@ -219,11 +225,33 @@ class RMSProp(object):
         self.epsilon = epsilon
         self.weight_decay = weight_decay
         self.grad_clip = grad_clip
+        self.no_weight_decay_name_list = no_weight_decay_name.split(
+        ) if no_weight_decay_name else []
+        self.one_dim_param_no_weight_decay = one_dim_param_no_weight_decay
 
     def __call__(self, model_list):
         # model_list is None in static graph
-        parameters = sum([m.parameters() for m in model_list],
-                         []) if model_list else None
+        parameters = None
+        if model_list:
+            params_with_decay = []
+            params_without_decay = []
+            for m in model_list:
+                for n, p in m.named_parameters():
+                    if any(nd in n for nd in self.no_weight_decay_name_list) \
+                        or (self.one_dim_param_no_weight_decay and len(p.shape) == 1):
+                        params_without_decay.append(p)
+                    else:
+                        params_with_decay.append(p)
+            if params_without_decay:
+                parameters = [{
+                    "params": params_with_decay,
+                    "weight_decay": self.weight_decay
+                }, {
+                    "params": params_without_decay,
+                    "weight_decay": 0.0
+                }]
+            else:
+                parameters = params_with_decay
         opt = optim.RMSProp(
             learning_rate=self.learning_rate,
             momentum=self.momentum,
@@ -279,9 +307,8 @@ class AdamW(object):
 
         if self.one_dim_param_no_weight_decay:
             self.no_weight_decay_param_name_list += [
-                p.name
-                for model in model_list for n, p in model.named_parameters()
-                if len(p.shape) == 1
+                p.name for model in model_list
+                for n, p in model.named_parameters() if len(p.shape) == 1
             ] if model_list else []
 
         opt = optim.AdamW(
@@ -349,7 +376,8 @@ class AdamWDL(object):
             self.layerwise_decay = layerwise_decay
             self.name_dict = name_dict
             self.n_layers = n_layers
-            self.set_param_lr_fun = self._layerwise_lr_decay
+            self.set_param_lr_func = partial(
+                self._layerwise_lr_decay, layerwise_decay, name_dict, n_layers)
             super().__init__(
                 learning_rate=learning_rate,
                 parameters=parameters,
@@ -361,30 +389,16 @@ class AdamWDL(object):
                 apply_decay_param_fun=apply_decay_param_fun,
                 weight_decay=weight_decay,
                 lazy_mode=lazy_mode,
-                multi_precision=multi_precision)
-
-        def _append_optimize_op(self, block, param_and_grad):
-            if self.set_param_lr_fun is None:
-                return super(AdamLW, self)._append_optimize_op(block,
-                                                               param_and_grad)
-
-            self._append_decoupled_weight_decay(block, param_and_grad)
-            prev_lr = param_and_grad[0].optimize_attr["learning_rate"]
-            self.set_param_lr_fun(self.layerwise_decay, self.name_dict,
-                                  self.n_layers, param_and_grad[0])
-            # excute Adam op
-            res = super(optim.AdamW, self)._append_optimize_op(block,
-                                                               param_and_grad)
-            param_and_grad[0].optimize_attr["learning_rate"] = prev_lr
-            return res
+                multi_precision=multi_precision,
+                lr_ratio=self.set_param_lr_func)
 
         # Layerwise decay
         def _layerwise_lr_decay(self, decay_rate, name_dict, n_layers, param):
             """
             Args:
-                decay_rate (float): 
+                decay_rate (float):
                     The layer-wise decay ratio.
-                name_dict (dict): 
+                name_dict (dict):
                     The keys of name_dict is dynamic name of model while the value
                     of name_dict is static name.
                     Use model.named_parameters() to get name_dict.
@@ -399,7 +413,8 @@ class AdamWDL(object):
                 ratio = decay_rate**(n_layers - layer)
             elif "embed" in static_name:
                 ratio = decay_rate**(n_layers + 1)
-            param.optimize_attr["learning_rate"] *= ratio
+            # param.optimize_attr["learning_rate"] *= ratio
+            return ratio
 
     def __call__(self, model_list):
         model = model_list[0]

@@ -60,7 +60,7 @@ def drop_path(x, drop_prob=0., training=False):
     """
     if drop_prob == 0. or not training:
         return x
-    keep_prob = paddle.to_tensor(1 - drop_prob)
+    keep_prob = paddle.to_tensor(1 - drop_prob, dtype=x.dtype)
     shape = (paddle.shape(x)[0], ) + (1, ) * (x.ndim - 1)
     random_tensor = keep_prob + paddle.rand(shape).astype(x.dtype)
     random_tensor = paddle.floor(random_tensor)  # binarize
@@ -302,7 +302,7 @@ class VisionTransformer(nn.Layer):
         # B = x.shape[0]
         B = paddle.shape(x)[0]
         x = self.patch_embed(x)
-        cls_tokens = self.cls_token.expand((B, -1, -1))
+        cls_tokens = self.cls_token.expand((B, -1, -1)).astype(x.dtype)
         x = paddle.concat((cls_tokens, x), axis=1)
         x = x + self.pos_embed
         x = self.pos_drop(x)
