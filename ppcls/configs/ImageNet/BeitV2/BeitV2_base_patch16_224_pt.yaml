@@ -16,7 +16,7 @@ Global:
   save_inference_dir: ./inference
   to_static: False
   seed: 0
-  distributed: 8
+  distributed: 16
 
 AMP:
   scale_loss: 65536.0
@@ -83,7 +83,7 @@ Optimizer:
   lr:
     name: Cosine
     learning_rate: 1.5e-3
-    T_max: 200
+    T_max: 300
     eta_min: 1e-5
     warmup_steps: 10
     warmup_start_Ir: 0
