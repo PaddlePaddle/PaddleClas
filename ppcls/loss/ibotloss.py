@@ -91,13 +91,13 @@ class IBOTLoss(nn.Layer):
         Update center used for teacher output.
         """
         cls_center = paddle.sum(teacher_cls, axis=0, keepdim=True)
-        dist.all_reduce(cls_center)
+        if dist.is_initialized():
+            dist.all_reduce(cls_center)
         cls_center = cls_center / (len(teacher_cls) * dist.get_world_size())
-        # cls_center = cls_center / (len(teacher_cls)* 1 )
         self.center = self.center * self.center_momentum + cls_center * (1 - self.center_momentum)
 
         patch_center = paddle.sum(teacher_patch.mean(1), axis=0, keepdim=True)
-        dist.all_reduce(patch_center)
+        if dist.is_initialized():
+            dist.all_reduce(patch_center)
         patch_center = patch_center / (len(teacher_patch) * dist.get_world_size())
-        # patch_center = patch_center / (len(teacher_patch) * 1)
         self.center2 = self.center2 * self.center_momentum2 + patch_center * (1 - self.center_momentum2)
