@@ -61,7 +61,8 @@ def train_epoch(engine, epoch_id, print_batch_step):
         if (iter_id + 1) % engine.update_freq == 0:
             for i in range(len(engine.optimizer)):
                 # optimizer.step() with auto amp
-                engine.scaler.minimize(engine.optimizer[i], scaled)
+                engine.scaler.step(engine.optimizer[i])
+                engine.scaler.update()
 
         if (iter_id + 1) % engine.update_freq == 0:
             # clear grad
