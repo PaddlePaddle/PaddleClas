@@ -13,7 +13,18 @@ class AutoCast:
         self.amp_eval = amp_eval
 
         if self.use_amp:
-            self.cast_context = partial(paddle.amp.auto_cast, level=amp_level)
+            # compatible with paddle 2.5 and older version
+            paddle_version = paddle.__version__[:3]
+            # paddle version >= 2.5.0 or develop
+            if paddle_version in ["2.5", "0.0"]:
+                self.cast_context = partial(
+                    paddle.amp.auto_cast,
+                    level=amp_level,
+                    use_promote=use_promote)
+            # paddle version < 2.3.0 and not develop
+            else:
+                self.cast_context = partial(
+                    paddle.amp.auto_cast, level=amp_level)
 
     def __call__(self, is_eval=False):
         if self.use_amp:
