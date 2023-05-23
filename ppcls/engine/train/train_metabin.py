@@ -201,7 +201,11 @@ def backward(engine, loss, optimizer):
     optimizer.clear_grad()
     scaled = engine.scaler.scale(loss)
     scaled.backward()
-    engine.scaler.minimize(optimizer, scaled)
+
+    # optimizer.step() with auto amp
+    engine.scaler.step(optimizer)
+    engine.scaler.update()
+
     for name, layer in engine.model.backbone.named_sublayers():
         if "gate" == name.split('.')[-1]:
             layer.clip_gate()

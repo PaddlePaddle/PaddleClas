@@ -75,7 +75,9 @@ def train_epoch_fixmatch(engine, epoch_id, print_batch_step):
         scaled.backward()
 
         for i in range(len(engine.optimizer)):
-            engine.scaler.minimize(engine.optimizer[i], scaled)
+            # optimizer.step() with auto amp
+            engine.scaler.step(engine.optimizer[i])
+            engine.scaler.update()
 
         # step lr(by step)
         for i in range(len(engine.lr_sch)):
