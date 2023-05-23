@@ -55,10 +55,7 @@ def classification_eval(engine, epoch_id=0):
             batch[1] = batch[1].reshape([-1, 1]).astype("int64")
 
         # image input
-        if engine.amp and engine.amp_eval:
-            with paddle.amp.auto_cast(level=engine.amp_level):
-                out = engine.model(batch[0])
-        else:
+        with engine.auto_cast(is_eval=True):
             out = engine.model(batch[0])
 
         # just for DistributedBatchSampler issue: repeat sampling
@@ -109,10 +106,7 @@ def classification_eval(engine, epoch_id=0):
 
         # calc loss
         if engine.eval_loss_func is not None:
-            if engine.amp and engine.amp_eval:
-                with paddle.amp.auto_cast(level=engine.amp_level):
-                    loss_dict = engine.eval_loss_func(preds, labels)
-            else:
+            with engine.auto_cast(is_eval=True):
                 loss_dict = engine.eval_loss_func(preds, labels)
 
             for key in loss_dict:
