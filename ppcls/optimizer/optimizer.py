@@ -411,7 +411,10 @@ class AdamWDL(object):
                 idx = static_name.find("blocks.")
                 layer = int(static_name[idx:].split(".")[1])
                 ratio = decay_rate**(n_layers - layer)
-            elif "embed" in static_name:
+            elif any([
+                    key in static_name
+                    for key in ["embed", "token", "conv1", "ln_pre"]
+            ]):
                 ratio = decay_rate**(n_layers + 1)
             # param.optimize_attr["learning_rate"] *= ratio
             return ratio
