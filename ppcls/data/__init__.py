@@ -37,6 +37,7 @@ from ppcls.data.dataloader.face_dataset import FiveValidationDataset, AdaFaceDat
 from ppcls.data.dataloader.custom_label_dataset import CustomLabelDataset
 from ppcls.data.dataloader.cifar import Cifar10, Cifar100
 from ppcls.data.dataloader.metabin_sampler import DomainShuffleBatchSampler, NaiveIdentityBatchSampler
+from ppcls.data.dataloader.ibot_dataset import IBOTDataset
 
 # sampler
 from ppcls.data.dataloader.DistributedRandomIdentitySampler import DistributedRandomIdentitySampler

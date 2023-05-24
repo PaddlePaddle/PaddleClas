@@ -71,6 +71,10 @@ class CommonDataset(Dataset):
                 img = f.read()
             if self._transform_ops:
                 img = transform(img, self._transform_ops)
+
+            if isinstance(img, list):
+                return (img, self.labels[idx])
+
             img = img.transpose((2, 0, 1))
             return (img, self.labels[idx])
 
