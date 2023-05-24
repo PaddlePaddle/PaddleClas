@@ -582,6 +582,11 @@ def beit_base_patch16_224(pretrained=False, finetune_weight=None, model_filter_n
 
         all_keys = list(checkpoint_model.keys())
         for key in all_keys:
+            if "Teacher" in key:
+                checkpoint_model.pop(key)
+            elif "Student" in key:
+                checkpoint_model[key.strip("Student.")] = checkpoint_model.pop(key)
+
             if "relative_position_index" in key:
                 checkpoint_model.pop(key)
 
