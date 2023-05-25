@@ -29,9 +29,11 @@ function func_set_amp_params(){
     value=$2
 
     if [[ ${value} = "fp16" ]];then
-        echo "-o AMP.scale_loss=128 -o AMP.use_dynamic_loss_scaling=True -o AMP.level=O2"
+        echo "-o AMP.use_amp=True -o AMP.scale_loss=128 -o AMP.use_dynamic_loss_scaling=True -o AMP.level=O2"
+    elif [[ ${value} = "amp" ]];then
+        echo "-o AMP.use_amp=True -o AMP.scale_loss=128 -o AMP.use_dynamic_loss_scaling=True -o AMP.level=O1"
     else
-        echo " "
+        echo "-o AMP.use_amp=False"
     fi
 }
 
@@ -42,7 +44,7 @@ function func_set_params(){
         echo " "
     elif [[ ${value} = "null" ]] || [[ ${value} = " " ]] || [ ${#value} -le 0 ];then
         echo " "
-    else 
+    else
         echo "${key}=${value}"
     fi
 }
