@@ -525,7 +525,8 @@ class Engine(object):
 
     def _init_amp(self):
         amp_config = self.config.get("AMP", None)
-        use_amp = True if amp_config else False
+        use_amp = True if amp_config and amp_config.get("use_amp",
+                                                        True) else False
 
         if not use_amp:
             self.auto_cast = AutoCast(use_amp)
