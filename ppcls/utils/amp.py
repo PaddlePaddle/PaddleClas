@@ -21,7 +21,7 @@ class AutoCast:
                     paddle.amp.auto_cast,
                     level=amp_level,
                     use_promote=use_promote)
-            # paddle version < 2.3.0 and not develop
+            # paddle version <= 2.4.x and not develop
             else:
                 self.cast_context = partial(
                     paddle.amp.auto_cast, level=amp_level)
