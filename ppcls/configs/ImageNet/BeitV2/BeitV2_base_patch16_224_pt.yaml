@@ -49,8 +49,7 @@ Arch:
         code_dim: 32
     - Student:
         name: beit_base_patch16_224_8k_vocab_cls_pt
-        pretrained: True
-        pretrained_weight: ./dataset/pretrain_model.pdparams
+        pretrained: False
         drop_path_rate: 0.1
         use_shared_rel_pos_bias: True
         use_abs_pos_emb: False

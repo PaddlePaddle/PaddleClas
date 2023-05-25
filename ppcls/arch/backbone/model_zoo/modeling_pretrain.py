@@ -358,7 +358,8 @@ def beit_base_patch16_224_8k_vocab_cls_pt(pretrained=False, pretrained_weight=No
     model = VisionTransformerForMaskedImageModelingCLS(
         patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
         norm_layer="nn.LayerNorm", vocab_size=vocab_size, **kwargs)
-    weight = paddle.load(pretrained_weight)
-    model.set_dict(weight)
+    if pretrained:
+        weight = paddle.load(pretrained_weight)
+        model.set_dict(weight)
     model.default_cfg = _cfg()
     return model
