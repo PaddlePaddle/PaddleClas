@@ -1,4 +1,4 @@
-# PULC Classification Model of Wheather Wearing Safety Helmet or Not
+# PULC Classification Model of Whether Wearing Safety Helmet or Not
 
 -----
 
@@ -38,7 +38,7 @@
 
 ## 1. Introduction
 
-This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of wheather wearing safety helmet using PaddleClas PULC (Practical Ultra Lightweight image Classification). The model can be widely used in construction scenes, factory workshop scenes, traffic scenes and so on.
+This case provides a way for users to quickly build a lightweight, high-precision and practical classification model of whether wearing safety helmet using PaddleClas PULC (Practical Ultra Lightweight image Classification). The model can be widely used in construction scenes, factory workshop scenes, traffic scenes and so on.
 
 The following table lists the relevant indicators of the model. The first three lines means that using SwinTransformer_tiny, Res2Net200_vd_26w_4s and MobileNetV3_small_x0_35 as the backbone to training. The fourth to seventh lines means that the backbone is replaced by PPLCNet, additional use of EDA strategy and additional use of EDA strategy and SKL-UGI knowledge distillation strategy.
 
