@@ -128,7 +128,7 @@ The name of PULC series models are as follows:
 | --- | --- |
 | person_exists | Human Exists Classification |
 | person_attribute | Pedestrian Attribute Classification |
-| safety_helmet | Classification of Wheather Wearing Safety Helmet |
+| safety_helmet | Classification of Whether Wearing Safety Helmet |
 | traffic_sign | Traffic Sign Classification |
 | vehicle_attribute | Vehicle Attribute Classification |
 | car_exists | Car Exists Classification |
@@ -136,7 +136,7 @@ The name of PULC series models are as follows:
 | textline_orientation | Text-line Orientation Classification |
 | language_classification | Language Classification |
 
-Please refer to [Human Exists Classification](../PULC/PULC_person_exists_en.md)、[Pedestrian Attribute Classification](../PULC/PULC_person_attribute_en.md)、[Classification of Wheather Wearing Safety Helmet](../PULC/PULC_safety_helmet_en.md)、[Traffic Sign Classification](../PULC/PULC_traffic_sign_en.md)、[Vehicle Attribute Classification](../PULC/PULC_vehicle_attribute_en.md)、[Car Exists Classification](../PULC/PULC_car_exists_en.md)、[Text Image Orientation Classification](../PULC/PULC_text_image_orientation_en.md)、[Text-line Orientation Classification](../PULC/PULC_textline_orientation_en.md)、[Language Classification](../PULC/PULC_language_classification_en.md) for more information about different scenarios.
+Please refer to [Human Exists Classification](../PULC/PULC_person_exists_en.md)、[Pedestrian Attribute Classification](../PULC/PULC_person_attribute_en.md)、[Classification of Whether Wearing Safety Helmet](../PULC/PULC_safety_helmet_en.md)、[Traffic Sign Classification](../PULC/PULC_traffic_sign_en.md)、[Vehicle Attribute Classification](../PULC/PULC_vehicle_attribute_en.md)、[Car Exists Classification](../PULC/PULC_car_exists_en.md)、[Text Image Orientation Classification](../PULC/PULC_text_image_orientation_en.md)、[Text-line Orientation Classification](../PULC/PULC_textline_orientation_en.md)、[Language Classification](../PULC/PULC_language_classification_en.md) for more information about different scenarios.
 
 <a name="3"></a>
 
