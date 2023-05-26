@@ -524,6 +524,9 @@ class Engine(object):
         )
 
     def _init_amp(self):
+        if self.mode == "export":
+            return
+
         amp_config = self.config.get("AMP", None)
         use_amp = True if amp_config and amp_config.get("use_amp",
                                                         True) else False
