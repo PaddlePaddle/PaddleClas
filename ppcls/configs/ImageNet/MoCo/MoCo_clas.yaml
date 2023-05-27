@@ -2,7 +2,6 @@
 Global:
   checkpoints: null
   output_dir: ./output/ 
-  seed: 0
   device: gpu
   save_interval: 20
   eval_during_train: True
@@ -15,10 +14,6 @@ Global:
   save_inference_dir: ./inference
   # training model under @to_static
   to_static: False
-  # distributed train seed
-  seed: 0
-  # gpu nums for distributed train
-  distributed: 4
 
 
 Arch:
