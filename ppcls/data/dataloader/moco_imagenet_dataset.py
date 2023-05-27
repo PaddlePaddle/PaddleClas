@@ -21,14 +21,18 @@ from ppcls.data.preprocess import transform
 
 
 class MoCoImageNetDataset(CommonDataset):
-    """ImageNetDataset
+    """MoCoImageNetDataset
 
     Args:
         image_root (str): image root, path to `ILSVRC2012`
         cls_label_path (str): path to annotation file `train_list.txt` or `val_list.txt`
+        return_label (bool, optional): whether return original label.
+        return_two_sample (bool, optional): whether return two views about original image.
         transform_ops (list, optional): list of transform op(s). Defaults to None.
         delimiter (str, optional): delimiter. Defaults to None.
         relabel (bool, optional): whether do relabel when original label do not starts from 0 or are discontinuous. Defaults to False.
+        view_trans1 (list): some transform op(s) for view1.
+        view_trans2 (list): some transform op(s) for view2.
     """
 
     def __init__(
