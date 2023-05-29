@@ -4,10 +4,9 @@ import numpy as np
 import paddle
 from paddle.nn import functional as F
 from paddle import nn
-from .utils import interpolate_pos_embed
+from .utils import interpolate_pos_embed,MODEL_URLS,load_dygraph_pretrain_from_url
 from .utils import GatherLayer
 from paddle.nn.initializer import Assign, Normal, Constant
-
 
 __all__ = ["CVLP_r50", "CVLP_vit16"]
 
@@ -224,7 +223,6 @@ class VisionTransformer(nn.Layer):
                 scale * paddle.randn((width,))
             )
         )
-        self.add_parameter("class_embedding", self.class_embedding)
         self.positional_embedding = self.create_parameter(
             shape=(width,),
             default_initializer=Assign(
@@ -233,7 +231,6 @@ class VisionTransformer(nn.Layer):
                     ((input_resolution // patch_size) ** 2 + 1, width))
             )
         )
-        self.add_parameter("positional_embedding", self.positional_embedding)
         self.ln_pre = LayerNorm(width)
 
         self.transformer = Transformer(width, layers, heads)
@@ -245,7 +242,6 @@ class VisionTransformer(nn.Layer):
                 scale * paddle.randn(((width, output_dim)))
             )
         )
-        self.add_parameter("proj", self.proj)
 
     def forward(self, x: paddle.Tensor):
         x = self.conv1(x)  # shape = [*, width, grid, grid]
@@ -287,11 +283,13 @@ class CVLP(nn.Layer):
                  transformer_width: int,
                  transformer_heads: int,
                  transformer_layers: int,
-                 args=None,
+                 model_type = "",
+                 pretrained_clip=None,
                  ):
         super().__init__()
 
         self.context_length = context_length
+        self.model_type = model_type
 
         if isinstance(vision_layers, (tuple, list)):
             vision_heads = vision_width * 32 // 64
@@ -345,7 +343,7 @@ class CVLP(nn.Layer):
         self.add_parameter("logit_scale", self.logit_scale)
         
 
-        self.initialize_parameters(args.pretrained_clip)
+        self.initialize_parameters(pretrained_clip)
 
     def initialize_parameters(self, pretrained_clip):
         Normal(std=0.02)(self.token_embedding.weight)
@@ -394,7 +392,10 @@ class CVLP(nn.Layer):
             #nn.init.normal_(self.text_projection, std=self.transformer.width ** -0.5)
             Normal(std=self.transformer.width ** -0.5)(self.text_projection)
         if pretrained_clip is not None:
-            pretrained_state_dict = paddle.load(pretrained_clip)
+            if self.model_type == "vit":
+                pretrained_state_dict = load_dygraph_pretrain_from_url(MODEL_URLS["CLIP_vit_base_patch16_224"],False)
+            else:
+                pretrained_state_dict = paddle.load(pretrained_clip)
             #pretrained_state_dict = model.state_dict()
             for key in ["input_resolution", "context_length", "vocab_size"]:
                 if key in pretrained_state_dict:
@@ -496,20 +497,21 @@ def CVLP_r50(pretrained=False,args=None):
 
 
 def CVLP_vit16(pretrained=False, **kwargs):
-    args = kwargs['args']
-
+    model_type = "vit"
+    pretrained_clip = kwargs['pretrained_clip'] if "pretrained_clip" in kwargs.keys() else None
     model = CVLP(
         embed_dim=512,
         image_resolution=224,
         vision_layers=12,
         vision_width=768,
         vision_patch_size=16,
-        context_length=args.context_length + 2,
+        context_length=kwargs['context_length'] + 2,
         vocab_size=49408,
         transformer_width=512,
         transformer_heads=8,
         transformer_layers=12,
-        args=args,
+        model_type = model_type,
+        pretrained_clip = pretrained_clip
     )
 
     return model

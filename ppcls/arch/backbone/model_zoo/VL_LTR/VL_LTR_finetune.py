@@ -14,9 +14,7 @@ from paddle.nn.initializer import Assign, Normal, Constant,TruncatedNormal
 
 __all__ = [
             'LGR_r50', 
-            'LGR_r50_v_detach_img_grad',
             'LGR_vit16',
-            'LGR_vit16_v_detach_img_grad',
         ]
 
 
@@ -429,7 +427,7 @@ def LGR_r50_test_api(pretrained=False, **kwargs):
         sent_idxs=sent_idxs,
         use_norm=True,
         img_grad=False,
-        select_sent='val'
+        select_sent='rand'
     )
 
     vis_backbone_path = osp.join(args.pretrain_cvlp_path, "checkpoint.pdparams")
@@ -479,7 +477,7 @@ def LGR_vit16(pretrained=False, **kwargs):
     args = kwargs['args']
     dataset = kwargs['dataset']
     sent_idxs = getattr(dataset, 'end_idxs', None)
-    select_sent = 'val' if args.test else 'train'
+    #select_sent = 'val' if args.test else 'train'
 
     model = LGR(
         num_classes=args.nb_classes,
@@ -493,69 +491,13 @@ def LGR_vit16(pretrained=False, **kwargs):
         sent_idxs=sent_idxs,
         use_norm=True,
         img_grad=False,
-        select_sent=select_sent
+        select_sent="rand"
     )
 
     model.load_pretrained_model(
-        txt_embed_path=osp.join(args.pretrain_cvlp_path, "txt_embed.npy"),
-        vis_backbone_path=osp.join(args.pretrain_cvlp_path, "checkpoint.pth"),
+        txt_embed_path=os.join(args.pretrain_cvlp_path, "txt_embed.npy"),
+        vis_backbone_path=os.join(args.pretrain_cvlp_path, "checkpoint.pth"),
         img_grad=False
-    )
-
-    return model
-
-
-def LGR_r50_v_detach_img_grad(pretrained=False, **kwargs):
-    args = kwargs['args']
-    dataset = kwargs['dataset']
-    sent_idxs = getattr(dataset, 'end_idxs', None)
-    select_sent = 'val' if args.test else 'train'
-    model = LGR(
-        num_classes=args.nb_classes,
-        embed_dim=1024,
-        image_resolution=224,
-        vision_layers=(3, 4, 6, 3),
-        vision_width=64,
-        vision_patch_size=None,
-        sent_length=args.sent_length,
-        attn_heads=1,
-        sent_idxs=sent_idxs,
-        use_norm=True,
-        select_sent=select_sent,
-        v_detach=True
-    )
-
-    model.load_pretrained_model(
-        txt_embed_path=osp.join(args.pretrain_cvlp_path, "txt_embed.npy"),
-        vis_backbone_path=osp.join(args.pretrain_cvlp_path, "checkpoint.pth"),
-    )
-
-    return model
-
-
-def LGR_vit16_v_detach_img_grad(pretrained=False, **kwargs):
-    args = kwargs['args']
-    dataset = kwargs['dataset']
-    sent_idxs = getattr(dataset, 'end_idxs', None)
-    select_sent = 'val' if args.test else 'train'
-    model = LGR(
-        num_classes=args.nb_classes,
-        embed_dim=512,
-        image_resolution=224,
-        vision_layers=12,
-        vision_width=768,
-        vision_patch_size=16,
-        sent_length=args.sent_length,
-        attn_heads=1,
-        sent_idxs=sent_idxs,
-        use_norm=True,
-        select_sent=select_sent,
-        v_detach=True
-    )
-
-    model.load_pretrained_model(
-        txt_embed_path=osp.join(args.pretrain_cvlp_path, "txt_embed.npy"),
-        vis_backbone_path=osp.join(args.pretrain_cvlp_path, "checkpoint.pth"),
     )
 
     return model
