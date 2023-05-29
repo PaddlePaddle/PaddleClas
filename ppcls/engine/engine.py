@@ -579,7 +579,7 @@ class Engine(object):
                     optimizers=self.optimizer,
                     level=amp_level,
                     save_dtype='float32')
-            elif self.amp_eval:
+            elif amp_eval:
                 self.model = paddle.amp.decorate(
                     models=self.model, level=amp_level, save_dtype='float32')
 
