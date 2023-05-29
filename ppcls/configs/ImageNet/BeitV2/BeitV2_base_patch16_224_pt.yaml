@@ -1,0 +1,136 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output/
+  device: gpu
+  save_interval: 1
+  train_mode: mask_samples
+  eval_during_train: False
+  eval_interval: 1
+  epochs: 300
+  print_batch_step: 10
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  use_multilabel: True
+  save_inference_dir: ./inference
+  to_static: False
+  seed: 0
+  distributed: 16
+
+AMP:
+  scale_loss: 65536.0
+  use_dynamic_loss_scaling: True
+  incr_every_n_steps: 2000
+  # O1: mixed fp16
+  level: O1
+
+# model architecture
+Arch:
+  name: "Beitv2Model"
+  drop_path_rate : 0.1
+  class_num: 1000
+  # if not null, its lengths should be same as models
+  pretrained_list:
+  # if not null, its lengths should be same as models
+  freeze_params_list:
+  - True
+  - False
+  infer_model_name: "Student"
+  models:
+    - Teacher:
+        name: vqkd_encoder_base_decoder_3x768x12_clip
+        pretrained: True
+        pretrained_weight: ./dataset/vqkd.pdparams
+        as_tokenzer: False
+        img_size: 224
+        n_code: 8192
+        code_dim: 32
+    - Student:
+        name: beit_base_patch16_224_8k_vocab_cls_pt
+        pretrained: False
+        drop_path_rate: 0.1
+        use_shared_rel_pos_bias: True
+        use_abs_pos_emb: False
+        init_values: 0.1
+        early_layers: 9
+        head_layers: 2
+        shared_lm_head: True
+
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - DistillationBeitV2CELoss:
+        weight: 1.0
+        model_name_pairs:
+        - ["Teacher", "Student"]
+  Eval:
+    - CELoss:
+        weight: 1.0
+
+Optimizer:
+  name: AdamW
+  beta1: 0.9
+  beta2: 0.98
+  momentum: 0.9
+  weight_decay: 0.05
+  #multi precision: True
+  no_weight_decay_name: pos_embed cls_token .bias norm gamma
+  one_dim_param_no_weight_decay: True
+  # Ir自定义
+  lr:
+    name: Cosine
+    learning_rate: 1.5e-3
+    T_max: 300
+    eta_min: 1e-5
+    warmup_steps: 10
+    warmup_start_Ir: 0
+    # end Ir 不用
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: BEiT_ImageNet
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True,
+            channel_first: False
+        - ColorJitter:
+            brightness: 0.4
+            contrast: 0.4
+            saturation: 0.4
+            hue: 0.4
+        - RandomHorizontalFlip:
+        - RandomResizedCropAndInterpolationWithTwoPic:
+            size: 224
+            second_size: 224
+            scale: [0.2, 1.0]
+            interpolation: 'bicubic'
+            second_interpolation: 'bicubic'
+      patch_transforms:
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+            channel_num: 3
+        - ToTensor:
+      visual_token_transforms:
+        - ToTensor:
+      masking_generator:
+        input_size: 14
+        num_masking_patches: 75
+        max_num_patches: None
+        min_num_patches: 16
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 128
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: True

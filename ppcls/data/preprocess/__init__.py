@@ -20,9 +20,10 @@ from ppcls.data.preprocess.ops.timm_autoaugment import RawTimmAutoAugment
 from ppcls.data.preprocess.ops.cutout import Cutout
 
 from ppcls.data.preprocess.ops.hide_and_seek import HideAndSeek
-from ppcls.data.preprocess.ops.random_erasing import RandomErasing
+from ppcls.data.preprocess.ops.random_erasing import RandomErasing, BeitV2RandomErasing
 from ppcls.data.preprocess.ops.grid import GridMask
-
+from ppcls.data.preprocess.ops.random_crop_and_interpolation import RandomResizedCropAndInterpolationWithTwoPic, RandomResizedCropAndInterpolation
+from ppcls.data.preprocess.ops.masking_generator import MaskingGenerator
 from ppcls.data.preprocess.ops.operators import DecodeImage
 from ppcls.data.preprocess.ops.operators import ResizeImage
 from ppcls.data.preprocess.ops.operators import CropImage

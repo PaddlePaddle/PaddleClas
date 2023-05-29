@@ -14,6 +14,7 @@
 
 import copy
 import importlib
+import paddle
 import paddle.nn as nn
 from paddle.jit import to_static
 from paddle.static import InputSpec
@@ -28,7 +29,7 @@ from ..utils.save_load import load_dygraph_pretrain
 from .slim import prune_model, quantize_model
 from .distill.afd_attention import LinearTransformStudent, LinearTransformTeacher
 
-__all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel"]
+__all__ = ["build_model", "RecModel", "DistillationModel", "AttentionModel", "Beitv2Model"]
 
 
 def build_model(config, mode="train"):
@@ -168,4 +169,23 @@ class AttentionModel(DistillationModel):
             else:
                 out = self.model_list[idx](out, label)
                 result_dict.update(out)
+        return result_dict
+
+class Beitv2Model(DistillationModel):
+    def __init__(self,
+                 models=None,
+                 pretrained_list=None,
+                 freeze_params_list=None,
+                 **kargs):
+        super().__init__(models, pretrained_list, freeze_params_list, **kargs)
+    def forward(self, samples, images, bool_masked):
+        result_dict = dict()
+        for idx, model_name in enumerate(self.model_name_list):
+            bool_masked_pos = bool_masked.flatten(1).astype(paddle.bool)
+            if model_name == "Teacher":
+                with paddle.no_grad():
+                    input_ids = self.model_list[idx].get_codebook_indices(images)
+                    result_dict[model_name] = input_ids[bool_masked_pos]
+            else:
+                result_dict[model_name] = self.model_list[idx](samples, bool_masked_pos)
         return result_dict

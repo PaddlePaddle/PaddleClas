@@ -19,7 +19,7 @@ from ppcls.engine.train.utils import update_loss, update_metric, log_info, type_
 from ppcls.utils import profiler
 
 
-def train_epoch(engine, epoch_id, print_batch_step):
+def train_epoch_mask_samples(engine, epoch_id, print_batch_step):
     tic = time.time()
 
     if not hasattr(engine, "train_dataloader_iter"):
@@ -56,10 +56,10 @@ def train_epoch(engine, epoch_id, print_batch_step):
                     },
                     level=amp_level):
                 out = forward(engine, batch)
-                loss_dict = engine.train_loss_func(out, batch[1])
+                loss_dict = engine.train_loss_func(out, batch)
         else:
             out = forward(engine, batch)
-            loss_dict = engine.train_loss_func(out, batch[1])
+            loss_dict = engine.train_loss_func(out, batch)
 
         # loss
         loss = loss_dict["loss"] / engine.update_freq
@@ -70,8 +70,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
             scaled.backward()
             if (iter_id + 1) % engine.update_freq == 0:
                 for i in range(len(engine.optimizer)):
-                    engine.scaler.step(engine.optimizer[i])
-                    engine.scaler.update()
+                    engine.scaler.minimize(engine.optimizer[i], scaled)
         else:
             loss.backward()
             if (iter_id + 1) % engine.update_freq == 0:
@@ -108,7 +107,4 @@ def train_epoch(engine, epoch_id, print_batch_step):
 
 
 def forward(engine, batch):
-    if not engine.is_rec:
-        return engine.model(batch[0])
-    else:
-        return engine.model(batch[0], batch[1])
+    return engine.model(batch[0], batch[1], batch[2])
