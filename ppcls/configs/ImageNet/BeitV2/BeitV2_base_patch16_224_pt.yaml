@@ -5,6 +5,7 @@ Global:
   output_dir: ./output/
   device: gpu
   save_interval: 1
+  train_mode: mask_samples
   eval_during_train: False
   eval_interval: 1
   epochs: 300
@@ -30,7 +31,6 @@ Arch:
   name: "Beitv2Model"
   drop_path_rate : 0.1
   class_num: 1000
-  is_beitv2: True
   # if not null, its lengths should be same as models
   pretrained_list:
   # if not null, its lengths should be same as models

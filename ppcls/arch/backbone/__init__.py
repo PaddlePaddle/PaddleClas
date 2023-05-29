@@ -76,8 +76,7 @@ from .model_zoo.convnext import ConvNeXt_tiny, ConvNeXt_small, ConvNeXt_base_224
 from .model_zoo.nextvit import NextViT_small_224, NextViT_base_224, NextViT_large_224, NextViT_small_384, NextViT_base_384, NextViT_large_384
 from .model_zoo.cae import cae_base_patch16_224, cae_large_patch16_224
 from .model_zoo.vqkd import vqkd_encoder_base_decoder_3x768x12_clip
-from .model_zoo.modeling_pretrain import beit_base_patch16_224_8k_vocab_cls_pt
-from .model_zoo.modeling_finetune import beit_base_patch16_224
+from .model_zoo.BeiTV2 import beit_base_patch16_224, beit_base_patch16_224_8k_vocab_cls_pt
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1
 from .variant_models.resnet_variant import ResNet50_adaptive_max_pool2d

@@ -60,10 +60,6 @@ class Engine(object):
             self.is_rec = True
         else:
             self.is_rec = False
-        if self.config["Arch"].get("is_beitv2", False):
-            self.is_beitv2 = True
-        else:
-            self.is_beitv2 = False
 
         # set seed
         seed = self.config["Global"].get("seed", False)
