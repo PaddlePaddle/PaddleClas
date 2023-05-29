@@ -17,8 +17,11 @@ Global:
 
 # mixed precision training
 AMP:
+  use_amp: True
+  use_fp16_test: False
   scale_loss: 65536
   use_dynamic_loss_scaling: True
+  use_promote: False
   # O1: mixed fp16, O2: pure fp16
   level: O1
 
