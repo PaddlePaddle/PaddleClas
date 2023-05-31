@@ -7,6 +7,38 @@ from paddle.nn import functional as F
 from paddle.nn.functional import interpolate
 from paddle.autograd import PyLayer
 import paddle.distributed as dist
+import os
+from .download import get_weights_path_from_url
+
+
+MODEL_URLS = {
+    "CLIP_vit_base_patch32_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_base_patch32_224.pdparams",
+    "CLIP_vit_base_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_base_patch16_224.pdparams",
+    "CLIP_vit_large_patch14_336":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_large_patch14_336.pdparams",
+    "CLIP_vit_large_patch14_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CLIP_vit_large_patch14_224.pdparams",
+    "BEiTv2_vit_base_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/BEiTv2_vit_base_patch16_224.pdparams",
+    "BEiTv2_vit_large_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/BEiTv2_vit_large_patch16_224.pdparams",
+    "CAE_vit_base_patch16_224":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CAE_vit_base_patch16_224.pdparams",
+    'EVA_vit_giant_patch14':
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/EVA_vit_giant_patch14.pdparams",
+    "MOCOV3_vit_small":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MOCOV3_vit_small.pdparams",
+    "MOCOV3_vit_base":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MOCOV3_vit_base.pdparams",
+    "MAE_vit_huge_patch14":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_huge_patch14.pdparams",
+    "MAE_vit_large_patch16":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_large_patch16.pdparams",
+    "MAE_vit_base_patch16":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_base_patch16.pdparams",
+}
 class GatherLayer(PyLayer):
     '''
         Gather tensors from all process, support backward propagation.
@@ -28,6 +60,8 @@ class GatherLayer(PyLayer):
     
 def interpolate_pos_embed(pos_embed_checkpoint: paddle.Tensor, new_patch_size, num_extra_tokens=1):
     # interpolate position embedding
+    if pos_embed_checkpoint.ndim > 2:
+        pos_embed_checkpoint = paddle.squeeze(pos_embed_checkpoint)
     embedding_size = pos_embed_checkpoint.shape[1]
     # height (== width) for the checkpoint position embedding
     orig_size = int((pos_embed_checkpoint.shape[0] - num_extra_tokens) ** 0.5)
@@ -36,11 +70,12 @@ def interpolate_pos_embed(pos_embed_checkpoint: paddle.Tensor, new_patch_size, n
     extra_tokens = pos_embed_checkpoint[:num_extra_tokens, :]
     # only the position tokens are interpolated
     pos_tokens = pos_embed_checkpoint[num_extra_tokens:, :]
-    pos_tokens = paddle.transpose(paddle.reshape(pos_tokens,(orig_size, orig_size, embedding_size)),(0, 3, 1, 2))
+    pos_tokens = paddle.reshape(pos_tokens,[-1,orig_size, orig_size, embedding_size])
+    pos_tokens = paddle.transpose(pos_tokens,(0, 3, 1, 2))
     pos_tokens = interpolate(pos_tokens, size=(new_patch_size, new_patch_size), mode='bicubic', align_corners=False)
 
     pos_tokens = paddle.transpose(pos_tokens,(0, 2, 3, 1))
-    pos_tokens = paddle.flatten(pos_tokens,(1,2))
+    pos_tokens = paddle.flatten(pos_tokens,1,2)
     pos_tokens = paddle.squeeze(pos_tokens,axis=0)
 
     new_pos_embed = paddle.concat((extra_tokens, pos_tokens), axis=0)
@@ -102,3 +137,20 @@ def trunc_normal_(tensor, mean=0., std=1., a=-2., b=2.):
         >>> nn.init.trunc_normal_(w)
     """
     return _no_grad_trunc_normal_(tensor, mean, std, a, b)
+
+
+def load_dygraph_pretrain(path=None):
+    if not (os.path.isdir(path) or os.path.exists(path + '.pdparams')):
+        raise ValueError("Model pretrain path {}.pdparams does not "
+                         "exists.".format(path))
+    param_state_dict = paddle.load(path + ".pdparams")
+    return param_state_dict
+
+
+def load_dygraph_pretrain_from_url(pretrained_url, use_ssld=False):
+    if use_ssld:
+        pretrained_url = pretrained_url.replace("_pretrained",
+                                                "_ssld_pretrained")
+    local_weight_path = get_weights_path_from_url(pretrained_url).replace(
+        ".pdparams", "")
+    return load_dygraph_pretrain(path=local_weight_path)

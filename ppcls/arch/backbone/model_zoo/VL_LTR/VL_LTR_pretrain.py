@@ -249,16 +249,16 @@ class VisionTransformer(nn.Layer):
         x = paddle.reshape(x,(x.shape[0], x.shape[1], -1))
         x = paddle.transpose(x,(0, 2, 1))
         #x = x.permute(0, 2, 1)  # shape = [*, grid ** 2, width]
-        x = paddle.concat([paddle.cast(self.class_embedding,x.dtype) + paddle.zeros((x.shaoe[0],1,x.shape[-1]),dtype=x.dtype),x],axis=1)
+        x = paddle.concat([paddle.cast(self.class_embedding,x.dtype) + paddle.zeros((x.shape[0],1,x.shape[-1]),dtype=x.dtype),x],axis=1)
         #x = torch.cat([self.class_embedding.to(x.dtype) + torch.zeros(x.shape[0], 1, x.shape[-1], dtype=x.dtype, device=x.device), x], dim=1)  # shape = [*, grid ** 2 + 1, width]
         #x = x + self.positional_embedding.to(x.dtype)
         x = x + paddle.cast(self.positional_embedding,x.dtype)
         x = self.ln_pre(x)
 
         #x = x.permute(1, 0, 2)  # NLD -> LND
-        x = paddle.transpose(x,(1,0,2))# NLD -> LND
+        #x = paddle.transpose(x,(1,0,2))# NLD -> LND
         x = self.transformer(x)
-        x = paddle.transpose(x,(1,0,2))# LND -> NLD
+        #x = paddle.transpose(x,(1,0,2))# LND -> NLD
         #x = x.permute(1, 0, 2)  # LND -> NLD
 
         x = self.ln_post(x[:, 0, :])
@@ -403,9 +403,9 @@ class CVLP(nn.Layer):
             if isinstance(self.visual, VisionTransformer):
                 num_extra_tokens = 1
                 new_size = int((self.visual.positional_embedding.shape[0] - num_extra_tokens) ** 0.5)
-                new_pos_embed = interpolate_pos_embed(pretrained_state_dict['visual.positional_embedding'], 
+                new_pos_embed = interpolate_pos_embed(pretrained_state_dict['pos_embed'], 
                                                         new_size, num_extra_tokens=num_extra_tokens)
-                pretrained_state_dict['visual.positional_embedding'] = new_pos_embed
+                pretrained_state_dict['pos_embed'] = new_pos_embed
 
             info = self.set_state_dict(pretrained_state_dict)
             print('loaded pretrained clip.')
@@ -431,6 +431,7 @@ class CVLP(nn.Layer):
         return self.visual(image)
 
     def encode_text(self, text) -> paddle.Tensor:
+        text = paddle.cast(text,paddle.int32)
         x = paddle.cast(self.token_embedding(text),self.dtype)
         #x = self.token_embedding(text).type(self.dtype)  # [batch_size, n_ctx, d_model]
 
@@ -461,17 +462,13 @@ class CVLP(nn.Layer):
         image_features = image_features / image_features.norm(axis=-1, keepdim=True)
         text_features = text_features / text_features.norm(axis=-1, keepdim=True)
 
-        if dist.is_initialized():
-            image_features = paddle.concat(GatherLayer.apply(image_features), 0)
-            text_features = paddle.concat(GatherLayer.apply(text_features), 0)
-
         # cosine similarity as logits
         logit_scale = paddle.exp(self.logit_scale) 
         logits_per_image = logit_scale * image_features @ text_features.t()
         logits_per_text = logits_per_image.transpose((0, 1))
 
         # shape = [global_batch_size, global_batch_size]
-        return logits_per_image, logits_per_text
+        return [image.detach(),text.detach()], (logits_per_image, logits_per_text)
 
 
 

@@ -1,6 +1,7 @@
 import paddle
 import paddle.nn as nn
 from paddle.nn import functional as F
+from ..arch.backbone.model_zoo.VL_LTR.VL_LTR_pretrain import CVLP_vit16
 
 def cross_entropy(outputs, teacher_outputs):
     logprobs = F.log_softmax(outputs, axis=-1)
@@ -8,6 +9,11 @@ def cross_entropy(outputs, teacher_outputs):
     distill_loss = -paddle.sum(soft_targets * logprobs, axis=-1)
     return paddle.mean(distill_loss)
 
+def labels2idxs(labels: paddle.Tensor):
+    #labels = paddle.cast(labels,paddle.int32)
+    buff = [paddle.cast(labels[i] == labels,dtype=paddle.int32) for i in range(labels.shape[0])]
+    targets = paddle.stack(buff)
+    return targets
 
 def kl_div(outputs1, outputs2, T=1.):
     return paddle.log(F.kl_div(
@@ -16,6 +22,15 @@ def kl_div(outputs1, outputs2, T=1.):
                 reduction='sum',
             )) * (T * T) / paddle.numel(outputs1)
 
+class SoftTargetCrossEntropy(nn.Layer):
+
+    def __init__(self):
+        super(SoftTargetCrossEntropy, self).__init__()
+
+    def forward(self, x: paddle.Tensor, target: paddle.Tensor) -> paddle.Tensor:
+        target = paddle.cast(target,dtype=paddle.float32)
+        loss = paddle.sum(-target * paddle.nn.functional.log_softmax(x, axis=-1), axis=-1)
+        return paddle.mean(loss)
 
 class LabelSmoothingCrossEntropy(nn.Layer):
     """
@@ -37,9 +52,7 @@ class LabelSmoothingCrossEntropy(nn.Layer):
         smooth_loss = -paddle.mean(logprobs,axis=-1)
         #smooth_loss = -logprobs.mean(dim=-1)
         if target.ndim == 1:
-            nll_loss = -paddle.gather(logprobs,index=paddle.unsqueeze(target,axis=1),axis=-1)
-            #nll_loss = -logprobs.gather(dim=-1, index=target.unsqueeze(1))
-            #nll_loss = nll_loss.squeeze(1)
+            nll_loss = -paddle.gather(logprobs,index=paddle.unsqueeze(target),axis=-1)
             nll_loss = paddle.squeeze(nll_loss,axis=1)
         else:
             assert target.ndim == 2
@@ -49,10 +62,11 @@ class LabelSmoothingCrossEntropy(nn.Layer):
 
 
 class PretrainSentLoss(nn.Layer):
-    def __init__(self, teacher_model:nn.Layer ,base_criterion: nn.Layer, loss_type: str, args=None, 
+    def __init__(self,loss_type: str,context_length,pretrained_clip, args=None, 
         distill_type='none', alpha=0., beta=0., tau=0., set_training_mode=False):
         super().__init__()
-        self.base_criterion = base_criterion
+        self.teacher_model = CVLP_vit16(context_length=context_length,pretrained_clip=pretrained_clip)
+        self.base_criterion = LabelSmoothingCrossEntropy()
         self.loss_type = loss_type
         self.alpha = alpha
         self.beta = beta
@@ -61,14 +75,13 @@ class PretrainSentLoss(nn.Layer):
         self.distill_type:str = distill_type
         if beta > 0:
             assert self.distill_type.startswith("logits")
-            self.teacher_model = teacher_model
-            if args.teacher_path:
-                self.teacher_model.initialize_parameters(args.teacher_path)
             self.teacher_model.stop_gradient = True
-            self.fp32 = args.fp32_resume
-            self.set_training_mode=set_training_mode
 
-    def forward(self, inputs, outputs, labels: paddle.Tensor):
+    def forward(self, x, labels: paddle.Tensor):
+        # x \in [inputs, outputs]
+        inputs, outputs = x
+        labels = paddle.squeeze(labels)
+        labels = labels2idxs(labels)
         #check the format for labels
         if isinstance(outputs, paddle.Tensor):
             loss = self.base_criterion(outputs, labels)
@@ -90,8 +103,7 @@ class PretrainSentLoss(nn.Layer):
         base_loss = (loss1 + loss2) / 2.0
         loss = (1 - self.alpha) * base_loss + self.alpha * distill_loss
         if self.beta > 0:
-            self.teacher_model.eval()
-            teacher_outputs1, teacher_outputs2 = self.teacher_model(inputs)
+            _,(teacher_outputs1, teacher_outputs2) = self.teacher_model(inputs)
             teacher_outputs1, teacher_outputs2 = teacher_outputs1.detach(), teacher_outputs2.detach()
             if self.distill_type == 'logits_kl':
                 distill_loss1 = kl_div(outputs1, teacher_outputs1, T=self.tau)
@@ -103,26 +115,50 @@ class PretrainSentLoss(nn.Layer):
                 distill_loss2 = cross_entropy(outputs2, teacher_outputs2)
                 distill_loss = (distill_loss1 + distill_loss2) / 2.0
             loss = (1 - self.beta) * loss + self.beta * distill_loss
-        return loss, distill_loss
+        return {"pretrain_loss": loss}
 
-
+class LGRTwoBrachLoss(nn.Layer):
+    def __init__(self,  teacher_model: nn.Layer = None,
+                 distillation_type: str = 'none', alpha: float = 0.0, tau: float=0.0):
+        super().__init__()
+        self.loss = VLT_DistillationLoss(teacher_model,distillation_type, alpha, tau)
+    def forward(self, x, labels):
+        output1,output2 = x[0], x[1]
+        loss1 = self.loss(output1,labels)
+        loss2 = self.loss(output2,labels)
+        loss = loss1 + loss2
+        return {"two_branch_loss":loss}
+    
+class LGRTwoBrachCELoss(nn.Layer):
+    def __init__(self,  teacher_model: nn.Layer = None,
+                 distillation_type: str = 'none', alpha: float = 0.0, tau: float=0.0):
+        super().__init__()
+        self.loss = F.cross_entropy
+    def forward(self, x, labels):
+        output1,output2 = x[0], x[1]
+        loss1 = self.loss(output1,labels)
+        loss2 = self.loss(output2,labels)
+        loss = loss1.mean() + loss2.mean()
+        return {"two_branch_loss":loss}
+    
 class VLT_DistillationLoss(nn.Layer):
     """
     This module wraps a standard criterion and adds an extra knowledge distillation loss by
     taking a teacher model prediction and using it as additional supervision.
     """
 
-    def __init__(self, base_criterion: nn.Layer, teacher_model: nn.Layer,
-                 distillation_type: str, alpha: float, tau: float):
+    def __init__(self, teacher_model: nn.Layer = None,
+                 distillation_type: str = 'none', alpha: float = 0.0, tau: float=0.0):
         super().__init__()
-        self.base_criterion = base_criterion
+        self.base_criterion = SoftTargetCrossEntropy()
         self.teacher_model = teacher_model
         assert distillation_type in ['none', 'soft', 'hard']
         self.distillation_type = distillation_type
         self.alpha = alpha
         self.tau = tau
 
-    def forward(self, inputs, outputs, labels):
+    def forward(self, x, labels):
+        outputs = x
         """
         Args:
             inputs: The original inputs that are feed to the teacher model
@@ -138,25 +174,4 @@ class VLT_DistillationLoss(nn.Layer):
         base_loss = self.base_criterion(outputs, labels)
         if self.distillation_type == 'none':
             return base_loss
-
-        if outputs_kd is None:
-            raise ValueError("When knowledge distillation is enabled, the model is "
-                             "expected to return a Tuple[Tensor, Tensor] with the output of the "
-                             "class_token and the dist_token")
-        # don't backprop throught the teacher
-        with paddle.no_grad():
-            teacher_outputs = self.teacher_model(inputs)
-
-        if self.distillation_type == 'soft':
-            T = self.tau
-            distillation_loss = F.kl_div(
-                F.log_softmax(outputs_kd / T, axis=1),
-                F.log_softmax(teacher_outputs / T, axis=1),
-                reduction='sum',
-                log_target=True
-            ) * (T * T) /  paddle.numel(outputs_kd)
-        elif self.distillation_type == 'hard':
-            distillation_loss = F.cross_entropy(outputs_kd, paddle.argmax(teacher_outputs,axis=1))
-
-        loss = base_loss * (1 - self.alpha) + distillation_loss * self.alpha
-        return loss
+        return base_loss

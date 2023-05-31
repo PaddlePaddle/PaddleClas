@@ -342,7 +342,7 @@ class ImageNetLTDataset(CommonDataset):
     def __init__(self,
                  image_root,
                  cls_label_path,
-                 context_length=77,
+                 context_length=75,
                  is_pretrain=False,
                  transform_ops=None,
                  delimiter=None,
@@ -390,7 +390,6 @@ class ImageNetLTDataset(CommonDataset):
                 idx = np.random.randint(sent_idxs[target])
                 token = text_tokens[target][idx]
 
-                outputs = np.stack([img,token])
                 return ((img,token),target)
             return (img, self.labels[idx])
 

@@ -18,14 +18,19 @@ Global:
 Arch:
   name: LGR_vit16
   class_num: 1000
+  context_length: 75
+  sent_length: 64
+  cache_root: "cached"
+  pretrained_clip: "vit"
+  pretrain_model_path: "output/CVLP_vit16/best_model.pdparams"
  
 # loss function config for traing/eval process
 Loss:
   Train:
-    - CELoss:
+    - LGRTwoBrachLoss:
         weight: 1.0
   Eval:
-    - CELoss:
+    - LGRTwoBrachCELoss:
         weight: 1.0
 
 
@@ -33,12 +38,12 @@ Optimizer:
   name: Momentum
   momentum: 0.9
   lr:
-    name: Piecewise
-    decay_epochs: [30, 60, 90]
-    values: [0.01, 0.001, 0.0001, 0.00001]
-  regularizer:
-    name: 'L2'
-    coeff: 0.0001
+    name: Cosine
+    learning_rate: 1e-3
+    epochs: 120
+    warmup_start_lr: 0.000001
+    step_each_epoch: 30
+    warmup_epoch: 0
 
 
 # data loader for train and eval
@@ -47,7 +52,9 @@ DataLoader:
     dataset:
       name: ImageNetLTDataset
       image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      cls_label_path: ./dataset/ILSVRC2012/ImageNet_LT_train.txt
+      is_pretrain: False
+      context_length: 75
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -61,10 +68,13 @@ DataLoader:
             mean: [0.485, 0.456, 0.406]
             std: [0.229, 0.224, 0.225]
             order: ''
-
+      batch_transform_ops:
+        - MixupOperator:
+            alpha: 0.2
+        
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 40
       drop_last: False
       shuffle: True
     loader:
@@ -75,7 +85,9 @@ DataLoader:
     dataset: 
       name: ImageNetLTDataset
       image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
+      cls_label_path: ./dataset/ILSVRC2012/ImageNet_LT_val.txt
+      is_pretrain: False
+      context_length: 75
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -91,9 +103,20 @@ DataLoader:
             order: ''
     sampler:
       name: DistributedBatchSampler
-      batch_size: 64
+      batch_size: 40
       drop_last: False
       shuffle: False
     loader:
       num_workers: 4
       use_shared_memory: True
+
+Metric:
+  Train:
+    - LGRTwoBranchMetric:
+        is_mixup: True
+        topk: [1, 5]
+  Eval:
+    - LGRTwoBranchMetric:
+        topk: [1, 5]
+
+

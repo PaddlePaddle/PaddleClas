@@ -1,4 +1,5 @@
 import os.path as osp
+import os
 from typing import Tuple, Union
 
 import paddle.distributed as dist
@@ -250,32 +251,21 @@ class LGR(nn.Layer):
                                     )
             self.text_padding_mask = self.build_key_padding_mask(paddle.to_tensor(self.sent_idxs))
 
-        #self.initialize_parameters()
-
-    def train(self, mode=True):
-        """Convert the model into training mode while keep normalization layer freezed."""
-        super(LGR, self).train()
-        if mode:
-            if self.img_grad is False:
-                print('freeze visual norm')
-                for m in self.visual.parameters():
-                    if isinstance(m, nn.LayerNorm):
-                        m.eval()
-                    if isinstance(m, nn.BatchNorm2D):
-                        m.eval()
-            if self.attn_grad is False:
-                print('freeze attn norm')
-                for m in self.text_block.attn.parameters():
-                    if isinstance(m, nn.LayerNorm):
-                        m.eval()
-                    if isinstance(m, nn.BatchNorm2D):
-                        m.eval()
+        if self.img_grad is False:
+            print('freeze visual norm')
+            for m in self.visual.parameters():
+                if isinstance(m, nn.LayerNorm):
+                    m.eval()
+                if isinstance(m, nn.BatchNorm2D):
+                    m.eval()
+        if self.attn_grad is False:
+            print('freeze attn norm')
+            for m in self.text_block.attn.parameters():
+                if isinstance(m, nn.LayerNorm):
+                    m.eval()
+                if isinstance(m, nn.BatchNorm2D):
+                    m.eval()
         self.initialize_parameters()
-
-    def to(self, device, *args):
-        super().to(device=device, *args)
-        if self.text_padding_mask is not None:
-            self.text_padding_mask = self.text_padding_mask.to(device=device, *args)
 
     @property
     def dtype(self):
@@ -320,44 +310,13 @@ class LGR(nn.Layer):
         #mask = mask.expand(idxs.shape[0], self.sent_length).gt(idxs.unsqueeze(1) - 1)
         return mask
 
-    def load_pretrained_model(self, txt_embed_path=None, vis_backbone_path=None, img_grad=True,
+    def load_pretrained_model(self, vis_backbone_path=None, img_grad=True,
                               attn_grad=True):
-        if txt_embed_path is not None:
-            self._load_text_embeddings(txt_embed_path)
-            self.text_embeddings.stop_gradient = True
+        
         if vis_backbone_path is not None:
             self._load_vis_backbone(vis_backbone_path)
             self.visual.stop_gradient = not img_grad
             self.text_block.attn.stop_gradient = not attn_grad
-
-    def _load_text_embeddings(self, txt_embed_path):
-        assert self.text_embeddings is not None
-        if not osp.exists(txt_embed_path):
-            print("warning: no txt embeddings found, please generate the txt embeddings first in the pretraining stage")
-            return
-        text_embeddings = paddle.to_tensor(np.load(txt_embed_path))  # [Nt, embed_dim]
-        split_text_embeddings = paddle.split(text_embeddings, self.sent_idxs)
-        
-        if self.select_sent == 'rand':
-            print('randomly selecting sents')
-            split_text_embeddings = [s[self.sent_offset:, :] for s in split_text_embeddings]
-            split_sorted_idxs = [paddle.randperm(len(s))[:self.sent_length] for s in split_text_embeddings]
-            split_text_embeddings = [s[i] for s,i in zip(split_text_embeddings, split_sorted_idxs)]
-        elif self.select_sent is not None:
-            print('using selected sents')
-            txt_ces_path = txt_embed_path.replace('txt_embed.npy', '%s_txt_ce.npy' % self.select_sent)
-            assert osp.exists(txt_ces_path)
-            text_ces = paddle.to_tensor(np.load(txt_ces_path))  # [Nt, embed_dim]
-            split_text_ces = paddle.split(text_ces, self.sent_idxs)
-            split_sorted_idxs = [paddle.sort(text_ces)[1][:self.sent_length] for text_ces in split_text_ces]
-            split_text_embeddings = [text_embeddings[sorted_idxs] for sorted_idxs, text_embeddings in
-                                        zip(split_sorted_idxs, split_text_embeddings)]
-        else:
-            split_text_embeddings = [s[self.sent_offset:self.sent_length+self.sent_offset, :] for s in split_text_embeddings]
-        if self.select_sent != "rand":
-            split_text_embeddings = pad_sequence(split_text_embeddings,pad_value=0.0)
-        self.text_embeddings.data = split_text_embeddings
-        print("text embeddings loaded")
 
 
     def _load_vis_backbone(self, vis_backbone_path):
@@ -402,7 +361,7 @@ class LGR(nn.Layer):
         x = self.encode_image(x)
         if self.text_block is not None:
 
-            x = self.text_block( paddle.unsqueeze(x,axis=1), paddle.cast(self.text_embeddings,x.dtype),
+            x = self.text_block(paddle.unsqueeze(x,axis=1), paddle.cast(self.text_embeddings,x.dtype),
                                 key_padding_mask=self.text_padding_mask,
                                 logit_scale=self.logit_scale)
         else:   
@@ -410,36 +369,6 @@ class LGR(nn.Layer):
         return x
 
 
-def LGR_r50_test_api(pretrained=False, **kwargs):
-    args = kwargs['args']
-    dataset = kwargs['dataset']
-    sent_idxs = getattr(dataset, 'end_idxs', [0])
-
-    model = LGR(
-        num_classes=args.nb_classes,
-        embed_dim=1024,
-        image_resolution=224,
-        vision_layers=(3, 4, 6, 3),
-        vision_width=64,
-        vision_patch_size=None,
-        sent_length=args.sent_length,
-        attn_heads=1,
-        sent_idxs=sent_idxs,
-        use_norm=True,
-        img_grad=False,
-        select_sent='rand'
-    )
-
-    vis_backbone_path = osp.join(args.pretrain_cvlp_path, "checkpoint.pdparams")
-    if not osp.exists(vis_backbone_path):
-        print("no ckpt file found")
-        vis_backbone_path = args.pretrained_clip
-    model.load_pretrained_model(
-        txt_embed_path=osp.join(args.pretrain_cvlp_path, "txt_embed.npy"),
-        vis_backbone_path=vis_backbone_path, img_grad=False
-    )
-
-    return model
 def LGR_r50(pretrained=False, args=None,dataset=None):
     args = args
     dataset = dataset
@@ -474,29 +403,29 @@ def LGR_r50(pretrained=False, args=None,dataset=None):
 
 
 def LGR_vit16(pretrained=False, **kwargs):
-    args = kwargs['args']
-    dataset = kwargs['dataset']
-    sent_idxs = getattr(dataset, 'end_idxs', None)
-    #select_sent = 'val' if args.test else 'train'
+    cache_root = kwargs["cache_root"]
+    clip_token_path = os.path.join(cache_root, 'IMNET_LT_text_tokens.pkl')
+    assert os.path.exists(clip_token_path)
+    text_tokens = paddle.load(clip_token_path)
+    sent_idxs = [len(sents) for sents in text_tokens]
 
     model = LGR(
-        num_classes=args.nb_classes,
+        num_classes= kwargs['class_num'],
         embed_dim=512,
         image_resolution=224,
         vision_layers=12,
         vision_width=768,
         vision_patch_size=16,
-        sent_length=args.sent_length,
+        sent_length= kwargs['sent_length'], 
         attn_heads=1,
-        sent_idxs=sent_idxs,
         use_norm=True,
         img_grad=False,
+        sent_idxs = sent_idxs,
         select_sent="rand"
     )
 
     model.load_pretrained_model(
-        txt_embed_path=os.join(args.pretrain_cvlp_path, "txt_embed.npy"),
-        vis_backbone_path=os.join(args.pretrain_cvlp_path, "checkpoint.pth"),
+        vis_backbone_path=kwargs['pretrain_model_path'],
         img_grad=False
     )
 
