@@ -14,6 +14,7 @@
 
 import sys
 import paddle
+import paddle.profiler as profiler
 
 # A global variable to record the number of calling times for profiler
 # functions. It is used to specify the tracing range of training steps.
@@ -21,7 +22,7 @@ _profiler_step_id = 0
 
 # A global variable to avoid parsing from string every time.
 _profiler_options = None
-
+_prof = None
 
 class ProfilerOptions(object):
     '''
@@ -85,7 +86,6 @@ def add_profiler_step(options_str=None):
     Enable the operator-level timing using PaddlePaddle's profiler.
     The profiler uses a independent variable to count the profiler steps.
     One call of this function is treated as a profiler step.
-    
     Args:
       profiler_options - a string to initialize the ProfilerOptions.
                          Default is None, and the profiler is disabled.
@@ -93,18 +93,32 @@ def add_profiler_step(options_str=None):
     if options_str is None:
         return
 
+    global _prof 
     global _profiler_step_id
     global _profiler_options
 
     if _profiler_options is None:
         _profiler_options = ProfilerOptions(options_str)
-
-    if _profiler_step_id == _profiler_options['batch_range'][0]:
-        paddle.utils.profiler.start_profiler(
-            _profiler_options['state'], _profiler_options['tracer_option'])
-    elif _profiler_step_id == _profiler_options['batch_range'][1]:
-        paddle.utils.profiler.stop_profiler(_profiler_options['sorted_key'],
-                                            _profiler_options['profile_path'])
+    # profile 3个纬度打印性能数据 https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/performance_improving/profiling_model.html#chakanxingnengshujudetongjibiaodan
+    # timer_only = True 仅展示模型的吞吐量以及时间开销
+    # timer_only = False 调用 summary 能够打印统计表单，通过不同角度的表单呈现性能数据
+    # timer_only = False 同时产出Timeline 信息在 profiler_log目录下
+    if _prof is None:
+        _prof = profiler.Profiler(
+                   scheduler = (_profiler_options['batch_range'][0], _profiler_options['batch_range'][1]),
+                   on_trace_ready = profiler.export_chrome_tracing('./profiler_log'),
+                   timer_only = True)
+        _prof.start()
+    else:
+        _prof.step()
+        
+    if _profiler_step_id == _profiler_options['batch_range'][1]:
+        _prof.stop()
+        _prof.summary(
+             op_detail=True,
+             thread_sep=False,
+             time_unit='ms')
+        _prof = None
         if _profiler_options['exit_on_finished']:
             sys.exit(0)
 
