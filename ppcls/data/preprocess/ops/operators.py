@@ -28,7 +28,7 @@ from PIL import ImageFilter, Image, ImageOps, __version__ as PILLOW_VERSION
 from paddle.vision.transforms import ColorJitter as RawColorJitter
 from paddle.vision.transforms import CenterCrop, Resize
 from paddle.vision.transforms import RandomRotation as RawRandomRotation
-from paddle.vision.transforms import ToTensor, Normalize, RandomHorizontalFlip, RandomResizedCrop, Transpose
+from paddle.vision.transforms import ToTensor, Normalize, RandomHorizontalFlip, RandomResizedCrop
 from paddle.vision.transforms import functional as F
 from paddle.vision.transforms import transforms as T
 from .autoaugment import ImageNetPolicy
@@ -862,18 +862,17 @@ class BlurImage(object):
 class GaussianBlur(object):
     """Gaussian blur augmentation in SimCLR https://arxiv.org/abs/2002.05709"""
 
-    def __init__(self, sigma=[.1, 2.], _PIL=False):
+    def __init__(self, sigma=[.1, 2.], backend="cv2"):
         self.sigma = sigma
         self.kernel_size = 23
-        self._PIL = _PIL
+        self.backbend = backend
 
     def __call__(self, x):
         sigma = np.random.uniform(self.sigma[0], self.sigma[1])
-        if self._PIL:
+        if self.backbend == "PIL":
             x = x.filter(ImageFilter.GaussianBlur(radius=sigma))
             return x
         else:
-            import cv2
             x = cv2.GaussianBlur(
                 np.array(x), (self.kernel_size, self.kernel_size), sigma)
             return Image.fromarray(x.astype(np.uint8))
@@ -904,12 +903,11 @@ class RandomGrayscale(object):
         Returns:
             PIL Image: Randomly grayscaled image.
         """
-        import PIL
-        if isinstance(img, PIL.Image.Image):
+        if isinstance(img, Image.Image):
             if img.mode == 'L':
                 num_output_channels = 1
 
-        if isinstance(img, np.ndarray) or isinstance(img, PIL.Image.Image):
+        if isinstance(img, np.ndarray) or isinstance(img, Image.Image):
             num_output_channels = 3
             if random.random() < self.p:
                 return F.to_grayscale(
