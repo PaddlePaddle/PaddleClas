@@ -99,10 +99,10 @@ def add_profiler_step(options_str=None):
 
     if _profiler_options is None:
         _profiler_options = ProfilerOptions(options_str)
-    # profile 3个纬度打印性能数据 https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/performance_improving/profiling_model.html#chakanxingnengshujudetongjibiaodan
-    # timer_only = True 仅展示模型的吞吐量以及时间开销
-    # timer_only = False 调用 summary 能够打印统计表单，通过不同角度的表单呈现性能数据
-    # timer_only = False 同时产出Timeline 信息在 profiler_log目录下
+    # profile : https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/performance_improving/profiling_model.html#chakanxingnengshujudetongjibiaodan
+    # timer_only = True  only the model's throughput and time overhead are displayed
+    # timer_only = False calling summary can print a statistical form that presents performance data from different perspectives.
+    # timer_only = False the output Timeline information can be found in the profiler_log directory
     if _prof is None:
         _prof = profiler.Profiler(
                    scheduler = (_profiler_options['batch_range'][0], _profiler_options['batch_range'][1]),
