@@ -14,7 +14,6 @@ from .VL_LTR_pretrain import ModifiedResNet, VisionTransformer
 from paddle.nn.initializer import Assign, Normal, Constant,TruncatedNormal
 
 __all__ = [
-            'LGR_r50', 
             'LGR_vit16',
         ]
 
@@ -51,7 +50,6 @@ class Attention(nn.Layer):
         super().__init__()
         self.num_heads = num_heads
         head_dim = dim // num_heads
-        # NOTE scale factor was wrong in my original version, can set manually to be compat with prev weights
         self.scale = qk_scale or head_dim ** -0.5
         self.norm1q = nn.LayerNorm(dim)
         self.norm1k = nn.LayerNorm(dim)
@@ -61,9 +59,6 @@ class Attention(nn.Layer):
         self.attn_drop = nn.Dropout(attn_drop)
 
     def forward(self, qx: paddle.Tensor, kx: paddle.Tensor, key_padding_mask: paddle.Tensor = None):
-        # qx: [Bq, 1, C]    kx: [Bk, Nk, C]
-        # key_padding_mask: [Bk, Nk] (mask==1 ==> '-inf')
-        # output: [Bq, Bk, C]
         assert qx.shape[-1] == kx.shape[-1] and qx.shape[1] == 1
         Bq, _, C = qx.shape
         Bk, Nk, _ = kx.shape
@@ -75,14 +70,8 @@ class Attention(nn.Layer):
         k = paddle.reshape(k,(Bk, Nk, self.num_heads, C // self.num_heads))
         k = paddle.transpose(k,(0, 2, 1, 3))
 
-        #k = self.wk(self.norm1k(kx)).reshape(Bk, Nk, self.num_heads, C //
-        #                                     self.num_heads).permute(0, 2, 1, 3)
         
         v = paddle.unsqueeze(kx,axis=1)
-        #v = kx.unsqueeze(1)
-        #  q: [Bq, num_heads,  1, C // num_heads]
-        # kv: [Bk, num_heads, Nk, C // num_heads]
-        # attn: [Bq, Bk, num_heads, Nk]
         attn = paddle.einsum('qhoc,khnc->qkhn', q, k) * self.scale
         if key_padding_mask is not None:
             attn = masked_fill(attn, paddle.unsqueeze(paddle.unsqueeze(key_padding_mask,axis=0),axis=2),float('-inf'))
@@ -121,14 +110,10 @@ class Block(nn.Layer):
             self.fc = None
 
     def forward(self, qx: paddle.Tensor, kx: paddle.Tensor, key_padding_mask: paddle.Tensor = None, logit_scale=None):
-        # qx: [Bq, 1, C]    kx: [Bk, Nk, C]
-        # v: [Bq, Bk, C]
         v = self.attn(qx, kx, key_padding_mask=key_padding_mask)
         if self.op_type == 'concat':
             x = paddle.expand(qx,(qx.shape[0], kx.shape[0], qx.shape[-1]))
-            #x = qx.expand(qx.shape[0], kx.shape[0], qx.shape[-1])
             x = paddle.concat((x,v),axis=-1)
-            #x = torch.cat((x, v), dim=-1)  # [Bq, Bk, 2*C]
             x = self.fc(x)  # [Bq, Bk, 1]
         elif self.op_type == 'cosine':
             if logit_scale is not None:
@@ -233,15 +218,12 @@ class LGR(nn.Layer):
                     (1,),
                     default_initializer=Assign(paddle.ones([1])* np.log(1 / 0.07))
                 )
-                #self.logit_scale = paddle.ones([]) * np.log(1 / 0.07)
                 self.logit_scale.stop_gradient = True
             else:
                 self.logit_scale = None
             self.text_embeddings = self.create_parameter(
                     (self.num_classes, self.sent_length, embed_dim)
-                )
-            #self.text_embeddings = paddle.empty(self.num_classes, self.sent_length, embed_dim)
-            
+                )     
             self.text_block = Block(dim=embed_dim, num_heads=attn_heads,
                                     qkv_bias=False, qk_scale=None, drop=0,
                                     attn_drop=0,
@@ -275,32 +257,23 @@ class LGR(nn.Layer):
         
         if isinstance(m, nn.Linear):
             TruncatedNormal(std=0.02)(m.weight)
-            #m.weight.set_value(paddle.trunc(paddle.normal(std=0.02)))
             if isinstance(m, nn.Linear) and m.bias is not None:
-                #nn.init.constant_(m.bias, 0)
                 Constant(0.0)(m.bias)
-                #m.bias.set_value(paddle.zeros_like(m.bias))
 
         elif isinstance(m, nn.LayerNorm):
-            #nn.init.constant_(m.bias, 0)
             Constant(0.0)(m.bias)
-            #m.bias.set_value(paddle.zeros_like(m.bias))
-            #nn.init.constant_(m.weight, 1.0)
             Constant(1.0)(m.weight)
-            #m.weight.set_value(paddle.ones_like(m.bias))
+
         if self.text_block is not None:
             Assign(paddle.eye(self.text_block.attn.wq.weight.shape[0]))(self.text_block.attn.wq.weight)
             Assign(paddle.eye(self.text_block.attn.wk.weight.shape[0]))(self.text_block.attn.wk.weight)
-            #self.text_block.attn.wq.weight.set_value(paddle.eye(self.text_block.attn.wq.weight.shape[0]))
-            #self.text_block.attn.wk.weight.set_value(paddle.eye(self.text_block.attn.wk.weight.shape[0]))
-            #nn.init.eye_(self.text_block.attn.wq.weight)
-            #nn.init.eye_(self.text_block.attn.wk.weight)
+
         
     def initialize_parameters(self):
         self.apply(self._init_weights)
 
     def build_key_padding_mask(self, idxs: paddle.Tensor):
-        # 根据idxs生成mask，>idxs的位置设为True，以防止pad 0的影响
+        #avoid the influence of pad 0
         mask = paddle.arange(0,self.sent_length)
         mask = paddle.cast(mask,idxs.dtype)
         mask = paddle.unsqueeze(mask,axis=0)
@@ -320,13 +293,8 @@ class LGR(nn.Layer):
 
 
     def _load_vis_backbone(self, vis_backbone_path):
-        if vis_backbone_path.endswith('RN50.pt') or \
-            vis_backbone_path.endswith('ViT-B-32.pt') or \
-            vis_backbone_path.endswith('ViT-B-16.pt'):
-            pretrained_state_dict = paddle.load(
-                vis_backbone_path).state_dict()
-        else:
-            pretrained_state_dict = paddle.load(
+        assert osp.exists(vis_backbone_path)
+        pretrained_state_dict = paddle.load(
                 vis_backbone_path)
         
         if isinstance(self.visual, VisionTransformer):
@@ -368,37 +336,6 @@ class LGR(nn.Layer):
             x = self.fc(x)
         return x
 
-
-def LGR_r50(pretrained=False, args=None,dataset=None):
-    args = args
-    dataset = dataset
-    sent_idxs = getattr(dataset, 'end_idxs', None)
-
-    model = LGR(
-        num_classes=args.nb_classes,
-        embed_dim=1024,
-        image_resolution=224,
-        vision_layers=(3, 4, 6, 3),
-        vision_width=64,
-        vision_patch_size=None,
-        sent_length=args.sent_length,
-        attn_heads=1,
-        sent_idxs=sent_idxs,
-        use_norm=True,
-        img_grad=False,
-        select_sent='rand'
-    )
-
-    vis_backbone_path = osp.join(args.pretrain_cvlp_path, "checkpoint.pth")
-    if not osp.exists(vis_backbone_path):
-        print("no ckpt file found")
-        vis_backbone_path = args.pretrained_clip
-    model.load_pretrained_model(
-        txt_embed_path=osp.join(args.pretrain_cvlp_path, "txt_embed.npy"),
-        vis_backbone_path=vis_backbone_path, img_grad=False
-    )
-
-    return model
 
 
 

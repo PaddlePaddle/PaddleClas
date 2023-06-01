@@ -5,10 +5,9 @@ import paddle
 from paddle.nn import functional as F
 from paddle import nn
 from .utils import interpolate_pos_embed,MODEL_URLS,load_dygraph_pretrain_from_url
-from .utils import GatherLayer
 from paddle.nn.initializer import Assign, Normal, Constant
 
-__all__ = ["CVLP_r50", "CVLP_vit16"]
+__all__ = ["CVLP_vit16"]
 
 
 
@@ -151,7 +150,6 @@ class ModifiedResNet(nn.Layer):
                 x = self.relu(bn(conv(x)))
             x = self.avgpool(x)
             return x
-        #x = x.type(self.conv1.weight.dtype)
         x = stem(x)
         x = self.layer1(x)
         x = self.layer2(x)
@@ -245,22 +243,12 @@ class VisionTransformer(nn.Layer):
 
     def forward(self, x: paddle.Tensor):
         x = self.conv1(x)  # shape = [*, width, grid, grid]
-        #x = x.reshape(x.shape[0], x.shape[1], -1)  # shape = [*, width, grid ** 2]
         x = paddle.reshape(x,(x.shape[0], x.shape[1], -1))
         x = paddle.transpose(x,(0, 2, 1))
-        #x = x.permute(0, 2, 1)  # shape = [*, grid ** 2, width]
         x = paddle.concat([paddle.cast(self.class_embedding,x.dtype) + paddle.zeros((x.shape[0],1,x.shape[-1]),dtype=x.dtype),x],axis=1)
-        #x = torch.cat([self.class_embedding.to(x.dtype) + torch.zeros(x.shape[0], 1, x.shape[-1], dtype=x.dtype, device=x.device), x], dim=1)  # shape = [*, grid ** 2 + 1, width]
-        #x = x + self.positional_embedding.to(x.dtype)
         x = x + paddle.cast(self.positional_embedding,x.dtype)
         x = self.ln_pre(x)
-
-        #x = x.permute(1, 0, 2)  # NLD -> LND
-        #x = paddle.transpose(x,(1,0,2))# NLD -> LND
         x = self.transformer(x)
-        #x = paddle.transpose(x,(1,0,2))# LND -> NLD
-        #x = x.permute(1, 0, 2)  # LND -> NLD
-
         x = self.ln_post(x[:, 0, :])
 
         if self.proj is not None:
@@ -348,9 +336,6 @@ class CVLP(nn.Layer):
     def initialize_parameters(self, pretrained_clip):
         Normal(std=0.02)(self.token_embedding.weight)
         Normal(std=0.01)(self.positional_embedding)
-        #nn.init.normal_(self.token_embedding.weight, std=0.02)
-        #nn.init.normal_(self.positional_embedding, std=0.01)
-        #nn.initializer.normal()
         if isinstance(self.visual, ModifiedResNet):
             if self.visual.attnpool is not None:
                 std = self.embed_dim ** -0.5
@@ -359,10 +344,6 @@ class CVLP(nn.Layer):
                 normal_(self.visual.attnpool.attn.k_proj.weight)
                 normal_(self.visual.attnpool.attn.v_proj.weight)
                 normal_(self.visual.attnpool.attn.out_proj.weight)
-                #nn.init.normal_(self.visual.attnpool.q_proj.weight, std=std)
-                #nn.init.normal_(self.visual.attnpool.k_proj.weight, std=std)
-                #nn.init.normal_(self.visual.attnpool.v_proj.weight, std=std)
-                #nn.init.normal_(self.visual.attnpool.c_proj.weight, std=std)
 
             for resnet_block in [self.visual.layer1, self.visual.layer2, self.visual.layer3, self.visual.layer4]:
                 for name, param in resnet_block.named_parameters():
@@ -383,13 +364,8 @@ class CVLP(nn.Layer):
             Normal(std=proj_std)(block.attn.out_proj.weight)
             Normal(std=fc_std)(block.mlp.c_fc.weight)
             Normal(std=proj_std)(block.mlp.c_proj.weight)
-            #nn.init.normal_(block.attn.in_proj_weight, std=attn_std)
-            #nn.init.normal_(block.attn.out_proj.weight, std=proj_std)
-            #nn.init.normal_(block.mlp.c_fc.weight, std=fc_std)
-            #nn.init.normal_(block.mlp.c_proj.weight, std=proj_std)
 
         if self.text_projection is not None:
-            #nn.init.normal_(self.text_projection, std=self.transformer.width ** -0.5)
             Normal(std=self.transformer.width ** -0.5)(self.text_projection)
         if pretrained_clip is not None:
             if self.model_type == "vit":
@@ -417,9 +393,7 @@ class CVLP(nn.Layer):
         # pytorch uses additive attention mask; fill with -inf
         mask = paddle.empty((self.context_length, self.context_length))
         mask = paddle.full_like(mask,float("-inf"))
-        #mask.fill_(float("-inf"))
         mask = paddle.triu(mask,diagonal=1)
-        #mask.triu_(1)  # zero out the lower diagonal
         return mask
 
     @property
@@ -433,20 +407,11 @@ class CVLP(nn.Layer):
     def encode_text(self, text) -> paddle.Tensor:
         text = paddle.cast(text,paddle.int32)
         x = paddle.cast(self.token_embedding(text),self.dtype)
-        #x = self.token_embedding(text).type(self.dtype)  # [batch_size, n_ctx, d_model]
 
         x = x + paddle.cast(self.positional_embedding,self.dtype)
-        #x = paddle.transpose(x,(1,0,2))
-        #x = x.permute(1, 0, 2)  # NLD -> LND
-        
         x = self.transformer(x)
-
-        #x = paddle.transpose(x,(1,0,2))
-        #x = x.permute(1, 0, 2)  # LND -> NLD
         x = paddle.cast(self.ln_final(x),self.dtype)
-        #x = self.ln_final(x).type(self.dtype)
 
-        # x.shape = [batch_size, n_ctx, transformer.width]
         # take features from the eot embedding (eot_token is the highest number in each sequence)
         _buff = paddle.argmax(text,axis=1)
         x = x[paddle.arange(x.shape[0]), _buff] @ self.text_projection
@@ -469,27 +434,6 @@ class CVLP(nn.Layer):
 
         # shape = [global_batch_size, global_batch_size]
         return [image.detach(),text.detach()], (logits_per_image, logits_per_text)
-
-
-
-def CVLP_r50(pretrained=False,args=None):
-    args = args
-
-    model = CVLP(
-        embed_dim=1024,
-        image_resolution=224,
-        vision_layers=(3, 4, 6, 3),
-        vision_width=64,
-        vision_patch_size=None,
-        context_length=args.context_length + 2,
-        vocab_size=49408,
-        transformer_width=512,
-        transformer_heads=8,
-        transformer_layers=12,
-        args=args,
-    )
-
-    return model
 
 
 

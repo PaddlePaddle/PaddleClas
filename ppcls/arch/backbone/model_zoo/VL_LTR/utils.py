@@ -8,7 +8,7 @@ from paddle.nn.functional import interpolate
 from paddle.autograd import PyLayer
 import paddle.distributed as dist
 import os
-from .download import get_weights_path_from_url
+from ......ppcls.utils.download import get_weights_path_from_url
 
 
 MODEL_URLS = {
@@ -39,24 +39,7 @@ MODEL_URLS = {
     "MAE_vit_base_patch16":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_base_patch16.pdparams",
 }
-class GatherLayer(PyLayer):
-    '''
-        Gather tensors from all process, support backward propagation.
-    '''
 
-    @staticmethod
-    def forward(ctx, input):
-        ctx.save_for_backward(input)
-        output = [paddle.zeros_like(input) for _ in range(dist.get_world_size())]
-        dist.all_gather(output, input)
-        return tuple(output)
-    
-    @staticmethod
-    def backward(ctx, *grads):
-        input, = ctx.saved_tensors
-        grad_out = paddle.zeros_like(input)
-        grad_out[:] = grads[dist.get_rank()] * dist.get_world_size()
-        return grad_out
     
 def interpolate_pos_embed(pos_embed_checkpoint: paddle.Tensor, new_patch_size, num_extra_tokens=1):
     # interpolate position embedding
