@@ -63,7 +63,7 @@ function _train(){
     esac
 
     echo "train_cmd: ${train_cmd}  log_file: ${log_file}"
-    timeout 15m ${train_cmd} > ${log_file} 2>&1
+    timeout 10m ${train_cmd} > ${log_file} 2>&1
     if [ $? -ne 0 ];then
         echo -e "${model_name}, FAIL"
     else
@@ -74,7 +74,6 @@ function _train(){
         rm ${log_file}
         cp mylog/workerlog.0 ${log_file}
     fi
-    echo ${train_cmd} >> ${log_file}
     cd ../
 }
 
