@@ -16,7 +16,7 @@
 # reference: https://arxiv.org/abs/1909.13719
 
 import random
-from .operators import RawColorJitter, ColorJitter, GaussianBlur
+from .operators import RawColorJitter
 from paddle.vision.transforms import transforms as T
 
 import numpy as np
@@ -68,23 +68,6 @@ def cutout(image, pad_size, replace=0):
             image_np, fill_value=replace, dtype=image_np.dtype),
         image_np)
     return Image.fromarray(image_np)
-
-
-class RandomApply(object):
-    def __init__(self, p, transforms):
-        self.p = p
-        ts = []
-        for t in transforms:
-            for key in t.keys():
-                ts.append(eval(key)(**t[key]))
-
-        self.trans = T.Compose(ts)
-
-    def __call__(self, img):
-        if self.p < np.random.rand(1):
-            return img
-        timg = self.trans(img)
-        return timg
 
 
 class RandAugment(object):
@@ -172,6 +155,23 @@ class RandAugment(object):
             op_name = np.random.choice(avaiable_op_names)
             img = self.func[op_name](img, self.level_map[op_name])
         return img
+
+
+class RandomApply(object):
+    def __init__(self, p, transforms):
+        self.p = p
+        ts = []
+        for t in transforms:
+            for key in t.keys():
+                ts.append(eval(key)(**t[key]))
+
+        self.trans = T.Compose(ts)
+
+    def __call__(self, img):
+        if self.p < np.random.rand(1):
+            return img
+        timg = self.trans(img)
+        return timg
 
 
 ## RandAugment_EfficientNetV2 code below ##
