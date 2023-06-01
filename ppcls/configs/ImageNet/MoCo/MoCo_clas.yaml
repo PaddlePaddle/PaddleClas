@@ -17,7 +17,7 @@ Global:
 
 
 Arch:
-  name: moco_clas
+  name: MoCo_finetune
   pretrained_model: ./pretrain/moco_v2_bs_256_epoch_200
   backbone:
     name: ResNet50

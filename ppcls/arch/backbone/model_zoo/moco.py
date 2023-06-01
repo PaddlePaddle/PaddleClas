@@ -24,7 +24,7 @@ from ppcls.utils.initializer import kaiming_normal_, constant_, normal_
 from ..legendary_models import *
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {"moco_v1": "UNKNOWN", "moco_v2": "UNKNOWN"}
+MODEL_URLS = {"MoCo_V1": "UNKNOWN", "MoCo_V2": "UNKNOWN"}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -338,17 +338,17 @@ def freeze_batchnorm_statictis(layer):
             layer._use_global_stats = True
 
 
-def moco_v1(backbone, neck, head, pretrained=False, use_ssld=False):
+def MoCo_V1(backbone, neck, head, pretrained=False, use_ssld=False):
     model = MoCo(
         backbone_config=backbone, neck_config=neck, head_config=head, T=0.07)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["moco_v1"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MoCo_V1"], use_ssld=use_ssld)
     return model
 
 
-def moco_v2(backbone, neck, head, pretrained=False, use_ssld=False):
+def MoCo_V2(backbone, neck, head, pretrained=False, use_ssld=False):
     model = MoCo(
         backbone_config=backbone, neck_config=neck, head_config=head, T=0.2)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["moco_v2"], use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["MoCo_V2"], use_ssld=use_ssld)
     return model

@@ -21,7 +21,7 @@ Global:
 
 # model architecture
 Arch:
-  name: moco_v2
+  name: MoCo_V2
   backbone:
     name: ResNet50
     stop_layer_name: AvgPool2D

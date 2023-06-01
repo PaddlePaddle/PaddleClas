@@ -25,7 +25,7 @@ from ppcls.utils.initializer import normal_
 from ..legendary_models import *
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
-MODEL_URLS = {"moco_clas": "UNKNOWN"}
+MODEL_URLS = {"MoCo_finetune": "UNKNOWN"}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -105,7 +105,7 @@ def freeze_params(model):
             param.trainable = False
 
 
-def moco_clas(backbone, head, pretrained=False, use_ssld=False):
+def MoCo_finetune(backbone, head, pretrained=False, use_ssld=False):
     backbone_config = backbone
     head_config = head
     backbone_name = backbone_config.pop('name')
