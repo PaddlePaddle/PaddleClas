@@ -194,7 +194,7 @@ We also used the same optimization strategy in the other 8 scenarios and got the
 | scenarios | large model | large model metrics(%) | small model | small model metrics(%) |
 |----------|----------|----------|----------|----------|
 | Pedestrian Attribute Classification | Res2Net200_vd | 81.25 | PPLCNet_x1_0 | 78.59 |
-| Classification of Wheather Wearing Safety Helmet | Res2Net200_vd| 98.92 | PPLCNet_x1_0 |99.38 |
+| Classification of Whether Wearing Safety Helmet | Res2Net200_vd| 98.92 | PPLCNet_x1_0 |99.38 |
 | Traffic Sign Classification | SwinTransformer_tiny | 98.11 | PPLCNet_x1_0 | 98.35 |
 | Vehicle Attribute Classification | Res2Net200_vd_26w_4s | 91.36 | PPLCNet_x1_0 | 90.81 |
 | Car Exists Classification | SwinTransformer_tiny | 97.71 | PPLCNet_x1_0 | 95.92 |

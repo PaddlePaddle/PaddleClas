@@ -62,13 +62,7 @@ def train_epoch_fixmatch(engine, epoch_id, print_batch_step):
         inputs = paddle.concat([inputs_x, inputs_u_w, inputs_u_s], axis=0)
 
         # image input
-        if engine.amp:
-            amp_level = engine.config['AMP'].get("level", "O1").upper()
-            with paddle.amp.auto_cast(level=amp_level):
-                loss_dict, logits_label = get_loss(
-                    engine, inputs, batch_size_label, temperture, threshold,
-                    targets_x)
-        else:
+        with engine.auto_cast(is_eval=False):
             loss_dict, logits_label = get_loss(engine, inputs,
                                                batch_size_label, temperture,
                                                threshold, targets_x)
@@ -77,16 +71,13 @@ def train_epoch_fixmatch(engine, epoch_id, print_batch_step):
         loss = loss_dict["loss"]
 
         # backward & step opt
-        if engine.amp:
-            scaled = engine.scaler.scale(loss)
-            scaled.backward()
+        scaled = engine.scaler.scale(loss)
+        scaled.backward()
 
-            for i in range(len(engine.optimizer)):
-                engine.scaler.minimize(engine.optimizer[i], scaled)
-        else:
-            loss.backward()
-            for i in range(len(engine.optimizer)):
-                engine.optimizer[i].step()
+        for i in range(len(engine.optimizer)):
+            # optimizer.step() with auto amp
+            engine.scaler.step(engine.optimizer[i])
+            engine.scaler.update()
 
         # step lr(by step)
         for i in range(len(engine.lr_sch)):

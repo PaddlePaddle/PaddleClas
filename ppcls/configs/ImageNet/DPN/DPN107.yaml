@@ -14,6 +14,18 @@ Global:
   image_shape: [3, 224, 224]
   save_inference_dir: ./inference
 
+
+# mixed precision
+AMP:
+  use_amp: False
+  use_fp16_test: False
+  scale_loss: 128.0
+  use_dynamic_loss_scaling: True
+  use_promote: False
+  # O1: mixed fp16, O2: pure fp16
+  level: O1
+
+
 # model architecture
 Arch:
   name: DPN107

@@ -33,6 +33,7 @@ from ppcls.arch import apply_to_static
 from ppcls.loss import build_loss
 from ppcls.metric import build_metrics
 from ppcls.optimizer import build_optimizer
+from ppcls.utils.amp import AutoCast, build_scaler
 from ppcls.utils.ema import ExponentialMovingAverage
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 from ppcls.utils.save_load import init_model
@@ -242,61 +243,8 @@ class Engine(object):
                 self.config["Optimizer"], self.config["Global"]["epochs"],
                 self.iter_per_epoch // self.update_freq,
                 [self.model, self.train_loss_func])
-
-        # AMP training and evaluating
-        self.amp = "AMP" in self.config and self.config["AMP"] is not None
-        self.amp_eval = False
-        # for amp
-        if self.amp:
-            AMP_RELATED_FLAGS_SETTING = {'FLAGS_max_inplace_grad_add': 8, }
-            if paddle.is_compiled_with_cuda():
-                AMP_RELATED_FLAGS_SETTING.update({
-                    'FLAGS_cudnn_batchnorm_spatial_persistent': 1
-                })
-            paddle.set_flags(AMP_RELATED_FLAGS_SETTING)
-
-            self.scale_loss = self.config["AMP"].get("scale_loss", 1.0)
-            self.use_dynamic_loss_scaling = self.config["AMP"].get(
-                "use_dynamic_loss_scaling", False)
-            self.scaler = paddle.amp.GradScaler(
-                init_loss_scaling=self.scale_loss,
-                use_dynamic_loss_scaling=self.use_dynamic_loss_scaling)
-
-            self.amp_level = self.config['AMP'].get("level", "O1")
-            if self.amp_level not in ["O1", "O2"]:
-                msg = "[Parameter Error]: The optimize level of AMP only support 'O1' and 'O2'. The level has been set 'O1'."
-                logger.warning(msg)
-                self.config['AMP']["level"] = "O1"
-                self.amp_level = "O1"
-
-            self.amp_eval = self.config["AMP"].get("use_fp16_test", False)
-            # TODO(gaotingquan): Paddle not yet support FP32 evaluation when training with AMPO2
-            if self.mode == "train" and self.config["Global"].get(
-                    "eval_during_train",
-                    True) and self.amp_level == "O2" and self.amp_eval == False:
-                msg = "PaddlePaddle only support FP16 evaluation when training with AMP O2 now. "
-                logger.warning(msg)
-                self.config["AMP"]["use_fp16_test"] = True
-                self.amp_eval = True
-
-            if self.mode == "train":
-                self.model, self.optimizer = paddle.amp.decorate(
-                    models=self.model,
-                    optimizers=self.optimizer,
-                    level=self.amp_level,
-                    save_dtype='float32')
-            elif self.amp_eval:
-                self.model = paddle.amp.decorate(
-                    models=self.model,
-                    level=self.amp_level,
-                    save_dtype='float32')
-
-            if self.mode == "train" and len(self.train_loss_func.parameters(
-            )) > 0:
-                self.train_loss_func = paddle.amp.decorate(
-                    models=self.train_loss_func,
-                    level=self.amp_level,
-                    save_dtype='float32')
+        # amp
+        self._init_amp()
 
         # build EMA model
         self.ema = "EMA" in self.config and self.mode == "train"
@@ -512,10 +460,7 @@ class Engine(object):
             if len(batch_data) >= batch_size or idx == len(image_list) - 1:
                 batch_tensor = paddle.to_tensor(batch_data)
 
-                if self.amp and self.amp_eval:
-                    with paddle.amp.auto_cast(level=self.amp_level):
-                        out = self.model(batch_tensor)
-                else:
+                with self.auto_cast(is_eval=True):
                     out = self.model(batch_tensor)
 
                 if isinstance(out, list):
@@ -577,6 +522,73 @@ class Engine(object):
         logger.info(
             f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
         )
+
+    def _init_amp(self):
+        if self.mode == "export":
+            return
+
+        amp_config = self.config.get("AMP", None)
+        use_amp = True if amp_config and amp_config.get("use_amp",
+                                                        True) else False
+
+        if not use_amp:
+            self.auto_cast = AutoCast(use_amp)
+            self.scaler = build_scaler(use_amp)
+        else:
+            AMP_RELATED_FLAGS_SETTING = {'FLAGS_max_inplace_grad_add': 8, }
+            if paddle.is_compiled_with_cuda():
+                AMP_RELATED_FLAGS_SETTING.update({
+                    'FLAGS_cudnn_batchnorm_spatial_persistent': 1
+                })
+            paddle.set_flags(AMP_RELATED_FLAGS_SETTING)
+
+            use_promote = amp_config.get("use_promote", False)
+            amp_level = amp_config.get("level", "O1")
+            if amp_level not in ["O1", "O2"]:
+                msg = "[Parameter Error]: The optimize level of AMP only support 'O1' and 'O2'. The level has been set 'O1'."
+                logger.warning(msg)
+                amp_level = amp_config["level"] = "O1"
+
+            amp_eval = self.config["AMP"].get("use_fp16_test", False)
+            # TODO(gaotingquan): Paddle not yet support FP32 evaluation when training with AMPO2
+            if self.mode == "train" and self.config["Global"].get(
+                    "eval_during_train",
+                    True) and amp_level == "O2" and amp_eval == False:
+                msg = "PaddlePaddle only support FP16 evaluation when training with AMP O2 now. "
+                logger.warning(msg)
+                self.config["AMP"]["use_fp16_test"] = True
+                amp_eval = True
+
+            self.auto_cast = AutoCast(
+                use_amp,
+                amp_level=amp_level,
+                use_promote=use_promote,
+                amp_eval=amp_eval)
+
+            scale_loss = amp_config.get("scale_loss", 1.0)
+            use_dynamic_loss_scaling = amp_config.get(
+                "use_dynamic_loss_scaling", False)
+            self.scaler = build_scaler(
+                use_amp,
+                scale_loss=scale_loss,
+                use_dynamic_loss_scaling=use_dynamic_loss_scaling)
+
+            if self.mode == "train":
+                self.model, self.optimizer = paddle.amp.decorate(
+                    models=self.model,
+                    optimizers=self.optimizer,
+                    level=amp_level,
+                    save_dtype='float32')
+            elif amp_eval:
+                self.model = paddle.amp.decorate(
+                    models=self.model, level=amp_level, save_dtype='float32')
+
+            if self.mode == "train" and len(self.train_loss_func.parameters(
+            )) > 0:
+                self.train_loss_func = paddle.amp.decorate(
+                    models=self.train_loss_func,
+                    level=self.amp_level,
+                    save_dtype='float32')
 
 
 class ExportModel(TheseusLayer):

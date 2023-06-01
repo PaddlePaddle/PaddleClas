@@ -136,10 +136,7 @@ def compute_feature(engine, name="gallery"):
         if len(batch) >= 3:
             has_camera = True
             batch[2] = batch[2].reshape([-1, 1]).astype("int64")
-        if engine.amp and engine.amp_eval:
-            with paddle.amp.auto_cast(level=engine.amp_level):
-                out = engine.model(batch[0])
-        else:
+        with engine.auto_cast(is_eval=True):
             out = engine.model(batch[0])
         if "Student" in out:
             out = out["Student"]

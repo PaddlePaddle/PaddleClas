@@ -188,7 +188,7 @@ def parser():
         '-v',
         '--verbose',
         action='store_true',
-        help='wheather print the config info')
+        help='whether print the config info')
     return parser
 
 

@@ -15,9 +15,12 @@ Global:
   save_inference_dir: ./inference
 
 AMP:
+  use_amp: True
+  use_fp16_test: False
   scale_loss: 128.0
   use_dynamic_loss_scaling: True
-  # O1: mixed fp16
+  use_promote: False
+  # O1: mixed fp16, O2: pure fp16
   level: O1
 
 # model architecture

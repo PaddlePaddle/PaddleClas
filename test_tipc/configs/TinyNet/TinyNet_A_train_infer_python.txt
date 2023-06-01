@@ -37,7 +37,7 @@ inference_dir:null
 infer_model:../inference/
 infer_export:True
 infer_quant:Fasle
-inference:python/predict_cls.py -c configs/inference_cls.yaml
+inference:python/predict_cls.py -c configs/inference_cls.yaml -o PreProcess.transform_ops.0.ResizeImage.resize_short=219 -o PreProcess.transform_ops.1.CropImage.size=192
 -o Global.use_gpu:True|False
 -o Global.enable_mkldnn:False
 -o Global.cpu_num_threads:1

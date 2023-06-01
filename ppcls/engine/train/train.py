@@ -48,12 +48,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
         engine.global_step += 1
 
         # image input
-        if engine.amp:
-            amp_level = engine.config["AMP"].get("level", "O1").upper()
-            with paddle.amp.auto_cast(level=amp_level):
-                out = forward(engine, batch)
-                loss_dict = engine.train_loss_func(out, batch[1])
-        else:
+        with engine.auto_cast(is_eval=False):
             out = forward(engine, batch)
             loss_dict = engine.train_loss_func(out, batch[1])
 
@@ -61,17 +56,13 @@ def train_epoch(engine, epoch_id, print_batch_step):
         loss = loss_dict["loss"] / engine.update_freq
 
         # backward & step opt
-        if engine.amp:
-            scaled = engine.scaler.scale(loss)
-            scaled.backward()
-            if (iter_id + 1) % engine.update_freq == 0:
-                for i in range(len(engine.optimizer)):
-                    engine.scaler.minimize(engine.optimizer[i], scaled)
-        else:
-            loss.backward()
-            if (iter_id + 1) % engine.update_freq == 0:
-                for i in range(len(engine.optimizer)):
-                    engine.optimizer[i].step()
+        scaled = engine.scaler.scale(loss)
+        scaled.backward()
+        if (iter_id + 1) % engine.update_freq == 0:
+            for i in range(len(engine.optimizer)):
+                # optimizer.step() with auto amp
+                engine.scaler.step(engine.optimizer[i])
+                engine.scaler.update()
 
         if (iter_id + 1) % engine.update_freq == 0:
             # clear grad

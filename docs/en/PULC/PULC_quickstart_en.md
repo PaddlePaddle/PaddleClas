@@ -108,7 +108,7 @@ The name of PULC series models are as follows:
 | --- | --- |
 | person_exists | Human Exists Classification |
 | person_attribute | Pedestrian Attribute Classification |
-| safety_helmet | Classification of Wheather Wearing Safety Helmet |
+| safety_helmet | Classification of Whether Wearing Safety Helmet |
 | traffic_sign | Traffic Sign Classification |
 | vehicle_attribute | Vehicle Attribute Classification |
 | car_exists | Car Exists Classification |
@@ -120,4 +120,4 @@ The name of PULC series models are as follows:
 
 ## 3. Summary
 
-The PULC series models have been verified to be effective in different scenarios about people, vehicles, OCR, etc. The ultra lightweight model can achieve the accuracy close to SwinTransformer model, and the speed is increased by 40+ times. And PULC also provides the whole process of dataset getting, model training, model compression and deployment. Please refer to [Human Exists Classification](PULC_person_exists_en.md)、[Pedestrian Attribute Classification](PULC_person_attribute_en.md)、[Classification of Wheather Wearing Safety Helmet](PULC_safety_helmet_en.md)、[Traffic Sign Classification](PULC_traffic_sign_en.md)、[Vehicle Attribute Classification](PULC_vehicle_attribute_en.md)、[Car Exists Classification](PULC_car_exists_en.md)、[Text Image Orientation Classification](PULC_text_image_orientation_en.md)、[Text-line Orientation Classification](PULC_textline_orientation_en.md)、[Language Classification](PULC_language_classification_en.md) for more information about different scenarios.
+The PULC series models have been verified to be effective in different scenarios about people, vehicles, OCR, etc. The ultra lightweight model can achieve the accuracy close to SwinTransformer model, and the speed is increased by 40+ times. And PULC also provides the whole process of dataset getting, model training, model compression and deployment. Please refer to [Human Exists Classification](PULC_person_exists_en.md)、[Pedestrian Attribute Classification](PULC_person_attribute_en.md)、[Classification of Whether Wearing Safety Helmet](PULC_safety_helmet_en.md)、[Traffic Sign Classification](PULC_traffic_sign_en.md)、[Vehicle Attribute Classification](PULC_vehicle_attribute_en.md)、[Car Exists Classification](PULC_car_exists_en.md)、[Text Image Orientation Classification](PULC_text_image_orientation_en.md)、[Text-line Orientation Classification](PULC_textline_orientation_en.md)、[Language Classification](PULC_language_classification_en.md) for more information about different scenarios.

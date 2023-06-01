@@ -189,26 +189,23 @@ def get_meta_data(meta_dataloader_iter, num_domain):
 def forward(engine, batch, loss_func):
     batch_info = defaultdict()
     batch_info = {"label": batch[1], "domain": batch[2]}
-    if engine.amp:
-        amp_level = engine.config["AMP"].get("level", "O1").upper()
-        with paddle.amp.auto_cast(level=amp_level):
-            out = engine.model(batch[0], batch[1])
-            loss_dict = loss_func(out, batch_info)
-    else:
+
+    with engine.auto_cast(is_eval=False):
         out = engine.model(batch[0], batch[1])
         loss_dict = loss_func(out, batch_info)
+
     return out, loss_dict
 
 
 def backward(engine, loss, optimizer):
     optimizer.clear_grad()
-    if engine.amp:
-        scaled = engine.scaler.scale(loss)
-        scaled.backward()
-        engine.scaler.minimize(optimizer, scaled)
-    else:
-        loss.backward()
-        optimizer.step()
+    scaled = engine.scaler.scale(loss)
+    scaled.backward()
+
+    # optimizer.step() with auto amp
+    engine.scaler.step(optimizer)
+    engine.scaler.update()
+
     for name, layer in engine.model.backbone.named_sublayers():
         if "gate" == name.split('.')[-1]:
             layer.clip_gate()
