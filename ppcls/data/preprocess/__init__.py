@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from paddle.vision.transforms import ToTensor, Normalize, RandomHorizontalFlip, RandomResizedCrop, Transpose
 from ppcls.data.preprocess.ops.autoaugment import ImageNetPolicy as RawImageNetPolicy
 from ppcls.data.preprocess.ops.randaugment import RandAugment as RawRandAugment
 from ppcls.data.preprocess.ops.randaugment import RandomApply
@@ -48,6 +49,8 @@ from ppcls.data.preprocess.ops.operators import RandomRotation
 from ppcls.data.preprocess.ops.operators import Padv2
 from ppcls.data.preprocess.ops.operators import RandomRot90
 from ppcls.data.preprocess.ops.operators import PCALighting
+from ppcls.data.preprocess.ops.operators import GaussianBlur
+
 from .ops.operators import format_data
 from paddle.vision.transforms import Pad as Pad_paddle_vision
 
@@ -57,6 +60,7 @@ from ppcls.data.preprocess.batch_ops.batch_operators import MixupCutmixHybrid
 import numpy as np
 from PIL import Image
 import random
+
 
 def transform(data, ops=[]):
     """ transform """

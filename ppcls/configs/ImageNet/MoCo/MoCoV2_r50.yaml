@@ -1,0 +1,130 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output/ 
+  device: gpu
+  save_interval: 50
+  # train_epoch_iter_two_samples
+  train_mode: iter_two_samples
+  eval_during_train: False
+  eval_interval: 1
+  epochs: 200
+  print_batch_step: 10
+  use_visualdl: False
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  save_inference_dir: ./inference
+  # training model under @to_static
+  to_static: False
+
+
+# model architecture
+Arch:
+  name: MoCo_V2
+  backbone:
+    name: ResNet50
+    stop_layer_name: AvgPool2D
+  neck:
+    name: NonLinearNeck
+    in_channels: 2048
+    hid_channels: 2048
+    out_channels: 128
+  head:
+    name: ContrastiveHead
+    temperature: 0.2
+
+# loss function config 
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  weight_decay: 0.0001
+  lr:
+    name: Cosine
+    learning_rate: 0.03
+    T_max: 200
+
+    
+
+# data loader for train 
+DataLoader:
+  Train:
+    dataset:
+      name: MoCoImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      return_label: False
+      return_two_sample: True
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True,
+            channel_first: False
+        - RandomResizedCrop:
+            size: 224
+            scale: [0.2, 1.]
+      view_trans1:
+        - RandomApply:
+            transforms:
+              - RawColorJitter:
+                  brightness: 0.4
+                  contrast: 0.4
+                  saturation: 0.4
+                  hue: 0.1
+            p: 0.8
+        - RandomGrayscale:
+            p: 0.2
+        - RandomApply:
+            transforms:
+              - GaussianBlur:
+                  sigma: [0.1, 2.0]
+            p: 0.5
+        - RandomHorizontalFlip:
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - ToCHWImage:
+      view_trans2:
+        - RandomApply:
+            transforms:
+              - RawColorJitter:
+                  brightness: 0.4
+                  contrast: 0.4
+                  saturation: 0.4
+                  hue: 0.1
+            p: 0.8
+        - RandomGrayscale:
+            p: 0.2
+        - RandomApply:
+            transforms:
+              - GaussianBlur:
+                  sigma: [0.1, 2.0]
+            p: 0.5
+        - RandomHorizontalFlip:
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - ToCHWImage:
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 64
+      drop_last: True
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+Metric:
+  Train:
+    - TopkAcc:
+        topk: [1, 5]
+        

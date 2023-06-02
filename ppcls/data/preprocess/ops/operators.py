@@ -24,12 +24,13 @@ import math
 import random
 import cv2
 import numpy as np
-from PIL import Image, ImageOps, __version__ as PILLOW_VERSION
+from PIL import ImageFilter, Image, ImageOps, __version__ as PILLOW_VERSION
 from paddle.vision.transforms import ColorJitter as RawColorJitter
 from paddle.vision.transforms import CenterCrop, Resize
 from paddle.vision.transforms import RandomRotation as RawRandomRotation
 from paddle.vision.transforms import ToTensor, Normalize, RandomHorizontalFlip, RandomResizedCrop
 from paddle.vision.transforms import functional as F
+from paddle.vision.transforms import transforms as T
 from .autoaugment import ImageNetPolicy
 from .functional import augmentations
 from ppcls.utils import logger
@@ -742,8 +743,8 @@ class Pad(object):
         # Process fill color for affine transforms
         major_found, minor_found = (int(v)
                                     for v in PILLOW_VERSION.split('.')[:2])
-        major_required, minor_required = (int(v) for v in
-                                          min_pil_version.split('.')[:2])
+        major_required, minor_required = (
+            int(v) for v in min_pil_version.split('.')[:2])
         if major_found < major_required or (major_found == major_required and
                                             minor_found < minor_required):
             if fill is None:
@@ -858,6 +859,25 @@ class BlurImage(object):
         return {"img": img, "blur_image": label}
 
 
+class GaussianBlur(object):
+    """Gaussian blur augmentation in SimCLR https://arxiv.org/abs/2002.05709"""
+
+    def __init__(self, sigma=[.1, 2.], backend="cv2"):
+        self.sigma = sigma
+        self.kernel_size = 23
+        self.backbend = backend
+
+    def __call__(self, x):
+        sigma = np.random.uniform(self.sigma[0], self.sigma[1])
+        if self.backbend == "PIL":
+            x = x.filter(ImageFilter.GaussianBlur(radius=sigma))
+            return x
+        else:
+            x = cv2.GaussianBlur(
+                np.array(x), (self.kernel_size, self.kernel_size), sigma)
+            return Image.fromarray(x.astype(np.uint8))
+
+
 class RandomGrayscale(object):
     """Randomly convert image to grayscale with a probability of p (default 0.1).
 
@@ -878,14 +898,20 @@ class RandomGrayscale(object):
     def __call__(self, img):
         """
         Args:
-            img (PIL Image): Image to be converted to grayscale.
+            img (PIL.Image|np.array): Image to be converted to grayscale.
 
         Returns:
             PIL Image: Randomly grayscaled image.
         """
-        num_output_channels = 1 if img.mode == 'L' else 3
-        if random.random() < self.p:
-            return F.to_grayscale(img, num_output_channels=num_output_channels)
+        if isinstance(img, Image.Image):
+            if img.mode == 'L':
+                num_output_channels = 1
+
+        if isinstance(img, np.ndarray) or isinstance(img, Image.Image):
+            num_output_channels = 3
+            if random.random() < self.p:
+                return F.to_grayscale(
+                    img, num_output_channels=num_output_channels)
         return img
 
     def __repr__(self):

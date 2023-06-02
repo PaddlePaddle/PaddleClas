@@ -330,6 +330,7 @@ class Engine(object):
         if self.config["Global"]["distributed"]:
             dist.init_parallel_env()
             self.model = paddle.DataParallel(self.model)
+
             if self.mode == 'train' and len(self.train_loss_func.parameters(
             )) > 0:
                 self.train_loss_func = paddle.DataParallel(
