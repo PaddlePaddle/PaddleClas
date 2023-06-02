@@ -116,7 +116,7 @@ SAVE_LOG=${BENCHMARK_LOG_DIR:-$(pwd)}   # */benchmark_log
 mkdir -p "${SAVE_LOG}/benchmark_log/"
 status_log="${SAVE_LOG}/benchmark_log/results.log"
 # get benchmark profiling params : PROFILING_TIMER_ONLY=no|True|False
-PROFILING_TIMER_ONLY=${PROFILING_TIMER_ONLY:-"no"}
+PROFILING_TIMER_ONLY=${PROFILING_TIMER_ONLY:-"True"}
 
 # The number of lines in which train params can be replaced.
 line_python=3
