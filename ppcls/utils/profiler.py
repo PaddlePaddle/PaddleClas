@@ -54,7 +54,8 @@ class ProfilerOptions(object):
             'sorted_key': 'total',
             'tracer_option': 'Default',
             'profile_path': '/tmp/profile',
-            'exit_on_finished': True
+            'exit_on_finished': True,
+            'timer_only': True
         }
         self._parse_from_string(options_str)
 
@@ -72,6 +73,8 @@ class ProfilerOptions(object):
             elif key in [
                     'state', 'sorted_key', 'tracer_option', 'profile_path'
             ]:
+                self._options[key] = value
+            elif key == 'timer_only':
                 self._options[key] = value
 
     def __getitem__(self, name):
@@ -104,10 +107,11 @@ def add_profiler_step(options_str=None):
     # timer_only = False calling summary can print a statistical form that presents performance data from different perspectives.
     # timer_only = False the output Timeline information can be found in the profiler_log directory
     if _prof is None:
+        _timer_only = str(_profiler_options['timer_only']) == str(True)
         _prof = profiler.Profiler(
                    scheduler = (_profiler_options['batch_range'][0], _profiler_options['batch_range'][1]),
                    on_trace_ready = profiler.export_chrome_tracing('./profiler_log'),
-                   timer_only = True)
+                   timer_only = _timer_only)
         _prof.start()
     else:
         _prof.step()
