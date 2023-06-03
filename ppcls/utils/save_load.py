@@ -64,6 +64,34 @@ def load_dygraph_pretrain(model, path=None):
     logger.info("Finish load pretrained model from {}".format(path))
     return
 
+####
+"""
+return state_dict instead of directly loading
+"""
+def load_dygraph_pretrain_state_dict(path=None):
+    if not (os.path.isdir(path) or os.path.exists(path + '.pdparams')):
+        raise ValueError("Model pretrain path {}.pdparams does not "
+                         "exists.".format(path))
+    param_state_dict = paddle.load(path + ".pdparams")
+    return param_state_dict
+def load_dygraph_pretrain_from_url_state_dict(
+                                   pretrained_url,
+                                   use_ssld=False,
+                                   use_imagenet22k_pretrained=False,
+                                   use_imagenet22kto1k_pretrained=False):
+    if use_ssld:
+        pretrained_url = pretrained_url.replace("_pretrained",
+                                                "_ssld_pretrained")
+    if use_imagenet22k_pretrained:
+        pretrained_url = pretrained_url.replace("_pretrained",
+                                                "_22k_pretrained")
+    if use_imagenet22kto1k_pretrained:
+        pretrained_url = pretrained_url.replace("_pretrained",
+                                                "_22kto1k_pretrained")
+    local_weight_path = get_weights_path_from_url(pretrained_url).replace(
+        ".pdparams", "")
+    
+    return load_dygraph_pretrain_state_dict(path=local_weight_path)
 
 def load_dygraph_pretrain_from_url(model,
                                    pretrained_url,
