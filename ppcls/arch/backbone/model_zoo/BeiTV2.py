@@ -564,6 +564,16 @@ def beit_base_patch16_224(pretrained=False, finetune_weight=None, model_filter_n
                     else:
                         pass
                 checkpoint_model = new_dict
+
+        student_all_keys = list(checkpoint_model.keys())
+        for key in student_all_keys:
+            if "Teacher" in key:
+                checkpoint_model.pop(key)
+            elif "Student" in key:
+                checkpoint_model[key[8:]] = checkpoint_model.pop(key)
+            else:
+                continue
+
         state_dict = model.state_dict()
         for k in ['head.weight', 'head.bias']:
             if k in checkpoint_model and checkpoint_model[k].shape != state_dict[k].shape:
@@ -581,11 +591,6 @@ def beit_base_patch16_224(pretrained=False, finetune_weight=None, model_filter_n
 
         all_keys = list(checkpoint_model.keys())
         for key in all_keys:
-            if "Teacher" in key:
-                checkpoint_model.pop(key)
-            elif "Student" in key:
-                checkpoint_model[key.strip("Student.")] = checkpoint_model.pop(key)
-
             if "relative_position_index" in key:
                 checkpoint_model.pop(key)
 
