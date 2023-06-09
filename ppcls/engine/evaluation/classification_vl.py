@@ -3,7 +3,6 @@ batch_size = batch[0].shape[0] -> batch_size = batch[1].shape[0]
 batch[0] = paddle.to_tensor(batch[0]) -> #batch[0] = paddle.to_tensor(batch[0]) to make compatible with tuple x
 """
 
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -42,8 +41,11 @@ def classification_eval(engine, epoch_id=0):
                 time_info[key].reset()
 
         time_info["reader_cost"].update(time.time() - tic)
-        #for debug and while removing before push
-        #batch_size = batch[0].shape[0]
+        """
+        change batch[0] -> batch[1]
+        for vl-ltr inputs [(img,text),labels]
+        avoid redundant to_tensor: #batch[0] = paddle.to_tensor(batch[0])
+        """
         batch_size = batch[1].shape[0]
         #batch[0] = paddle.to_tensor(batch[0])
         if not engine.config["Global"].get("use_multilabel", False):

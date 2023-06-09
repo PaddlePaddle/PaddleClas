@@ -2,7 +2,6 @@
 batch_size = batch[0].shape[0] -> batch_size = batch[1].shape[0] to make compatible with tuple x
 """
 
-
 from __future__ import absolute_import, division, print_function
 
 import time
@@ -33,9 +32,10 @@ def train_epoch(engine, epoch_id, print_batch_step):
             for key in engine.time_info:
                 engine.time_info[key].reset()
         engine.time_info["reader_cost"].update(time.time() - tic)
-        # for local debug
-        #batch_size = batch[0].shape[0]
-        # need to adjust when push
+        """
+        change batch[0] -> batch[1]
+        for vl-ltr inputs [(img,text),labels]
+        """
         batch_size = batch[1].shape[0]
         if not engine.config["Global"].get("use_multilabel", False):
             batch[1] = batch[1].reshape([batch_size, -1])
