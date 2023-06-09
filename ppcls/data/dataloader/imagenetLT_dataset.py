@@ -264,7 +264,8 @@ class SentPreProcessor(object):
         self.drop_keys = [
             'External links', 'References', 'Further reading', 'Bibliography'
         ]
-        self._tokenizer = SimpleTokenizer()
+        self._tokenizer = SimpleTokenizer(
+            os.path.join(self.root, "bpe_simple_vocab_16e6.txt.gz"))
         self.SEP_TOKENS = [267, 269]  # [',', '.']
         self.wikis = None
 
