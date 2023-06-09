@@ -55,8 +55,8 @@ class ResidualAttentionBlock(nn.Layer):
         self.attn = nn.MultiHeadAttention(d_model, n_head)
         self.ln_1 = nn.LayerNorm(d_model)
         self.mlp = nn.Sequential(("c_fc", nn.Linear(d_model, d_model * 4)),
-                                 ("gelu", QuickGELU()),
-                                 ("c_proj", nn.Linear(d_model * 4, d_model)))
+                                 ("gelu", QuickGELU()), ("c_proj", nn.Linear(
+                                     d_model * 4, d_model)))
         self.ln_2 = nn.LayerNorm(d_model)
         self.attn_mask = attn_mask
 
@@ -564,8 +564,8 @@ class LGR(nn.Layer):
             for s in split_text_embeddings
         ]
         split_text_embeddings = paddle.to_tensor(split_text_embeddings)
-        split_text_embeddings = paddle.transpose(split_text_embeddings,
-                                                 (0, 1, 2))
+        split_text_embeddings = paddle.transpose(split_text_embeddings, (0, 1,
+                                                                         2))
         self.text_embeddings.set_value(split_text_embeddings)
 
     def _load_vis_backbone(self, vis_backbone_path):
