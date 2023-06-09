@@ -1,5 +1,5 @@
 from __future__ import print_function
-from typing import List,Dict
+from typing import List, Dict
 
 import numpy as np
 import os
@@ -16,7 +16,6 @@ import paddle
 from ppcls.data import preprocess
 from ppcls.data.preprocess import transform
 from ppcls.utils import logger
-
 """
 prompt for CLIP
 """
@@ -105,9 +104,13 @@ prompt_templates = [
 """
 CLIP text encoder and decoder
 """
+
+
 @lru_cache()
 def default_bpe():
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "bpe_simple_vocab_16e6.txt.gz")
+    return os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "bpe_simple_vocab_16e6.txt.gz")
 
 
 @lru_cache()
@@ -121,13 +124,14 @@ def bytes_to_unicode():
     To avoid that, we want lookup tables between utf-8 bytes and unicode strings.
     And avoids mapping to whitespace/control characters the bpe code barfs on.
     """
-    bs = list(range(ord("!"), ord("~")+1))+list(range(ord("¡"), ord("¬")+1))+list(range(ord("®"), ord("ÿ")+1))
+    bs = list(range(ord("!"), ord("~") + 1)) + list(
+        range(ord("¡"), ord("¬") + 1)) + list(range(ord("®"), ord("ÿ") + 1))
     cs = bs[:]
     n = 0
     for b in range(2**8):
         if b not in bs:
             bs.append(b)
-            cs.append(2**8+n)
+            cs.append(2**8 + n)
             n += 1
     cs = [chr(n) for n in cs]
     return dict(zip(bs, cs))
@@ -158,34 +162,40 @@ def whitespace_clean(text):
 
 
 class SimpleTokenizer(object):
-    def __init__(self, bpe_path: str = default_bpe()):
+    def __init__(self, bpe_path: str=default_bpe()):
         self.byte_encoder = bytes_to_unicode()
         self.byte_decoder = {v: k for k, v in self.byte_encoder.items()}
         merges = gzip.open(bpe_path).read().decode("utf-8").split('\n')
-        merges = merges[1:49152-256-2+1]
+        merges = merges[1:49152 - 256 - 2 + 1]
         merges = [tuple(merge.split()) for merge in merges]
         vocab = list(bytes_to_unicode().values())
-        vocab = vocab + [v+'</w>' for v in vocab]
+        vocab = vocab + [v + '</w>' for v in vocab]
         for merge in merges:
             vocab.append(''.join(merge))
         vocab.extend(['<|startoftext|>', '<|endoftext|>'])
         self.encoder = dict(zip(vocab, range(len(vocab))))
         self.decoder = {v: k for k, v in self.encoder.items()}
         self.bpe_ranks = dict(zip(merges, range(len(merges))))
-        self.cache = {'<|startoftext|>': '<|startoftext|>', '<|endoftext|>': '<|endoftext|>'}
-        self.pat = re.compile(r"""<\|startoftext\|>|<\|endoftext\|>|'s|'t|'re|'ve|'m|'ll|'d|[\p{L}]+|[\p{N}]|[^\s\p{L}\p{N}]+""", re.IGNORECASE)
+        self.cache = {
+            '<|startoftext|>': '<|startoftext|>',
+            '<|endoftext|>': '<|endoftext|>'
+        }
+        self.pat = re.compile(
+            r"""<\|startoftext\|>|<\|endoftext\|>|'s|'t|'re|'ve|'m|'ll|'d|[\p{L}]+|[\p{N}]|[^\s\p{L}\p{N}]+""",
+            re.IGNORECASE)
 
     def bpe(self, token):
         if token in self.cache:
             return self.cache[token]
-        word = tuple(token[:-1]) + ( token[-1] + '</w>',)
+        word = tuple(token[:-1]) + (token[-1] + '</w>', )
         pairs = get_pairs(word)
 
         if not pairs:
-            return token+'</w>'
+            return token + '</w>'
 
         while True:
-            bigram = min(pairs, key = lambda pair: self.bpe_ranks.get(pair, float('inf')))
+            bigram = min(
+                pairs, key=lambda pair: self.bpe_ranks.get(pair, float('inf')))
             if bigram not in self.bpe_ranks:
                 break
             first, second = bigram
@@ -200,8 +210,9 @@ class SimpleTokenizer(object):
                     new_word.extend(word[i:])
                     break
 
-                if word[i] == first and i < len(word)-1 and word[i+1] == second:
-                    new_word.append(first+second)
+                if word[i] == first and i < len(word) - 1 and word[
+                        i + 1] == second:
+                    new_word.append(first + second)
                     i += 2
                 else:
                     new_word.append(word[i])
@@ -220,48 +231,77 @@ class SimpleTokenizer(object):
         bpe_tokens = []
         text = whitespace_clean(basic_clean(text)).lower()
         for token in re.findall(self.pat, text):
-            token = ''.join(self.byte_encoder[b] for b in token.encode('utf-8'))
-            bpe_tokens.extend(self.encoder[bpe_token] for bpe_token in self.bpe(token).split(' '))
+            token = ''.join(self.byte_encoder[b]
+                            for b in token.encode('utf-8'))
+            bpe_tokens.extend(self.encoder[bpe_token]
+                              for bpe_token in self.bpe(token).split(' '))
         return bpe_tokens
 
     def decode(self, tokens):
         text = ''.join([self.decoder[token] for token in tokens])
-        text = bytearray([self.byte_decoder[c] for c in text]).decode('utf-8', errors="replace").replace('</w>', ' ')
+        text = bytearray([self.byte_decoder[c] for c in text]).decode(
+            'utf-8', errors="replace").replace('</w>', ' ')
         return text
-    
+
+
 """
 text_loader 
 """
+
+
 class SentPreProcessor(object):
-    def __init__(self,root:str) -> None:
+    def __init__(self, root: str) -> None:
         self.root = root
-        with open(os.path.join(self.root,"labels.txt"),"r") as f:
+        with open(os.path.join(self.root, "labels.txt"), "r") as f:
             data = f.readlines()
         _lines = [l.split() for l in data]
-        self.categories = [{"id": l[1].strip(), "name": l[-1].strip().replace("_", " "),
-                                "wid": l[0].strip()} for l in _lines]
+        self.categories = [{
+            "id": l[1].strip(),
+            "name": l[-1].strip().replace("_", " "),
+            "wid": l[0].strip()
+        } for l in _lines]
         self.categories.sort(key=lambda x: x["wid"])
-        self.drop_keys = ['External links', 'References', 'Further reading', 'Bibliography']
+        self.drop_keys = [
+            'External links', 'References', 'Further reading', 'Bibliography'
+        ]
         self._tokenizer = SimpleTokenizer()
         self.SEP_TOKENS = [267, 269]  # [',', '.']
         self.wikis = None
+
     def get_clip_text(self):
         if self.wikis is None:
-            self.wikis = [self._parse_wiki(id) for id in range(len(self.categories))]
-        naive_text = [self.gen_naive_desc(id) for id in range(len(self.categories))]
+            self.wikis = [
+                self._parse_wiki(id) for id in range(len(self.categories))
+            ]
+        naive_text = [
+            self.gen_naive_desc(id) for id in range(len(self.categories))
+        ]
         wiki_text = [self._get_text(wiki) for wiki in self.wikis]
-        return [naive_text[i] + wiki_text[i] for i in range(len(self.categories))]
-    def split_text(self,texts):
-        pat = re.compile(r'(?<!\w\.\w.)(?<!([A-Z][a-z])|([A-Z])\.)(?<=\.|\?)(?=[\sA-Z])', re.X)
+        return [
+            naive_text[i] + wiki_text[i] for i in range(len(self.categories))
+        ]
+
+    def split_text(self, texts):
+        pat = re.compile(
+            r'(?<!\w\.\w.)(?<!([A-Z][a-z])|([A-Z])\.)(?<=\.|\?)(?=[\sA-Z])',
+            re.X)
         sents = []
         for text in texts:
             split_text = pat.split(text)
-            split_text = [s.strip() for s in split_text if s is not None and s.strip() != '']
+            split_text = [
+                s.strip() for s in split_text
+                if s is not None and s.strip() != ''
+            ]
             sents.append(split_text)
         return sents
+
     def gen_naive_desc(self, id):
-        texts = [template.format(self.categories[id]['name'] + ' ') for template in prompt_templates]
+        texts = [
+            template.format(self.categories[id]['name'] + ' ')
+            for template in prompt_templates
+        ]
         return '\n'.join(texts)
+
     def tokenize(self, texts, context_length=75):
         """
         modified from CLIP
@@ -277,19 +317,24 @@ class SentPreProcessor(object):
         -------
         A two-dimensional tensor containing the resulting tokens, shape = [number of input strings, context_length]
         """
+
         def _tokenize(texts):
             sot_token = self._tokenizer.encoder["<|startoftext|>"]  # 49406
             eot_token = self._tokenizer.encoder["<|endoftext|>"]  # 49407
-            all_tokens = [[sot_token] + self._tokenizer.encode(text)[:context_length] + [eot_token] for text in
-                            texts]
+            all_tokens = [
+                [sot_token] + self._tokenizer.encode(text)[:context_length] +
+                [eot_token] for text in texts
+            ]
             result = paddle.zeros((len(all_tokens), context_length + 2))
             for i, tokens in enumerate(all_tokens):
                 if len(tokens) > context_length + 2:
                     raise RuntimeError(
-                        f"Input {texts[i]} is too long for context length {context_length}")
-                result[i, :len(tokens)] = paddle.to_tensor(tokens,dtype=paddle.float32)
+                        f"Input {texts[i]} is too long for context length {context_length}"
+                    )
+                result[i, :len(tokens)] = paddle.to_tensor(
+                    tokens, dtype=paddle.float32)
             return result
-        
+
         if isinstance(texts, str):
             texts = [texts]
         elif isinstance(texts[0], List):
@@ -299,7 +344,9 @@ class SentPreProcessor(object):
     def _get_text(self, wiki: Dict):
         # use all key part of each wiki text except those in drop_keys
         text = wiki["summary"] + "\n"
-        text += "\n".join([v for k, v in wiki.items() if k not in ["summary"] + self.drop_keys])
+        text += "\n".join([
+            v for k, v in wiki.items() if k not in ["summary"] + self.drop_keys
+        ])
         return text
 
     def _parse_wiki(self, id) -> Dict:
@@ -307,7 +354,9 @@ class SentPreProcessor(object):
             with open(os.path.join(self.root, "wiki", f"desc_{id}.txt")) as rf:
                 lines = rf.readlines()
         except UnicodeDecodeError:
-            with open(os.path.join(self.root, "wiki", f"desc_{id}.txt"), encoding='gbk') as rf:
+            with open(
+                    os.path.join(self.root, "wiki", f"desc_{id}.txt"),
+                    encoding='gbk') as rf:
                 lines = rf.readlines()
         lines = [d.strip() for d in lines if d.strip() != '']
         ret_dict = {}
@@ -321,14 +370,14 @@ class SentPreProcessor(object):
             else:
                 val += line + '\n'
         ret_dict[key] = val.strip()
-        return ret_dict    
-
-
+        return ret_dict
 
 
 """
 dataset
 """
+
+
 class ImageNetLTDataset(CommonDataset):
     """ImageNetDataset
 
@@ -339,6 +388,7 @@ class ImageNetLTDataset(CommonDataset):
         delimiter (str, optional): delimiter. Defaults to None.
         relabel (bool, optional): whether do relabel when original label do not starts from 0 or are discontinuous. Defaults to False.
     """
+
     def __init__(self,
                  image_root,
                  cls_label_path,
@@ -347,13 +397,14 @@ class ImageNetLTDataset(CommonDataset):
                  transform_ops=None,
                  delimiter=None,
                  relabel=False):
-        
+
         self.delimiter = delimiter if delimiter is not None else " "
         self.relabel = relabel
         self.is_pretrain = is_pretrain
         self.context_length = context_length
         super(ImageNetLTDataset, self).__init__(image_root, cls_label_path,
-                                              transform_ops)
+                                                transform_ops)
+
     def get_sentence_tokens(self, context_length):
         print('using clip text tokens splitted by sentence')
         cache_root = 'cached'
@@ -368,13 +419,14 @@ class ImageNetLTDataset(CommonDataset):
             os.makedirs(cache_root, exist_ok=True)
             texts = preprocessor.get_clip_text()
             texts = preprocessor.split_text(texts)
-            paddle.save(texts,cache_path)
+            paddle.save(texts, cache_path)
         else:
             texts = paddle.load(cache_path)
-        text_tokens = preprocessor.tokenize(texts, context_length=context_length)
-        paddle.save(text_tokens,clip_token_path)
+        text_tokens = preprocessor.tokenize(
+            texts, context_length=context_length)
+        paddle.save(text_tokens, clip_token_path)
         return text_tokens
-    
+
     def __getitem__(self, idx):
         try:
             with open(self.images[idx], 'rb') as f:
@@ -390,7 +442,7 @@ class ImageNetLTDataset(CommonDataset):
                 idx = np.random.randint(sent_idxs[target])
                 token = text_tokens[target][idx]
 
-                return ((img,token),target)
+                return ((img, token), target)
             return (img, self.labels[idx])
 
         except Exception as ex:
@@ -398,16 +450,16 @@ class ImageNetLTDataset(CommonDataset):
                          format(self.images[idx], ex))
             rnd_idx = np.random.randint(self.__len__())
             return self.__getitem__(rnd_idx)
-        
+
     def _load_anno(self, seed=None):
         assert os.path.exists(
             self._cls_path), f"path {self._cls_path} does not exist."
         assert os.path.exists(
             self._img_root), f"path {self._img_root} does not exist."
-        assert os.path.exists(
-            os.path.join(self._img_root,"wiki")), f"wiki does not exist."
-        assert os.path.exists(
-            os.path.join(self._img_root,"labels.txt")), f"labels does not exist."
+        assert os.path.exists(os.path.join(self._img_root,
+                                           "wiki")), f"wiki does not exist."
+        assert os.path.exists(os.path.join(
+            self._img_root, "labels.txt")), f"labels does not exist."
         self.images = []
         self.labels = []
 
@@ -437,4 +489,3 @@ class ImageNetLTDataset(CommonDataset):
 
         self.text_tokens = self.get_sentence_tokens(self.context_length)
         self.end_idxs = [len(sents) for sents in self.text_tokens]
-        
