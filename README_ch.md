@@ -24,7 +24,7 @@
 - **💥 直播回放**：PaddleClas研发团队详解PP-ShituV2优化策略与真实产业应用。微信扫描下方二维码，关注公众号并填写问卷后进入官方交流群，获取直播回放与20G重磅图像分类学习大礼包（内含20+数据集、4个垂类模型、70+前沿论文集合）
 
 <div align="center">
-    <img src="https://user-images.githubusercontent.com/50011306/215993395-b2601ca3-5b6e-42f6-9e3e-b2149c4a791e.png" width = "150" height = "150"/>
+    <img src="https://github.com/PaddlePaddle/PaddleClas/assets/12560511/eed2d9e0-28d8-4037-9777-a2d4cf3aabbc" width = "150" height = "150"/>
 </div>
 
 - 2022.9.14 发布**商超零售新革命-生鲜智能结算产业应用**范例
