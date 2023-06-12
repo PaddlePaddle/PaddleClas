@@ -1,0 +1,5 @@
+# for quantizaiton or prune model
+Slim:
+  ## for prune
+  quant:
+    name: pact
