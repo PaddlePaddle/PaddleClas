@@ -163,7 +163,11 @@ def save_model(net,
     """
     if paddle.distributed.get_rank() != 0:
         return
-    model_path = os.path.join(model_path, model_name)
+
+    if prefix == 'best_model':
+        uapi_best_model_path = os.path.join(model_path, 'best_model')
+        _mkdir_if_not_exist(uapi_best_model_path)
+
     _mkdir_if_not_exist(model_path)
     model_path = os.path.join(model_path, prefix)
 
@@ -182,6 +186,11 @@ def save_model(net,
             paddle.save(s_params, model_path + "_student.pdparams")
 
     paddle.save(params_state_dict, model_path + ".pdparams")
+
+    if prefix == 'best_model':
+        uapi_best_model_path = os.path.join(uapi_best_model_path, 'model')
+        paddle.save(params_state_dict, uapi_best_model_path + ".pdparams")
+
     if ema is not None:
         paddle.save(ema.state_dict(), model_path + ".ema.pdparams")
     paddle.save([opt.state_dict() for opt in optimizer], model_path + ".pdopt")

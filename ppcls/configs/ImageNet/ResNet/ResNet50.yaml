@@ -32,6 +32,7 @@ AMP:
 Arch:
   name: ResNet50
   class_num: 1000
+  pretrained: True
  
 # loss function config for traing/eval process
 Loss:
