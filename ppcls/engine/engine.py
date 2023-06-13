@@ -94,7 +94,7 @@ class Engine(object):
         self.vdl_writer = None
         if self.config['Global'][
                 'use_visualdl'] and mode == "train" and dist.get_rank() == 0:
-            vdl_writer_path = os.path.join(self.output_dir, "vdl")
+            vdl_writer_path = self.output_dir
             if not os.path.exists(vdl_writer_path):
                 os.makedirs(vdl_writer_path)
             self.vdl_writer = LogWriter(logdir=vdl_writer_path)
