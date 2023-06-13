@@ -165,8 +165,8 @@ def save_model(net,
         return
 
     if prefix == 'best_model':
-        uapi_best_model_path = os.path.join(model_path, 'best_model')
-        _mkdir_if_not_exist(uapi_best_model_path)
+        best_model_path = os.path.join(model_path, 'best_model')
+        _mkdir_if_not_exist(best_model_path)
 
     _mkdir_if_not_exist(model_path)
     model_path = os.path.join(model_path, prefix)
@@ -188,8 +188,8 @@ def save_model(net,
     paddle.save(params_state_dict, model_path + ".pdparams")
 
     if prefix == 'best_model':
-        uapi_best_model_path = os.path.join(uapi_best_model_path, 'model')
-        paddle.save(params_state_dict, uapi_best_model_path + ".pdparams")
+        best_model_path = os.path.join(best_model_path, 'model')
+        paddle.save(params_state_dict, best_model_path + ".pdparams")
 
     if ema is not None:
         paddle.save(ema.state_dict(), model_path + ".ema.pdparams")
