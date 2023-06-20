@@ -25,13 +25,14 @@ import paddle.nn.functional as F
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "MobileViTV2_x0_5": "",
-    "MobileViTV2_x0_75": "",
-    "MobileViTV2_x1_0": "",
-    "MobileViTV2_x1_25": "",
-    "MobileViTV2_x1_5": "",
-    "MobileViTV2_x1_75": "",
-    "MobileViTV2_x2_0": "",
+    "MobileViTV2_x0_5":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV2_x0_5_pretrained.pdparams",
+    "MobileViTV2_x1_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV2_x1_0_pretrained.pdparams",
+    "MobileViTV2_x1_5":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV2_x1_5_pretrained.pdparams",
+    "MobileViTV2_x2_0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViTV2_x2_0_pretrained.pdparams",
 }
 
 layer_norm_2d = partial(nn.GroupNorm, num_groups=1)

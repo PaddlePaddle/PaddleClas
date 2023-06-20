@@ -21,11 +21,16 @@ from .efficientnet import EfficientNet, efficientnet
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
-    "TinyNet_A": "",
-    "TinyNet_B": "",
-    "TinyNet_C": "",
-    "TinyNet_D": "",
-    "TinyNet_E": "",
+    "TinyNet_A":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TinyNet_A_pretrained.pdparams",
+    "TinyNet_B":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TinyNet_B_pretrained.pdparams",
+    "TinyNet_C":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TinyNet_C_pretrained.pdparams",
+    "TinyNet_D":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TinyNet_D_pretrained.pdparams",
+    "TinyNet_E":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/TinyNet_E_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
