@@ -347,6 +347,9 @@ class Engine(object):
                     "eval_during_train"] and epoch_id % self.config["Global"][
                         "eval_interval"] == 0 and epoch_id > start_eval_epoch:
                 acc = self.eval(epoch_id)
+                if isinstance(acc, tuple):
+                    acc_info = acc[1]
+                    acc = acc[0]
 
                 # step lr (by epoch) according to given metric, such as acc
                 for i in range(len(self.lr_sch)):
@@ -369,6 +372,8 @@ class Engine(object):
                         save_student_model=True)
                 logger.info("[Eval][Epoch {}][best metric: {}]".format(
                     epoch_id, best_metric["metric"]))
+                if acc_info:
+                    logger.info(acc_info)
                 logger.scaler(
                     name="eval_acc",
                     value=acc,

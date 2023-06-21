@@ -517,3 +517,71 @@ class ATTRMetric(nn.Layer):
                                        output.numpy(), self.threshold)
         self.attrmeter.update(metric_dict)
         return metric_dict
+
+
+class MetricsPerClass(nn.Layer):
+    def __init__(self,
+                 num_class,
+                 ):
+        super().__init__()
+        self.num_class = num_class
+        self.pre_true = dict()
+        self.acc_dict = dict()
+        self.recall_dict = dict()
+        self.gt_neg = dict()
+        self.precision_dict = dict()
+        self.gt_pos = dict()
+        self.acc = 0.0
+        self.max_acc = 0.0
+        self.acc_info = ""
+        for i in range(self.num_class):
+            self.pre_true[i] = []
+            self.gt_neg[i] = 0
+            self.gt_pos[i] = 0
+
+    def forward(self, x, label):
+        if isinstance(x, dict):
+            x = x["logits"]
+        self.acc = float(paddle.metric.accuracy(x, label, k=1))
+        for i in range(x.shape[0]):
+            pre_label = paddle.argmax(x[i])
+            self.pre_true[int(label[i])].append(pre_label==label[i])
+            self.gt_neg[int(label[i])] += 1
+            self.gt_pos[int(pre_label)] += 1
+        return {}
+
+    def reset(self):
+        for i in range(self.num_class):
+            self.pre_true[i] = []
+            self.gt_neg[i] = 0
+            self.gt_pos[i] = 0
+        self.acc_dict = dict()
+        self.recall_dict = dict()
+        self.precision_dict = dict()
+
+    @property
+    def avg(self):
+        return self.max_acc, self.acc_info
+
+    @property
+    def avg_info(self):
+        acc = 0.
+        for key, value in self.pre_true.items():
+            true_pos = paddle.cast(paddle.to_tensor(value), dtype="float32").sum()
+            if len(value) != 0:
+                self.acc_dict[key] = float(true_pos/len(value))
+            if self.gt_neg[key] != 0:
+                self.recall_dict[key] = float(true_pos/self.gt_neg[key])
+            if self.gt_pos[key] != 0:
+                self.precision_dict[key] = float(true_pos/self.gt_pos[key])
+            else:
+                self.precision_dict[key] = 0.0
+        if self.acc > self.max_acc:
+            self.max_acc = self.acc
+
+        result = f"Top1Acc: {self.acc}"
+        
+        self.acc_info = f"\n\tAcc\tRecall\tPrecision" 
+        for i in self.acc_dict:
+            self.acc_info += f"\n{i}:\t" + str('%.4f' % self.acc_dict[i]) + "\t" + str('%.4f' % self.recall_dict[i]) + "\t" + str('%.4f' % self.precision_dict[i])
+        return result
