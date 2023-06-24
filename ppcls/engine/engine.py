@@ -348,8 +348,9 @@ class Engine(object):
                         "eval_interval"] == 0 and epoch_id > start_eval_epoch:
                 acc = self.eval(epoch_id)
                 if isinstance(acc, tuple):
-                    acc_info = acc[1]
-                    acc = acc[0]
+                    acc_info, acc = acc[1], acc[0]
+                else:
+                    acc_info = None
 
                 # step lr (by epoch) according to given metric, such as acc
                 for i in range(len(self.lr_sch)):
