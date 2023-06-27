@@ -113,6 +113,10 @@ PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级�
     - [PULC含文字图像方向分类模型](docs/zh_CN/models/PULC/PULC_text_image_orientation.md)
     - [PULC文本行方向分类模型](docs/zh_CN/models/PULC/PULC_textline_orientation.md)
     - [PULC语种分类模型](docs/zh_CN/models/PULC/PULC_language_classification.md)
+    - [PULC表格属性识别模型](docs/zh_CN/models/PULC/PULC_table_attribute.md)
+    - [PULC有无广告码分类模型](docs/zh_CN/models/PULC/PULC_code_exists.md)
+    - [PULC清晰度评估模型](docs/zh_CN/models/PULC/PULC_clarity_assessment.md)
+    - [PULC图像方向分类模型](docs/zh_CN/models/PULC/PULC_image_orientation.md)
   - [模型训练](docs/zh_CN/training/PULC.md)
   - 推理部署
     - [基于python预测引擎推理](docs/zh_CN/deployment/image_classification/python.md#1)
