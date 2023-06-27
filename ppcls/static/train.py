@@ -78,8 +78,9 @@ def main(args):
         fleet.init(is_collective=True)
 
     # assign the device
-    assert global_config[
-        "device"] in ["cpu", "gpu", "xpu", "npu", "mlu", "ascend"]
+    assert global_config["device"] in [
+        "cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"
+    ]
     device = paddle.set_device(global_config["device"])
 
     # amp related config
