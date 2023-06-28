@@ -101,9 +101,6 @@ prompt_templates = [
     'a photo of a small {}.',
     'a tattoo of the {}.',
 ]
-"""
-CLIP text encoder and decoder
-"""
 
 
 @lru_cache()
@@ -159,6 +156,11 @@ def whitespace_clean(text):
     text = re.sub(r'\s+', ' ', text)
     text = text.strip()
     return text
+
+
+"""
+CLIP text encoder and decoder for the tokens
+"""
 
 
 class SimpleTokenizer(object):

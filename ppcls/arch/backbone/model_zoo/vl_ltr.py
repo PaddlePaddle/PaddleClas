@@ -1,13 +1,10 @@
 import os.path as osp
 import os
 from typing import Tuple, Union
-#check
-import paddle.distributed as dist
 import numpy as np
 import paddle
 from paddle.nn import functional as F
 from paddle import nn
-from paddle.static.nn import sequence_pad as pad_sequence
 from paddle.nn.initializer import Assign, Normal, Constant, TruncatedNormal
 from ....utils.save_load import load_dygraph_pretrain_from_url_state_dict
 from .foundation_vit import MODEL_URLS, VisionTransformer, QuickGELU

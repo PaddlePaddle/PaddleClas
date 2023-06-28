@@ -65,12 +65,12 @@ class MixupOperator(BatchOperator):
 
     """
 
-    def __init__(self, class_num, alpha: float=1., is_batch=False):
+    def __init__(self, class_num, alpha: float=1., is_multimodal=False):
         """Build Mixup operator
 
         Args:
             alpha (float, optional): The parameter alpha of mixup. Defaults to 1..
-            is_batch(bool,optional): The parameter for tuple input [(img,text),labels]
+            is_multimodal(bool,optional): The parameter for tuple input [(img,text),labels]
 
         Raises:
             Exception: The value of parameter is illegal.
@@ -85,20 +85,20 @@ class MixupOperator(BatchOperator):
             raise Exception(msg)
 
         self._alpha = alpha
-        self.is_batch = is_batch
+        self.is_multimodal = is_multimodal
         self.class_num = class_num
 
     def __call__(self, batch):
-        if self.is_batch:
-            (imgs,text),labels,bs = self._unpack(batch)
+        if self.is_multimodal:
+            (imgs, text), labels, bs = self._unpack(batch)
         else:
             imgs, labels, bs = self._unpack(batch)
         idx = np.random.permutation(bs)
         lam = np.random.beta(self._alpha, self._alpha)
         imgs = lam * imgs + (1 - lam) * imgs[idx]
         targets = self._mix_target(labels, labels[idx], lam)
-        if self.is_batch:
-            return list(zip((imgs,text),targets))
+        if self.is_multimodal:
+            return list(zip((imgs, text), targets))
         return list(zip(imgs, targets))
 
 
