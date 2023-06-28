@@ -196,10 +196,6 @@ class CVLP(nn.Layer):
         mask = paddle.triu(mask, diagonal=1)
         return mask
 
-    @property
-    def dtype(self):
-        return paddle.float32
-
     def encode_image(self, image) -> paddle.Tensor:
         image = paddle.cast(image, self.dtype)
         image = self.visual(image)
@@ -507,10 +503,6 @@ class LGR(nn.Layer):
                 if isinstance(m, nn.BatchNorm2D):
                     m.eval()
         self.initialize_parameters()
-
-    @property
-    def dtype(self):
-        return paddle.float32
 
     def _init_weights(self, m):
 
