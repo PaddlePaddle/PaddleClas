@@ -110,7 +110,7 @@ def main(args):
     # visualDL
     vdl_writer = None
     if global_config["use_visualdl"]:
-        vdl_dir = os.path.join(global_config["output_dir"], "vdl")
+        vdl_dir = global_config["output_dir"]
         vdl_writer = LogWriter(vdl_dir)
 
     # build dataloader

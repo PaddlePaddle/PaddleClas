@@ -15,6 +15,7 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+import shutil
 import platform
 import paddle
 import paddle.distributed as dist
@@ -72,8 +73,7 @@ class Engine(object):
 
         # init logger
         self.output_dir = self.config['Global']['output_dir']
-        log_file = os.path.join(self.output_dir, self.config["Arch"]["name"],
-                                f"{mode}.log")
+        log_file = os.path.join(self.output_dir, f"{mode}.log")
         init_logger(log_file=log_file)
         print_config(config)
 
@@ -94,7 +94,7 @@ class Engine(object):
         self.vdl_writer = None
         if self.config['Global'][
                 'use_visualdl'] and mode == "train" and dist.get_rank() == 0:
-            vdl_writer_path = os.path.join(self.output_dir, "vdl")
+            vdl_writer_path = self.output_dir
             if not os.path.exists(vdl_writer_path):
                 os.makedirs(vdl_writer_path)
             self.vdl_writer = LogWriter(logdir=vdl_writer_path)
@@ -519,6 +519,10 @@ class Engine(object):
                                                           save_path + "_int8")
         else:
             paddle.jit.save(model, save_path)
+        if self.config["Global"].get("export_for_fd", False):
+            src_path = self.config["Global"]["infer_config_path"]
+            dst_path = os.path.join(self.config["Global"]["save_inference_dir"], 'inference.yml')
+            shutil.copy(src_path, dst_path)
         logger.info(
             f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
         )
