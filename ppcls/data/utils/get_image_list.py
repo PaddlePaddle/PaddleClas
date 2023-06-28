@@ -27,9 +27,10 @@ def get_image_list(img_file):
     if os.path.isfile(img_file) and img_file.split('.')[-1] in img_end:
         imgs_lists.append(img_file)
     elif os.path.isdir(img_file):
-        for single_file in os.listdir(img_file):
-            if single_file.split('.')[-1] in img_end:
-                imgs_lists.append(os.path.join(img_file, single_file))
+        for root, dirs, files in os.walk(img_file):
+            for single_file in files:
+                if single_file.split('.')[-1] in img_end:
+                    imgs_lists.append(os.path.join(root, single_file))
     if len(imgs_lists) == 0:
         raise Exception("not found any img file in {}".format(img_file))
     imgs_lists = sorted(imgs_lists)
