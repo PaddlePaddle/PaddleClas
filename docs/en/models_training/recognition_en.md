@@ -16,7 +16,7 @@ The feature gallery is built in advance using the labeled image datasets. The co
 
 To experience the whole image recognition system, or learn  how to build a feature gallery, please refer to [Quick Start of Image Recognition](../quick_start/quick_start_recognition_en.md), which explains the overall application process. The following parts expound on the training part of the above three steps.
 
-Please first refer to the [Installation Guide](../installation/install_paddleclas_en.md) to configure the runtime environment.
+Please first refer to the [Installation Guide](../installation.md) to configure the runtime environment.
 
 ## Catalogue
 

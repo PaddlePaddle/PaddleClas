@@ -86,7 +86,7 @@ After a model is trained, the evaluation results of the model on the validation 
 
 ## 3. Application Methods
 
-Please refer to [Installation](../installation/install_paddleclas_en.md) to setup environment at first, and prepare flower102 dataset by following the instruction mentioned in the [Quick Start](../quick_start/quick_start_classification_new_user_en.md).
+Please refer to [Installation](../installation.md) to setup environment at first, and prepare flower102 dataset by following the instruction mentioned in the [Quick Start](../quick_start/quick_start_classification_new_user_en.md).
 
 So far, PaddleClas supports the following training/evaluation environments:
 

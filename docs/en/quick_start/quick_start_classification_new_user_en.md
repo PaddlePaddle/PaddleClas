@@ -48,7 +48,7 @@ Image classification is a pattern classification problem, which is the most basi
 <a name="2"></a>
 ## 2. Environmental installation and configuration
 
-For specific installation steps, please refer to [Paddle Installation Document](../installation/install_paddle_en.md), [PaddleClas Installation Document](../installation/install_paddleclas_en.md).
+For specific installation steps, please refer to [Installation Document](../installation.md).
 
 <a name="3"></a>
 ## 3. Data preparation and processing
