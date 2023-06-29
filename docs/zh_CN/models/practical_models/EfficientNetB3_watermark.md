@@ -54,7 +54,7 @@ python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
 ```
 cd path/to/PaddleClas
 #使用下面的命令构建
-python3 setup.py install
+pip install -v -e .
 ```
 
 <a name="3"></a>

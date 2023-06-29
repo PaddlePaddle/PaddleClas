@@ -107,7 +107,7 @@ pip install paddleclas
 * 如需使用 PaddleClas develop 分支体验最新功能，或是需要基于 PaddleClas 进行二次开发，请本地构建安装，命令如下：
 
 ```shell
-python setup.py install
+pip install -v -e .
 ```
 
 <a name='2'></a>

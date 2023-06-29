@@ -80,7 +80,7 @@ Open the installed APP, click the "**file recognition**" button below, select th
   cd PaddleClas
 
   # install paddleclas
-  python3.7 setup.py install
+  pip install -v -e .
   ```
 
 - Then execute the following command to download and decompress the demo data, and finally execute command to quick start image recognition
