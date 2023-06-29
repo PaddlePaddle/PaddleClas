@@ -86,13 +86,13 @@ python -c "import paddle; print(paddle.__version__)"
 从 GitHub 下载：
 
 ```shell
-git clone https://github.com/PaddlePaddle/PaddleClas.git -b release/2.4
+git clone https://github.com/PaddlePaddle/PaddleClas.git
 ```
 
 如果访问 GitHub 网速较慢，可以从 Gitee 下载，命令如下：
 
 ```shell
-git clone https://gitee.com/paddlepaddle/PaddleClas.git -b release/2.4
+git clone https://gitee.com/paddlepaddle/PaddleClas.git
 ```
 <a name='1.3'></a>
 
