@@ -1,6 +1,6 @@
 # Trial in 30mins(professional)
 
-Here is a quick start tutorial for professional users to use PaddleClas on the Linux operating system. The main content is based on the CIFAR-100 data set. You can quickly experience the training of different models, experience loading different pre-trained models, experience the SSLD knowledge distillation solution, and experience data augmentation. Please refer to [Installation Guide](../installation/install_paddleclas_en.md) to configure the operating environment and clone PaddleClas code.
+Here is a quick start tutorial for professional users to use PaddleClas on the Linux operating system. The main content is based on the CIFAR-100 data set. You can quickly experience the training of different models, experience loading different pre-trained models, experience the SSLD knowledge distillation solution, and experience data augmentation. Please refer to [Installation Guide](../installation.md) to configure the operating environment and clone PaddleClas code.
 
 ------
 
@@ -37,7 +37,7 @@ Here is a quick start tutorial for professional users to use PaddleClas on the L
 cd path_to_PaddleClas
 ```
 
-<a name="1.1.1"></a> 
+<a name="1.1.1"></a>
 
 #### 1.1.1 Prepare CIFAR100
 
@@ -54,11 +54,11 @@ cd ../
 
 ## 2. Model training
 
-<a name="2.1"></a> 
+<a name="2.1"></a>
 
 ### 2.1 Single label training
 
-<a name="2.1.1"></a> 
+<a name="2.1.1"></a>
 
 #### 2.1.1 Training without loading the pre-trained model
 
@@ -93,7 +93,7 @@ python3 -m paddle.distributed.launch \
 * Since the initial learning rate and batch-size need to maintain a linear relationship, when training is switched from 4 GPUs to 1 GPU, the total batch-size is reduced to 1/4 of the original, and the learning rate also needs to be reduced to 1/4 of the original, so changed the default learning rate from 0.04 to 0.01.
 
 
-<a name="2.1.2"></a> 
+<a name="2.1.2"></a>
 
 
 #### 2.1.2 Transfer learning
@@ -148,7 +148,7 @@ The highest accuracy of the validation set is about 0.601, which is nearly 12% l
 
 PaddleClas contains many data augmentation methods, such as Mixup, Cutout, RandomErasing, etc. For specific methods, please refer to [Data augmentation chapter](../algorithm_introduction/DataAugmentation_en.md)。
 
-<a name="3.1"></a> 
+<a name="3.1"></a>
 
 ### 3.1 Data augmentation-Mixup
 
@@ -245,11 +245,11 @@ In the end, the accuracy on the CIFAR100 validation set was 64.4%. Using the tea
 
 ## 5. Model evaluation and inference
 
-<a name="5.1"></a> 
+<a name="5.1"></a>
 
 ### 5.1 Single-label classification model evaluation and inference
 
-<a name="5.1.1"></a> 
+<a name="5.1.1"></a>
 
 #### 5.1.1 Single-label classification model evaluation
 
@@ -261,7 +261,7 @@ python3 tools/eval.py \
     -o Global.pretrained_model="output_CIFAR/ResNet50_vd/best_model"
 ```
 
-<a name="5.1.2"></a> 
+<a name="5.1.2"></a>
 
 #### 5.1.2 Single-label classification model prediction
 
@@ -274,7 +274,7 @@ python3 tools/infer.py \
     -o Global.pretrained_model=output_CIFAR/ResNet50_vd/best_model
 ```
 
-<a name="5.1.3"></a> 
+<a name="5.1.3"></a>
 
 #### 5.1.3 Single-label classification uses inference model for model inference
 

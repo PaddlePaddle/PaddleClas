@@ -17,7 +17,7 @@ PaddlePaddle supports exporting inference model for deployment. Compared with tr
 
 ## 1. Environmental preparation
 
-First, refer to the [Installing PaddlePaddle](../installation/install_paddle_en.md) and the [Installing PaddleClas](../installation/install_paddleclas_en.md) to prepare environment.
+First, refer to the [Installing PaddleClas](../installation.md) to prepare environment.
 
 <a name="2"></a>
 

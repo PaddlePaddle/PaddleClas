@@ -6,7 +6,7 @@ The model saved during the training process is the checkpoints model, which save
 
 Compared with the checkpoints model, the inference model will additionally save the structural information of the model. Therefore, it is easier to deploy because the model structure and model parameters are already solidified in the inference model file, and is suitable for integration with actual systems.
 
-Please refer to the document [install paddle](../installation/install_paddle_en.md) and [install paddleclas](../installation/install_paddleclas_en.md) to prepare the environment.
+Please refer to the document [install paddleclas](../installation.md) to prepare the environment.
 
 ---
 

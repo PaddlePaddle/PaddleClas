@@ -220,7 +220,7 @@ The result of demo above:
 
 ### 3.1 Installation
 
-Please refer to [Installation](../installation/install_paddleclas_en.md) to get the description about installation.
+Please refer to [Installation](../installation.md) to get the description about installation.
 
 <a name="3.2"></a>
 

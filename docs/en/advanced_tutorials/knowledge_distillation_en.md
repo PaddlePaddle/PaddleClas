@@ -805,7 +805,7 @@ Loss:
 
 ### 2.1 Environment Configuration
 
-* Installation: Please refer to [Paddle Installation Tutorial](../installation/install_paddle_en.md) and [PaddleClas Installation Tutorial](../installation/install_paddleclas_en.md) to configure the running environment.
+* Installation: Please refer to [Installation Tutorial](../installation.md) to configure the running environment.
 
 <a name="2.2"></a>
 
