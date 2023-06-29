@@ -55,7 +55,7 @@ pip install paddleslim -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```bash
 git clone https://github.com/PaddlePaddle/PaddleSlim.git
 cd Paddleslim
-python3.7 setup.py install
+pip install -v -e .
 ```
 
 <a name="1.2"></a>

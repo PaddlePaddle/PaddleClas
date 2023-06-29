@@ -64,7 +64,7 @@ python3 -m pip uninstall paddleclas
 
 ```
 cd path/to/PaddleClas
-python3 setup.py install
+pip install -v -e .
 ```
 
 <a name="3"></a>

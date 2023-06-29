@@ -140,5 +140,5 @@ pip install paddleclas
 * Please build and install locally if you need to use the develop branch of PaddleClas to experience the latest functions, or need to redevelop based on PaddleClas. The command is as follows:
 
 ```shell
-python setup.py install
+pip install -v -e .
 ```
