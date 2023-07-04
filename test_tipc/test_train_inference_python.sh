@@ -91,7 +91,7 @@ infer_value1=$(func_parser_value "${lines[50]}")
 if [ ! $epoch_num ]; then
     epoch_num=2
 fi
-if [[ $MODE = 'benchmark_train' ]]; then
+if [[ $MODE = 'benchmark_train' ]] || [[ $train_use_gpu_value = 'npu' ]]; then
     epoch_num=1
 fi
 
