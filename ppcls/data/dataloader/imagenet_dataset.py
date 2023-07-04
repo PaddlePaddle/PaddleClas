@@ -50,7 +50,7 @@ class ImageNetDataset(CommonDataset):
         self.images = []
         self.labels = []
 
-        with open(self._cls_path) as fd:
+        with open(self._cls_path, encoding='utf-8') as fd:
             lines = fd.readlines()
             if self.relabel:
                 label_set = set()
