@@ -39,7 +39,7 @@ def draw_bbox_results(image,
         xmin, ymin, xmax, ymax = result["bbox"]
         text = "{}, {:.2f}".format(result["rec_docs"], result["rec_scores"])
         th = font_size
-        tw = font.getsize(text)[0]
+        tw = font.getlength(text)
         # tw = int(len(result["rec_docs"]) * font_size) + 60
         start_y = max(0, ymin - th)
 
