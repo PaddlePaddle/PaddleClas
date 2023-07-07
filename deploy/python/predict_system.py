@@ -1,6 +1,6 @@
 # Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
 #
-# Licensed under the Apache License, Version 2.0 (the "License"); 
+# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -144,7 +144,8 @@ def main(config):
     for idx, image_file in enumerate(image_list):
         img = cv2.imread(image_file)[:, :, ::-1]
         output = system_predictor.predict(img)
-        draw_bbox_results(img, output, image_file)
+        save_dir = config["Global"]["output_dir"]
+        draw_bbox_results(img, output, image_file, save_dir=save_dir)
         print(output)
     return
 
