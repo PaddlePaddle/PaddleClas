@@ -60,7 +60,7 @@ class MultiScaleDataset(Dataset):
         self.images = []
         self.labels = []
 
-        with open(self._cls_path, encoding='utf-8') as fd:
+        with open(self._cls_path) as fd:
             lines = fd.readlines()
             if seed is not None:
                 np.random.RandomState(seed).shuffle(lines)
