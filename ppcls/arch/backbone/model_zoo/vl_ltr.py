@@ -197,7 +197,6 @@ class CVLP(nn.Layer):
         return mask
 
     def encode_image(self, image) -> paddle.Tensor:
-        image = paddle.cast(image, self.dtype)
         image = self.visual(image)
         image = self.ln_post(image[:, 0, :])
         if self.proj is not None:
@@ -206,13 +205,13 @@ class CVLP(nn.Layer):
 
     def encode_text(self, text) -> paddle.Tensor:
         text = paddle.cast(text, paddle.int32)
-        x = paddle.cast(self.token_embedding(text), self.dtype)
+        x = self.token_embedding(text)
 
-        x = x + paddle.cast(self.positional_embedding, self.dtype)
+        x = x + self.positional_embedding
 
         x = self.transformer(x)
 
-        x = paddle.cast(self.ln_final(x), self.dtype)
+        x = self.ln_final(x)
 
         _buff = paddle.argmax(text, axis=1)
         x = x[paddle.arange(x.shape[0]), _buff] @self.text_projection
@@ -593,7 +592,7 @@ class LGR(nn.Layer):
 
     def encode_image(self, image) -> paddle.Tensor:
         self.visual.eval()
-        x = self.visual(paddle.cast(image, self.dtype))
+        x = self.visual(image)
         x = self.ln_post(x[:, 0, :])
         if self.proj is not None:
             x = x @self.proj
@@ -606,7 +605,7 @@ class LGR(nn.Layer):
             x = self.text_block(
                 paddle.unsqueeze(
                     x, axis=1),
-                paddle.cast(self.text_embeddings, x.dtype),
+                self.text_embeddings,
                 key_padding_mask=self.text_padding_mask,
                 logit_scale=self.logit_scale)
         else:
