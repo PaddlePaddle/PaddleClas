@@ -63,19 +63,14 @@ class Engine(object):
         else:
             self.is_rec = False
 
-        # set seed
-        seed = self.config["Global"].get("seed", False)
-        if seed or seed == 0:
-            assert isinstance(seed, int), "The 'seed' must be a integer!"
-            paddle.seed(seed)
-            np.random.seed(seed)
-            random.seed(seed)
-
         # init logger
         self.output_dir = self.config['Global']['output_dir']
         log_file = os.path.join(self.output_dir, f"{mode}.log")
         init_logger(log_file=log_file)
         print_config(config)
+
+        # set seed
+        self._init_seed()
 
         # init train_func and eval_func
         assert self.eval_mode in [
@@ -100,8 +95,9 @@ class Engine(object):
             self.vdl_writer = LogWriter(logdir=vdl_writer_path)
 
         # set device
-        assert self.config["Global"][
-            "device"] in ["cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"]
+        assert self.config["Global"]["device"] in [
+            "cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"
+        ]
         self.device = paddle.set_device(self.config["Global"]["device"])
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
@@ -271,19 +267,6 @@ class Engine(object):
             )) > 0:
                 self.train_loss_func = paddle.DataParallel(
                     self.train_loss_func)
-
-            # set different seed in different GPU manually in distributed environment
-            if seed is None:
-                logger.warning(
-                    "The random seed cannot be None in a distributed environment. Global.seed has been set to 42 by default"
-                )
-                self.config["Global"]["seed"] = seed = 42
-            logger.info(
-                f"Set random seed to ({int(seed)} + $PADDLE_TRAINER_ID) for different trainer"
-            )
-            paddle.seed(int(seed) + dist.get_rank())
-            np.random.seed(int(seed) + dist.get_rank())
-            random.seed(int(seed) + dist.get_rank())
 
         # build postprocess for infer
         if self.mode == 'infer':
@@ -521,7 +504,8 @@ class Engine(object):
             paddle.jit.save(model, save_path)
         if self.config["Global"].get("export_for_fd", False):
             src_path = self.config["Global"]["infer_config_path"]
-            dst_path = os.path.join(self.config["Global"]["save_inference_dir"], 'inference.yml')
+            dst_path = os.path.join(
+                self.config["Global"]["save_inference_dir"], 'inference.yml')
             shutil.copy(src_path, dst_path)
         logger.info(
             f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
@@ -593,6 +577,29 @@ class Engine(object):
                     models=self.train_loss_func,
                     level=self.amp_level,
                     save_dtype='float32')
+
+    def _init_seed(self):
+        # set seed
+        seed = self.config["Global"].get("seed", False)
+        if dist.get_world_size() != 1:
+            # set different seed in different GPU manually in distributed environment
+            if not seed:
+                logger.warning(
+                    "The random seed cannot be None in a distributed environment. Global.seed has been set to 42 by default"
+                )
+                self.config["Global"]["seed"] = seed = 42
+            logger.info(
+                f"Set random seed to ({int(seed)} + $PADDLE_TRAINER_ID) for different trainer"
+            )
+            dist_seed = int(seed) + dist.get_rank()
+            paddle.seed(dist_seed)
+            np.random.seed(dist_seed)
+            random.seed(dist_seed)
+        elif seed or seed == 0:
+            assert isinstance(seed, int), "The 'seed' must be a integer!"
+            paddle.seed(seed)
+            np.random.seed(seed)
+            random.seed(seed)
 
 
 class ExportModel(TheseusLayer):
