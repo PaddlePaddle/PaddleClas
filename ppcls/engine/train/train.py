@@ -48,6 +48,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
         engine.global_step += 1
 
         # image input
+        hw_start = time.time()
         with engine.auto_cast(is_eval=False):
             out = forward(engine, batch)
             loss_dict = engine.train_loss_func(out, batch[1])
@@ -75,7 +76,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
             # update ema
             if engine.ema:
                 engine.model_ema.update(engine.model)
-
+        engine.time_info["hw_cost"].update(time.time() - hw_start)
         # below code just for logging
         # update metric_for_logger
         update_metric(engine, out, batch, batch_size)

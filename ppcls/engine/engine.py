@@ -308,6 +308,8 @@ class Engine(object):
         # val: metrics list word
         self.output_info = dict()
         self.time_info = {
+            "hw_cost": AverageMeter(
+                "hw_cost", '.5f', postfix=" s,"),
             "batch_cost": AverageMeter(
                 "batch_cost", '.5f', postfix=" s,"),
             "reader_cost": AverageMeter(
