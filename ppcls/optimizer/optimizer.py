@@ -17,6 +17,9 @@ from __future__ import division
 from __future__ import print_function
 
 import inspect
+# for python3.11
+if not hasattr(inspect, 'getargspec'):
+    inspect.getargspec = inspect.getfullargspec
 
 from paddle import optimizer as optim
 from ppcls.utils import logger
