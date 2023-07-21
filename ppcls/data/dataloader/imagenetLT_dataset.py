@@ -408,6 +408,9 @@ class ImageNetLTDataset(CommonDataset):
         super(ImageNetLTDataset, self).__init__(image_root, cls_label_path,
                                                 transform_ops)
 
+        self.text_tokens = self.get_sentence_tokens(self.context_length)
+        self.end_idxs = [len(sents) for sents in self.text_tokens]
+
     def get_sentence_tokens(self, context_length):
         print('using clip text tokens splitted by sentence')
         cache_root = 'cached'
@@ -443,7 +446,10 @@ class ImageNetLTDataset(CommonDataset):
                 target = self.labels[idx]
 
                 idx = np.random.randint(sent_idxs[target])
-                token = text_tokens[target][idx]
+                tokens = text_tokens[target]
+
+                token = paddle.gather(tokens, paddle.to_tensor([idx]), axis=0)
+                token = paddle.squeeze(token)
 
                 return ((img, token), target)
             return (img, self.labels[idx])
@@ -489,6 +495,3 @@ class ImageNetLTDataset(CommonDataset):
                     self.labels.append(np.int64(line[1]))
                 if os.path.exists(self.images[-1]) == False:
                     self.images.pop()
-
-        self.text_tokens = self.get_sentence_tokens(self.context_length)
-        self.end_idxs = [len(sents) for sents in self.text_tokens]

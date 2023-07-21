@@ -7,7 +7,7 @@ Global:
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
-  epochs: 20
+  epochs: 100
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
@@ -45,7 +45,7 @@ Optimizer:
   lr:
     name: Piecewise
     decay_epochs: [30, 60, 90]
-    values: [0.01, 0.001, 0.0001, 0.00001]
+    values: [0.0001, 0.0005, 0.00005, 0.00001]
 
 
 # data loader for train and eval
