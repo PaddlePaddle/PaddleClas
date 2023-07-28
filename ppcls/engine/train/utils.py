@@ -25,8 +25,8 @@ def update_metric(trainer, out, batch, batch_size):
         for key in metric_dict:
             if key not in trainer.output_info:
                 trainer.output_info[key] = AverageMeter(key, '7.5f')
-            trainer.output_info[key].update(metric_dict[key].numpy()[0],
-                                            batch_size)
+            trainer.output_info[key].update(
+                float(metric_dict[key]), batch_size)
 
 
 def update_loss(trainer, loss_dict, batch_size):
@@ -34,7 +34,7 @@ def update_loss(trainer, loss_dict, batch_size):
     for key in loss_dict:
         if key not in trainer.output_info:
             trainer.output_info[key] = AverageMeter(key, '7.5f')
-        trainer.output_info[key].update(loss_dict[key].numpy()[0], batch_size)
+        trainer.output_info[key].update(float(loss_dict[key]), batch_size)
 
 
 def log_info(trainer, batch_size, epoch_id, iter_id):
@@ -53,14 +53,13 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
 
     ips_msg = "ips: {:.5f} samples/s".format(
         batch_size / trainer.time_info["batch_cost"].avg)
-    eta_sec = ((trainer.config["Global"]["epochs"] - epoch_id + 1
-                ) * trainer.max_iter - iter_id
-               ) * trainer.time_info["batch_cost"].avg
+    eta_sec = (
+        (trainer.config["Global"]["epochs"] - epoch_id + 1
+         ) * trainer.max_iter - iter_id) * trainer.time_info["batch_cost"].avg
     eta_msg = "eta: {:s}".format(str(datetime.timedelta(seconds=int(eta_sec))))
     logger.info("[Train][Epoch {}/{}][Iter: {}/{}]{}, {}, {}, {}, {}".format(
         epoch_id, trainer.config["Global"]["epochs"], iter_id,
-        trainer.max_iter, lr_msg, metric_msg, time_msg, ips_msg,
-        eta_msg))
+        trainer.max_iter, lr_msg, metric_msg, time_msg, ips_msg, eta_msg))
 
     for i, lr in enumerate(trainer.lr_sch):
         logger.scaler(

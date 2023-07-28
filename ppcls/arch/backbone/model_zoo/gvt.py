@@ -324,7 +324,7 @@ class PyramidVisionTransformer(nn.Layer):
             self.pos_drops.append(nn.Dropout(p=drop_rate))
 
         dpr = [
-            x.numpy()[0]
+            float(x.numpy())  #[0]
             for x in paddle.linspace(0, drop_path_rate, sum(depths))
         ]  # stochastic depth decay rule
 
