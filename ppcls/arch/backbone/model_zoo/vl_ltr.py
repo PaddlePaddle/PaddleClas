@@ -101,12 +101,18 @@ class CVLP(nn.Layer):
             transformer_width: int,
             transformer_heads: int,
             transformer_layers: int,
+            cache_root: str,
             model_type="",
             pretrained_clip=None, ):
         super().__init__()
 
         self.context_length = context_length
         self.model_type = model_type
+
+        assert cache_root
+        clip_token_path = os.path.join(cache_root, 'IMNET_LT_text_tokens.pkl')
+        self.text_tokens = paddle.load(clip_token_path)
+        self.end_idxs = [len(sents) for sents in self.text_tokens]
 
         vision_heads = vision_width // 64
         self.visual = VisionTransformer(
@@ -219,7 +225,16 @@ class CVLP(nn.Layer):
         return x
 
     def forward(self, x):
-        image, text = x
+
+        image, labels = x
+        text = []
+        for label in labels:
+            idx = np.random.randint(self.end_idxs[label])
+            tokens = self.text_tokens[label]
+            token = paddle.gather(tokens, paddle.to_tensor([idx]), axis=0)
+            text.append(token)
+        text = paddle.concat(text)
+
         image_features = self.encode_image(image)
         text_features = self.encode_text(text)
 
@@ -238,6 +253,7 @@ class CVLP(nn.Layer):
 
 def CVLP_vit16(**kwargs):
     model_type = "vit"
+    cache_root = kwargs.get("cache_root", "./cached")
     pretrained_clip = kwargs[
         'pretrained_clip'] if "pretrained_clip" in kwargs.keys() else None
     model = CVLP(
@@ -248,6 +264,7 @@ def CVLP_vit16(**kwargs):
         vision_patch_size=16,
         context_length=kwargs['context_length'] + 2,
         vocab_size=49408,
+        cache_root=cache_root,
         transformer_width=512,
         transformer_heads=8,
         transformer_layers=12,

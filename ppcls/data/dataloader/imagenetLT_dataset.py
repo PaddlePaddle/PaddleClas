@@ -441,17 +441,7 @@ class ImageNetLTDataset(CommonDataset):
                 img = transform(img, self._transform_ops)
             img = img.transpose((2, 0, 1))
             if self.is_pretrain:
-                sent_idxs = self.end_idxs
-                text_tokens = self.text_tokens
-                target = self.labels[idx]
-
-                idx = np.random.randint(sent_idxs[target])
-                tokens = text_tokens[target]
-
-                token = paddle.gather(tokens, paddle.to_tensor([idx]), axis=0)
-                token = paddle.squeeze(token)
-
-                return ((img, token), target)
+                return ((img, self.labels[idx]), self.labels[idx])
             return (img, self.labels[idx])
 
         except Exception as ex:

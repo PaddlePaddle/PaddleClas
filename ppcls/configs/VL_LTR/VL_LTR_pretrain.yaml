@@ -19,6 +19,7 @@ Arch:
   name: CVLP_vit16
   class_num: 1000
   context_length: 75
+  cache_root: ./cached
   pretrained_clip: "vit"
  
 # loss function config for traing/eval process
@@ -45,7 +46,7 @@ Optimizer:
   lr:
     name: Piecewise
     decay_epochs: [30, 60, 90]
-    values: [0.0001, 0.0005, 0.00005, 0.00001]
+    values: [0.000035, 0.000005, 0.000002, 0.000001]
 
 
 # data loader for train and eval
@@ -74,7 +75,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 24
+      batch_size: 128
       drop_last: False
       shuffle: True
     loader:
@@ -103,7 +104,7 @@ DataLoader:
             order: ''
     sampler:
       name: DistributedBatchSampler
-      batch_size: 24
+      batch_size: 128
       drop_last: False
       shuffle: False
     loader:
@@ -117,4 +118,3 @@ Metric:
   Eval:
     - TopkAccVLPretrain:
         topk: [1, 5]
-

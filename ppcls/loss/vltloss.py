@@ -2,8 +2,13 @@ import paddle
 import paddle.nn as nn
 from paddle.nn import functional as F
 from ..arch.backbone.model_zoo.vl_ltr import CVLP_vit16
-from .celoss import CELoss
-from .kldivloss import KLDivLoss
+
+
+def cross_entropy_vlt(outputs, teacher_outputs):
+    logprobs = F.log_softmax(outputs, axis=-1)
+    soft_targets = F.softmax(teacher_outputs, axis=-1)
+    distill_loss = -paddle.sum(soft_targets * logprobs, axis=-1)
+    return distill_loss.mean()
 
 
 def labels2idxs(labels: paddle.Tensor):
@@ -79,8 +84,6 @@ class PretrainSentLoss(nn.Layer):
         self.alpha = alpha
         self.beta = beta
         self.tau = tau
-        self.ce_loss = CELoss()
-        self.kl_loss = KLDivLoss(self.tau)
         assert distill_type in ['none', 'feat', 'logits', 'logits_kl']
         self.distill_type: str = distill_type
         if beta > 0:
@@ -90,6 +93,7 @@ class PretrainSentLoss(nn.Layer):
     def forward(self, x, labels: paddle.Tensor):
         # x \in [inputs, outputs]
         inputs, outputs = x
+        hard_labels = labels
         labels = paddle.squeeze(labels)
         labels = labels2idxs(labels)
         #check the format for labels
@@ -112,24 +116,15 @@ class PretrainSentLoss(nn.Layer):
         loss2 = self.base_criterion(outputs2, labels)
         base_loss = (loss1 + loss2) / 2.0
         loss = (1 - self.alpha) * base_loss + self.alpha * distill_loss
+        print(f"phase 1 loss{loss}")
         if self.beta > 0:
-            _, (teacher_outputs1,
-                teacher_outputs2) = self.teacher_model(inputs)
+            _, (teacher_outputs1, teacher_outputs2) = self.teacher_model(
+                (inputs[0], hard_labels))
             teacher_outputs1, teacher_outputs2 = teacher_outputs1.detach(
             ), teacher_outputs2.detach()
-            if self.distill_type == 'logits_kl':
-                distill_loss1 = self.kl_loss(outputs1,
-                                             teacher_outputs1)['loss_kldiv']
-                distill_loss2 = self.kl_loss(outputs2,
-                                             teacher_outputs2)['loss_kldiv']
-                distill_loss = (distill_loss1 + distill_loss2) / 2.0
-            else:
-                assert self.distill_type == "logits"
-                distill_loss1 = self.ce_loss(outputs1,
-                                             teacher_outputs1)['CELoss']
-                distill_loss2 = self.ce_loss(outputs2,
-                                             teacher_outputs2)['CELoss']
-                distill_loss = (distill_loss1 + distill_loss2) / 2.0
+            distill_loss1 = cross_entropy_vlt(outputs1, teacher_outputs1)
+            distill_loss2 = cross_entropy_vlt(outputs2, teacher_outputs2)
+            distill_loss = (distill_loss1 + distill_loss2) / 2.0
             loss = (1 - self.beta) * loss + self.beta * distill_loss
         return {"pretrain_loss": loss}
 
