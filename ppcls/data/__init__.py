@@ -189,3 +189,8 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
 
     logger.debug("build data_loader({}) success...".format(data_loader))
     return data_loader
+
+
+# for PaddleX
+ClsDataset = ImageNetDataset
+ShiTuDataset = ImageNetDataset
