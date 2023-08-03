@@ -90,7 +90,7 @@ def main(args):
         fleet.init(is_collective=True)
 
     # assign the device
-    assert global_config["device"] in [
+    assert global_config["device"].split(":")[0] in [
         "cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"
     ]
     device = paddle.set_device(global_config["device"])

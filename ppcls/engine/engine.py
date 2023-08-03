@@ -101,7 +101,7 @@ class Engine(object):
 
         # set device
         assert self.config["Global"][
-            "device"] in ["cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"]
+            "device"].split(":")[0] in ["cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"]
         self.device = paddle.set_device(self.config["Global"]["device"])
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
@@ -117,7 +117,7 @@ class Engine(object):
             else:
                 msg = "The Global.class_num will be deprecated. Please use Arch.class_num instead. The Global.class_num has been ignored."
             logger.warning(msg)
-        #TODO(gaotingquan): support rec
+        # TODO(gaotingquan): support rec
         class_num = config["Arch"].get("class_num", None)
         self.config["DataLoader"].update({"class_num": class_num})
         self.config["DataLoader"].update({
@@ -137,7 +137,7 @@ class Engine(object):
 
             self.iter_per_epoch = len(
                 self.train_dataloader) - 1 if platform.system(
-                ) == "Windows" else len(self.train_dataloader)
+            ) == "Windows" else len(self.train_dataloader)
             if self.config["Global"].get("iter_per_epoch", None):
                 # set max iteration per epoch mannualy, when training by iteration(s), such as XBM, FixMatch.
                 self.iter_per_epoch = self.config["Global"].get(
