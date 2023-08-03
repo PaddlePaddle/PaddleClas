@@ -76,6 +76,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
             # update ema
             if engine.ema:
                 engine.model_ema.update(engine.model)
+        paddle.device.synchronize()
         engine.time_info["hw_cost"].update(time.time() - hw_start)
         # below code just for logging
         # update metric_for_logger
