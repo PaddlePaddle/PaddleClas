@@ -86,6 +86,7 @@ def gather_function_tuple(engine, batch, out, accum_samples, total_samples):
                 preds = preds[:total_samples + current_samples - accum_samples]
             labels = labels[:total_samples + current_samples - accum_samples]
             current_samples = total_samples + current_samples - accum_samples
+
     return preds, labels
 
 
@@ -156,10 +157,11 @@ def classification_eval(engine, epoch_id=0):
             labels = paddle.concat(label_list, 0)
 
             preds = None
-            if isinstance(out, list) and isinstance(out[0], list):
+
+            try:
                 preds, labels = gather_function_tuple(
                     engine, batch, out, accum_samples, total_samples)
-            else:
+            except:
                 if isinstance(out, list) and not preds:
                     preds = []
                     for x in out:
