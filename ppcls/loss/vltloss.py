@@ -94,6 +94,7 @@ class PretrainSentLoss(nn.Layer):
         # x \in [inputs, outputs]
         inputs, outputs = x
         hard_labels = labels
+
         labels = paddle.squeeze(labels)
         labels = labels2idxs(labels)
         #check the format for labels
@@ -112,11 +113,12 @@ class PretrainSentLoss(nn.Layer):
             distill_loss = 0.
         if self.loss_type in ["softCE", "smoothCE"]:
             labels = labels / paddle.sum(labels, axis=1, keepdim=True)
+        if labels.shape != outputs1.shape:
+            return {"pretrain_loss": 0.0}
         loss1 = self.base_criterion(outputs1, labels)
         loss2 = self.base_criterion(outputs2, labels)
         base_loss = (loss1 + loss2) / 2.0
         loss = (1 - self.alpha) * base_loss + self.alpha * distill_loss
-        print(f"phase 1 loss{loss}")
         if self.beta > 0:
             _, (teacher_outputs1, teacher_outputs2) = self.teacher_model(
                 (inputs[0], hard_labels))
