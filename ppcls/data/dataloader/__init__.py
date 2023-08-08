@@ -15,3 +15,4 @@ from ppcls.data.dataloader.custom_label_dataset import CustomLabelDataset
 from ppcls.data.dataloader.cifar import Cifar10, Cifar100
 from ppcls.data.dataloader.metabin_sampler import DomainShuffleBatchSampler, NaiveIdentityBatchSampler
 from ppcls.data.dataloader.moco_imagenet_dataset import MoCoImageNetDataset
+from ppcls.data.dataloader.imagenetLT_dataset import ImageNetLTDataset

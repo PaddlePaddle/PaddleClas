@@ -46,6 +46,7 @@ from .metabinloss import CELossForMetaBIN
 from .metabinloss import TripletLossForMetaBIN
 from .metabinloss import InterDomainShuffleLoss
 from .metabinloss import IntraDomainScatterLoss
+from .vltloss import PretrainSentLoss, LGRTwoBrachLoss, LGRTwoBrachCELoss
 
 
 class CombinedLoss(nn.Layer):
