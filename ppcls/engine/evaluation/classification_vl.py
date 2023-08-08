@@ -1,8 +1,16 @@
-"""
-batch_size = batch[0].shape[0] -> batch_size = batch[1].shape[0]
-batch[0] = paddle.to_tensor(batch[0]) -> #batch[0] = paddle.to_tensor(batch[0]) to make compatible with tuple x
-"""
-
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -12,6 +20,73 @@ import paddle
 
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
+
+
+def gather_function_tuple(engine, batch, out, accum_samples, total_samples):
+    # gather Tensor when distributed
+    if paddle.distributed.get_world_size() > 1:
+        label_list = []
+        device_id = paddle.distributed.ParallelEnv().device_id
+        label = batch[1].cuda(device_id) if engine.config["Global"][
+            "device"] == "gpu" else batch[1]
+        paddle.distributed.all_gather(label_list, label)
+        labels = paddle.concat(label_list, 0)
+
+        if isinstance(out, list) or isinstance(out, tuple):
+            preds_img_feature = []
+            preds_text_feature = []
+            pred_img_logit = []
+            pred_text_logit = []
+            for i, x in enumerate(out):
+                if i == 0:
+                    pred_list = []
+                    paddle.distributed.all_gather(pred_list, x[0])
+                    pred_x = paddle.concat(pred_list, 0)
+                    preds_img_feature.append(pred_x)
+
+                    pred_list = []
+                    paddle.distributed.all_gather(pred_list, x[1])
+                    pred_x = paddle.concat(pred_list, 0)
+                    preds_text_feature.append(pred_x)
+                elif i == 1:
+                    pred_list = []
+                    paddle.distributed.all_gather(pred_list, x[0])
+                    pred_x = paddle.concat(pred_list, 0)
+                    pred_img_logit.append(pred_x)
+
+                    pred_list = []
+                    paddle.distributed.all_gather(pred_list, x[1])
+                    pred_x = paddle.concat(pred_list, 0)
+                    pred_text_logit.append(pred_x)
+            preds_img_feature = paddle.concat(preds_img_feature, 0)
+            preds_text_feature = paddle.concat(preds_text_feature, 0)
+            pred_text_logit = paddle.concat(pred_text_logit, 0)
+            pred_img_logit = paddle.concat(pred_img_logit, 0)
+            preds = [[preds_img_feature, preds_text_feature],
+                     [pred_img_logit, pred_text_logit]]
+        else:
+            pred_list = []
+            paddle.distributed.all_gather(pred_list, out)
+            preds = paddle.concat(pred_list, 0)
+
+        if accum_samples > total_samples and not engine.use_dali:
+            if isinstance(preds, list):
+                preds = [[
+                    preds_img_feature[:total_samples + current_samples -
+                                      accum_samples],
+                    preds_text_feature[:total_samples + current_samples -
+                                       accum_samples]
+                ], [
+                    pred_img_logit[:total_samples + current_samples -
+                                   accum_samples],
+                    pred_text_logit[:total_samples + current_samples -
+                                    accum_samples]
+                ]]
+            else:
+                preds = preds[:total_samples + current_samples - accum_samples]
+            labels = labels[:total_samples + current_samples - accum_samples]
+            current_samples = total_samples + current_samples - accum_samples
+    return preds, labels
 
 
 def classification_eval(engine, epoch_id=0):
@@ -80,30 +155,35 @@ def classification_eval(engine, epoch_id=0):
             paddle.distributed.all_gather(label_list, label)
             labels = paddle.concat(label_list, 0)
 
-            if isinstance(out, list):
-                preds = []
-                for x in out:
-                    pred_list = []
-                    paddle.distributed.all_gather(pred_list, x)
-                    pred_x = paddle.concat(pred_list, 0)
-                    preds.append(pred_x)
+            preds = None
+            if isinstance(out, list) and isinstance(out[0], list):
+                preds, labels = gather_function_tuple(
+                    engine, batch, out, accum_samples, total_samples)
             else:
-                pred_list = []
-                paddle.distributed.all_gather(pred_list, out)
-                preds = paddle.concat(pred_list, 0)
-
-            if accum_samples > total_samples and not engine.use_dali:
-                if isinstance(preds, list):
-                    preds = [
-                        pred[:total_samples + current_samples - accum_samples]
-                        for pred in preds
-                    ]
+                if isinstance(out, list) and not preds:
+                    preds = []
+                    for x in out:
+                        pred_list = []
+                        paddle.distributed.all_gather(pred_list, x)
+                        pred_x = paddle.concat(pred_list, 0)
+                        preds.append(pred_x)
                 else:
-                    preds = preds[:total_samples + current_samples -
-                                  accum_samples]
-                labels = labels[:total_samples + current_samples -
-                                accum_samples]
-                current_samples = total_samples + current_samples - accum_samples
+                    pred_list = []
+                    paddle.distributed.all_gather(pred_list, out)
+                    preds = paddle.concat(pred_list, 0)
+
+                if accum_samples > total_samples and not engine.use_dali:
+                    if isinstance(preds, list):
+                        preds = [
+                            pred[:total_samples + current_samples -
+                                 accum_samples] for pred in preds
+                        ]
+                    else:
+                        preds = preds[:total_samples + current_samples -
+                                      accum_samples]
+                    labels = labels[:total_samples + current_samples -
+                                    accum_samples]
+                    current_samples = total_samples + current_samples - accum_samples
         else:
             labels = batch[1]
             preds = out
