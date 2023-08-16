@@ -21,6 +21,17 @@ FILENAME=$1
 # change gpu to xpu in tipc txt configs
 sed -i "s/Global.device:gpu/Global.device:xpu/g" $FILENAME
 sed -i "s/Global.use_gpu/Global.use_xpu/g" $FILENAME
+sed -i "s/Global.use_tensorrt:True|False/Global.use_tensorrt:False/g" $FILENAME
+sed -i "s/Global.save_interval=2/Global.save_interval=1/g" $FILENAME
+sed -i "s/-o Global.epochs:lite_train_lite_infer=2/-o Global.epochs:lite_train_lite_infer=1/g" $FILENAME
+# python has been updated to version 3.9 for npu backend
+sed -i "s/python3.7/python3.9/g" $FILENAME
+
+modelname=$(echo $FILENAME | cut -d '/' -f4)
+if  [ $modelname == "PVTV2" ] || [ $modelname == "Twins" ] || [ $modelname == "SwinTransformer" ]; then
+    sed -i "s/gpu_list:0|0,1/gpu_list:0,1/g" $FILENAME
+fi
+
 dataline=`cat $FILENAME`
 
 # parser params
