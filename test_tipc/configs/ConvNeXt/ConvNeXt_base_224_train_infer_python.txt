@@ -1,5 +1,5 @@
 ===========================train_params===========================
-model_name:ConvNeXt_small
+model_name:ConvNeXt_base_224
 python:python3.7
 gpu_list:0|0,1
 -o Global.device:gpu
@@ -21,13 +21,13 @@ to_static_train:-o Global.to_static=True
 null:null
 ##
 ===========================eval_params===========================
-eval:tools/eval.py -c ppcls/configs/ImageNet/ConvNeXt/ConvNeXt_small.yaml
+eval:tools/eval.py -c ppcls/configs/ImageNet/ConvNeXt/ConvNeXt_base_224.yaml
 null:null
 ##
 ===========================infer_params==========================
 -o Global.save_inference_dir:./inference
 -o Global.pretrained_model:
-norm_export:tools/export_model.py -c ppcls/configs/ImageNet/ConvNeXt/ConvNeXt_small.yaml
+norm_export:tools/export_model.py -c ppcls/configs/ImageNet/ConvNeXt/ConvNeXt_base_224.yaml
 quant_export:null
 fpgm_export:null
 distill_export:null
