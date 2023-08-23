@@ -23,7 +23,7 @@ AMP:
 
 # model architecture
 Arch:
-  name: CLIP_vit_base_patch16_224
+  name: CLIP_vit_large_patch14_224
   class_num: 1000
   return_embed: False
   pretrained: True
