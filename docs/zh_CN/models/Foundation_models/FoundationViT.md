@@ -49,6 +49,20 @@ output = model(inputs)  # the output of model embeding
 |  EVA  |       EVA_vit_giant_patch14       |  1010M  |      1408      | ImageNet-21k, CC12M,   CC2M, Object365,COCO, ADE | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/EVA_vit_giant_patch14.pdparams)               |
 |  CAE  |      CAE_vit_base_patch16_224      |   85M   |      768      |                   ImageNet-1k                   | [下载地址](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/CAE_vit_base_patch16_224.pdparams)           |
 
+**备注：** PaddleClas 提供的 CLIP 系列模型在 ImageNet1k 数据集 fine-tune 的配置（[CLIP_vit_base_patch14_224](ppcls/configs/CLIP/CLIP_vit_base_patch16_224_finetune.yaml)，[CLIP_vit_large_patch14_224](ppcls/configs/CLIP/CLIP_vit_large_patch16_224_finetune.yaml)）中：
+* 默认未使用 `EMA`，如需使用，请自行修改配置文件增加字段：
+    ```yaml
+    EMA:
+      decay: 0.9999
+    ```
+* 数据预处理中，`NormalizeImage` 默认使用 ImageNet1k 数据集的 `mean` 和 `std` 参数（`mean` 为 `[0.485, 0.456, 0.406]`，`std` 为 `[0.229, 0.224, 0.225]`），如需使用 LAION 数据集相应参数，请自行修改相应字段：
+    ```yaml
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.48145466, 0.4578275, 0.40821073]
+        std: [0.26862954, 0.26130258, 0.27577711]
+    ```
+
 ## 4. 参考文献
 
 1. [MoCo v3: An Empirical Study of Training Self-Supervised Vision Transformers](https://arxiv.org/pdf/2104.02057.pdf)
