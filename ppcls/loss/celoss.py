@@ -57,6 +57,7 @@ class CELoss(nn.Layer):
                 loss = loss.sum()
         else:
             if label.shape[-1] == x.shape[-1]:
+                label = F.softmax(label, axis=-1)
                 soft_label = True
             else:
                 soft_label = False
