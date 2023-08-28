@@ -14,7 +14,7 @@
 import os
 import json
 
-from .logger import init_logger
+from . import logger
 
 def save_predict_result(save_path, result):
     if os.path.splitext(save_path)[-1] == '':
@@ -31,5 +31,5 @@ def save_predict_result(save_path, result):
         logger.warning(
             f"The file {save_path} will be overwritten."
         )
-    with open(save_dir, 'w', encoding='utf-8') as f:
+    with open(save_path, 'w', encoding='utf-8') as f:
         json.dump(result, f)
