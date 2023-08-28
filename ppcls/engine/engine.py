@@ -477,8 +477,9 @@ class Engine(object):
                 results.extend(result)
                 batch_data.clear()
                 image_file_list.clear()
-        if self.config["Infer"]["save_dir"]:
-            save_predict_result(self.config["Infer"]["save_dir"], results)
+        save_path = self.config["Infer"].get("save_dir", None)
+        if save_path:
+            save_predict_result(save_path, results)
         return results
 
     def export(self):
