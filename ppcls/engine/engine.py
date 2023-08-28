@@ -38,7 +38,7 @@ from ppcls.utils.amp import AutoCast, build_scaler
 from ppcls.utils.ema import ExponentialMovingAverage
 from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 from ppcls.utils.save_load import init_model
-from ppcls.utils import save_load
+from ppcls.utils import save_load, save_predict_result
 
 from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
@@ -473,6 +473,8 @@ class Engine(object):
                     out = out["output"]
 
                 result = self.postprocess_func(out, image_file_list)
+                if self.config["Infer"]["save_dir"]:
+                    save_predict_result(self.config["Infer"]["save_dir"], result)
                 logger.info(result)
                 results.extend(result)
                 batch_data.clear()

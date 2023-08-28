@@ -1,9 +1,8 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2023 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
@@ -12,18 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import logger
-from . import metrics
-from . import misc
-from . import model_zoo
+import json
+import os
 
-from .config import get_config
-from .dist_utils import all_gather
-from .metrics import accuracy_score
-from .metrics import hamming_distance
-from .metrics import mean_average_precision
-from .metrics import multi_hot_encode
-from .metrics import precision_recall_fscore
-from .misc import AverageMeter
-from .save_load import init_model, save_model
-from .save_result import save_predict_result
+def save_predict_result(save_dir, result):
+    save_dir = save_dir + '.json'
+    save_dir = os.path.abspath(save_dir)
+    with open(f'{save_dir}', 'w', encoding='utf-8') as f:
+        json.dump(result, f)
