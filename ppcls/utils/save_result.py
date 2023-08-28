@@ -11,11 +11,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import os
+import json
 
-def save_predict_result(save_dir, result):
-    save_dir = save_dir + '.json'
-    save_dir = os.path.abspath(save_dir)
-    with open(f'{save_dir}', 'w', encoding='utf-8') as f:
+from .logger import init_logger
+
+def save_predict_result(save_path, result):
+    if os.path.splitext(save_path)[-1] == '':
+        if save_path[-1] == "/":
+            save_path = save_path[:-1]
+        save_path = save_path + '.json'
+    elif os.path.splitext(save_path)[-1] == '.json':
+        save_path = save_path
+    else:
+        logger.warning(
+            f"{save_path} is invalid input path, only files in json format are supported."
+        )
+    if os.path.exists(save_path):
+        logger.warning(
+            f"The file {save_path} will be overwritten."
+        )
+    with open(save_dir, 'w', encoding='utf-8') as f:
         json.dump(result, f)
