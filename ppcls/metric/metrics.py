@@ -54,8 +54,9 @@ class TopkAcc(AvgMetrics):
         metric_dict = dict()
         for idx, k in enumerate(self.topk):
             if output_dims < k:
-                msg = f"The output dims({output_dims}) is less than k({k}), and the argument {k} of Topk has been removed."
+                msg = f"The output dims({output_dims}) is less than k({k}), so the Top-{k} metric is meaningless."
                 logger.warning(msg)
+                metric_dict[f"top{k}"] = 1
                 self.avg_meters.pop(f"top{k}")
                 continue
             metric_dict[f"top{k}"] = paddle.metric.accuracy(x, label, k=k)
