@@ -473,12 +473,12 @@ class Engine(object):
                     out = out["output"]
 
                 result = self.postprocess_func(out, image_file_list)
-                if self.config["Infer"]["save_dir"]:
-                    save_predict_result(self.config["Infer"]["save_dir"], result)
                 logger.info(result)
                 results.extend(result)
                 batch_data.clear()
                 image_file_list.clear()
+        if self.config["Infer"]["save_dir"]:
+            save_predict_result(self.config["Infer"]["save_dir"], results)
         return results
 
     def export(self):
