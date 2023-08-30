@@ -442,7 +442,10 @@ class Engine(object):
         results = []
         total_trainer = dist.get_world_size()
         local_rank = dist.get_rank()
-        image_list = get_image_list(self.config["Infer"]["infer_imgs"])
+        infer_imgs = self.config["Infer"]["infer_imgs"]
+        infer_list = self.config["Infer"].get("infer_list", None)
+        dataset_path = self.config["Infer"].get("dataset_path", None)
+        image_list = get_image_list(infer_imgs, infer_list=infer_list, dataset_path=dataset_path)
         # data split
         image_list = image_list[local_rank::total_trainer]
 
@@ -450,6 +453,7 @@ class Engine(object):
         self.model.eval()
         batch_data = []
         image_file_list = []
+        save_path = self.config["Infer"].get("save_dir", None)
         for idx, image_file in enumerate(image_list):
             with open(image_file, 'rb') as f:
                 x = f.read()
@@ -473,11 +477,12 @@ class Engine(object):
                     out = out["output"]
 
                 result = self.postprocess_func(out, image_file_list)
+                if not save_path:
+                    logger.info(result)
                 logger.info(result)
                 results.extend(result)
                 batch_data.clear()
                 image_file_list.clear()
-        save_path = self.config["Infer"].get("save_dir", None)
         if save_path:
             save_predict_result(save_path, results)
         return results
