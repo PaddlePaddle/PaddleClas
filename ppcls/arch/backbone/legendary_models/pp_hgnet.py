@@ -207,7 +207,8 @@ class PPHGNet(TheseusLayer):
                  use_last_conv=True,
                  class_expand=2048,
                  dropout_prob=0.0,
-                 class_num=1000):
+                 class_num=1000,
+                 **kwargs):
         super().__init__()
         self.use_last_conv = use_last_conv
         self.class_expand = class_expand
