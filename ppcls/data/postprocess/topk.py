@@ -42,9 +42,9 @@ class Topk(object):
             except Exception as e:
                 with open(class_id_map_file, "r", encoding='gbk') as fin:
                     lines = fin.readlines()
-                for line in lines:
-                    partition = line.split("\n")[0].partition(self.delimiter)
-                    class_id_map[int(partition[0])] = str(partition[-1])
+            for line in lines:
+                partition = line.split("\n")[0].partition(self.delimiter)
+                class_id_map[int(partition[0])] = str(partition[-1])
         except Exception as ex:
             print(ex)
             class_id_map = None
