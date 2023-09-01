@@ -444,8 +444,7 @@ class Engine(object):
         local_rank = dist.get_rank()
         infer_imgs = self.config["Infer"]["infer_imgs"]
         infer_list = self.config["Infer"].get("infer_list", None)
-        dataset_path = self.config["Infer"].get("dataset_path", None)
-        image_list = get_image_list(infer_imgs, infer_list=infer_list, dataset_path=dataset_path)
+        image_list = get_image_list(infer_imgs, infer_list=infer_list)
         # data split
         image_list = image_list[local_rank::total_trainer]
 

@@ -18,20 +18,16 @@ import base64
 import numpy as np
 
 
-def get_image_list(img_file, infer_list=None, dataset_path=None):
+def get_image_list(img_file, infer_list=None):
     imgs_lists = []
     if infer_list and not os.path.exists(infer_list):
         raise Exception("not found any img file in {}".format(infer_list))
-    if dataset_path and not os.path.exists(dataset_path):
-        raise Exception("not found any img file in {}".format(dataset_path))
     if infer_list:
-        if not dataset_path:
-            raise Exception("please input dataset_path")
         with open(infer_list, "r") as f:
             lines = f.readlines()
             for line in lines:
                 image_path = line.strip(" ").split()[0]
-                image_path = os.path.join(dataset_path, image_path)
+                image_path = os.path.join(img_file, image_path)
                 imgs_lists.append(image_path)
     else:
         if img_file is None or not os.path.exists(img_file):
