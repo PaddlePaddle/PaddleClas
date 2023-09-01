@@ -478,7 +478,6 @@ class Engine(object):
                 result = self.postprocess_func(out, image_file_list)
                 if not save_path:
                     logger.info(result)
-                logger.info(result)
                 results.extend(result)
                 batch_data.clear()
                 image_file_list.clear()
