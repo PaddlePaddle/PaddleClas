@@ -18,19 +18,28 @@ import base64
 import numpy as np
 
 
-def get_image_list(img_file):
+def get_image_list(img_file, infer_list=None):
     imgs_lists = []
-    if img_file is None or not os.path.exists(img_file):
-        raise Exception("not found any img file in {}".format(img_file))
-
-    img_end = ['jpg', 'png', 'jpeg', 'JPEG', 'JPG', 'bmp']
-    if os.path.isfile(img_file) and img_file.split('.')[-1] in img_end:
-        imgs_lists.append(img_file)
-    elif os.path.isdir(img_file):
-        for root, dirs, files in os.walk(img_file):
-            for single_file in files:
-                if single_file.split('.')[-1] in img_end:
-                    imgs_lists.append(os.path.join(root, single_file))
+    if infer_list and not os.path.exists(infer_list):
+        raise Exception("not found infer list {}".format(infer_list))
+    if infer_list:
+        with open(infer_list, "r") as f:
+            lines = f.readlines()
+        for line in lines:
+            image_path = line.strip(" ").split()[0]
+            image_path = os.path.join(img_file, image_path)
+            imgs_lists.append(image_path)
+    else:
+        if img_file is None or not os.path.exists(img_file):
+            raise Exception("not found any img file in {}".format(img_file))
+        img_end = ['jpg', 'png', 'jpeg', 'JPEG', 'JPG', 'bmp']
+        if os.path.isfile(img_file) and img_file.split('.')[-1] in img_end:
+            imgs_lists.append(img_file)
+        elif os.path.isdir(img_file):
+            for root, dirs, files in os.walk(img_file):
+                for single_file in files:
+                    if single_file.split('.')[-1] in img_end:
+                        imgs_lists.append(os.path.join(root, single_file))
     if len(imgs_lists) == 0:
         raise Exception("not found any img file in {}".format(img_file))
     imgs_lists = sorted(imgs_lists)
