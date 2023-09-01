@@ -24,12 +24,9 @@ def save_predict_result(save_path, result):
     elif os.path.splitext(save_path)[-1] == '.json':
         save_path = save_path
     else:
-        logger.warning(
-            f"{save_path} is invalid input path, only files in json format are supported."
-        )
+        raise Exception(f"{save_path} is invalid input path, only files in json format are supported.")
+
     if os.path.exists(save_path):
-        logger.warning(
-            f"The file {save_path} will be overwritten."
-        )
+        logger.warning(f"The file {save_path} will be overwritten.")
     with open(save_path, 'w', encoding='utf-8') as f:
         json.dump(result, f)
