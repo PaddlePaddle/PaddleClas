@@ -27,7 +27,6 @@ Arch:
   class_num: 1000
   return_embed: False
   pretrained: True
-  head_init_scale: 0.001
 
 # loss function config for traing/eval process
 Loss:
