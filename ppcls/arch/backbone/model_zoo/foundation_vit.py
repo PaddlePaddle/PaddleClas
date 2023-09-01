@@ -567,7 +567,7 @@ class VisionTransformer(nn.Layer):
                  drop_path_rate=0.,
                  norm_layer='nn.LayerNorm',
                  epsilon=1e-5,
-                 head_init_scale=1,
+                 head_init_scale=0.001,
                  **kwargs):
         super().__init__()
         global _model_diff
