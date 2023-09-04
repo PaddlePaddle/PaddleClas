@@ -16,7 +16,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from ppcls.loss.multilabelloss import ratio2weight
+from ppcls.loss.multilabelloss import ratio2weight_1
 
 
 class DMLLoss(nn.Layer):
