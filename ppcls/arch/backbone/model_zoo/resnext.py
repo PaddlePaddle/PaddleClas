@@ -234,7 +234,7 @@ class ResNeXt(nn.Layer):
         with paddle.static.amp.fp16_guard():
             return self._forward(inputs)
 
-    def _forward(self, inputs)
+    def _forward(self, inputs):
         if self.data_format == "NHWC":
             inputs = paddle.tensor.transpose(inputs, [0, 2, 3, 1])
             inputs.stop_gradient = True
