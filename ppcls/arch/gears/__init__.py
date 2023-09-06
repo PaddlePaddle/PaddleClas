@@ -17,13 +17,14 @@ from .cosmargin import CosMargin
 from .circlemargin import CircleMargin
 from .fc import FC
 from .vehicle_neck import VehicleNeck
-from paddle.nn import Tanh
+from paddle.nn import Tanh, Identity
 from .bnneck import BNNeck
 from .adamargin import AdaMargin
 from .frfn_neck import FRFNNeck
 from .metabnneck import MetaBNNeck
+from .ml_decoder import MLDecoder
 
-__all__ = ['build_gear']
+__all__ = ['build_gear', 'add_ml_decoder_head']
 
 
 def build_gear(config):
@@ -36,3 +37,17 @@ def build_gear(config):
         'head only support {}'.format(support_dict))
     module_class = eval(module_name)(**config)
     return module_class
+
+
+def add_ml_decoder_head(model, config):
+    for layer_name, new_layer in zip(
+            ["avg_pool", "flatten", "fc"],
+            [Identity(), Identity(), MLDecoder(**config)]):
+
+        if hasattr(model, layer_name):
+            delattr(model, layer_name)
+            setattr(model, layer_name, new_layer)
+        else:
+            raise AttributeError(
+                "Please carefully check that the last three layers of the model "
+                "you need to add a are `avg_pool`, `flatten`, and `fc`.")
