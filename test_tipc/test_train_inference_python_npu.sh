@@ -24,6 +24,7 @@ sed -i "s/Global.use_gpu/Global.use_npu/g" $FILENAME
 sed -i "s/Global.use_tensorrt:True|False/Global.use_tensorrt:False/g" $FILENAME
 sed -i "s/Global.save_interval=2/Global.save_interval=1/g" $FILENAME
 sed -i "s/-o Global.epochs:lite_train_lite_infer=2/-o Global.epochs:lite_train_lite_infer=1/g" $FILENAME
+sed -i "s/enable_mkldnn:True|False/enable_mkldnn:False/g" $FILENAME
 # python has been updated to version 3.9 for npu backend
 sed -i "s/python3.7/python3.9/g" $FILENAME
 
