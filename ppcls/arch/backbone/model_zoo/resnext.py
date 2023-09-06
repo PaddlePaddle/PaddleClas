@@ -232,17 +232,20 @@ class ResNeXt(nn.Layer):
 
     def forward(self, inputs):
         with paddle.static.amp.fp16_guard():
-            if self.data_format == "NHWC":
-                inputs = paddle.tensor.transpose(inputs, [0, 2, 3, 1])
-                inputs.stop_gradient = True
-            y = self.conv(inputs)
-            y = self.pool2d_max(y)
-            for block in self.block_list:
-                y = block(y)
-            y = self.pool2d_avg(y)
-            y = paddle.reshape(y, shape=[-1, self.pool2d_avg_channels])
-            y = self.out(y)
-            return y
+            return self._forward(inputs)
+
+    def _forward(self, inputs)
+        if self.data_format == "NHWC":
+            inputs = paddle.tensor.transpose(inputs, [0, 2, 3, 1])
+            inputs.stop_gradient = True
+        y = self.conv(inputs)
+        y = self.pool2d_max(y)
+        for block in self.block_list:
+            y = block(y)
+        y = self.pool2d_avg(y)
+        y = paddle.reshape(y, shape=[-1, self.pool2d_avg_channels])
+        y = self.out(y)
+        return y
 
 
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
