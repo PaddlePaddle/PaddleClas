@@ -18,6 +18,8 @@
 import numpy as np
 import random
 
+from PIL import Image, ImageDraw
+
 
 class Cutout(object):
     def __init__(self, n_holes=1, length=112):
@@ -39,4 +41,51 @@ class Cutout(object):
             x2 = np.clip(x + self.length // 2, 0, w)
 
             img[y1:y2, x1:x2] = 0
+        return img
+
+
+class CutoutPIL(object):
+    """
+    Cutout use PIL backend.
+
+    Args:
+        n_holes (int): the number of cutout holes.
+        cutout_factor (float): the ratio of cutout hole to image size.
+        fill_color (tuple, optional): fill color, use random value if got None.
+    """
+
+    def __init__(self, n_holes=1, cutout_factor=0.5, fill_color=None):
+        self.n_holes = n_holes
+        self.cutout_factor = cutout_factor
+        self.fill_color = fill_color
+
+    def __call__(self, img):
+        """ cutout_image """
+        h, w = img.shape[:2]
+        cutout_h = int(self.cutout_factor * h + 0.5)
+        cutout_w = int(self.cutout_factor * w + 0.5)
+
+        img = Image.fromarray(img)
+        draw = ImageDraw.Draw(img)
+
+        for n in range(self.n_holes):
+            y = np.random.randint(h)
+            x = np.random.randint(w)
+
+            y1 = np.clip(y - cutout_h // 2, 0, h).item()
+            y2 = np.clip(y + cutout_h // 2, 0, h).item()
+            x1 = np.clip(x - cutout_w // 2, 0, w).item()
+            x2 = np.clip(x + cutout_w // 2, 0, w).item()
+
+            if self.fill_color is None:
+                target_color = (random.randint(0, 255),
+                                random.randint(0, 255),
+                                random.randint(0, 255))
+            else:
+                target_color = self.fill_color
+
+            draw.rectangle((x1, y1, x2, y2), fill=target_color)
+
+        if not isinstance(img, np.ndarray):
+            img = np.asarray(img)
         return img
