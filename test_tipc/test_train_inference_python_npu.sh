@@ -27,7 +27,7 @@ sed -i "s/-o Global.epochs:lite_train_lite_infer=2/-o Global.epochs:lite_train_l
 # python has been updated to version 3.9 for npu backend
 sed -i "s/python3.7/python3.9/g" $FILENAME
 
-modelname=$(echo $FILENAME | cut -d '/' -f4)
+modelname=$(echo $FILENAME | cut -d '/' -f3)
 if  [ $modelname == "PVTV2" ] || [ $modelname == "Twins" ] || [ $modelname == "SwinTransformer" ]; then
     sed -i "s/gpu_list:0|0,1/gpu_list:0,1/g" $FILENAME
 fi
