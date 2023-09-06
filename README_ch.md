@@ -61,6 +61,32 @@ PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级�
 <img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "170" height = "170" />
 </div>
 
+- 飞桨AI套件（PaddleX）中训练、推理、高性能部署全流程体验：
+    - 通用图像分类：https://aistudio.baidu.com/modelsdetail/287?modelId=287
+    - PP-ShiTuV2通用图像识别系统：https://aistudio.baidu.com/modelsdetail/307?modelId=307
+
+
+## 📖 技术交流合作
+
+- 飞桨AI套件（[PaddleX](https://www.paddlepaddle.org.cn/paddle/PaddleX)）—— 精选产业实用模型的一站式开发平台。包含如下特点：
+  - 【丰富的算法库】PaddleX提供36个精选模型，覆盖了10大AI任务场景，并附带模型推理benchmark数据。开发者可以根据业务需求轻松选择合适的模型，并进行开发和部署。
+  - 【简便的开发方式】PaddleX支持无代码和低代码开发，只需四个简单步骤，即可完成全流程AI开发，包括数据处理、模型训练、验证和部署。
+  - 【高效的模型部署】PaddleX平台提供强大的部署能力，支持快速实现产业级部署，实现跨平台、跨硬件的部署。
+  - 【多样的硬件支持】PaddleX不仅能够在AI Studio云端使用，还支持在Windows本地环境使用，并正在积极扩展支持Linux版本、昆仑芯版本、昇腾版本和寒武纪版本。
+  - 【共赢的合作机会】除了提供便捷的AI应用开发工具，PaddleX还为企业提供商业收益机会，共同探索更多商业空间，实现共同成长和共赢。
+
+- 作为一款高效的开发神器，PaddleX值得每一位开发者拥有。
+
+- PaddleX官网地址：https://www.paddlepaddle.org.cn/paddle/PaddleX
+
+- 微信扫描下面二维码添加运营同学，并回复【PaddleX】，运营同学会邀请您加入官方交流群，获得更高效的问题答疑。
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/dygraph/doc/joinus_paddlex.jpg"  width = "150" height = "150",caption='' />
+<p>飞桨AI套件【PaddleX】技术交流群二维码</p>
+</div>
+
+
 ## 👫 开源社区
 
 * **📑项目合作：** 如果您是企业开发者且有明确的图像分类应用需求，填写[问卷](https://paddle.wjx.cn/vm/hnGOjfn.aspx# )后可免费与官方团队展开不同层次的合作。
