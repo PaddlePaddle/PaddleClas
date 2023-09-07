@@ -9,6 +9,7 @@
 * [5. 模型预测](#5)
 * [6. 基于预测引擎预测](#6)
   * [6.1 导出 inference model](#6.1)
+  * [6.2 基于 Python 预测引擎推理](#6.2)
 * [7. 引用](#7)
 
 <a name="1"></a>
@@ -157,6 +158,85 @@ python3 tools/export_model.py \
     -o Arch.pretrained="./output/ResNet50_ml_decoder/best_model"
 ```
 inference model 的路径默认在当前路径下 `./inference`
+`./inference` 文件夹下应有如下文件结构：
+
+```
+├── inference
+│   ├── inference.pdiparams
+│   ├── inference.pdiparams.info
+│   └── inference.pdmodel
+```
+
+<a name="6.2"></a>
+
+### 6.2 基于 Python 预测引擎推理
+
+切换到depoly目录下，并且使用depoly中的脚本进行推理前需要确认paddleclas为非本地安装, 如不是请进行切换，不然会出现包的导入错误。 
+
+```shell
+# 本地安装
+pip install -e .
+# 非本地安装
+python setup.py install
+
+# 进入depoly目录下
+cd deploy
+```
+
+<a name="6.2.1"></a>  
+
+#### 6.2.1 预测单张图像
+
+运行下面的命令，对图像 `./images/coco_000000570688.jpg` 进行分类。
+
+```shell
+# linux使用`python3`，windows使用`python (-m)`来执行脚本
+# 使用下面的命令使用 GPU 进行预测
+python3 python/predict_cls.py \
+    -c configs/inference_cls_multilabel.yaml \
+    -o Global.inference_model_dir=../inference/ \
+    -o Global.infer_imgs=images/coco_000000570688.jpg \
+    -o PostProcess.MultiLabelThreshOutput.class_id_map_file=../ppcls/utils/COCO2017_label_list.txt
+# 使用下面的命令使用 CPU 进行预测
+python3 python/predict_cls.py \
+    -c configs/inference_cls_multilabel.yaml \
+    -o Global.inference_model_dir=../inference/ \
+    -o Global.infer_imgs=images/coco_000000570688.jpg \
+    -o PostProcess.MultiLabelThreshOutput.class_id_map_file=../ppcls/utils/COCO2017_label_list.txt \
+    -o Global.use_gpu=False
+```
+
+输出结果如下：
+
+```
+coco_000000570688.jpg:  class id(s): [2, 4, 6, 7, 12, 16, 17, 19, 20, 23, 25, 26, 27, 29, 30, 35, 36, 37, 38, 39, 42, 49, 51, 52, 60, 63, 64, 65, 66, 67, 70, 71, 74, 77], score(s): [0.60, 0.57, 0.86, 0.79, 0.51, 0.77, 0.69, 0.69, 0.57, 0.85, 0.57, 0.57, 0.84, 0.91, 0.86, 0.85, 0.67, 0.76, 0.63, 0.87, 0.71, 0.66, 0.87, 0.71, 0.59, 0.61, 0.63, 0.84, 0.82, 0.93, 0.50, 0.73, 0.53, 0.83], label_name(s): ['car', 'airplane', 'train', 'truck', 'parking meter', 'dog', 'horse', 'cow', 'elephant', 'giraffe', 'umbrella', 'handbag', 'tie', 'frisbee', 'skis', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'fork', 'orange', 'carrot', 'hot dog', 'dining table', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'toaster', 'sink', 'clock', 'teddy bear']
+```
+
+<a name="6.2.2"></a>  
+
+#### 6.2.2 基于文件夹的批量预测
+
+如果希望预测文件夹内的图像，可以直接修改配置文件中的 `Global.infer_imgs` 字段，也可以通过下面的 `-o` 参数修改对应的配置。
+
+```shell
+# linux使用`python3`，windows使用`python (-m)`来执行脚本
+# 使用下面的命令使用 GPU 进行预测，如果希望使用 CPU 预测，可以在命令后面添加 -o Global.use_gpu=False
+python3 python/predict_cls.py \
+    -c configs/inference_cls_multilabel.yaml \
+    -o Global.inference_model_dir=../inference/ \
+    -o Global.infer_imgs=images/coco_000000570688.jpg \
+    -o PostProcess.MultiLabelThreshOutput.class_id_map_file=../ppcls/utils/COCO2017_label_list.txt \
+    -o Global.infer_imgs=images/ImageNet/
+```
+
+终端中会输出该文件夹内所有图像的分类结果，如下所示。
+
+```
+ILSVRC2012_val_00000010.jpeg:   class id(s): [2, 3, 4, 6, 7, 8, 16, 17, 20, 21, 23, 24, 25, 26, 27, 29, 30, 35, 36, 37, 38, 39, 42, 49, 51, 52, 57, 60, 63, 64, 65, 66, 67, 70, 71, 74, 77], score(s): [0.72, 0.63, 0.51, 0.85, 0.83, 0.64, 0.68, 0.66, 0.53, 0.51, 0.88, 0.54, 0.56, 0.70, 0.83, 0.90, 0.88, 0.87, 0.65, 0.83, 0.82, 0.82, 0.68, 0.59, 0.70, 0.90, 0.72, 0.63, 0.72, 0.80, 0.87, 0.82, 0.92, 0.58, 0.90, 0.53, 0.74], label_name(s): ['car', 'motorcycle', 'airplane', 'train', 'truck', 'boat', 'dog', 'horse', 'elephant', 'bear', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'frisbee', 'skis', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'fork', 'orange', 'carrot', 'hot dog', 'couch', 'dining table', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'toaster', 'sink', 'clock', 'teddy bear']
+ILSVRC2012_val_00010010.jpeg:   class id(s): [2, 4, 6, 7, 8, 12, 16, 17, 19, 23, 24, 25, 26, 27, 29, 30, 35, 36, 37, 38, 39, 42, 49, 51, 52, 56, 57, 60, 63, 64, 65, 66, 67, 70, 71, 77], score(s): [0.75, 0.59, 0.83, 0.71, 0.56, 0.62, 0.74, 0.73, 0.62, 0.80, 0.51, 0.51, 0.67, 0.81, 0.89, 0.85, 0.88, 0.52, 0.91, 0.67, 0.73, 0.73, 0.55, 0.72, 0.75, 0.53, 0.55, 0.66, 0.67, 0.75, 0.85, 0.80, 0.93, 0.76, 0.84, 0.78], label_name(s): ['car', 'airplane', 'train', 'truck', 'boat', 'parking meter', 'dog', 'horse', 'cow', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'frisbee', 'skis', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'fork', 'orange', 'carrot', 'hot dog', 'chair', 'couch', 'dining table', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'toaster', 'sink', 'teddy bear']
+ILSVRC2012_val_00020010.jpeg:   class id(s): [2, 3, 6, 7, 16, 17, 19, 23, 25, 26, 27, 29, 30, 35, 36, 37, 38, 39, 41, 42, 44, 49, 51, 52, 60, 63, 64, 65, 66, 67, 70, 71, 74, 77], score(s): [0.73, 0.52, 0.84, 0.78, 0.64, 0.79, 0.66, 0.86, 0.53, 0.57, 0.86, 0.85, 0.89, 0.87, 0.61, 0.72, 0.64, 0.79, 0.53, 0.60, 0.52, 0.68, 0.82, 0.89, 0.61, 0.62, 0.61, 0.85, 0.77, 0.94, 0.61, 0.71, 0.62, 0.86], label_name(s): ['car', 'motorcycle', 'train', 'truck', 'dog', 'horse', 'cow', 'giraffe', 'umbrella', 'handbag', 'tie', 'frisbee', 'skis', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'cup', 'fork', 'spoon', 'orange', 'carrot', 'hot dog', 'dining table', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'toaster', 'sink', 'clock', 'teddy bear']
+ILSVRC2012_val_00030010.jpeg:   class id(s): [2, 3, 4, 6, 7, 16, 17, 19, 23, 25, 26, 27, 29, 30, 35, 36, 37, 38, 39, 42, 46, 49, 51, 52, 57, 60, 63, 64, 65, 66, 67, 70, 71, 77], score(s): [0.67, 0.51, 0.61, 0.87, 0.72, 0.68, 0.66, 0.67, 0.91, 0.50, 0.62, 0.82, 0.91, 0.84, 0.90, 0.63, 0.79, 0.67, 0.86, 0.68, 0.52, 0.72, 0.84, 0.86, 0.51, 0.55, 0.60, 0.66, 0.88, 0.77, 0.94, 0.64, 0.79, 0.82], label_name(s): ['car', 'motorcycle', 'airplane', 'train', 'truck', 'dog', 'horse', 'cow', 'giraffe', 'umbrella', 'handbag', 'tie', 'frisbee', 'skis', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'fork', 'banana', 'orange', 'carrot', 'hot dog', 'couch', 'dining table', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'toaster', 'sink', 'teddy bear']
+```
 
 <a name="7"></a>
 ## 7. 引用
