@@ -105,7 +105,7 @@ class MLDecoder(nn.Layer):
         return x
 
     def forward(self, x):
-        assert x.ndim == 4 and x.shape[1] == self.in_chans, "Wrong input shape!!!"
+        assert x.ndim == 4 and x.shape[1] == self.in_channels, "Wrong input shape!!!"
 
         feat_proj = F.relu(self.input_proj(x))
         feat_flatten = feat_proj.flatten(2).transpose([0, 2, 1])

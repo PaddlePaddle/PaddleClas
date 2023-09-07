@@ -18,6 +18,7 @@
 import random
 
 import numpy as np
+import cv2
 
 
 class Cutout(object):
@@ -40,21 +41,15 @@ class Cutout(object):
             x1 = np.clip(x - self.length // 2, 0, w)
             x2 = np.clip(x + self.length // 2, 0, w)
 
-            if img.ndim == 2:
-                if self.fill_value is None:
+            fill_value = self.fill_value
+            if fill_value is None:
+                if img.ndim == 2:
                     fill_value = random.randint(0, 255)
                 else:
-                    fill_value = self.fill_value
-                img[y1:y2, x1:x2] = fill_value
-            else:
-                if self.fill_value is None:
                     fill_value = [random.randint(0, 255),
                                   random.randint(0, 255),
                                   random.randint(0, 255)]
-                else:
-                    fill_value = self.fill_value
-                img[y1:y2, x1:x2, 0] = fill_value[0]
-                img[y1:y2, x1:x2, 1] = fill_value[1]
-                img[y1:y2, x1:x2, 2] = fill_value[2]
+
+                img = cv2.rectangle(img, (x1, y1), (x2, y2), fill_value, -1)
 
         return img
