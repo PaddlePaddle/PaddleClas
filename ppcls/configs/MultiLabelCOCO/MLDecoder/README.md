@@ -182,11 +182,7 @@ cd deploy
 ```shell
 # linux使用`python3`，windows使用`python (-m)`来执行脚本
 # 使用下面的命令使用 GPU 进行预测
-python3 python/predict_cls.py \
-    -c configs/inference_cls_multilabel.yaml \
-    -o Global.inference_model_dir=../inference/ \
-    -o Global.infer_imgs=images/coco_000000570688.jpg \
-    -o PostProcess.MultiLabelThreshOutput.class_id_map_file=../ppcls/utils/COCO2017_label_list.txt
+c
 # 使用下面的命令使用 CPU 进行预测
 python3 python/predict_cls.py \
     -c configs/inference_cls_multilabel.yaml \
@@ -199,7 +195,7 @@ python3 python/predict_cls.py \
 输出结果如下：
 
 ```
-coco_000000570688.jpg:  class id(s): [2, 4, 6, 7, 12, 16, 17, 19, 20, 23, 25, 26, 27, 29, 30, 35, 36, 37, 38, 39, 42, 49, 51, 52, 60, 63, 64, 65, 66, 67, 70, 71, 74, 77], score(s): [0.60, 0.57, 0.86, 0.79, 0.51, 0.77, 0.69, 0.69, 0.57, 0.85, 0.57, 0.57, 0.84, 0.91, 0.86, 0.85, 0.67, 0.76, 0.63, 0.87, 0.71, 0.66, 0.87, 0.71, 0.59, 0.61, 0.63, 0.84, 0.82, 0.93, 0.50, 0.73, 0.53, 0.83], label_name(s): ['car', 'airplane', 'train', 'truck', 'parking meter', 'dog', 'horse', 'cow', 'elephant', 'giraffe', 'umbrella', 'handbag', 'tie', 'frisbee', 'skis', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'fork', 'orange', 'carrot', 'hot dog', 'dining table', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'toaster', 'sink', 'clock', 'teddy bear']
+coco_000000570688.jpg:  class id(s): [0, 2, 3, 4, 7, 9, 21, 22, 23, 24, 25, 27, 28, 29, 30, 33, 38, 39, 45, 46, 47, 48, 49, 51, 52, 53, 54, 57, 58, 60, 61, 62, 63, 64, 65, 67, 69, 70, 71, 72, 73, 75], score(s): [0.84, 0.68, 0.93, 0.54, 0.74, 0.90, 0.56, 0.60, 0.63, 0.77, 0.64, 0.70, 0.94, 0.82, 0.99, 0.71, 0.86, 0.81, 0.81, 0.65, 0.65, 0.92, 0.67, 0.53, 0.83, 0.63, 0.58, 0.52, 0.83, 0.55, 0.92, 0.72, 0.74, 0.59, 0.82, 0.50, 0.62, 0.77, 0.87, 0.64, 0.84, 0.67], label_name(s): ['person', 'car', 'motorcycle', 'airplane', 'truck', 'traffic light', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'tie', 'suitcase', 'frisbee', 'skis', 'kite', 'tennis racket', 'bottle', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'carrot', 'hot dog', 'pizza', 'donut', 'couch', 'potted plant', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'cell phone', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'vase']
 ```
 
 <a name="6.2.2"></a>  
