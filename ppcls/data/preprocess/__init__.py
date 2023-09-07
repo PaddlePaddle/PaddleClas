@@ -19,7 +19,7 @@ from ppcls.data.preprocess.ops.randaugment import RandAugmentV2 as RawRandAugmen
 from ppcls.data.preprocess.ops.randaugment import RandAugmentV3 as RawRandAugmentV3
 from ppcls.data.preprocess.ops.randaugment import RandAugmentV4 as RawRandAugmentV4
 from ppcls.data.preprocess.ops.timm_autoaugment import RawTimmAutoAugment
-from ppcls.data.preprocess.ops.cutout import Cutout, CutoutPIL
+from ppcls.data.preprocess.ops.cutout import Cutout
 
 from ppcls.data.preprocess.ops.hide_and_seek import HideAndSeek
 from ppcls.data.preprocess.ops.random_erasing import RandomErasing
