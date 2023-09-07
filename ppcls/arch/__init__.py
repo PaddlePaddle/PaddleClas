@@ -46,13 +46,7 @@ def build_model(config, mode="train"):
             logger.warning(msg)
 
     if use_ml_decoder:
-        ml_decoder_config = config.get("MLDecoder", {})
-        if "class_num" not in ml_decoder_config:
-            if hasattr(arch, "class_num"):
-                ml_decoder_config["class_num"] = arch.class_num
-            else:
-                ml_decoder_config["class_num"] = arch_config["class_num"]
-        add_ml_decoder_head(arch, ml_decoder_config)
+        add_ml_decoder_head(arch, config.get("MLDecoder", {}))
 
     if isinstance(arch, TheseusLayer):
         prune_model(config, arch)

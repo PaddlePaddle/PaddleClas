@@ -40,6 +40,7 @@ def build_gear(config):
 
 
 def add_ml_decoder_head(model, config):
+    config['class_num'] = model.class_num
     for layer_name, new_layer in zip(
             ["avg_pool", "flatten", "fc"],
             [Identity(), Identity(), MLDecoder(**config)]):

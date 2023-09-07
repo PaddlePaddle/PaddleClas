@@ -34,9 +34,9 @@ class MLDecoder(nn.Layer):
     """
 
     def __init__(self,
-                 class_num=1000,
+                 class_num=80,
                  in_chans=2048,
-                 query_num=100,
+                 query_num=80,
                  embed_dim=768,
                  depth=1,
                  num_heads=8,
