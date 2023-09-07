@@ -41,9 +41,8 @@ Arch:
 
 # ml-decoder head
 MLDecoder:
-  class_num: 80
   query_num: 80 # default: 80, query_num <= class_num
-  in_chans: 2048
+  in_channels: 2048
 
 # loss function config for training/eval process
 Loss:
@@ -66,14 +65,14 @@ Loss:
 Optimizer:
   name: AdamW
   one_dim_param_no_weight_decay: True
-  weight_decay: 0.0001
+  weight_decay: 0.0001 # 1e-4
   lr:
     name: OneCycleLR
     max_learning_rate: 0.0001 # 1e-4
     divide_factor: 25.0
     end_learning_rate: 0.0000000001 # 1e-10
     phase_pct: 0.2
-    anneal_strategy: "cos"
+    anneal_strategy: cos
     three_phase: False
 
 
@@ -90,15 +89,16 @@ DataLoader:
             channel_first: False
         - ResizeImage:
             size: 640
-            interpolation: "bilinear"
-            backend: "pil"
-        - CutoutPIL:
-            cutout_factor: 0.5
+            interpolation: bilinear
+            backend: pil
+        - Cutout:
+            length: 320
+            fill_value: none
         - RandAugmentV4:
         - NormalizeImage:
             scale: 1.0/255.0
-            mean: [0.0, 0.0, 0.0]
-            std: [1.0, 1.0, 1.0]
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
             order: ''
 
     sampler:
@@ -107,8 +107,8 @@ DataLoader:
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 32
-      use_shared_memory: False
+      num_workers: 8
+      use_shared_memory: True
 
   Eval:
     dataset:
@@ -121,21 +121,21 @@ DataLoader:
             channel_first: False
         - ResizeImage:
             size: 640
-            interpolation: "bilinear"
-            backend: "pil"
+            interpolation: bilinear
+            backend: pil
         - NormalizeImage:
             scale: 1.0/255.0
-            mean: [0.0, 0.0, 0.0]
-            std: [1.0, 1.0, 1.0]
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
             order: ''
     sampler:
       name: DistributedBatchSampler
-      batch_size: 1
+      batch_size: 64
       drop_last: False
       shuffle: False
     loader:
-      num_workers: 32
-      use_shared_memory: False
+      num_workers: 8
+      use_shared_memory: True
 
 Infer:
   infer_imgs: deploy/images/coco_000000570688.jpg
@@ -146,21 +146,23 @@ Infer:
         channel_first: False
     - ResizeImage:
         size: 640
-        interpolation: "bilinear"
-        backend: "pil"
+        interpolation: bilinear
+        backend: pil
     - NormalizeImage:
         scale: 1.0/255.0
-        mean: [0.0, 0.0, 0.0]
-        std: [1.0, 1.0, 1.0]
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
         order: ''
     - ToCHWImage:
   PostProcess:
     name: MultiLabelThreshOutput
     threshold: 0.5
-    class_id_map_file: "ppcls/utils/COCO2017_label_list.txt"
-    delimiter: " "
+    class_id_map_file: ppcls/utils/COCO2017_label_list.txt
 
 Metric:
   Train:
   Eval:
     - MultiLabelMAP:
+        # support list: integral, 11point
+        # default: integral
+        map_type: integral
