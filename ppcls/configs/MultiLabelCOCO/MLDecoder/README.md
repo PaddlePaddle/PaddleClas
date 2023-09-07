@@ -145,10 +145,10 @@ python3 tools/infer.py \
 [{'class_ids': [0, 2, 7, 24, 25, 26, 33, 56], 'scores': [0.99998, 0.52104, 0.51953, 0.59292, 0.64329, 0.63605, 0.99994, 0.7054], 'label_names': ['person', 'car', 'truck', 'backpack', 'umbrella', 'handbag', 'kite', 'chair'], 'file_name': 'deploy/images/coco_000000570688.jpg'}]
 ```
 
-<a name="5"></a>
+<a name="6"></a>
 ## 6. 基于预测引擎预测
 
-<a name="5.1"></a>
+<a name="6.1"></a>
 ### 6.1 导出 inference model
 
 ```bash
