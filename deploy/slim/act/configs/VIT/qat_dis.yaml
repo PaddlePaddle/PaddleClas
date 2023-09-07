@@ -1,0 +1,27 @@
+Global:
+  model_dir: ViT_base_patch16_224_infer
+  model_filename: inference.pdmodel
+  params_filename: inference.pdiparams
+  batch_size: 16
+  input_name: inputs
+
+Distillation:
+  node:
+  - softmax_12.tmp_0
+  
+QuantAware:
+  use_pact: true
+  onnx_format: true
+  
+TrainConfig:
+  epochs: 1
+  eval_iter: 500
+  learning_rate: 
+    type: CosineAnnealingDecay 
+    learning_rate: 0.015
+  optimizer_builder:
+    optimizer:
+      type: Momentum
+    weight_decay: 0.00002
+  origin_metric: 0.8189
+  
