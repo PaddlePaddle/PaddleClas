@@ -46,13 +46,9 @@ MLDecoder:
 
 目前使用ResNet结合ML-Decoder在COCO2017的多标签分类任务上的性能指标如下：
 
-|        Model         | Backbone  | Resolution |  mAP  |                                                                                                                                                                                                         Links                                                                                                                                                                                                         |
-|:--------------------:|:---------:|:----------:|:-----:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| ResNet50_ml_decoder  | ResNet50  |  224x224   | 0.795 | [config](ResNet50_ml_decoder_224.yaml) \  [model](https://bj.bcebos.com/v1/ai-studio-online/0af3af5c12b543fa9461a015bdb99aa6327439cd284e4ebea8255e5ce970a460?responseContentDisposition=attachment%3B%20filename%3DResNet50_ml_decoder_0.795.pdparams&authorization=bce-auth-v1%2F5cfe9a5e1454405eb2a975c43eace6ec%2F2023-09-06T11%3A17%3A51Z%2F-1%2F%2F7d78e695070117e615bb0114422ed25ec9c62df2e62bba7b039c3e33f92f3359) |
-| ResNet101_ml_decoder | ResNet101 |  224x224   |       |                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| ResNet101_ml_decoder | ResNet101 |  448x448   |       |                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| ResNet152_ml_decoder | ResNet152 |  448x448   |       |                                                                                                                                                                                                                                                                                                                                                                                                                       |
-
+|        Model         | Backbone  | Resolution | mAP |                   Links                   |
+|:--------------------:|:---------:|:----------:|:---:|:-----------------------------------------:|
+| ResNet101_ml_decoder | ResNet101 |  448x448   |     | [config](./ResNet101_ml_decoder_448.yaml) |
 
 基于 [COCO2017](https://cocodataset.org/) 数据集，如下将介绍添加ml-decoder进行多标签分类的训练、评估、预测的过程。请首先安装 PaddlePaddle 和 PaddleClas，具体安装步骤可详看 [环境准备](../installation.md)。
 
