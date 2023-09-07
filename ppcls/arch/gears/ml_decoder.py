@@ -35,7 +35,7 @@ class MLDecoder(nn.Layer):
 
     def __init__(self,
                  class_num=80,
-                 in_chans=2048,
+                 in_channels=2048,
                  query_num=80,
                  embed_dim=768,
                  depth=1,
@@ -47,13 +47,13 @@ class MLDecoder(nn.Layer):
                  remove_self_attn=True):
         super().__init__()
         self.class_num = class_num
-        self.in_chans = in_chans
+        self.in_channels = in_channels
 
         # 1 <= query_num <= class_num
         query_num = min(max(query_num, 1), class_num)
 
         self.input_proj = nn.Conv2D(
-            in_channels=in_chans,
+            in_channels=in_channels,
             out_channels=embed_dim,
             kernel_size=1,
             stride=1)
