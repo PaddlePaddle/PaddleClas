@@ -68,15 +68,9 @@ cd path_to_PaddleClas
 ```shell
 mkdir dataset/COCO2017
 cd dataset/COCO2017
-wget http://images.cocodataset.org/zips/train2017.zip
-wget http://images.cocodataset.org/zips/val2017.zip
-wget http://images.cocodataset.org/annotations/annotations_trainval2017.zip
-unzip train2017.zip -d .
-unzip val2017.zip -d .
-unzip annotations_trainval2017.zip -d .
-rm train2017.zip
-rm val2017.zip
-rm annotations_trainval2017.zip
+curl http://images.cocodataset.org/zips/train2017.zip | unzip -d .
+curl http://images.cocodataset.org/zips/val2017.zip | unzip -d .
+curl http://images.cocodataset.org/annotations/annotations_trainval2017.zip | unzip -d .
 ```
 
 * 返回 `PaddleClas` 根目录
