@@ -30,7 +30,7 @@ ML-Decoder是一种新的基于注意力的分类头，它通过查询来预测�
 ```yaml
 # model architecture
 Arch:
-  name: ResNet50
+  name: ResNet101
   class_num: 80
   pretrained: True
   # use ml-decoder head to replace avg_pool and fc
@@ -38,7 +38,6 @@ Arch:
 
 # ml-decoder head
 MLDecoder:
-  class_num: 80
   query_num: 80 # default: 80, query_num <= class_num
   in_chans: 2048
 ```
@@ -101,15 +100,14 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train.py \
-        -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet50_ml_decoder.yaml
+        -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml
 # 单卡
 python3 tools/train.py \
-        -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet50_ml_decoder.yaml
+        -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml
 ```
 
 **注意:**
-1. 目前`ResNet50_ml_decoder.yaml`的训练默认单卡，如进行多卡训练请相应的调节学习率。
-2. 目前多标签分类的损失函数默认使用`MultiLabelAsymmetricLoss`。
+1. 目前多标签分类的损失函数默认使用`MultiLabelAsymmetricLoss`。
 2. 目前多标签分类的评估指标默认使用`MultiLabelMAP(integral)`。
 
 <a name="4"></a>
@@ -118,8 +116,8 @@ python3 tools/train.py \
 
 ```bash
 python3 tools/eval.py \
-    -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet50_ml_decoder.yaml \
-    -o Arch.pretrained="./output/ResNet50_ml_decoder/best_model"
+    -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml \
+    -o Arch.pretrained="./output/ResNet101_ml_decoder_448/best_model"
 ```
 
 <a name="5"></a>
@@ -127,8 +125,8 @@ python3 tools/eval.py \
 
 ```bash
 python3 tools/infer.py \
-    -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet50_ml_decoder.yaml \
-    -o Arch.pretrained="./output/ResNet50_ml_decoder/best_model"
+    -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml \
+    -o Arch.pretrained="./output/ResNet101_ml_decoder_448/best_model"
 ```
 
 得到类似下面的输出：
@@ -144,8 +142,8 @@ python3 tools/infer.py \
 
 ```bash
 python3 tools/export_model.py \
-    -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet50_ml_decoder.yaml \
-    -o Arch.pretrained="./output/ResNet50_ml_decoder/best_model"
+    -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml \
+    -o Arch.pretrained="./output/ResNet101_ml_decoder_448/best_model"
 ```
 inference model 的路径默认在当前路径下 `./inference`
 `./inference` 文件夹下应有如下文件结构：
@@ -161,7 +159,7 @@ inference model 的路径默认在当前路径下 `./inference`
 
 ### 6.2 基于 Python 预测引擎推理
 
-切换到depoly目录下，并且使用depoly中的脚本进行推理前需要确认paddleclas为非本地安装, 如不是请进行切换，不然会出现包的导入错误。 
+切换到depoly目录下，并且使用deploy中的脚本进行推理前需要确认paddleclas为非本地安装, 如不是请进行切换，不然会出现包的导入错误。 
 
 ```shell
 # 本地安装
@@ -169,7 +167,7 @@ pip install -e .
 # 非本地安装
 python setup.py install
 
-# 进入depoly目录下
+# 进入deploy目录下
 cd deploy
 ```
 
@@ -182,7 +180,11 @@ cd deploy
 ```shell
 # linux使用`python3`，windows使用`python (-m)`来执行脚本
 # 使用下面的命令使用 GPU 进行预测
-c
+python3 python/predict_cls.py \
+    -c configs/inference_cls_multilabel.yaml \
+    -o Global.inference_model_dir=../inference/ \
+    -o Global.infer_imgs=images/coco_000000570688.jpg \
+    -o PostProcess.MultiLabelThreshOutput.class_id_map_file=../ppcls/utils/COCO2017_label_list.txt 
 # 使用下面的命令使用 CPU 进行预测
 python3 python/predict_cls.py \
     -c configs/inference_cls_multilabel.yaml \
