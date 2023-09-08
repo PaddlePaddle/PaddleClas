@@ -135,7 +135,8 @@ def classification_eval(engine, epoch_id=0):
                     "{}: {:.5f}".format(key, output_info[key].val)
                     for key in output_info
                 ])
-                metric_msg += ", {}".format(engine.eval_metric_func.avg_info)
+                if "MultiLabelMAP" not in engine.config["Metric"]["Eval"][0]:
+                    metric_msg += ", {}".format(engine.eval_metric_func.avg_info)
             logger.info("[Eval][Epoch {}][Iter: {}/{}]{}, {}, {}".format(
                 epoch_id, iter_id,
                 len(engine.eval_dataloader), metric_msg, time_msg, ips_msg))

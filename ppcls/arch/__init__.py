@@ -20,7 +20,7 @@ from paddle.static import InputSpec
 
 from . import backbone, gears
 from .backbone import *
-from .gears import build_gear
+from .gears import build_gear, add_ml_decoder_head
 from .utils import *
 from .backbone.base.theseus_layer import TheseusLayer
 from ..utils import logger
@@ -35,6 +35,7 @@ def build_model(config, mode="train"):
     arch_config = copy.deepcopy(config["Arch"])
     model_type = arch_config.pop("name")
     use_sync_bn = arch_config.pop("use_sync_bn", False)
+    use_ml_decoder = arch_config.pop("use_ml_decoder", False)
     mod = importlib.import_module(__name__)
     arch = getattr(mod, model_type)(**arch_config)
     if use_sync_bn:
@@ -43,6 +44,9 @@ def build_model(config, mode="train"):
         else:
             msg = "SyncBatchNorm can only be used on GPU device. The releated setting has been ignored."
             logger.warning(msg)
+
+    if use_ml_decoder:
+        add_ml_decoder_head(arch, config.get("MLDecoder", {}))
 
     if isinstance(arch, TheseusLayer):
         prune_model(config, arch)

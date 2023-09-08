@@ -517,3 +517,145 @@ class ATTRMetric(nn.Layer):
                                        output.numpy(), self.threshold)
         self.attrmeter.update(metric_dict)
         return metric_dict
+
+
+class MultiLabelMAP(nn.Layer):
+    """
+    Calculate multi-label classification mean average precision.
+    Currently, support two types: 11point and integral
+
+    The code base on:
+    https://github.com/PaddlePaddle/PaddleDetection/blob/develop/ppdet/metrics/map_utils.py
+
+    Args:
+        map_type (str): Calculation method of mean average.
+    """
+
+    def __init__(self, map_type='integral'):
+        super().__init__()
+        assert map_type in ['11point', 'integral'], \
+            "map_type currently only support '11point' and 'integral'"
+        self.map_type = map_type
+
+        self.reset()
+
+    def reset(self):
+        self.is_latest = True
+        self.class_score_poss = None
+        self.class_gt_counts = None
+        self.mAP = 0.0
+
+    def one_class_update(self, score, gt_label, class_idx):
+        topk_idx = np.argsort(score)[::-1]
+        topk_score = score[topk_idx]
+        topk_gt_label = gt_label[topk_idx]
+        for s, l in zip(topk_score, topk_gt_label):
+            if int(l) == 1:
+                self.class_score_poss[class_idx].append([s, 1.])
+                self.class_gt_counts[class_idx] += 1
+            else:
+                self.class_score_poss[class_idx].append([s, 0.])
+
+    @staticmethod
+    def get_tp_fp_accum(score_pos_list):
+        """
+        Calculate accumulating true/false positive results from
+        [score, pos] records
+        """
+        sorted_list = sorted(score_pos_list, key=lambda s: s[0], reverse=True)
+
+        accum_tp = 0
+        accum_fp = 0
+        accum_tp_list = []
+        accum_fp_list = []
+        for (score, pos) in sorted_list:
+            accum_tp += int(pos)
+            accum_tp_list.append(accum_tp)
+            accum_fp += 1 - int(pos)
+            accum_fp_list.append(accum_fp)
+
+        return accum_tp_list, accum_fp_list
+
+    def compute_mAP(self):
+        if not self.is_latest:
+            mAP = 0.
+            valid_cnt = 0
+            for score_pos, count in zip(self.class_score_poss,
+                                        self.class_gt_counts):
+                if count == 0:
+                    continue
+
+                if len(score_pos) == 0:
+                    valid_cnt += 1
+                    continue
+
+                accum_tp_list, accum_fp_list = \
+                    self.get_tp_fp_accum(score_pos)
+                precision = []
+                recall = []
+                for ac_tp, ac_fp in zip(accum_tp_list, accum_fp_list):
+                    precision.append(float(ac_tp) / (ac_tp + ac_fp))
+                    recall.append(float(ac_tp) / count)
+
+                one_class_ap = 0.0
+                if self.map_type == '11point':
+                    max_precisions = [0.] * 11
+                    start_idx = len(precision) - 1
+                    for j in range(10, -1, -1):
+                        for i in range(start_idx, -1, -1):
+                            if recall[i] < float(j) / 10.:
+                                start_idx = i
+                                if j > 0:
+                                    max_precisions[j - 1] = max_precisions[j]
+                                    break
+                            else:
+                                if max_precisions[j] < precision[i]:
+                                    max_precisions[j] = precision[i]
+                    one_class_ap = sum(max_precisions) / 11.
+                    mAP += one_class_ap
+                    valid_cnt += 1
+                elif self.map_type == 'integral':
+                    import math
+                    prev_recall = 0.
+                    for i in range(len(precision)):
+                        recall_gap = math.fabs(recall[i] - prev_recall)
+                        if recall_gap > 1e-6:
+                            one_class_ap += precision[i] * recall_gap
+                            prev_recall = recall[i]
+                    mAP += one_class_ap
+                    valid_cnt += 1
+                else:
+                    raise NotImplementedError(
+                        f"Unsupported mAP type {self.map_type}")
+
+            self.mAP = mAP / float(valid_cnt) if valid_cnt > 0 else mAP
+
+            self.is_latest = True
+
+    def forward(self, output, target):
+        scores = F.sigmoid(output).numpy()
+        gt_labels = target.numpy()
+
+        if self.class_score_poss is None:
+            self.class_score_poss = [[] for _ in range(scores.shape[-1])]
+        if self.class_gt_counts is None:
+            self.class_gt_counts = [0] * scores.shape[-1]
+
+        for class_idx in range(scores.shape[-1]):
+            score = scores[:, class_idx]
+            gt_label = gt_labels[:, class_idx]
+            self.one_class_update(score, gt_label, class_idx)
+
+        self.is_latest = False
+
+        return {}
+
+    @property
+    def avg_info(self):
+        self.compute_mAP()
+        return f"MultiLabelMAP({self.map_type}): {self.mAP:.3f}"
+
+    @property
+    def avg(self):
+        self.compute_mAP()
+        return self.mAP
