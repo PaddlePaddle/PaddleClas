@@ -59,7 +59,7 @@ class TripletAngularMarginLoss(nn.Layer):
         """
         Args:
             inputs: feature matrix with shape (batch_size, feat_dim)
-            target: ground truth labels with shape (num_classes)
+            target: ground truth labels with shape (batch_size)
         """
         inputs = input[self.feature_from]
 
@@ -160,7 +160,7 @@ class TripletAngularMarginLoss_XBM(TripletAngularMarginLoss):
         """
         Args:
             inputs: feature matrix with shape (batch_size, feat_dim)
-            target: ground truth labels with shape (num_classes)
+            target: ground truth labels with shape (batch_size)
         """
         feats = input[self.feature_from]
         if self.normalize_feature:
