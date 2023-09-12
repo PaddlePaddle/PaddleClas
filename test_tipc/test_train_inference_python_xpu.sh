@@ -27,6 +27,7 @@ sed -i "s/-o Global.epochs:lite_train_lite_infer=2/-o Global.epochs:lite_train_l
 sed -i "s/enable_mkldnn:True|False/enable_mkldnn:False/g" $FILENAME
 # python has been updated to version 3.9 for xpu backend
 sed -i "s/python3.7/python3.9/g" $FILENAME
+sed -i "s/python3.10/python3.9/g" $FILENAME
 
 modelname=$(echo $FILENAME | cut -d '/' -f3)
 if  [ $modelname == "PVTV2" ] || [ $modelname == "Twins" ] || [ $modelname == "SwinTransformer" ]; then
