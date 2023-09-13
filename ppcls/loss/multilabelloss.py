@@ -156,7 +156,7 @@ class MultiLabelAsymmetricLoss(nn.Layer):
         # Asymmetric Clipping and Basic CE calculation
         if self.clip and self.clip > 0:
             pt = (1 - pred_sigmoid + self.clip).clip(max=1) \
-                * (1 - target) + pred_sigmoid * target
+                 * (1 - target) + pred_sigmoid * target
         else:
             pt = (1 - pred_sigmoid) * (1 - target) + pred_sigmoid * target
 
