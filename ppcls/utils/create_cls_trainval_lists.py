@@ -48,7 +48,8 @@ def main(args):
             for single_file in files:
                 if single_file.split('.')[-1] in img_end:
                     img_path = os.path.relpath(
-                        os.path.join(root, single_file), args.dataset_path)
+                        os.path.join(root, single_file),
+                        os.path.dirname(args.dataset_path))
                     img_list.append(f'{img_path} {index}')
                 else:
                     print(
