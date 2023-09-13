@@ -11,7 +11,6 @@ def ratio2weight_1(targets, ratio):
     ```
     REF: https://arxiv.org/abs/2107.03576v2
     '''
-
     pos_weights = targets * (1. - ratio)
     neg_weights = (1. - targets) * ratio
     weights = paddle.exp(neg_weights + pos_weights)
@@ -71,14 +70,14 @@ class MultiLabelLoss(nn.Layer):
     Multi-label loss
     """
 
-    def __init__(self, epsilon=None, size_sum=False, weight_type=1, weight_ratio=False, weight_alpha=False):
+    def __init__(self, epsilon=None, size_sum=False, weight_ratio=False, weight_type=1, weight_alpha=0.1):
         super().__init__()
         if epsilon is not None and (epsilon <= 0 or epsilon >= 1):
             epsilon = None
         self.epsilon = epsilon
+        self.weight_ratio = weight_ratio
         self.weight_type = weight_type
         self.weight_alpha = weight_alpha
-        self.weight_ratio = weight_ratio
         self.size_sum = size_sum
 
     def _labelsmoothing(self, target, class_num):
@@ -124,3 +123,55 @@ class MultiLabelLoss(nn.Layer):
         loss = self._binary_crossentropy(x, target, class_num)
         loss = loss.mean()
         return {"MultiLabelLoss": loss}
+
+
+class MultiLabelAsymmetricLoss(nn.Layer):
+    """
+    Multi-label asymmetric loss, introduced by
+    Emanuel Ben-Baruch at el. in https://arxiv.org/pdf/2009.14119v4.pdf.
+    """
+
+    def __init__(self,
+                 gamma_pos=1,
+                 gamma_neg=4,
+                 clip=0.05,
+                 epsilon=1e-8,
+                 disable_focal_loss_grad=True,
+                 reduction="sum"):
+        super().__init__()
+        self.gamma_pos = gamma_pos
+        self.gamma_neg = gamma_neg
+        self.clip = clip
+        self.epsilon = epsilon
+        self.disable_focal_loss_grad = disable_focal_loss_grad
+        assert reduction in ["mean", "sum", "none"]
+        self.reduction = reduction
+
+    def forward(self, x, target):
+        if isinstance(x, dict):
+            x = x["logits"]
+        pred_sigmoid = F.sigmoid(x)
+        target = target.astype(pred_sigmoid.dtype)
+
+        # Asymmetric Clipping and Basic CE calculation
+        if self.clip and self.clip > 0:
+            pt = (1 - pred_sigmoid + self.clip).clip(max=1) \
+                * (1 - target) + pred_sigmoid * target
+        else:
+            pt = (1 - pred_sigmoid) * (1 - target) + pred_sigmoid * target
+
+        # Asymmetric Focusing
+        if self.disable_focal_loss_grad:
+            paddle.set_grad_enabled(False)
+        asymmetric_weight = (1 - pt).pow(
+            self.gamma_pos * target + self.gamma_neg * (1 - target))
+        if self.disable_focal_loss_grad:
+            paddle.set_grad_enabled(True)
+
+        loss = -paddle.log(pt.clip(min=self.epsilon)) * asymmetric_weight
+
+        if self.reduction == 'mean':
+            loss = loss.mean()
+        elif self.reduction == 'sum':
+            loss = loss.sum()
+        return {"MultiLabelAsymmetricLoss": loss}
