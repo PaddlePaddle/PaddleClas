@@ -11,7 +11,6 @@ def ratio2weight_1(targets, ratio):
     ```
     REF: https://arxiv.org/abs/2107.03576v2
     '''
-
     pos_weights = targets * (1. - ratio)
     neg_weights = (1. - targets) * ratio
     weights = paddle.exp(neg_weights + pos_weights)
@@ -71,14 +70,14 @@ class MultiLabelLoss(nn.Layer):
     Multi-label loss
     """
 
-    def __init__(self, epsilon=None, size_sum=False, weight_type=1, weight_ratio=False, weight_alpha=False):
+    def __init__(self, epsilon=None, size_sum=False, weight_ratio=False, weight_type=1, weight_alpha=0.1):
         super().__init__()
         if epsilon is not None and (epsilon <= 0 or epsilon >= 1):
             epsilon = None
         self.epsilon = epsilon
+        self.weight_ratio = weight_ratio
         self.weight_type = weight_type
         self.weight_alpha = weight_alpha
-        self.weight_ratio = weight_ratio
         self.size_sum = size_sum
 
     def _labelsmoothing(self, target, class_num):
