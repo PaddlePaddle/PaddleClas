@@ -32,6 +32,8 @@ def main(args):
     img_list = []
     label_list = []
     img_end = ['jpg', 'JPG', 'png', 'PNG', 'jpeg', 'JPEG', 'bmp']
+    if args.dataset_path[-1] == "/":
+        args.dataset_path = args.dataset_path[:-1]
     if not os.path.exists(args.dataset_path):
         raise Exception(f"The data path {args.dataset_path} not exists.")
     else:
@@ -57,18 +59,22 @@ def main(args):
     if len(img_list) == 0:
         raise Exception(f"Not found any images file in {args.dataset_path}.")
 
-    with open(os.path.join(args.dataset_path, args.save_img_list_path),
-              'w') as f:
+    with open(
+            os.path.join(
+                os.path.dirname(args.dataset_path), args.save_img_list_path),
+            'w') as f:
         f.write('\n'.join(img_list))
     print(
-        f'Already save {args.save_img_list_path} in {os.path.join(args.dataset_path, args.save_img_list_path)}.'
+        f'Already save {args.save_img_list_path} in {os.path.join(os.path.dirname(args.dataset_path), args.save_img_list_path)}.'
     )
 
-    with open(os.path.join(args.dataset_path, args.save_label_map_path),
-              'w') as f:
+    with open(
+            os.path.join(
+                os.path.dirname(args.dataset_path), args.save_label_map_path),
+            'w') as f:
         f.write('\n'.join(label_list))
     print(
-        f'Already save {args.save_label_map_path} in {os.path.join(args.dataset_path, args.save_label_map_path)}.'
+        f'Already save {args.save_label_map_path} in {os.path.join(os.path.dirname(args.dataset_path), args.save_label_map_path)}.'
     )
 
 
