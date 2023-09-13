@@ -47,12 +47,6 @@ def main(args):
     if args.dataset_path[-1] == "/":
         args.dataset_path = args.dataset_path[:-1]
 
-    if not os.path.exists(
-            os.path.join(os.path.dirname(args.dataset_path),
-                         'label.txt')) and args.val:
-        raise Exception(
-            'The label file is not exist. Please set "--train" first.')
-
     if not os.path.exists(args.dataset_path):
         raise Exception(f"The data path {args.dataset_path} not exists.")
     else:
@@ -60,6 +54,12 @@ def main(args):
             label for label in os.listdir(args.dataset_path)
             if os.path.isdir(os.path.join(args.dataset_path, label))
         ]
+
+    if not os.path.exists(
+            os.path.join(os.path.dirname(args.dataset_path),
+                         'label.txt')) and args.val:
+        raise Exception(
+            'The label file is not exist. Please set "--train" first.')
 
     for index, label_name in enumerate(label_name_list):
         for root, dirs, files in os.walk(
