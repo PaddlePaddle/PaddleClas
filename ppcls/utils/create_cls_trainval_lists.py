@@ -22,10 +22,22 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset_path', type=str, default='./data')
     parser.add_argument('--save_img_list_path', type=str, default='train.txt')
-    parser.add_argument('--save_label_map_path', type=str, default='label.txt')
+    parser.add_argument(
+        '--train', action='store_true', help='Create train list.')
+    parser.add_argument('--val', action='store_true', help='Create val list.')
 
     args = parser.parse_args()
     return args
+
+
+def parse_class_id_map(class_id_map_file):
+    class_id_map = {}
+    with open(class_id_map_file, "r") as f:
+        lines = f.readlines()
+        for line in lines:
+            partition = line.split("\n")[0].partition(" ")
+            class_id_map[str(partition[-1])] = int(partition[0])
+    return class_id_map
 
 
 def main(args):
@@ -34,6 +46,13 @@ def main(args):
     img_end = ['jpg', 'JPG', 'png', 'PNG', 'jpeg', 'JPEG', 'bmp']
     if args.dataset_path[-1] == "/":
         args.dataset_path = args.dataset_path[:-1]
+
+    if not os.path.exists(
+            os.path.join(os.path.dirname(args.dataset_path),
+                         'label.txt')) and args.val:
+        raise Exception(
+            'The label file is not exist. Please set "--train" first.')
+
     if not os.path.exists(args.dataset_path):
         raise Exception(f"The data path {args.dataset_path} not exists.")
     else:
@@ -50,10 +69,18 @@ def main(args):
                     img_path = os.path.relpath(
                         os.path.join(root, single_file),
                         os.path.dirname(args.dataset_path))
-                    img_list.append(f'{img_path} {index}')
+                    if args.val:
+                        class_id_map = parse_class_id_map(
+                            os.path.join(
+                                os.path.dirname(args.dataset_path),
+                                'label.txt'))
+                        img_list.append(
+                            f'{img_path} {class_id_map[label_name]}')
+                    else:
+                        img_list.append(f'{img_path} {index}')
                 else:
                     print(
-                        f'WARNING: File {single_file} end with {single_file.split(".")[-1]} is not supported.'
+                        f'WARNING: File {os.path.join(root, single_file)} end with {single_file.split(".")[-1]} is not supported.'
                     )
         label_list.append(f'{index} {label_name}')
 
@@ -69,14 +96,14 @@ def main(args):
         f'Already save {args.save_img_list_path} in {os.path.join(os.path.dirname(args.dataset_path), args.save_img_list_path)}.'
     )
 
-    with open(
-            os.path.join(
-                os.path.dirname(args.dataset_path), args.save_label_map_path),
-            'w') as f:
-        f.write('\n'.join(label_list))
-    print(
-        f'Already save {args.save_label_map_path} in {os.path.join(os.path.dirname(args.dataset_path), args.save_label_map_path)}.'
-    )
+    if not args.val:
+        with open(
+                os.path.join(os.path.dirname(args.dataset_path), 'label.txt'),
+                'w') as f:
+            f.write('\n'.join(label_list))
+        print(
+            f'Already save label.txt in {os.path.join(os.path.dirname(args.dataset_path), "label.txt")}.'
+        )
 
 
 if __name__ == '__main__':
