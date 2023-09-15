@@ -14,11 +14,11 @@
 
 import os
 import sys
-import argparse
 import math
+import argparse
+import numpy as np
 from tqdm import tqdm
 
-import numpy as np
 import paddle
 from paddleslim.common import load_config as load_slim_config
 from paddleslim.auto_compression import AutoCompression

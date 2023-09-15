@@ -1,24 +1,24 @@
 Global:
-  model_dir: ViT_base_patch16_224_infer
+  model_dir: CLIP_vit_base_patch16_224_ft_in1k_infer
   model_filename: inference.pdmodel
   params_filename: inference.pdiparams
-  batch_size: 16
-  input_name: inputs
+  batch_size: 32
+  input_name: x
 
 Distillation:
   node:
-  - softmax_12.tmp_0
+  - softmax_13.tmp_0
   
 QuantAware:
   use_pact: true
   onnx_format: true
   
 TrainConfig:
-  epochs: 1
+  epochs: 10
   eval_iter: 500
   learning_rate: 
     type: CosineAnnealingDecay 
-    learning_rate: 0.015
+    learning_rate: 0.01
   optimizer_builder:
     optimizer:
       type: Momentum

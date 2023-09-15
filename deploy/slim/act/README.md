@@ -23,20 +23,31 @@
 
 ### PaddleClas模型
 
-|           模型           | 策略 | Top-1 Acc | GPU 耗时(ms) | ARM CPU 耗时(ms) | 配置文件 | Inference模型 |
+|           模型           | 策略 | 压缩训练评估 Top-1 Acc | GPU 耗时(ms) | CPU 耗时(ms) | 配置文件 | Inference模型 |
 |:----------------------:|:------:|:---------:|:----------:|:--------------:|:------:|:-----:|
-| MobileNetV3_small_x1_0 | Baseline |   68.19   |     -      |                | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileNetV3_small_x1_0_infer.tar) |
-| MobileNetV3_small_x1_0 | 量化+蒸馏 |   64.90   |     -      |                | [Config](./configs/MobileNetV3_small_x1_0/qat_dis.yaml) ||
-|        ResNet50        | Baseline |  76.46       |            |       -        | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar) |
-|      ResNet50_vd       | 量化+蒸馏 |   76.08   |            |       -        | [Config](./configs/ResNet50_vd/qat_dis.yaml) |  |
+| MobileNetV3_small_x1_0 | Baseline |   68.00   |     7.3      |    1.1           | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileNetV3_small_x1_0_infer.tar) | 
+| MobileNetV3_small_x1_0 | 量化+蒸馏 |   65.97   |     5.9      |    0.9           | [Config](./configs/MobileNetV3_small_x1_0/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_Mobilenet.zip) |
+|      ResNet50_vd       | Baseline |    76.36     |   1.4         |      23.5       | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar) |
+|      ResNet50_vd       | 量化+蒸馏 |  75.99   |      1.4      |      17.8       | [Config](./configs/ResNet50/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_ResNet50_7614.zip) |
+|      PP-HGNet_small       | Baseline |    81.51      |   3.1         |       22.6        | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_infer.tar) |
+|      PP-HGNet_small       | 量化+蒸馏 |  79.60  |      1.6      |       22.9       | [Config](./configs/PPHGNet_small/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_PPHGNet_small_7960.zip) |
+|      SwinTransformer_base_patch4_window7_224       | Baseline |     83.25    |   7.3          |      942.7       | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_base_patch4_window7_224_infer.tar) |
+|      SwinTransformer_base_patch4_window7_224       | 量化+蒸馏 |  83.26   |    5.9        |       955.1       | [Config](./configs/SwinTransformer_base/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_swin_8329.zip) |
+|      PP-LCNet_x1_0       | Baseline |      71.32    |       1.0     |       6.0        | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_0_infer.tar) |
+|      PP-LCNet_x1_0       | 量化+蒸馏 |   55.96  |   0.9         |       6.5       | [Config](./configs/PPLCNet_x1_0/qat_dis.yaml) |  [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_PPLCNet_5596.zip) |
+|      CLIP_vit_base_patch16_224       | Baseline |      85.48   |   7.4          |       68.9        | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CLIP_vit_base_patch16_224_ft_in1k_infer.tar) |
+|      CLIP_vit_base_patch16_224       | 量化+蒸馏 |  83.71   |      7.2      |       66.5       | [Config](./configs/CLIP_vit_base_patch16_224/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_clip_vit.zip) |
 
 
+- CPU测试环境：
+  - Intel(R) Xeon(R) Gold 6271C CPU @ 2.60GHz
+  - cpu thread: 10
 
-- ARM CPU 测试环境：`SDM865(4xA77+4xA55)`
-- Nvidia GPU 测试环境：
-  - 硬件：NVIDIA Tesla T4 单卡
-  - 软件：CUDA 11.2, cuDNN 8.0, TensorRT 8.4
-  - 测试配置：batch_size: 1, image size: 224
+
+- Nvidia GPU测试环境：
+  - 硬件：NVIDIA Tesla V100 单卡
+  - 软件：CUDA 11.2, cudnn 8.1.0, TensorRT-8.0.3.4
+  - 测试配置：batch_size: 4
 
 ## 3. 自动压缩流程
 
@@ -103,7 +114,7 @@ python run_ppclas.py \
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3
-python -m paddle.distributed.launch run.py --save_dir='./save_quant_resnet50/' --config_path='./configs/ResNet50/qat_dis.yaml'
+python -m paddle.distributed.launch run_ppclas.py --save_dir='./save_quant_resnet50/' --compression_config_path='./configs/ResNet50/qat_dis.yaml'  --reader_config_path='./configs/ResNet50/data_reader.yaml'  
 ```
 多卡训练指的是将训练任务按照一定方法拆分到多个训练节点完成数据读取、前向计算、反向梯度计算等过程，并将计算出的梯度上传至服务节点。服务节点在收到所有训练节点传来的梯度后，会将梯度聚合并更新参数。最后将参数发送给训练节点，开始新一轮的训练。多卡训练一轮训练能训练```batch size * num gpus```的数据，比如单卡的```batch size```为32，单轮训练的数据量即32，而四卡训练的```batch size```为32，单轮训练的数据量为128。
 
@@ -163,7 +174,7 @@ python test_ppclas.py \
 - MKLDNN预测：
 
 ```shell
-python test_ppclas \
+python test_ppclas.py  \
       --model_path=./save_quant_resnet50 \
       --data_path=./dataset/ILSVRC2012/ \
       --cpu_num_threads=10 \

@@ -76,21 +76,30 @@ def argsparser():
     return parser
 
 
-def eval_reader(data_dir, batch_size, crop_size, resize_size):
+def eval_reader(data_dir, batch_size, crop_size, resize_size, config, args):
     """
     eval reader func
     """
+    # 这样加载数据的方式慢很多
+    # device = 'gpu' if args.use_gpu else 'cpu'
+    # use_dali = False
+    # eval_dataloader = build_dataloader(
+    #                 config["DataLoader"], "Eval", device,
+    #                 use_dali)
+    # return eval_dataloader
+
     val_reader = ImageNetDataset(
         mode="val",
         data_dir=data_dir,
         crop_size=crop_size,
         resize_size=resize_size)
+
     val_loader = DataLoader(
         val_reader,
         batch_size=args.batch_size,
         shuffle=False,
         drop_last=False,
-        num_workers=0)
+        num_workers=12)
     return val_loader
 
 
@@ -244,7 +253,7 @@ class Predictor(object):
         sys.stdout.flush()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": 
     parser = argsparser()
     args = parser.parse_args()
     predictor = Predictor()
