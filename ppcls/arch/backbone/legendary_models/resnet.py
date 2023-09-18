@@ -403,15 +403,18 @@ class ResNet(TheseusLayer):
 
     def forward(self, x):
         with paddle.static.amp.fp16_guard():
-            if self.data_format == "NHWC":
-                x = paddle.transpose(x, [0, 2, 3, 1])
-                x.stop_gradient = True
-            x = self.stem(x)
-            x = self.max_pool(x)
-            x = self.blocks(x)
-            x = self.avg_pool(x)
-            x = self.flatten(x)
-            x = self.fc(x)
+            return self._forward(x)
+
+    def _forward(self, x):
+        if self.data_format == "NHWC":
+            x = paddle.transpose(x, [0, 2, 3, 1])
+            x.stop_gradient = True
+        x = self.stem(x)
+        x = self.max_pool(x)
+        x = self.blocks(x)
+        x = self.avg_pool(x)
+        x = self.flatten(x)
+        x = self.fc(x)
         return x
 
 
