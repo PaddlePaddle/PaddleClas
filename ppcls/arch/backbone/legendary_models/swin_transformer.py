@@ -101,6 +101,8 @@ class RollWrapper(object):
         return RollWrapper._roll(x, shifts, axis)
 
 
+# NOTE(xiongkun): paddle.SOT can't analysis this builtin function, which will cause subgraph break in sot.
+# we do this here will not effect sot translate.
 paddle_custom_device_types = paddle.device.get_all_custom_device_type()
 
 if RollWrapper._roll is None:
