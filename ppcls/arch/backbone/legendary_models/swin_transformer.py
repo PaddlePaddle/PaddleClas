@@ -94,17 +94,20 @@ class NpuRollWithIndexSelect():
 
 
 class RollWrapper(object):
-
     _roll = None
 
     @staticmethod
     def roll(x, shifts, axis):
-        if RollWrapper._roll is None:
-            RollWrapper._roll = NpuRollWithIndexSelect(
-            ) if 'npu' in paddle.device.get_all_custom_device_type(
-            ) else paddle.roll
-
         return RollWrapper._roll(x, shifts, axis)
+
+
+# NOTE(xiongkun): paddle.SOT can't analysis this builtin function, which will cause subgraph break in sot.
+# we do this here will not effect sot translate.
+paddle_custom_device_types = paddle.device.get_all_custom_device_type()
+
+if RollWrapper._roll is None:
+    RollWrapper._roll = NpuRollWithIndexSelect(
+    ) if 'npu' in paddle_custom_device_types else paddle.roll
 
 
 class Mlp(nn.Layer):
