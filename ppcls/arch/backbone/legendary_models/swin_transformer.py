@@ -92,19 +92,16 @@ class NpuRollWithIndexSelect():
         index_fp, index_bp = self.index_dict[key]
         return self.roll_with_index_select(x, index_fp, index_bp)
 
-
 class RollWrapper(object):
-
     _roll = None
 
     @staticmethod
     def roll(x, shifts, axis):
-        if RollWrapper._roll is None:
-            RollWrapper._roll = NpuRollWithIndexSelect(
-            ) if 'npu' in paddle.device.get_all_custom_device_type(
-            ) else paddle.roll
-
         return RollWrapper._roll(x, shifts, axis)
+
+paddle_custom_device_types = paddle.device.get_all_custom_device_type()
+if RollWrapper._roll is None:
+    RollWrapper._roll = NpuRollWithIndexSelect()  if 'npu' in paddle_custom_device_types else paddle.roll
 
 
 class Mlp(nn.Layer):

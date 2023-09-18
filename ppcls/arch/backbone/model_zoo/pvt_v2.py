@@ -294,7 +294,7 @@ class PyramidVisionTransformerV2(nn.Layer):
                     qk_scale=qk_scale,
                     drop=drop_rate,
                     attn_drop=attn_drop_rate,
-                    drop_path=dpr[cur + j],
+                    drop_path=dpr[cur + j].item(),
                     norm_layer=norm_layer,
                     sr_ratio=sr_ratios[i],
                     linear=linear) for j in range(depths[i])
