@@ -39,6 +39,8 @@ class MultiLabelLoss(nn.Layer):
     def _binary_crossentropy(self, input, target, class_num):
         if self.weight_ratio:
             target, label_ratio = target[:, 0, :], target[:, 1, :]
+        else:
+            target = target[:, 0, :]
         if self.epsilon is not None:
             target = self._labelsmoothing(target, class_num)
         cost = F.binary_cross_entropy_with_logits(
@@ -95,7 +97,7 @@ class MultiLabelAsymmetricLoss(nn.Layer):
         # Asymmetric Clipping and Basic CE calculation
         if self.clip and self.clip > 0:
             pt = (1 - pred_sigmoid + self.clip).clip(max=1) \
-                 * (1 - target) + pred_sigmoid * target
+                * (1 - target) + pred_sigmoid * target
         else:
             pt = (1 - pred_sigmoid) * (1 - target) + pred_sigmoid * target
 
