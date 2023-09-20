@@ -4,10 +4,10 @@
 
 # 标题
 
-|任务名称 | xxx | 
+|任务名称 | SSLD蒸馏Teacher离线化 | 
 |---|---|
-|提交作者<input type="checkbox" class="rowselector hidden"> | 李强、张明 | 
-|提交时间<input type="checkbox" class="rowselector hidden"> | 2022-10-21 | 
+|提交作者<input type="checkbox" class="rowselector hidden"> | 刘鑫豪、徐子荣 | 
+|提交时间<input type="checkbox" class="rowselector hidden"> | 2023-9-21 | 
 |版本号 | 此设计文档的版本号，如V1.0 | 
 |依赖飞桨版本<input type="checkbox" class="rowselector hidden"> | 如无特殊情况，都应基于develop版本开发 | 
 |文件名 | 提交的markdown设计文档文件名称，如：20221021_design_template.md<br> | 
