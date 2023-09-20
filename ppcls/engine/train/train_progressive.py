@@ -62,7 +62,7 @@ def train_epoch_progressive(engine, epoch_id, print_batch_step):
             seed=epoch_id)
         engine.train_dataloader_iter = iter(engine.train_dataloader)
         engine.last_stage = stage_id
-    logger.info(f"Training stage: [{stage_id+1}/{num_stage}]("
+        logger.info(f"Training stage: [{stage_id+1}/{num_stage}]("
                 f"random_aug_magnitude={cur_magnitude}, "
                 f"train_image_size={cur_image_size}, "
                 f"dropout_rate={cur_dropout_rate}"
