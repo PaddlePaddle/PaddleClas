@@ -6,7 +6,7 @@
 
 |任务名称 | SSLD蒸馏Teacher离线化 | 
 |---|---|
-|提交作者<input type="checkbox" class="rowselector hidden"> | 刘鑫豪、徐子荣 | 
+|提交作者<input type="checkbox" class="rowselector hidden"> | lxh、xzr | 
 |提交时间<input type="checkbox" class="rowselector hidden"> | 2023-9-21 | 
 |版本号 | 此设计文档的版本号，如V1.0 | 
 |依赖飞桨版本<input type="checkbox" class="rowselector hidden"> | 如无特殊情况，都应基于develop版本开发 | 
