@@ -37,12 +37,21 @@ class MovingAverageMeter(object):
         self.vals = [0] * self.window_size
         self.sum = 0
         self.avg = 0
+        self.count = 0
 
     def update(self, val, n=1):
         """ update """
         offset = max(self.window_size - n, 0)
         self.sum -= sum(self.vals[:self.window_size - offset])
         self.sum = val * min(self.window_size, n)
+
+        self.count += n
+        count = min(self.count, self.window_size)
+        self.avg = self.sum / count
+
+        self.vals.extend(val)
+        if len(self.vals) > self.window_size:
+            self.vals = self.vals[-self.window_size:]
 
     @property
     def avg_info(self):
