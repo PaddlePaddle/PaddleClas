@@ -34,23 +34,15 @@ class MovingAverageMeter(object):
 
     def reset(self):
         """ reset """
-        self.vals = []
+        self.vals = [0] * self.window_size
         self.sum = 0
         self.avg = 0
 
     def update(self, val, n=1):
         """ update """
-        self.vals.extend([val] * n)
-        if len(self.vals) + n <= self.window_size:
-            self.sum += val * n
-        elif len(self.vals) == self.window_size:
-            self.sum -= sum(self.vals[:n])
-            self.sum += val * n
-            self.vals = self.vals[-self.window_size:]
-        else:
-            self.vals = self.vals[-self.window_size:]
-            self.sum = sum(self.vals)
-        self.avg = self.sum / len(self.vals)
+        offset = max(self.window_size - n, 0)
+        self.sum -= sum(self.vals[:self.window_size - offset])
+        self.sum = val * min(self.window_size, n)
 
     @property
     def avg_info(self):
