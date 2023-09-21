@@ -19,11 +19,6 @@ __all__ = ['AverageMeter, MovingAverageMeter']
 
 
 class MovingAverageMeter(object):
-    """
-    Computes and stores the average and current value
-    Code was based on https://github.com/pytorch/examples/blob/master/imagenet/main.py
-    """
-
     def __init__(self,
                  name='',
                  window_size=10,
