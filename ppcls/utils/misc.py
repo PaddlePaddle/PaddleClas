@@ -13,8 +13,54 @@
 # limitations under the License.
 
 import paddle
+import numpy
 
 __all__ = ['AverageMeter']
+
+
+class MovingAverageMeter(object):
+    """
+    Computes and stores the average and current value
+    Code was based on https://github.com/pytorch/examples/blob/master/imagenet/main.py
+    """
+
+    def __init__(self,
+                 name='',
+                 window_size=10,
+                 fmt='f',
+                 postfix="",
+                 need_avg=True):
+        self.name = name
+        self.fmt = fmt
+        self.postfix = postfix
+        self.need_avg = need_avg
+        self.window_size = window_size
+        self.reset()
+
+    def reset(self):
+        """ reset """
+        self.vals = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        """ update """
+        self.vals.extend([val] * n)
+        self.avg = numpy.mean(self.vals)
+        if len(self.vals) > self.window_size:
+            self.vals = self.vals[-self.window_size:]
+
+    @property
+    def avg_info(self):
+        if isinstance(self.avg, paddle.Tensor):
+            self.avg = float(self.avg)
+        return "{}: {:.5f}".format(self.name, self.avg)
+
+    @property
+    def mean(self):
+        return '{self.name}: {self.avg:{self.fmt}}{self.postfix}'.format(
+            self=self) if self.need_avg else ''
 
 
 class AverageMeter(object):

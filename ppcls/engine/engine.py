@@ -24,7 +24,7 @@ from paddle import nn
 import numpy as np
 import random
 
-from ppcls.utils.misc import AverageMeter
+from ppcls.utils.misc import AverageMeter, MovingAverageMeter
 from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
 from ppcls.utils.config import print_config
@@ -100,8 +100,9 @@ class Engine(object):
             self.vdl_writer = LogWriter(logdir=vdl_writer_path)
 
         # set device
-        assert self.config["Global"][
-            "device"] in ["cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"]
+        assert self.config["Global"]["device"] in [
+            "cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"
+        ]
         self.device = paddle.set_device(self.config["Global"]["device"])
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
@@ -308,8 +309,8 @@ class Engine(object):
         # val: metrics list word
         self.output_info = dict()
         self.time_info = {
-            "batch_cost": AverageMeter(
-                "batch_cost", '.5f', postfix=" s,"),
+            "batch_cost": MovingAverageMeter(
+                "batch_cost", 10, '.5f', postfix=" s,"),
             "reader_cost": AverageMeter(
                 "reader_cost", ".5f", postfix=" s,"),
         }
@@ -527,7 +528,8 @@ class Engine(object):
             paddle.jit.save(model, save_path)
         if self.config["Global"].get("export_for_fd", False):
             src_path = self.config["Global"]["infer_config_path"]
-            dst_path = os.path.join(self.config["Global"]["save_inference_dir"], 'inference.yml')
+            dst_path = os.path.join(
+                self.config["Global"]["save_inference_dir"], 'inference.yml')
             shutil.copy(src_path, dst_path)
         logger.info(
             f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
