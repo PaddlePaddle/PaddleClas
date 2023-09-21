@@ -15,7 +15,7 @@
 import paddle
 import numpy
 
-__all__ = ['AverageMeter']
+__all__ = ['AverageMeter, MovingAverageMeter']
 
 
 class MovingAverageMeter(object):
@@ -39,17 +39,23 @@ class MovingAverageMeter(object):
 
     def reset(self):
         """ reset """
-        self.vals = 0
-        self.avg = 0
+        self.vals = []
         self.sum = 0
-        self.count = 0
+        self.avg = 0
 
     def update(self, val, n=1):
         """ update """
         self.vals.extend([val] * n)
-        self.avg = numpy.mean(self.vals)
-        if len(self.vals) > self.window_size:
+        if len(self.vals) + n <= self.window_size:
+            self.sum += val * n
+        elif len(self.vals) == self.window_size:
+            self.sum -= sum(self.vals[:n])
+            self.sum += val * n
             self.vals = self.vals[-self.window_size:]
+        else:
+            self.vals = self.vals[-self.window_size:]
+            self.sum = sum(self.vals)
+        self.avg = self.sum / len(self.vals)
 
     @property
     def avg_info(self):
