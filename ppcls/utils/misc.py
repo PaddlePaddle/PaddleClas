@@ -15,7 +15,7 @@
 import paddle
 import numpy
 
-__all__ = ['AverageMeter, MovingAverageMeter']
+__all__ = ['AverageMeter', 'MovingAverageMeter']
 
 
 class MovingAverageMeter(object):
