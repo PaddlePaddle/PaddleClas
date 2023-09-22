@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import paddle
-import numpy
 
 __all__ = ['AverageMeter', 'MovingAverageMeter']
 
