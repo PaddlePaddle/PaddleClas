@@ -144,7 +144,7 @@ python3 tools/train.py \
 ```bash
 python3 tools/eval.py \
     -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml \
-    -o Arch.pretrained="./output/ResNet101_ml_decoder_448/best_model"
+    -o Arch.pretrained_model="./output/ResNet101_ml_decoder_448/best_model"
 ```
 
 <a name="5"></a>
@@ -153,7 +153,7 @@ python3 tools/eval.py \
 ```bash
 python3 tools/infer.py \
     -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml \
-    -o Arch.pretrained="./output/ResNet101_ml_decoder_448/best_model"
+    -o Arch.pretrained_model="./output/ResNet101_ml_decoder_448/best_model"
 ```
 
 得到类似下面的输出：
@@ -170,7 +170,7 @@ python3 tools/infer.py \
 ```bash
 python3 tools/export_model.py \
     -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml \
-    -o Arch.pretrained="./output/ResNet101_ml_decoder_448/best_model"
+    -o Arch.pretrained_model="./output/ResNet101_ml_decoder_448/best_model"
 ```
 inference model 的路径默认在当前路径下 `./inference`
 `./inference` 文件夹下应有如下文件结构：
