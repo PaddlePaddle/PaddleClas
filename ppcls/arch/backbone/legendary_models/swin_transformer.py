@@ -27,17 +27,17 @@ from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_f
 
 MODEL_URLS = {
     "SwinTransformer_tiny_patch4_window7_224":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams",
+        "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams",
     "SwinTransformer_small_patch4_window7_224":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_small_patch4_window7_224_pretrained.pdparams",
+        "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_small_patch4_window7_224_pretrained.pdparams",
     "SwinTransformer_base_patch4_window7_224":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_pretrained.pdparams",
+        "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window7_224_pretrained.pdparams",
     "SwinTransformer_base_patch4_window12_384":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_pretrained.pdparams",
+        "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_base_patch4_window12_384_pretrained.pdparams",
     "SwinTransformer_large_patch4_window7_224":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22kto1k_pretrained.pdparams",
+        "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window7_224_22kto1k_pretrained.pdparams",
     "SwinTransformer_large_patch4_window12_384":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22kto1k_pretrained.pdparams",
+        "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/SwinTransformer_large_patch4_window12_384_22kto1k_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -128,7 +128,7 @@ class WindowAttention(nn.Layer):
         self.window_size = window_size  # Wh, Ww
         self.num_heads = num_heads
         head_dim = dim // num_heads
-        self.scale = qk_scale or head_dim**-0.5
+        self.scale = qk_scale or head_dim ** -0.5
 
         # define a parameter table of relative position bias
         # 2*Wh-1 * 2*Ww-1, nH
@@ -153,7 +153,7 @@ class WindowAttention(nn.Layer):
         relative_coords = relative_coords.transpose(
             [1, 2, 0])  # Wh*Ww, Wh*Ww, 2
         relative_coords[:, :, 0] += self.window_size[
-            0] - 1  # shift to start from 0
+                                        0] - 1  # shift to start from 0
         relative_coords[:, :, 1] += self.window_size[1] - 1
         relative_coords[:, :, 0] *= 2 * self.window_size[1] - 1
         relative_position_index = relative_coords.sum(-1)  # Wh*Ww, Wh*Ww
@@ -195,12 +195,11 @@ class WindowAttention(nn.Layer):
         B_, N, C = x.shape
         qkv = self.qkv(x).reshape(
             [B_, N, 3, self.num_heads, C // self.num_heads]).transpose(
-                [2, 0, 3, 1, 4])
+            [2, 0, 3, 1, 4])
         q, k, v = qkv[0], qkv[1], qkv[2]
 
         q = q * self.scale
         attn = paddle.mm(q, k.transpose([0, 1, 3, 2]))
-
         if self.training or not hasattr(self, "relative_position_bias"):
             index = self.relative_position_index.reshape([-1])
 
@@ -292,7 +291,7 @@ class SwinTransformerBlock(nn.Layer):
         self.window_size = window_size
         self.shift_size = shift_size
         self.mlp_ratio = mlp_ratio
-        if min(self.input_resolution) <= self.window_size:
+        if min(self.input_resolution) < self.window_size:
             # if window size is larger than input resolution, we don't partition windows
             self.shift_size = 0
             self.window_size = min(self.input_resolution)
@@ -349,11 +348,9 @@ class SwinTransformerBlock(nn.Layer):
         H, W = self.input_resolution
         B, L, C = x.shape
         assert L == H * W, "input feature has wrong size"
-
         shortcut = x
         x = self.norm1(x)
         x = x.reshape([B, H, W, C])
-
         # cyclic shift
         if self.shift_size > 0:
             shifted_x = paddle.roll(
@@ -371,10 +368,10 @@ class SwinTransformerBlock(nn.Layer):
         # W-MSA/SW-MSA
         attn_windows = self.attn(
             x_windows, mask=self.attn_mask)  # nW*B, window_size*window_size, C
-
         # merge windows
         attn_windows = attn_windows.reshape(
             [-1, self.window_size, self.window_size, C])
+
         shifted_x = window_reverse(attn_windows, self.window_size, H, W,
                                    C)  # B H' W' C
 
@@ -388,10 +385,10 @@ class SwinTransformerBlock(nn.Layer):
             x = shifted_x
         x = x.reshape([B, H * W, C])
 
+        # breakpoint()
         # FFN
         x = shortcut + self.drop_path(x)
         x = x + self.drop_path(self.mlp(self.norm2(x)))
-
         return x
 
     def extra_repr(self):
@@ -427,8 +424,9 @@ class PatchMerging(nn.Layer):
         super().__init__()
         self.input_resolution = input_resolution
         self.dim = dim
-        self.reduction = nn.Linear(4 * dim, 2 * dim, bias_attr=False)
+        self.sampler = nn.Unfold(kernel_sizes=2, strides=2)
         self.norm = norm_layer(4 * dim)
+        self.reduction = nn.Linear(4 * dim, 2 * dim, bias_attr=False)
 
     def forward(self, x):
         """
@@ -440,18 +438,20 @@ class PatchMerging(nn.Layer):
         assert H % 2 == 0 and W % 2 == 0, "x size ({}*{}) are not even.".format(
             H, W)
 
-        x = x.reshape([B, H, W, C])
+        x = x.reshape([B, H, W, C]).transpose([0, 3, 1, 2])
 
-        x0 = x[:, 0::2, 0::2, :]  # B H/2 W/2 C
-        x1 = x[:, 1::2, 0::2, :]  # B H/2 W/2 C
-        x2 = x[:, 0::2, 1::2, :]  # B H/2 W/2 C
-        x3 = x[:, 1::2, 1::2, :]  # B H/2 W/2 C
-        x = paddle.concat([x0, x1, x2, x3], -1)  # B H/2 W/2 4*C
-        x = x.reshape([B, H * W // 4, 4 * C])  # B H/2*W/2 4*C
+        x = self.sampler(x)
 
+        # x0 = x[:, 0::2, 0::2, :]  # B H/2 W/2 C
+        # x1 = x[:, 1::2, 0::2, :]  # B H/2 W/2 C
+        # x2 = x[:, 0::2, 1::2, :]  # B H/2 W/2 C
+        # x3 = x[:, 1::2, 1::2, :]  # B H/2 W/2 C
+        # x = paddle.concat([x0, x1, x2, x3], -1)  # B H/2 W/2 4*C
+        # x = x.reshape([B, H * W // 4, 4 * C])  # B H/2*W/2 4*C
+
+        x = x.transpose([0, 2, 1])
         x = self.norm(x)
         x = self.reduction(x)
-
         return x
 
     def extra_repr(self):
@@ -535,9 +535,12 @@ class BasicLayer(nn.Layer):
     def forward(self, x):
         for blk in self.blocks:
             x = blk(x)
+
         if self.downsample is not None:
-            x = self.downsample(x)
-        return x
+            x_down = self.downsample(x)
+            return x_down, x
+        else:
+            return x, x
 
     def extra_repr(self):
         return "dim={}, input_resolution={}, depth={}".format(
@@ -595,16 +598,16 @@ class PatchEmbed(nn.Layer):
         # TODO (littletomatodonkey), uncomment the line will cause failure of jit.save
         # assert [H, W] == self.img_size[:2], "Input image size ({H}*{W}) doesn't match model ({}*{}).".format(H, W, self.img_size[0], self.img_size[1])
         x = self.proj(x)
-
+        out_size = (x.shape[2], x.shape[3])
         x = x.flatten(2).transpose([0, 2, 1])  # B Ph*Pw C
         if self.norm is not None:
             x = self.norm(x)
-        return x
+        return x, out_size
 
     def flops(self):
         Ho, Wo = self.patches_resolution
         flops = Ho * Wo * self.embed_dim * self.in_chans * (
-            self.patch_size[0] * self.patch_size[1])
+                self.patch_size[0] * self.patch_size[1])
         if self.norm is not None:
             flops += Ho * Wo * self.embed_dim
         return flops
@@ -644,6 +647,7 @@ class SwinTransformer(TheseusLayer):
                  embed_dim=96,
                  depths=[2, 2, 6, 2],
                  num_heads=[3, 6, 12, 24],
+                 out_indices=(0, 1, 2, 3),
                  window_size=7,
                  mlp_ratio=4.,
                  qkv_bias=True,
@@ -655,6 +659,7 @@ class SwinTransformer(TheseusLayer):
                  ape=False,
                  patch_norm=True,
                  use_checkpoint=False,
+                 semantic_weight=1.0,
                  **kwargs):
         super(SwinTransformer, self).__init__()
 
@@ -663,9 +668,9 @@ class SwinTransformer(TheseusLayer):
         self.embed_dim = embed_dim
         self.ape = ape
         self.patch_norm = patch_norm
-        self.num_features = int(embed_dim * 2**(self.num_layers - 1))
+        self.num_features = int(embed_dim * 2 ** (self.num_layers - 1))
         self.mlp_ratio = mlp_ratio
-
+        self.out_indices = out_indices
         # split image into non-overlapping patches
         self.patch_embed = PatchEmbed(
             img_size=img_size,
@@ -694,9 +699,9 @@ class SwinTransformer(TheseusLayer):
         self.layers = nn.LayerList()
         for i_layer in range(self.num_layers):
             layer = BasicLayer(
-                dim=int(embed_dim * 2**i_layer),
-                input_resolution=(patches_resolution[0] // (2**i_layer),
-                                  patches_resolution[1] // (2**i_layer)),
+                dim=int(embed_dim * 2 ** i_layer),
+                input_resolution=(patches_resolution[0] // (2 ** i_layer),
+                                  patches_resolution[1] // (2 ** i_layer)),
                 depth=depths[i_layer],
                 num_heads=num_heads[i_layer],
                 window_size=window_size,
@@ -712,8 +717,32 @@ class SwinTransformer(TheseusLayer):
                 use_checkpoint=use_checkpoint)
             self.layers.append(layer)
 
-        self.norm = norm_layer(self.num_features)
-        self.avgpool = nn.AdaptiveAvgPool1D(1)
+        # self.norm = norm_layer(self.num_features)
+
+        self.num_features_s = [int(embed_dim * 2 ** i) for i in range(self.num_layers)]
+        for i in out_indices:
+            layer = norm_layer(self.num_features_s[i])
+            layer_name = f'norm{i}'
+            self.add_sublayer(layer_name, layer)
+
+        self.avgpool = nn.AdaptiveAvgPool2D(1)
+
+        # semantic embedding
+        self.semantic_weight = semantic_weight
+        if self.semantic_weight >= 0:
+            self.semantic_embed_w = nn.LayerList()
+            self.semantic_embed_b = nn.LayerList()
+            for i in range(len(depths)):
+                if i >= len(depths) - 1:
+                    i = len(depths) - 2
+                semantic_embed_w = nn.Linear(2, self.num_features_s[i + 1])
+                semantic_embed_b = nn.Linear(2, self.num_features_s[i + 1])
+                self._init_weights(semantic_embed_w)
+                self._init_weights(semantic_embed_b)
+                self.semantic_embed_w.append(semantic_embed_w)
+                self.semantic_embed_b.append(semantic_embed_b)
+            self.softplus = nn.Softplus()
+
         self.head = nn.Linear(
             self.num_features,
             num_classes) if self.num_classes > 0 else nn.Identity()
@@ -729,21 +758,37 @@ class SwinTransformer(TheseusLayer):
             zeros_(m.bias)
             ones_(m.weight)
 
-    def forward_features(self, x):
-        x = self.patch_embed(x)
+    def forward_features(self, x, semantic_weight=None):
+        if self.semantic_weight >= 0 and semantic_weight is None:
+            w = paddle.ones((x.shape[0], 1)) * self.semantic_weight
+            w = paddle.concat([w, 1 - w], axis=-1)
+            semantic_weight = w.cuda()
+        x, hw_shape = self.patch_embed(x)
+
         if self.ape:
             x = x + self.absolute_pos_embed
         x = self.pos_drop(x)
+        outs = []
+        for i, layer in enumerate(self.layers):
+            x, out = layer(x)
+            if self.semantic_weight >= 0:
+                sw = self.semantic_embed_w[i](semantic_weight).unsqueeze(1)
+                sb = self.semantic_embed_b[i](semantic_weight).unsqueeze(1)
+                x = x * self.softplus(sw) + sb
+            if i in self.out_indices:
+                norm_layer = getattr(self, f'norm{i}')
+                out = norm_layer(out)
+                out = out.reshape([-1, *hw_shape,
+                                   self.num_features_s[i]]).transpose([0, 3, 1, 2])
+                hw_shape = [item // 2 for item in hw_shape]
+                outs.append(out)
 
-        for layer in self.layers:
-            x = layer(x)
-
-        x = self.norm(x)  # B L C
-        x = self.avgpool(x.transpose([0, 2, 1]))  # B C 1
+        x = self.avgpool(outs[-1])  # B C 1
         x = paddle.flatten(x, 1)
         return x
 
     def forward(self, x):
+        # np.save("test1223.npy", x.cpu().detach().numpy())
         x = self.forward_features(x)
         x = self.head(x)
         return x
@@ -754,7 +799,7 @@ class SwinTransformer(TheseusLayer):
         for _, layer in enumerate(self.layers):
             flops += layer.flops()
         flops += self.num_features * self.patches_resolution[
-            0] * self.patches_resolution[1] // (2**self.num_layers)
+            0] * self.patches_resolution[1] // (2 ** self.num_layers)
         flops += self.num_features * self.num_classes
         return flops
 
