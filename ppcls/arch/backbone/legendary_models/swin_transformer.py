@@ -441,14 +441,6 @@ class PatchMerging(nn.Layer):
         x = x.reshape([B, H, W, C]).transpose([0, 3, 1, 2])
 
         x = self.sampler(x)
-
-        # x0 = x[:, 0::2, 0::2, :]  # B H/2 W/2 C
-        # x1 = x[:, 1::2, 0::2, :]  # B H/2 W/2 C
-        # x2 = x[:, 0::2, 1::2, :]  # B H/2 W/2 C
-        # x3 = x[:, 1::2, 1::2, :]  # B H/2 W/2 C
-        # x = paddle.concat([x0, x1, x2, x3], -1)  # B H/2 W/2 4*C
-        # x = x.reshape([B, H * W // 4, 4 * C])  # B H/2*W/2 4*C
-
         x = x.transpose([0, 2, 1])
         x = self.norm(x)
         x = self.reduction(x)
@@ -788,7 +780,6 @@ class SwinTransformer(TheseusLayer):
         return x
 
     def forward(self, x):
-        # np.save("test1223.npy", x.cpu().detach().numpy())
         x = self.forward_features(x)
         x = self.head(x)
         return x
