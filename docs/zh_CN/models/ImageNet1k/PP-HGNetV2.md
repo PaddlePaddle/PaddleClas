@@ -41,7 +41,7 @@ PP-HGNetV2 在 PP-HGNet 上的具体改进点如下：
 - 改进了 PPHGNet 网络 stem 部分，堆叠更多的 2x2 卷积核以学习更丰富的局部特征，使用更小的通道数以提升大分辨率任务如目标检测、语义分割等的推理速度；
 - 替换了 PP-HGNet 中靠后 stage 的较冗余的标准卷积层为 PW + DW5x5 组合，在获得更大感受野的同时网络的参数量更少，且精度可以进一步提升；
 - 增加了 LearnableAffineBlock 模块，其可以在增加极少参数量的同时大幅提升较小模型的精度，且对推理时间无损；
-- 重构了 PP-HGNet 网络的 stage 分布，使其涵盖了从 B0-B7 不同量级的模型，从而满足不同任务的需求。
+- 重构了 PP-HGNet 网络的 stage 分布，使其涵盖了从 B0-B6 不同量级的模型，从而满足不同任务的需求。
 
 除以上改进点之外，相比 PaddleClas 提供的其他模型，PP-HGNetV2 默认提供了精度更高、泛化能力更强的 [SSLD](https://arxiv.org/abs/2103.05959) 预训练权重，其在下游任务中表现更佳。
 
@@ -60,8 +60,6 @@ PP-HGNetV2 的精度、速度指标、预训练权重、推理模型权重链接
 | PPHGNetV2_B4     | 83.57 | 96.72 | 1.46 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B4_ssld_stage1_pretrained.pdparams)| [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B4_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNetV2_B4_ssld_infer.tar) |
 | PPHGNetV2_B5     | 84.75 | 97.32 | 2.84 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B5_ssld_stage1_pretrained.pdparams)| [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B5_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNetV2_B5_ssld_infer.tar) |
 | PPHGNetV2_B6     | 86.30 | 97.84 | 5.29 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B6_ssld_stage1_pretrained.pdparams)| [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B6_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNetV2_B6_ssld_infer.tar) |
-| PPHGNetV2_B7     | comming soon | comming soon | 11.06 |comming soon| comming soon | comming soon |
-
 
 **备注：**
 

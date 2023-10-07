@@ -38,8 +38,6 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B5_ssld_pretrained.pdparams",
     "PPHGNetV2_B6":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B6_ssld_pretrained.pdparams",
-    "PPHGNetV2_B7":
-    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B7_ssld_pretrained.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -701,31 +699,4 @@ def PPHGNetV2_B6(pretrained=False, use_ssld=False, **kwargs):
         use_lab=False,
         **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["PPHGNetV2_B6"], use_ssld)
-    return model
-
-
-def PPHGNetV2_B7(pretrained=False, use_ssld=False, **kwargs):
-    """
-    PPHGNetV2_B7
-    Args:
-        pretrained (bool/str): If `True` load pretrained parameters, `False` otherwise.
-                    If str, means the path of the pretrained model.
-        use_ssld (bool) Whether using ssld pretrained model when pretrained is True.
-    Returns:
-        model: nn.Layer. Specific `PPHGNetV2_B7` model depends on args.
-    """
-    stage_config = {
-        # in_channels, mid_channels, out_channels, num_blocks, is_downsample, light_block, kernel_size, layer_num
-        "stage1": [128, 128, 256, 2, False, False, 3, 7],
-        "stage2": [256, 256, 512, 4, True, False, 3, 7],
-        "stage3": [512, 512, 1024, 12, True, True, 5, 7],
-        "stage4": [1024, 1024, 2048, 4, True, True, 5, 7],
-    }
-
-    model = PPHGNetV2(
-        stem_channels=[3, 64, 128],
-        stage_config=stage_config,
-        use_lab=False,
-        **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["PPHGNetV2_B7"], use_ssld)
     return model
