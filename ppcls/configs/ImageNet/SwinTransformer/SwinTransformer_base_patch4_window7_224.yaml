@@ -18,7 +18,7 @@ Global:
 
 # model architecture
 Arch:
-  name: SwinTransformer_base_patch4_window7_224
+  name: SwinTransformer_base_patch4_window7_224_SOLIDER
   class_num: 1000
  
 # loss function config for traing/eval process

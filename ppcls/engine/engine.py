@@ -426,6 +426,7 @@ class Engine(object):
                 x = process(x)
             batch_data.append(x)
             image_file_list.append(image_file)
+
             if len(batch_data) >= batch_size or idx == len(image_list) - 1:
                 batch_tensor = paddle.to_tensor(batch_data)
 
