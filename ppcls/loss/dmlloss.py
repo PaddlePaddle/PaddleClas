@@ -16,7 +16,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from ppcls.loss.multilabelloss import ratio2weight
+from ppcls.loss.multilabelloss import ratio2weight_1, ratio2weight_2, ratio2weight_3
 
 
 class DMLLoss(nn.Layer):
@@ -24,7 +24,7 @@ class DMLLoss(nn.Layer):
     DMLLoss
     """
 
-    def __init__(self, act="softmax", sum_across_class_dim=False, eps=1e-12):
+    def __init__(self, act="softmax", sum_across_class_dim=False, eps=1e-12, weight_type=1, weight_alpha=0.1):
         super().__init__()
         if act is not None:
             assert act in ["softmax", "sigmoid"]
@@ -36,6 +36,8 @@ class DMLLoss(nn.Layer):
             self.act = None
         self.eps = eps
         self.sum_across_class_dim = sum_across_class_dim
+        self.weight_type = weight_type
+        self.weight_alpha = weight_alpha
 
     def _kldiv(self, x, target):
         class_num = x.shape[-1]
@@ -54,7 +56,15 @@ class DMLLoss(nn.Layer):
         if gt_label is not None:
             gt_label, label_ratio = gt_label[:, 0, :], gt_label[:, 1, :]
             targets_mask = paddle.cast(gt_label > 0.5, 'float32')
-            weight = ratio2weight(targets_mask, paddle.to_tensor(label_ratio))
+            if self.weight_type == 2:
+                weight = ratio2weight_2(
+                    targets_mask, paddle.to_tensor(label_ratio))
+            elif self.weight_type == 3:
+                weight = ratio2weight_3(
+                    targets_mask, paddle.to_tensor(label_ratio), self.weight_alpha)
+            else:
+                weight = ratio2weight_1(
+                    targets_mask, paddle.to_tensor(label_ratio))
             weight = weight * (gt_label > -1)
             loss = loss * weight
 
