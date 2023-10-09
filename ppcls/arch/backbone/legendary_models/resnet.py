@@ -29,7 +29,7 @@ import math
 from ....utils import logger
 from ..base.theseus_layer import TheseusLayer
 from ..base.dbb.dbb_block import DiverseBranchBlock
-from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain
 
 MODEL_URLS = {
     "ResNet18":
@@ -422,7 +422,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
     if pretrained is False:
         pass
     elif pretrained is True:
-        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
     elif isinstance(pretrained, str):
         load_dygraph_pretrain(model, pretrained)
     else:

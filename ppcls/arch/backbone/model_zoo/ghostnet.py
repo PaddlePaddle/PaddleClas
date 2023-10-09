@@ -24,7 +24,7 @@ from paddle.nn import Conv2D, BatchNorm, AdaptiveAvgPool2D, Linear
 from paddle.regularizer import L2Decay
 from paddle.nn.initializer import Uniform, KaimingNormal
 
-from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain
 
 MODEL_URLS = {
     "GhostNet_x0_5":
@@ -334,7 +334,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
     elif pretrained is True:
-        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
     elif isinstance(pretrained, str):
         load_dygraph_pretrain(model, pretrained)
     else:
