@@ -36,7 +36,7 @@ from ppcls.metric import build_metrics
 from ppcls.optimizer import build_optimizer
 from ppcls.utils.amp import AutoCast, build_scaler
 from ppcls.utils.ema import ExponentialMovingAverage
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.utils.save_load import init_model
 from ppcls.utils import save_load, save_predict_result
 
@@ -228,14 +228,9 @@ class Engine(object):
 
         # load_pretrain
         if self.config["Global"]["pretrained_model"] is not None:
-            if self.config["Global"]["pretrained_model"].startswith("http"):
-                load_dygraph_pretrain_from_url(
-                    [self.model, getattr(self, 'train_loss_func', None)],
-                    self.config["Global"]["pretrained_model"])
-            else:
-                load_dygraph_pretrain(
-                    [self.model, getattr(self, 'train_loss_func', None)],
-                    self.config["Global"]["pretrained_model"])
+            load_dygraph_pretrain(
+                [self.model, getattr(self, 'train_loss_func', None)],
+                self.config["Global"]["pretrained_model"])
 
         # build optimizer
         if self.mode == 'train':
@@ -492,14 +487,9 @@ class Engine(object):
             False) or "ATTRMetric" in self.config["Metric"]["Eval"][0]
         model = ExportModel(self.config["Arch"], self.model, use_multilabel)
         if self.config["Global"]["pretrained_model"] is not None:
-            if self.config["Global"]["pretrained_model"].startswith("http"):
-                load_dygraph_pretrain_from_url(
-                    model.base_model,
-                    self.config["Global"]["pretrained_model"])
-            else:
-                load_dygraph_pretrain(
-                    model.base_model,
-                    self.config["Global"]["pretrained_model"])
+            load_dygraph_pretrain(
+                model.base_model,
+                self.config["Global"]["pretrained_model"])
 
         model.eval()
 
