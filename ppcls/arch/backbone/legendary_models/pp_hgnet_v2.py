@@ -504,7 +504,11 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
     if pretrained is False:
         pass
     elif pretrained is True:
-        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld, use_stage1_pretrained=True)
+        load_dygraph_pretrain(
+            model,
+            model_url,
+            use_ssld=use_ssld,
+            use_ssld_stage1_pretrained=True)
     elif isinstance(pretrained, str):
         load_dygraph_pretrain(model, pretrained)
     else:
