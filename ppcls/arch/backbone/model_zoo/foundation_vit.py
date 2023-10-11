@@ -499,10 +499,28 @@ class PatchEmbed(nn.Layer):
             stride=patch_size,
             bias_attr=False)
 
+    def maybe_pad(self, pixel_values, height, width):
+        if width % self.patch_size[1] != 0:
+            pad_values = (0, 0, 0, 0, 0, 0, 0,
+                          self.patch_size[1] - width % self.patch_size[1])
+            pixel_values = nn.functional.pad(pixel_values, pad_values)
+        if height % self.patch_size[0] != 0:
+            pad_values = (
+                0,
+                0,
+                0,
+                0,
+                0,
+                self.patch_size[0] - height % self.patch_size[0],
+                0,
+                0, )
+            pixel_values = nn.functional.pad(pixel_values, pad_values)
+        return pixel_values
+
     def forward(self, x):
         B, C, H, W = x.shape
-        assert H == self.img_size[0] and W == self.img_size[1], \
-            f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
+
+        x = self.maybe_pad(x, H, W)
 
         x = self.proj(x).flatten(2).transpose((0, 2, 1))
         return x

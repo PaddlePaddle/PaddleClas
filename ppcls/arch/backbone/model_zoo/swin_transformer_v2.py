@@ -50,6 +50,11 @@ MODEL_URLS = {
 __all__ = list(MODEL_URLS.keys())
 
 
+def masked_fill(x, mask, value):
+    y = paddle.full(x.shape, value, x.dtype)
+    return paddle.where(mask, y, x)
+
+
 class Mlp(nn.Layer):
     def __init__(self,
                  in_features,
@@ -345,7 +350,7 @@ class SwinTransformerBlock(nn.Layer):
                        hidden_features=mlp_hidden_dim,
                        act_layer=act_layer,
                        drop=drop)
-
+        """
         if self.shift_size > 0:
             # calculate attention mask for SW-MSA
             H, W = self.input_resolution
@@ -370,17 +375,62 @@ class SwinTransformerBlock(nn.Layer):
             attn_mask = masked_fill(attn_mask, attn_mask != 0, float(-100.0))
             attn_mask = masked_fill(attn_mask, attn_mask == 0, float(0.0))
         else:
-            attn_mask = None
+        """
+        H, W = self.input_resolution
+        attn_mask = paddle.zeros([1, H, W, 1])
 
         self.register_buffer("attn_mask", attn_mask)
 
-    def forward(self, x):
-        H, W = self.input_resolution
-        B, L, C = x.shape
-        assert L == H * W, "input feature has wrong size"
+    def maybe_pad(self, hidden_states, height, width):
+        pad_right = (
+            self.window_size - width % self.window_size) % self.window_size
+        pad_bottom = (
+            self.window_size - height % self.window_size) % self.window_size
+        pad_values = (0, 0, 0, pad_right, 0, pad_bottom, 0, 0)
+        hidden_states = nn.functional.pad(hidden_states, pad_values)
+        return hidden_states, pad_values
 
+    def get_attn_mask(self, height, width, dtype):
+        if self.shift_size > 0:
+            # calculate attention mask for shifted window multihead self attention
+            img_mask = paddle.zeros((1, height, width, 1), dtype=dtype)
+            height_slices = (
+                slice(0, -self.window_size),
+                slice(-self.window_size, -self.shift_size),
+                slice(-self.shift_size, None), )
+            width_slices = (
+                slice(0, -self.window_size),
+                slice(-self.window_size, -self.shift_size),
+                slice(-self.shift_size, None), )
+            count = 0
+            for height_slice in height_slices:
+                for width_slice in width_slices:
+                    img_mask[:, height_slice, width_slice, :] = count
+                    count += 1
+
+            mask_windows = window_partition(img_mask, self.window_size)
+            mask_windows = mask_windows.reshape(
+                (-1, self.window_size * self.window_size))
+            attn_mask = mask_windows.unsqueeze(1) - mask_windows.unsqueeze(2)
+            attn_mask = masked_fill(attn_mask, attn_mask != 0, float(-100.0))
+            attn_mask = masked_fill(attn_mask, attn_mask == 0, float(0.0))
+        else:
+            attn_mask = None
+        return attn_mask
+
+    def forward(self, x):
+
+        H, W = self.input_resolution
+
+        #token format
+        B, L, C = x.shape
         shortcut = x
+
         x = x.reshape([B, H, W, C])
+        #feature format
+
+        x, pad_values = self.maybe_pad(x, H, W)
+        _, height_pad, width_pad, _ = x.shape
 
         # cyclic shift
         if self.shift_size > 0:
@@ -397,14 +447,15 @@ class SwinTransformerBlock(nn.Layer):
              C])  # nW*B, window_size*window_size, C
 
         # W-MSA/SW-MSA
+        attn_mask = self.get_attn_mask(height_pad, width_pad, x.dtype)
         attn_windows = self.attn(
-            x_windows, mask=self.attn_mask)  # nW*B, window_size*window_size, C
+            x_windows, mask=attn_mask)  # nW*B, window_size*window_size, C
 
         # merge windows
         attn_windows = attn_windows.reshape(
             [-1, self.window_size, self.window_size, C])
-        shifted_x = window_reverse(attn_windows, self.window_size, H,
-                                   W)  # B H' W' C
+        shifted_x = window_reverse(attn_windows, self.window_size, height_pad,
+                                   width_pad)  # B H' W' C
 
         # reverse cyclic shift
         if self.shift_size > 0:
@@ -414,12 +465,16 @@ class SwinTransformerBlock(nn.Layer):
                 axis=(1, 2))
         else:
             x = shifted_x
+
+        was_padded = pad_values[3] > 0 or pad_values[5] > 0
+        if was_padded:
+            x = x[:, :H, :W, :]
+
         x = x.reshape([B, H * W, C])
         x = shortcut + self.drop_path(self.norm1(x))
 
         # FFN
         x = x + self.drop_path(self.norm2(self.mlp(x)))
-
         return x
 
     def extra_repr(self):
@@ -457,19 +512,40 @@ class PatchMerging(nn.Layer):
         self.reduction = nn.Linear(4 * dim, 2 * dim, bias_attr=False)
         self.norm = norm_layer(2 * dim)
 
+    def maybe_pad(self, input_feature, height, width):
+        should_pad = (height % 2 == 1) or (width % 2 == 1)
+        if should_pad:
+            pad_values = (0, 0, 0, 0, 0, width % 2, 0, height % 2)
+            input_feature = nn.functional.pad(input_feature, pad_values)
+
+        return input_feature
+
     def forward(self, x):
         """
         x: B, H*W, C
         """
         H, W = self.input_resolution
         B, L, C = x.shape
-        assert L == H * W, "input feature has wrong size"
-        assert H % 2 == 0 and W % 2 == 0, f"x size ({H}*{W}) are not even."
 
-        x = x.reshape([B, H // 2, 2, W // 2, 2, C])
-        x = x.transpose((0, 1, 3, 4, 2, 5))
-        x = x.reshape([B, H * W // 4, 4 * C])  # B H/2*W/2 4*C
-        x = self.reduction(x)
+        x = x.reshape((B, H, W, C))
+        x = self.maybe_pad(x, H, W)
+
+        # [batch_size, height/2, width/2, num_channels]
+        input_feature_0 = x[:, 0::2, 0::2, :]
+        # [batch_size, height/2, width/2, num_channels]
+        input_feature_1 = x[:, 1::2, 0::2, :]
+        # [batch_size, height/2, width/2, num_channels]
+        input_feature_2 = x[:, 0::2, 1::2, :]
+        # [batch_size, height/2, width/2, num_channels]
+        input_feature_3 = x[:, 1::2, 1::2, :]
+
+        # [batch_size, height/2 * width/2, 4*num_channels]
+        input_feature = paddle.concat([
+            input_feature_0, input_feature_1, input_feature_2, input_feature_3
+        ], -1)
+        input_feature = input_feature.reshape(
+            (B, -1, 4 * C))  # [batch_size, height/2 * width/2, 4*C]
+        x = self.reduction(input_feature)
         x = self.norm(x)
         return x
 
@@ -605,11 +681,28 @@ class PatchEmbed(nn.Layer):
         else:
             self.norm = None
 
+    def maybe_pad(self, pixel_values, height, width):
+        if width % self.patch_size[1] != 0:
+            pad_values = (0, 0, 0, 0, 0, 0, 0,
+                          self.patch_size[1] - width % self.patch_size[1])
+            pixel_values = nn.functional.pad(pixel_values, pad_values)
+        if height % self.patch_size[0] != 0:
+            pad_values = (
+                0,
+                0,
+                0,
+                0,
+                0,
+                self.patch_size[0] - height % self.patch_size[0],
+                0,
+                0, )
+            pixel_values = nn.functional.pad(pixel_values, pad_values)
+        return pixel_values
+
     def forward(self, x):
         B, C, H, W = x.shape
-        # FIXME look at relaxing size constraints
-        assert H == self.img_size[0] and W == self.img_size[1], \
-            f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
+
+        x = self.maybe_pad(x, H, W)
         x = self.proj(x).flatten(2).transpose([0, 2, 1])  # B Ph*Pw C
         if self.norm is not None:
             x = self.norm(x)
