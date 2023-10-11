@@ -55,6 +55,83 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/foundation_models/MAE_vit_base_patch16.pdparams",
 }
 
+
+def resize_pos_embed(pos_embed,
+                     src_shape,
+                     dst_shape,
+                     mode='bicubic',
+                     num_extra_tokens=1):
+    """Resize pos_embed weights.
+
+    Args:
+        pos_embed (torch.Tensor): Position embedding weights with shape
+            [1, L, C].
+        src_shape (tuple): The resolution of downsampled origin training
+            image, in format (H, W).
+        dst_shape (tuple): The resolution of downsampled new training
+            image, in format (H, W).
+        mode (str): Algorithm used for upsampling. Choose one from 'nearest',
+            'linear', 'bilinear', 'bicubic' and 'trilinear'.
+            Defaults to 'bicubic'.
+        num_extra_tokens (int): The number of extra tokens, such as cls_token.
+            Defaults to 1.
+
+    Returns:
+        torch.Tensor: The resized pos_embed of shape [1, L_new, C]
+    """
+    if src_shape[0] == dst_shape[0] and src_shape[1] == dst_shape[1]:
+        return pos_embed
+    assert pos_embed.ndim == 3, 'shape of pos_embed must be [1, L, C]'
+    _, L, C = pos_embed.shape
+    src_h, src_w = src_shape
+    assert L == src_h * src_w + num_extra_tokens, \
+        f"The length of `pos_embed` ({L}) doesn't match the expected " \
+        f'shape ({src_h}*{src_w}+{num_extra_tokens}). Please check the' \
+        '`img_size` argument.'
+    extra_tokens = pos_embed[:, :num_extra_tokens]
+
+    src_weight = pos_embed[:, num_extra_tokens:]
+    src_weight = src_weight.reshape([-1, src_h, src_w, C]).transpose(
+        [0, 3, 1, 2])
+
+    # The cubic interpolate algorithm only accepts float32
+    dst_weight = paddle.nn.functional.interpolate(
+        paddle.cast(src_weight, paddle.float32),
+        size=dst_shape,
+        align_corners=False,
+        mode=mode)
+    dst_weight = paddle.flatten(dst_weight, 2).transpose([0, 2, 1])
+    dst_weight = paddle.cast(dst_weight, src_weight.dtype)
+
+    return paddle.concat((extra_tokens, dst_weight), axis=1)
+
+
+def pading_for_not_divisible(pixel_values,
+                             height,
+                             width,
+                             patch_size,
+                             format="BCHW",
+                             function="split"):
+    if isinstance(patch_size, int):
+        patch_size = (patch_size, patch_size)
+    if height % patch_size[0] == 0 and width % patch_size[1]:
+        return pixel_values, None
+    if function == "split":
+        pading_width = patch_size[1] - width % patch_size[1]
+        pading_height = patch_size[0] - height % patch_size[0]
+    elif function == "merge":
+        pading_width = width % 2
+        pading_height = height % 2
+    if format == "BCHW":
+        pad_index = (0, 0, 0, 0, 0, pading_height, 0, pading_width)
+    elif format == "BHWC":
+        pad_index = (0, 0, 0, pading_height, 0, pading_width, 0, 0)
+    else:
+        assert ("vaild format")
+
+    return paddle.nn.functional.pad(pixel_values, pad_index), pad_index
+
+
 __all__ = list(MODEL_URLS.keys())
 
 _model_size = None
@@ -501,11 +578,13 @@ class PatchEmbed(nn.Layer):
 
     def forward(self, x):
         B, C, H, W = x.shape
-        assert H == self.img_size[0] and W == self.img_size[1], \
-            f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
+        x, _ = pading_for_not_divisible(x, H, W, patch_size=self.patch_size)
 
-        x = self.proj(x).flatten(2).transpose((0, 2, 1))
-        return x
+        x = self.proj(x)
+        _, _, H, W = x.shape
+
+        x = x.flatten(2).transpose((0, 2, 1))
+        return x, (H, W)
 
 
 class Head(nn.Layer):
@@ -678,14 +757,15 @@ class VisionTransformer(nn.Layer):
 
     def forward_features(self, x):
         # B = x.shape[0]
-        B = paddle.shape(x)[0]
-        x = self.patch_embed(x)
+        B, C, H, W = x.shape
+        x, output_dimensions = self.patch_embed(x)
         if not _model_size in _model_diff['remove_cls_token']:
             cls_tokens = self.cls_token.expand((B, -1, -1))
             x = paddle.concat((cls_tokens, x), axis=1)
 
         if self.pos_embed is not None:
-            x = x + self.pos_embed
+            x = x + resize_pos_embed(self.pos_embed, self.window_size,
+                                     output_dimensions)
 
         x = self.ln_pre(x)
         x = self.pos_drop(x)
