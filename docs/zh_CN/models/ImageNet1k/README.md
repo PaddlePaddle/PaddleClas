@@ -12,7 +12,7 @@
   - [2.3 Intel CPU 端知识蒸馏模型](#SSLD_intel_cpu)
 - [三、CNN 系列模型](#CNN_based)
   - [3.1 服务器端模型](#CNN_server)
-    - [PP-HGNet 系列](#PPHGNet)
+    - [PP-HGNet & PP-HGNetV2 系列](#PPHGNet)
     - [ResNet 系列](#ResNet)
     - [ResNeXt 系列](#ResNeXt)
     - [Res2Net 系列](#Res2Net)
@@ -136,9 +136,9 @@
 
 <a name="PPHGNet"></a>
 
-## PP-HGNet 系列
+## PP-HGNet & PP-HGNetV2 系列
 
-PP-HGNet 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[PP-HGNet 系列模型文档](PP-HGNet.md)。
+PP-HGNet & PP-HGNetV2 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[PP-HGNet 系列模型文档](PP-HGNet.md)、[PP-HGNetV2 系列模型文档](PP-HGNetV2.md)。
 
 | 模型  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
 | ---  | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -147,6 +147,16 @@ PP-HGNet 系列模型的精度、速度指标如下表所示，更多关于该�
 | PPHGNet_small | 0.8151    |  0.9582    |  2.46            | 5.12           |    8.77  | 8.53       | 24.38           | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_small_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_infer.tar) |
 | PPHGNet_small_ssld | 0.8382    |  0.9681  | 2.46            | 5.12           |    8.77  | 8.53       | 24.38           | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_small_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_ssld_infer.tar) |
 | PPHGNet_base_ssld | 0.8500    |  0.9735  | 5.97            | -           |    -  | 25.14       | 71.62           | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNet_base_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_base_ssld_infer.tar) |
+
+| 模型  | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | stage-1预训练模型下载地址 | stage-2预训练模型下载地址 |inference模型下载地址(stage-2) |
+| ---  | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| PPHGNetV2_B0 | 0.7777 | 0.9391 | 0.52 | - | - | - | - | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B0_ssld_stage1_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B0_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNetV2_B0_ssld_infer.tar) |
+| PPHGNetV2_B1 | 0.7918 | 0.9457 | 0.58 | - | - | - | - | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B1_ssld_stage1_pretrained.pdparams)| [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B1_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNetV2_B1_ssld_infer.tar) |
+| PPHGNetV2_B2 | 0.8174 | 0.9588 | 0.95 | - | - | - | - | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B2_ssld_stage1_pretrained.pdparams)| [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B2_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNetV2_B2_ssld_infer.tar) |
+| PPHGNetV2_B3 | 0.8298 | 0.9643 | 1.18 | - | - | - | - | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B3_ssld_stage1_pretrained.pdparams)| [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B3_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNetV2_B3_ssld_infer.tar) |
+| PPHGNetV2_B4 | 0.8357 | 0.9672 | 1.46 | - | - | - | - | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B4_ssld_stage1_pretrained.pdparams)| [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B4_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNetV2_B4_ssld_infer.tar) |
+| PPHGNetV2_B5 | 0.8475 | 0.9732 | 2.84 | - | - | - | - | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B5_ssld_stage1_pretrained.pdparams)| [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B5_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNetV2_B5_ssld_infer.tar) |
+| PPHGNetV2_B6 | 0.8630 | 0.9784 | 5.29 | - | - | - | - | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B6_ssld_stage1_pretrained.pdparams)| [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/PPHGNetV2_B6_ssld_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNetV2_B6_ssld_infer.tar) |
 
 <a name="ResNet"></a>
 
