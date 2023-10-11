@@ -2,7 +2,7 @@ import numpy as np
 import paddle
 import paddle.nn as nn
 from ppcls.arch.backbone.legendary_models.swin_transformer import SwinTransformer, _load_pretrained, \
-    MODEL_URLS, PatchEmbed, BasicLayer
+    MODEL_URLS, PatchEmbed, BasicLayer,SwinTransformerBlock
 
 __all__ = ["SwinTransformer_tiny_patch4_window7_224_SOLIDER",
            "SwinTransformer_small_patch4_window7_224_SOLIDER",
@@ -21,8 +21,118 @@ class PatchEmbed_SOLIDER(PatchEmbed):
             x = self.norm(x)
         return x, out_size
 
+class SwinTransformerBlock_SOLIDER(SwinTransformerBlock):
+    r""" Swin Transformer Block.
 
+    Args:
+        dim (int): Number of input channels.
+        input_resolution (tuple[int]): Input resulotion.
+        num_heads (int): Number of attention heads.
+        window_size (int): Window size.
+        shift_size (int): Shift size for SW-MSA.
+        mlp_ratio (float): Ratio of mlp hidden dim to embedding dim.
+        qkv_bias (bool, optional): If True, add a learnable bias to query, key, value. Default: True
+        qk_scale (float | None, optional): Override default qk scale of head_dim ** -0.5 if set.
+        drop (float, optional): Dropout rate. Default: 0.0
+        attn_drop (float, optional): Attention dropout rate. Default: 0.0
+        drop_path (float, optional): Stochastic depth rate. Default: 0.0
+        act_layer (nn.Layer, optional): Activation layer. Default: nn.GELU
+        norm_layer (nn.Layer, optional): Normalization layer.  Default: nn.LayerNorm
+    """
+
+    def __init__(self,
+                 dim,
+                 input_resolution,
+                 num_heads,
+                 window_size=7,
+                 shift_size=0,
+                 mlp_ratio=4.,
+                 qkv_bias=True,
+                 qk_scale=None,
+                 drop=0.,
+                 attn_drop=0.,
+                 drop_path=0.,
+                 act_layer=nn.GELU,
+                 norm_layer=nn.LayerNorm):
+        super(SwinTransformerBlock_SOLIDER,self).__init__(
+            dim=dim,
+            input_resolution=input_resolution,
+            num_heads=num_heads,
+            window_size=window_size,
+            shift_size=shift_size,
+            mlp_ratio=mlp_ratio,
+            qkv_bias=qkv_bias,
+            qk_scale=qk_scale,
+            drop=drop,
+            attn_drop=attn_drop,
+            drop_path=drop_path,
+            act_layer=act_layer,
+            norm_layer=norm_layer,
+        )
+        self.dim = dim
+        self.input_resolution = input_resolution
+        self.num_heads = num_heads
+        self.window_size = window_size
+        self.shift_size = shift_size
+        self.mlp_ratio = mlp_ratio
+        self.check_condition()
+    def check_condition(self):
+        if min(self.input_resolution) < self.window_size:
+            # if window size is larger than input resolution, we don't partition windows
+            self.shift_size = 0
+            self.window_size = min(self.input_resolution)
+        assert 0 <= self.shift_size < self.window_size, "shift_size must in 0-window_size"
 class BasicLayer_SOLIDER(BasicLayer):
+    def __init__(self,
+                 dim,
+                 input_resolution,
+                 depth,
+                 num_heads,
+                 window_size,
+                 mlp_ratio=4.,
+                 qkv_bias=True,
+                 qk_scale=None,
+                 drop=0.,
+                 attn_drop=0.,
+                 drop_path=0.,
+                 norm_layer=nn.LayerNorm,
+                 downsample=None,
+                 use_checkpoint=False):
+
+        super(BasicLayer_SOLIDER,self).__init__(
+            dim=dim,
+            input_resolution=input_resolution,
+            depth=depth,
+            num_heads=num_heads,
+            window_size=window_size,
+            mlp_ratio=mlp_ratio,
+            qkv_bias=qkv_bias,
+            qk_scale=qk_scale,
+            drop=drop,
+            attn_drop=attn_drop,
+            drop_path=drop_path,
+            norm_layer=norm_layer,
+            downsample=downsample,
+            use_checkpoint=use_checkpoint
+        )
+        # build blocks
+        self.blocks = nn.LayerList([
+            SwinTransformerBlock_SOLIDER(
+                dim=dim,
+                input_resolution=input_resolution,
+                num_heads=num_heads,
+                window_size=window_size,
+                shift_size=0 if (i % 2 == 0) else window_size // 2,
+                mlp_ratio=mlp_ratio,
+                qkv_bias=qkv_bias,
+                qk_scale=qk_scale,
+                drop=drop,
+                attn_drop=attn_drop,
+                drop_path=drop_path[i]
+                if isinstance(drop_path, list) else drop_path,
+                norm_layer=norm_layer) for i in range(depth)
+        ])
+
     def forward(self, x):
         for blk in self.blocks:
             x = blk(x)

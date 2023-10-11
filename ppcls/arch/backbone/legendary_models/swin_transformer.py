@@ -359,12 +359,8 @@ class SwinTransformerBlock(nn.Layer):
         self.window_size = window_size
         self.shift_size = shift_size
         self.mlp_ratio = mlp_ratio
-        if min(self.input_resolution) < self.window_size:
-            # if window size is larger than input resolution, we don't partition windows
-            self.shift_size = 0
-            self.window_size = min(self.input_resolution)
-        assert 0 <= self.shift_size < self.window_size, "shift_size must in 0-window_size"
 
+        self.check_condition()
         self.norm1 = norm_layer(dim)
         self.attn = WindowAttention(
             dim,
@@ -411,7 +407,12 @@ class SwinTransformerBlock(nn.Layer):
             attn_mask = None
 
         self.register_buffer("attn_mask", attn_mask)
-
+    def check_condition(self):
+        if min(self.input_resolution) <= self.window_size:
+            # if window size is larger than input resolution, we don't partition windows
+            self.shift_size = 0
+            self.window_size = min(self.input_resolution)
+        assert 0 <= self.shift_size < self.window_size, "shift_size must in 0-window_size"
     def forward(self, x):
         H, W = self.input_resolution
         B, L, C = x.shape
