@@ -11,9 +11,6 @@ __all__ = ["SwinTransformer_tiny_patch4_window7_224_SOLIDER",
 
 class PatchEmbed_SOLIDER(PatchEmbed):
     def forward(self, x):
-        B, C, H, W = x.shape
-        # TODO (littletomatodonkey), uncomment the line will cause failure of jit.save
-        # assert [H, W] == self.img_size[:2], "Input image size ({H}*{W}) doesn't match model ({}*{}).".format(H, W, self.img_size[0], self.img_size[1])
         x = self.proj(x)
         out_size = (x.shape[2], x.shape[3])
         x = x.flatten(2).transpose([0, 2, 1])  # B Ph*Pw C

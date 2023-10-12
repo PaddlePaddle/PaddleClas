@@ -4,7 +4,7 @@
 ## 目录
 
 - [1. 模型介绍](#1)
-- [2. 精度、模型](#2)
+- [2. 对齐日志、模型](#2)
 
 <a name='1'></a>
 
@@ -14,22 +14,13 @@ Solider是一个语义可控的自监督学习框架，可以从大量未标记�
 
 <a name='2'></a>
 
-## 2. 精度、模型
+## 2. 对齐日志、模型
 
-| Task                                              | Dataset     | Swin Tiny ([Link](链接：https://pan.baidu.com/s/1Buzo4fNt_HvDmTidUVRbuQ?pwd=yzys <br/>提取码：yzys)) | Swin Small ([Link](链接：https://pan.baidu.com/s/1d11UIQAu01zWQz-3Gv4n9g?pwd=ofbe <br/>提取码：ofbe)) | Swin Base ([Link](链接：https://pan.baidu.com/s/1KrRZRNaS3E8z7dXbXe9AJg?pwd=0z72 <br/>提取码：0z72)) |
-| ------------------------------------------------- | ----------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Person Re-identification (mAP/R1) w/o re-ranking  | Market1501  | 91.6/96.1                                                    | 93.3/96.6                                                    | 93.9/96.9                                                    |
-|                                                   | MSMT17      | 67.4/85.9                                                    | 76.9/90.8                                                    | 77.1/90.7                                                    |
-| Person Re-identification (mAP/R1) with re-ranking | Market1501  | 95.3/96.6                                                    | 95.4/96.4                                                    | 95.6/96.7                                                    |
-|                                                   | MSMT17      | 81.5/89.2                                                    | 86.5/91.7                                                    | 86.5/91.7                                                    |
-| Attribute Recognition (mA)                        | PETA_ZS     | 74.37                                                        | 76.21                                                        | 76.43                                                        |
-|                                                   | RAP_ZS      | 74.23                                                        | 75.95                                                        | 76.42                                                        |
-|                                                   | PA100K      | 84.14                                                        | 86.25                                                        | 86.37                                                        |
-| Person Search (mAP/R1)                            | CUHK-SYSU   | 94.9/95.7                                                    | 95.5/95.8                                                    | 94.9/95.5                                                    |
-|                                                   | PRW         | 56.8/86.8                                                    | 59.8/86.7                                                    | 59.7/86.8                                                    |
-| Pedestrian Detection (MR-2)                       | CityPersons | 10.3/40.8                                                    | 10.0/39.2                                                    | 9.7/39.4                                                     |
-| Human Parsing (mIOU)                              | LIP         | 57.52                                                        | 60.21                                                        | 60.50                                                        |
-| Pose Estimation (AP/AR)                           | COCO        | 74.4/79.6                                                    | 76.3/81.3                                                    | 76.6/81.5                                                    |
+| model                         | weight                                                       | log                                                          |
+| ----------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| swin_tiny_patch4_window7_224  | 链接：https://pan.baidu.com/s/1QdUviOSW2RdS3UGGxxHEAA?pwd=qcdd <br/>提取码：qcdd | 链接：https://pan.baidu.com/s/1W5zUFboMMhXETy4HEWbM3Q?pwd=45nx <br/>提取码：45nx |
+| swin_small_patch4_window7_224 | 链接：https://pan.baidu.com/s/1rvGSOSn0REEWoNcSsGMTrQ?pwd=ub5q <br/>提取码：ub5q | 链接：https://pan.baidu.com/s/1sqcUdfv6FyhW9_QgxBUPWA?pwd=letv <br/>提取码：letv |
+| swin_base_patch4_window7_224  | 链接：https://pan.baidu.com/s/1hp9TPQBBF8mSYI0UehITMQ?pwd=x5ht <br/>提取码：x5ht | 链接：https://pan.baidu.com/s/1S2TgDxDRa72C_3FrP8duiA?pwd=u3d2 <br/>提取码：u3d2 |
 
 [1]：基于  LUPerson 数据集预训练
 
