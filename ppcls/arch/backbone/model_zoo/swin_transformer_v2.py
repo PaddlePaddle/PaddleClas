@@ -381,7 +381,7 @@ class SwinTransformerBlock(nn.Layer):
 
         self.register_buffer("attn_mask", attn_mask)
 
-    def maybe_pad(self, hidden_states, height, width):
+    def pad_patch(self, hidden_states, height, width):
         pad_right = (
             self.window_size - width % self.window_size) % self.window_size
         pad_bottom = (
@@ -429,7 +429,7 @@ class SwinTransformerBlock(nn.Layer):
         x = x.reshape([B, H, W, C])
         #feature format
 
-        x, pad_values = self.maybe_pad(x, H, W)
+        x, pad_values = self.pad_patch(x, H, W)
         _, height_pad, width_pad, _ = x.shape
 
         # cyclic shift
@@ -512,7 +512,7 @@ class PatchMerging(nn.Layer):
         self.reduction = nn.Linear(4 * dim, 2 * dim, bias_attr=False)
         self.norm = norm_layer(2 * dim)
 
-    def maybe_pad(self, input_feature, height, width):
+    def pad_patch(self, input_feature, height, width):
         should_pad = (height % 2 == 1) or (width % 2 == 1)
         if should_pad:
             pad_values = (0, 0, 0, 0, 0, width % 2, 0, height % 2)
@@ -528,7 +528,7 @@ class PatchMerging(nn.Layer):
         B, L, C = x.shape
 
         x = x.reshape((B, H, W, C))
-        x = self.maybe_pad(x, H, W)
+        x = self.pad_patch(x, H, W)
 
         # [batch_size, height/2, width/2, num_channels]
         input_feature_0 = x[:, 0::2, 0::2, :]
@@ -681,7 +681,7 @@ class PatchEmbed(nn.Layer):
         else:
             self.norm = None
 
-    def maybe_pad(self, pixel_values, height, width):
+    def pad_patch(self, pixel_values, height, width):
         if width % self.patch_size[1] != 0:
             pad_values = (0, 0, 0, 0, 0, 0, 0,
                           self.patch_size[1] - width % self.patch_size[1])
@@ -702,7 +702,7 @@ class PatchEmbed(nn.Layer):
     def forward(self, x):
         B, C, H, W = x.shape
 
-        x = self.maybe_pad(x, H, W)
+        x = self.pad_patch(x, H, W)
         x = self.proj(x).flatten(2).transpose([0, 2, 1])  # B Ph*Pw C
         if self.norm is not None:
             x = self.norm(x)
