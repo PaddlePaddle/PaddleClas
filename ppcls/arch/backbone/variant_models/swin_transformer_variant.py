@@ -1,7 +1,7 @@
 import numpy as np
 import paddle
 import paddle.nn as nn
-from ppcls.arch.backbone.legendary_models.swin_transformer import SwinTransformer, _load_pretrained, \
+from ..legendary_models.swin_transformer import SwinTransformer, _load_pretrained, \
     MODEL_URLS, PatchEmbed, BasicLayer,SwinTransformerBlock
 
 __all__ = ["SwinTransformer_tiny_patch4_window7_224_SOLIDER",

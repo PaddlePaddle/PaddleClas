@@ -1,0 +1,2 @@
+[console_scripts]
+paddleclas = paddleclas.paddleclas:main

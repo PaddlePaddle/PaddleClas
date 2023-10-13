@@ -18,9 +18,9 @@ Solider是一个语义可控的自监督学习框架，可以从大量未标记�
 
 | model                         | weight                                                       | log                                                          |
 | ----------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| swin_tiny_patch4_window7_224  | 链接：https://pan.baidu.com/s/1QdUviOSW2RdS3UGGxxHEAA?pwd=qcdd <br/>提取码：qcdd | 链接：https://pan.baidu.com/s/1W5zUFboMMhXETy4HEWbM3Q?pwd=45nx <br/>提取码：45nx |
-| swin_small_patch4_window7_224 | 链接：https://pan.baidu.com/s/1rvGSOSn0REEWoNcSsGMTrQ?pwd=ub5q <br/>提取码：ub5q | 链接：https://pan.baidu.com/s/1sqcUdfv6FyhW9_QgxBUPWA?pwd=letv <br/>提取码：letv |
-| swin_base_patch4_window7_224  | 链接：https://pan.baidu.com/s/1hp9TPQBBF8mSYI0UehITMQ?pwd=x5ht <br/>提取码：x5ht | 链接：https://pan.baidu.com/s/1S2TgDxDRa72C_3FrP8duiA?pwd=u3d2 <br/>提取码：u3d2 |
+| swin_tiny_patch4_window7_224  | https://paddleclas.bj.bcebos.com/models/SOILDER/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams | 链接：https://pan.baidu.com/s/1W5zUFboMMhXETy4HEWbM3Q?pwd=45nx <br/>提取码：45nx |
+| swin_small_patch4_window7_224 | https://paddleclas.bj.bcebos.com/models/SOILDER/SwinTransformer_small_patch4_window7_224_pretrained.pdparams | 链接：https://pan.baidu.com/s/1sqcUdfv6FyhW9_QgxBUPWA?pwd=letv <br/>提取码：letv |
+| swin_base_patch4_window7_224  | https://paddleclas.bj.bcebos.com/models/SOILDER/SwinTransformer_base_patch4_window7_224_pretrained.pdparams | 链接：https://pan.baidu.com/s/1S2TgDxDRa72C_3FrP8duiA?pwd=u3d2 <br/>提取码：u3d2 |
 
 [1]：基于  LUPerson 数据集预训练
 
