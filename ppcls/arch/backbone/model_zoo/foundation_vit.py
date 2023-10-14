@@ -520,8 +520,6 @@ class PatchEmbed(nn.Layer):
     def forward(self, x):
         B, C, H, W = x.shape
 
-        x = self.pad_patch(x, H, W)
-
         x = self.proj(x).flatten(2).transpose((0, 2, 1))
         return x
 
@@ -696,7 +694,7 @@ class VisionTransformer(nn.Layer):
 
     def forward_features(self, x):
         # B = x.shape[0]
-        B = paddle.shape(x)[0]
+        B, C, H, W = x.shape
         x = self.patch_embed(x)
         if not _model_size in _model_diff['remove_cls_token']:
             cls_tokens = self.cls_token.expand((B, -1, -1))
