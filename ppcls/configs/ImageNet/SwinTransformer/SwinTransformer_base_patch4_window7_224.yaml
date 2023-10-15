@@ -33,7 +33,7 @@ Arch:
   name: SwinTransformer_base_patch4_window7_224
   class_num: 1000
   pretrained: True
-
+ 
 # loss function config for traing/eval process
 Loss:
   Train:
@@ -51,7 +51,7 @@ Optimizer:
   beta2: 0.999
   epsilon: 1e-8
   weight_decay: 0.05
-  no_weight_decay_name: absolute_pos_embed relative_position_bias_table .bias norm
+  no_weight_decay_name: absolute_pos_embed relative_position_bias_table .bias norm 
   one_dim_param_no_weight_decay: True
   lr:
     # for 8 cards
@@ -115,7 +115,7 @@ DataLoader:
       use_shared_memory: True
 
   Eval:
-    dataset:
+    dataset: 
       name: ImageNetDataset
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/val_list.txt
