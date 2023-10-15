@@ -32,6 +32,7 @@ AMP:
 Arch:
   name: SwinTransformer_base_patch4_window12_384
   class_num: 1000
+  pretrained: True
  
 # loss function config for traing/eval process
 Loss:

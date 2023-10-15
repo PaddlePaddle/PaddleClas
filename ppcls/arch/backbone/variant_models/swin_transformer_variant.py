@@ -2,11 +2,18 @@ import numpy as np
 import paddle
 import paddle.nn as nn
 from ..legendary_models.swin_transformer import SwinTransformer, _load_pretrained, \
-    MODEL_URLS, PatchEmbed, BasicLayer,SwinTransformerBlock
+    PatchEmbed, BasicLayer, SwinTransformerBlock
 
-__all__ = ["SwinTransformer_tiny_patch4_window7_224_SOLIDER",
-           "SwinTransformer_small_patch4_window7_224_SOLIDER",
-           "SwinTransformer_base_patch4_window7_224_SOLIDER"]
+MODEL_URLS_SOLIDER = {
+    "SwinTransformer_tiny_patch4_window7_224_SOLIDER":
+        'https://paddleclas.bj.bcebos.com/models/SOILDER/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams',
+    "SwinTransformer_small_patch4_window7_224_SOLIDER":
+        'https://paddleclas.bj.bcebos.com/models/SOILDER/SwinTransformer_small_patch4_window7_224_pretrained.pdparams',
+    "SwinTransformer_base_patch4_window7_224_SOLIDER":
+        'https://paddleclas.bj.bcebos.com/models/SOILDER/SwinTransformer_base_patch4_window7_224_pretrained.pdparams'
+}
+
+__all__ = list(MODEL_URLS_SOLIDER.keys())
 
 
 class PatchEmbed_SOLIDER(PatchEmbed):
@@ -17,6 +24,7 @@ class PatchEmbed_SOLIDER(PatchEmbed):
         if self.norm is not None:
             x = self.norm(x)
         return x, out_size
+
 
 class SwinTransformerBlock_SOLIDER(SwinTransformerBlock):
     r""" Swin Transformer Block.
@@ -51,7 +59,7 @@ class SwinTransformerBlock_SOLIDER(SwinTransformerBlock):
                  drop_path=0.,
                  act_layer=nn.GELU,
                  norm_layer=nn.LayerNorm):
-        super(SwinTransformerBlock_SOLIDER,self).__init__(
+        super(SwinTransformerBlock_SOLIDER, self).__init__(
             dim=dim,
             input_resolution=input_resolution,
             num_heads=num_heads,
@@ -73,12 +81,15 @@ class SwinTransformerBlock_SOLIDER(SwinTransformerBlock):
         self.shift_size = shift_size
         self.mlp_ratio = mlp_ratio
         self.check_condition()
+
     def check_condition(self):
         if min(self.input_resolution) < self.window_size:
             # if window size is larger than input resolution, we don't partition windows
             self.shift_size = 0
             self.window_size = min(self.input_resolution)
         assert 0 <= self.shift_size < self.window_size, "shift_size must in 0-window_size"
+
+
 class BasicLayer_SOLIDER(BasicLayer):
     def __init__(self,
                  dim,
@@ -96,7 +107,7 @@ class BasicLayer_SOLIDER(BasicLayer):
                  downsample=None,
                  use_checkpoint=False):
 
-        super(BasicLayer_SOLIDER,self).__init__(
+        super(BasicLayer_SOLIDER, self).__init__(
             dim=dim,
             input_resolution=input_resolution,
             depth=depth,
@@ -291,9 +302,6 @@ class SwinTransformer_SOLIDER(SwinTransformer):
 
 def SwinTransformer_tiny_patch4_window7_224_SOLIDER(
         pretrained=False,
-        use_ssld=False,
-        use_imagenet22k_pretrained=False,
-        use_imagenet22kto1k_pretrained=False,
         **kwargs):
     model = SwinTransformer_SOLIDER(
         embed_dim=96,
@@ -304,19 +312,14 @@ def SwinTransformer_tiny_patch4_window7_224_SOLIDER(
         **kwargs)
     _load_pretrained(
         pretrained,
-        model,
-        MODEL_URLS["SwinTransformer_tiny_patch4_window7_224"],
-        use_ssld=use_ssld,
-        use_imagenet22k_pretrained=use_imagenet22k_pretrained,
-        use_imagenet22kto1k_pretrained=use_imagenet22kto1k_pretrained)
+        model=model,
+        model_url=MODEL_URLS_SOLIDER["SwinTransformer_tiny_patch4_window7_224_SOLIDER"],
+        **kwargs)
     return model
 
 
 def SwinTransformer_small_patch4_window7_224_SOLIDER(
         pretrained=False,
-        use_ssld=False,
-        use_imagenet22k_pretrained=False,
-        use_imagenet22kto1k_pretrained=False,
         **kwargs):
     model = SwinTransformer_SOLIDER(
         embed_dim=96,
@@ -327,19 +330,14 @@ def SwinTransformer_small_patch4_window7_224_SOLIDER(
         **kwargs)
     _load_pretrained(
         pretrained,
-        model,
-        MODEL_URLS["SwinTransformer_small_patch4_window7_224"],
-        use_ssld=use_ssld,
-        use_imagenet22k_pretrained=use_imagenet22k_pretrained,
-        use_imagenet22kto1k_pretrained=use_imagenet22kto1k_pretrained)
+        model=model,
+        model_url=MODEL_URLS_SOLIDER["SwinTransformer_small_patch4_window7_224_SOLIDER"],
+        **kwargs)
     return model
 
 
 def SwinTransformer_base_patch4_window7_224_SOLIDER(
         pretrained=False,
-        use_ssld=False,
-        use_imagenet22k_pretrained=False,
-        use_imagenet22kto1k_pretrained=False,
         **kwargs):
     model = SwinTransformer_SOLIDER(
         embed_dim=128,
@@ -350,9 +348,7 @@ def SwinTransformer_base_patch4_window7_224_SOLIDER(
         **kwargs)
     _load_pretrained(
         pretrained,
-        model,
-        MODEL_URLS["SwinTransformer_base_patch4_window7_224"],
-        use_ssld=use_ssld,
-        use_imagenet22k_pretrained=use_imagenet22k_pretrained,
-        use_imagenet22kto1k_pretrained=use_imagenet22kto1k_pretrained)
+        model=model,
+        model_url=MODEL_URLS_SOLIDER["SwinTransformer_base_patch4_window7_224_SOLIDER"],
+        **kwargs)
     return model
