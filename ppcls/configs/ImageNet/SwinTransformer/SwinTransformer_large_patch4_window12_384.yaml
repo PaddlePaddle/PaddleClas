@@ -11,7 +11,7 @@ Global:
   print_batch_step: 10
   use_visualdl: False
   # used for static mode and model export
-  image_shape: [3, 384, 384]
+  image_shape: [3, 224, 224]
   save_inference_dir: ./inference
   # training model under @to_static
   to_static: False
@@ -30,7 +30,7 @@ AMP:
 
 # model architecture
 Arch:
-  name: SwinTransformer_large_patch4_window12_384
+  name: SwinTransformer_large_patch4_window7_224
   class_num: 1000
 
 # loss function config for traing/eval process
@@ -50,7 +50,7 @@ Optimizer:
   beta2: 0.999
   epsilon: 1e-8
   weight_decay: 0.05
-  no_weight_decay_name: absolute_pos_embed relative_position_bias_table .bias norm 
+  no_weight_decay_name: absolute_pos_embed relative_position_bias_table .bias norm
   one_dim_param_no_weight_decay: True
   lr:
     # for 8 cards
@@ -73,7 +73,7 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - RandCropImage:
-            size: 384
+            size: 224
             interpolation: bicubic
             backend: pil
         - RandFlipImage:
@@ -81,7 +81,7 @@ DataLoader:
         - TimmAutoAugment:
             config_str: rand-m9-mstd0.5-inc1
             interpolation: bicubic
-            img_size: 384 
+            img_size: 224
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -114,7 +114,7 @@ DataLoader:
       use_shared_memory: True
 
   Eval:
-    dataset: 
+    dataset:
       name: ImageNetDataset
       image_root: ./dataset/ILSVRC2012/
       cls_label_path: ./dataset/ILSVRC2012/val_list.txt
@@ -123,11 +123,11 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - ResizeImage:
-            resize_short: 438
+            resize_short: 256
             interpolation: bicubic
             backend: pil
         - CropImage:
-            size: 384
+            size: 224
         - NormalizeImage:
             scale: 1.0/255.0
             mean: [0.485, 0.456, 0.406]
@@ -150,11 +150,11 @@ Infer:
         to_rgb: True
         channel_first: False
     - ResizeImage:
-        resize_short: 438
+        resize_short: 256
         interpolation: bicubic
         backend: pil
     - CropImage:
-        size: 384
+        size: 224
     - NormalizeImage:
         scale: 1.0/255.0
         mean: [0.485, 0.456, 0.406]
