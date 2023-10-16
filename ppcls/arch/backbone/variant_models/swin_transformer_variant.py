@@ -6,11 +6,11 @@ from ..legendary_models.swin_transformer import SwinTransformer, _load_pretraine
 
 MODEL_URLS_SOLIDER = {
     "SwinTransformer_tiny_patch4_window7_224_SOLIDER":
-        'https://paddleclas.bj.bcebos.com/models/SOILDER/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams',
+        'https://paddleclas.bj.bcebos.com/models/SOLIDER/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams',
     "SwinTransformer_small_patch4_window7_224_SOLIDER":
-        'https://paddleclas.bj.bcebos.com/models/SOILDER/SwinTransformer_small_patch4_window7_224_pretrained.pdparams',
+        'https://paddleclas.bj.bcebos.com/models/SOLIDER/SwinTransformer_small_patch4_window7_224_pretrained.pdparams',
     "SwinTransformer_base_patch4_window7_224_SOLIDER":
-        'https://paddleclas.bj.bcebos.com/models/SOILDER/SwinTransformer_base_patch4_window7_224_pretrained.pdparams'
+        'https://paddleclas.bj.bcebos.com/models/SOLIDER/SwinTransformer_base_patch4_window7_224_pretrained.pdparams'
 }
 
 __all__ = list(MODEL_URLS_SOLIDER.keys())
@@ -297,6 +297,7 @@ class SwinTransformer_SOLIDER(SwinTransformer):
 
         x = self.avgpool(outs[-1])  # B C 1
         x = paddle.flatten(x, 1)
+
         return x
 
 
