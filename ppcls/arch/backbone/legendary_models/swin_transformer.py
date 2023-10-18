@@ -389,7 +389,6 @@ class SwinTransformerBlock(nn.Layer):
         self.shift_size = shift_size
         self.mlp_ratio = mlp_ratio
 
-        self.check_condition()
         self.norm1 = norm_layer(dim)
         self.attn = WindowAttention(
             dim,
@@ -407,39 +406,12 @@ class SwinTransformerBlock(nn.Layer):
                        hidden_features=mlp_hidden_dim,
                        act_layer=act_layer,
                        drop=drop)
-        """
-        
-        if self.shift_size > 0:
-            # calculate attention mask for SW-MSA
-            H, W = self.input_resolution
-            img_mask = paddle.zeros((1, H, W, 1))  # 1 H W 1
-            h_slices = (slice(0, -self.window_size),
-                        slice(-self.window_size, -self.shift_size),
-                        slice(-self.shift_size, None))
-            w_slices = (slice(0, -self.window_size),
-                        slice(-self.window_size, -self.shift_size),
-                        slice(-self.shift_size, None))
-            cnt = 0
-            for h in h_slices:
-                for w in w_slices:
-                    img_mask[:, h, w, :] = cnt
-                    cnt += 1
 
-            mask_windows = window_partition(
-                img_mask, self.window_size)  # nW, window_size, window_size, 1
-            mask_windows = mask_windows.reshape(
-                [-1, self.window_size * self.window_size])
-            attn_mask = mask_windows.unsqueeze(1) - mask_windows.unsqueeze(2)
-
-            huns = -100.0 * paddle.ones_like(attn_mask)
-            attn_mask = huns * (attn_mask != 0).astype("float32")
-        else:
-            attn_mask = None
-        """
         H, W = self.input_resolution
         attn_mask = paddle.zeros([1, H, W, 1])
 
         self.register_buffer("attn_mask", attn_mask)
+
     def get_attn_mask(self, height, width, dtype):
         if self.shift_size > 0:
             # calculate attention mask for shifted window multihead self attention
@@ -467,7 +439,7 @@ class SwinTransformerBlock(nn.Layer):
         else:
             attn_mask = None
         return attn_mask
-      
+
     def forward(self, x, input_dimensions):
         H, W = input_dimensions
         B, L, C = x.shape
