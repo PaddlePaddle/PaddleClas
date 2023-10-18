@@ -46,6 +46,11 @@ __all__ = list(MODEL_URLS.keys())
 # https://gitee.com/ascend/pytorch/blob/master/torch_npu/contrib/function/roll.py
 
 
+def masked_fill(x, mask, value):
+    y = paddle.full(x.shape, value, x.dtype)
+    return paddle.where(mask, y, x)
+
+
 class RollWithIndexSelect(paddle.autograd.PyLayer):
     @staticmethod
     def forward(ctx, input1, index_fp, index_bp):
@@ -132,6 +137,30 @@ class Mlp(nn.Layer):
         x = self.fc2(x)
         x = self.drop(x)
         return x
+
+
+def pading_for_not_divisible(pixel_values,
+                             height,
+                             width,
+                             patch_size,
+                             format="BCHW",
+                             function="split"):
+    if isinstance(patch_size, int):
+        patch_size = (patch_size, patch_size)
+    if function == "split":
+        pading_width = patch_size[1] - width % patch_size[1]
+        pading_height = patch_size[0] - height % patch_size[0]
+    elif function == "merge":
+        pading_width = width % 2
+        pading_height = height % 2
+    if format == "BCHW":
+        pad_index = (0, 0, 0, 0, 0, pading_height, 0, pading_width)
+    elif format == "BHWC":
+        pad_index = (0, 0, 0, pading_height, 0, pading_width, 0, 0)
+    else:
+        assert ("vaild format")
+
+    return F.pad(pixel_values, pad_index), pad_index
 
 
 def window_partition(x, window_size):
@@ -360,7 +389,6 @@ class SwinTransformerBlock(nn.Layer):
         self.shift_size = shift_size
         self.mlp_ratio = mlp_ratio
 
-        self.check_condition()
         self.norm1 = norm_layer(dim)
         self.attn = WindowAttention(
             dim,
@@ -378,52 +406,50 @@ class SwinTransformerBlock(nn.Layer):
                        hidden_features=mlp_hidden_dim,
                        act_layer=act_layer,
                        drop=drop)
-
-        if self.shift_size > 0:
-            # calculate attention mask for SW-MSA
-            H, W = self.input_resolution
-            img_mask = paddle.zeros((1, H, W, 1))  # 1 H W 1
-            h_slices = (slice(0, -self.window_size),
-                        slice(-self.window_size, -self.shift_size),
-                        slice(-self.shift_size, None))
-            w_slices = (slice(0, -self.window_size),
-                        slice(-self.window_size, -self.shift_size),
-                        slice(-self.shift_size, None))
-            cnt = 0
-            for h in h_slices:
-                for w in w_slices:
-                    img_mask[:, h, w, :] = cnt
-                    cnt += 1
-
-            mask_windows = window_partition(
-                img_mask, self.window_size)  # nW, window_size, window_size, 1
-            mask_windows = mask_windows.reshape(
-                [-1, self.window_size * self.window_size])
-            attn_mask = mask_windows.unsqueeze(1) - mask_windows.unsqueeze(2)
-
-            huns = -100.0 * paddle.ones_like(attn_mask)
-            attn_mask = huns * (attn_mask != 0).astype("float32")
-        else:
-            attn_mask = None
+        H, W = self.input_resolution
+        attn_mask = paddle.zeros([1, H, W, 1])
 
         self.register_buffer("attn_mask", attn_mask)
 
-    def check_condition(self):
-        if min(self.input_resolution) <= self.window_size:
-            # if window size is larger than input resolution, we don't partition windows
-            self.shift_size = 0
-            self.window_size = min(self.input_resolution)
-        assert 0 <= self.shift_size < self.window_size, "shift_size must in 0-window_size"
+    def get_attn_mask(self, height, width, dtype):
+        if self.shift_size > 0:
+            # calculate attention mask for shifted window multihead self attention
+            img_mask = paddle.zeros((1, height, width, 1), dtype=dtype)
+            height_slices = (
+                slice(0, -self.window_size),
+                slice(-self.window_size, -self.shift_size),
+                slice(-self.shift_size, None), )
+            width_slices = (
+                slice(0, -self.window_size),
+                slice(-self.window_size, -self.shift_size),
+                slice(-self.shift_size, None), )
+            count = 0
+            for height_slice in height_slices:
+                for width_slice in width_slices:
+                    img_mask[:, height_slice, width_slice, :] = count
+                    count += 1
 
-    def forward(self, x):
-        H, W = self.input_resolution
+            mask_windows = window_partition(img_mask, self.window_size)
+            mask_windows = mask_windows.reshape(
+                (-1, self.window_size * self.window_size))
+            attn_mask = mask_windows.unsqueeze(1) - mask_windows.unsqueeze(2)
+            attn_mask = masked_fill(attn_mask, attn_mask != 0, float(-100.0))
+            attn_mask = masked_fill(attn_mask, attn_mask == 0, float(0.0))
+        else:
+            attn_mask = None
+        return attn_mask
+
+    def forward(self, x, input_dimensions):
+        H, W = input_dimensions
         B, L, C = x.shape
-        assert L == H * W, "input feature has wrong size"
 
         shortcut = x
         x = self.norm1(x)
         x = x.reshape([B, H, W, C])
 
+        x, pad_values = pading_for_not_divisible(x, H, W, self.window_size,
+                                                 "BHWC")
+        _, height_pad, width_pad, _ = x.shape
         # cyclic shift
         if self.shift_size > 0:
             shifted_x = RollWrapper.roll(
@@ -439,14 +465,15 @@ class SwinTransformerBlock(nn.Layer):
              C])  # nW*B, window_size*window_size, C
 
         # W-MSA/SW-MSA
+        attn_mask = self.get_attn_mask(height_pad, width_pad, x.dtype)
         attn_windows = self.attn(
-            x_windows, mask=self.attn_mask)  # nW*B, window_size*window_size, C
+            x_windows, mask=attn_mask)  # nW*B, window_size*window_size, C
 
         # merge windows
         attn_windows = attn_windows.reshape(
             [-1, self.window_size, self.window_size, C])
-        shifted_x = window_reverse(attn_windows, self.window_size, H, W,
-                                   C)  # B H' W' C
+        shifted_x = window_reverse(attn_windows, self.window_size, height_pad,
+                                   width_pad, C)  # B H' W' C
 
         # reverse cyclic shift
         if self.shift_size > 0:
@@ -456,6 +483,10 @@ class SwinTransformerBlock(nn.Layer):
                 axis=(1, 2))
         else:
             x = shifted_x
+
+        was_padded = pad_values[3] > 0 or pad_values[5] > 0
+        if was_padded:
+            x = x[:, :H, :W, :]
         x = x.reshape([B, H * W, C])
 
         # FFN
@@ -500,28 +531,25 @@ class PatchMerging(nn.Layer):
         self.reduction = nn.Linear(4 * dim, 2 * dim, bias_attr=False)
         self.norm = norm_layer(4 * dim)
 
-    def forward(self, x):
+    def forward(self, x, input_dimensions):
         """
         x: B, H*W, C
         """
-        H, W = self.input_resolution
+        H, W = input_dimensions
         B, L, C = x.shape
-        assert L == H * W, "input feature has wrong size"
-        assert H % 2 == 0 and W % 2 == 0, "x size ({}*{}) are not even.".format(
-            H, W)
+        x = x.reshape((B, H, W, C))
+        x, _ = pading_for_not_divisible(x, H, W, 2, "BHWC", function="merge")
 
-        # x = x.reshape([B, H, W, C])
+        x0 = x[:, 0::2, 0::2, :]  # B H/2 W/2 C
+        x1 = x[:, 1::2, 0::2, :]  # B H/2 W/2 C
+        x2 = x[:, 0::2, 1::2, :]  # B H/2 W/2 C
+        x3 = x[:, 1::2, 1::2, :]  # B H/2 W/2 C
+        x = paddle.concat([x0, x1, x2, x3], -1)  # B H/2 W/2 4*C
 
-        # x0 = x[:, 0::2, 0::2, :]  # B H/2 W/2 C
-        # x1 = x[:, 1::2, 0::2, :]  # B H/2 W/2 C
-        # x2 = x[:, 0::2, 1::2, :]  # B H/2 W/2 C
-        # x3 = x[:, 1::2, 1::2, :]  # B H/2 W/2 C
-        # x = paddle.concat([x0, x1, x2, x3], -1)  # B H/2 W/2 4*C
+        # x = x.reshape([B, H // 2, 2, W // 2, 2, C])
+        # x = x.transpose((0, 1, 3, 4, 2, 5))
 
-        x = x.reshape([B, H // 2, 2, W // 2, 2, C])
-        x = x.transpose((0, 1, 3, 4, 2, 5))
-
-        x = x.reshape([B, H * W // 4, 4 * C])  # B H/2*W/2 4*C
+        x = x.reshape([B, -1, 4 * C])  # B H/2*W/2 4*C
 
         x = self.norm(x)
         x = self.reduction(x)
@@ -606,12 +634,14 @@ class BasicLayer(nn.Layer):
         else:
             self.downsample = None
 
-    def forward(self, x):
+    def forward(self, x, input_dimensions):
+        H, W = input_dimensions
         for blk in self.blocks:
-            x = blk(x)
+            x = blk(x, input_dimensions)
         if self.downsample is not None:
-            x = self.downsample(x)
-        return x
+            H, W = (H + 1) // 2, (W + 1) // 2
+            x = self.downsample(x, input_dimensions)
+        return x, (H, W)
 
     def extra_repr(self):
         return "dim={}, input_resolution={}, depth={}".format(
@@ -666,14 +696,14 @@ class PatchEmbed(nn.Layer):
 
     def forward(self, x):
         B, C, H, W = x.shape
-        # TODO (littletomatodonkey), uncomment the line will cause failure of jit.save
-        # assert [H, W] == self.img_size[:2], "Input image size ({H}*{W}) doesn't match model ({}*{}).".format(H, W, self.img_size[0], self.img_size[1])
+        x, _ = pading_for_not_divisible(x, H, W, self.patch_size, "BCHW")
         x = self.proj(x)
-
+        _, _, height, width = x.shape
+        output_dimensions = (height, width)
         x = x.flatten(2).transpose([0, 2, 1])  # B Ph*Pw C
         if self.norm is not None:
             x = self.norm(x)
-        return x
+        return x, output_dimensions
 
     def flops(self):
         Ho, Wo = self.patches_resolution
@@ -804,13 +834,13 @@ class SwinTransformer(TheseusLayer):
             ones_(m.weight)
 
     def forward_features(self, x):
-        x = self.patch_embed(x)
+        x, output_dimensions = self.patch_embed(x)
         if self.ape:
             x = x + self.absolute_pos_embed
         x = self.pos_drop(x)
 
         for layer in self.layers:
-            x = layer(x)
+            x, output_dimensions = layer(x, output_dimensions)
 
         x = self.norm(x)  # B L C
         x = self.avgpool(x.transpose([0, 2, 1]))  # B C 1
