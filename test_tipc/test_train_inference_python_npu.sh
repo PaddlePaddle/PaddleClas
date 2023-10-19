@@ -24,10 +24,12 @@ sed -i "s/Global.use_gpu/Global.use_npu/g" $FILENAME
 sed -i "s/Global.use_tensorrt:True|False/Global.use_tensorrt:False/g" $FILENAME
 sed -i "s/Global.save_interval=2/Global.save_interval=1/g" $FILENAME
 sed -i "s/-o Global.epochs:lite_train_lite_infer=2/-o Global.epochs:lite_train_lite_infer=1/g" $FILENAME
+sed -i "s/enable_mkldnn:True|False/enable_mkldnn:False/g" $FILENAME
 # python has been updated to version 3.9 for npu backend
 sed -i "s/python3.7/python3.9/g" $FILENAME
+sed -i "s/python3.10/python3.9/g" $FILENAME
 
-modelname=$(echo $FILENAME | cut -d '/' -f4)
+modelname=$(echo $FILENAME | cut -d '/' -f3)
 if  [ $modelname == "PVTV2" ] || [ $modelname == "Twins" ] || [ $modelname == "SwinTransformer" ]; then
     sed -i "s/gpu_list:0|0,1/gpu_list:0,1/g" $FILENAME
 fi
@@ -50,6 +52,9 @@ grep -n 'tools/.*yaml' $FILENAME  | cut -d ":" -f 1 \
     trainer_config=$(func_parser_config ${train_cmd})
     sed -i 's/device: gpu/device: npu/g' "$REPO_ROOT_PATH/$trainer_config"
 done
+
+# change gpu to npu in execution script
+sed -i "s/\"gpu\"/\"npu\"/g" test_tipc/test_train_inference_python.sh
 
 # pass parameters to test_train_inference_python.sh
 cmd="bash test_tipc/test_train_inference_python.sh ${FILENAME} $2"
