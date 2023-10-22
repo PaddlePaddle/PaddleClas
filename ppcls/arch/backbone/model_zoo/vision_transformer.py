@@ -21,7 +21,9 @@ import numpy as np
 import paddle
 import paddle.nn as nn
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal
-
+from paddle.incubate.nn.functional import (
+    variable_length_memory_efficient_attention
+)
 from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
@@ -130,18 +132,24 @@ class Attention(nn.Layer):
         self.proj = nn.Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
 
-    def forward(self, x):
+    def forward(self, x, seq_lens=None):
         # B= paddle.shape(x)[0]
         N, C = x.shape[1:]
         qkv = self.qkv(x).reshape((-1, N, 3, self.num_heads, C //
                                    self.num_heads)).transpose((2, 0, 3, 1, 4))
         q, k, v = qkv[0], qkv[1], qkv[2]
 
-        attn = (q.matmul(k.transpose((0, 1, 3, 2)))) * self.scale
-        attn = nn.functional.softmax(attn, axis=-1)
-        attn = self.attn_drop(attn)
+        x = variable_length_memory_efficient_attention(
+            q,
+            k,
+            v,
+            seq_lens,
+            seq_lens,
+            None,
+            scale=self.scale
+        )
 
-        x = (attn.matmul(v)).transpose((0, 2, 1, 3)).reshape((-1, N, C))
+        x = x.transpose((0, 2, 1, 3)).reshape((-1, N, C))
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
@@ -190,8 +198,8 @@ class Block(nn.Layer):
                        act_layer=act_layer,
                        drop=drop)
 
-    def forward(self, x):
-        x = x + self.drop_path(self.attn(self.norm1(x)))
+    def forward(self, x, seq_lens=None):
+        x = x + self.drop_path(self.attn(self.norm1(x), seq_lens=seq_lens))
         x = x + self.drop_path(self.mlp(self.norm2(x)))
         return x
 
@@ -306,8 +314,11 @@ class VisionTransformer(nn.Layer):
         x = paddle.concat((cls_tokens, x), axis=1)
         x = x + self.pos_embed
         x = self.pos_drop(x)
+
+        batch, seq_len, _ = x.shape
+        seq_lens = paddle.to_tensor([seq_len, ] * batch, dtype='int32')
         for blk in self.blocks:
-            x = blk(x)
+            x = blk(x, seq_lens=seq_lens)
         x = self.norm(x)
         return x[:, 0]
 
