@@ -114,6 +114,8 @@ def pading_for_not_divisible(pixel_values,
                              function="split"):
     if isinstance(patch_size, int):
         patch_size = (patch_size, patch_size)
+    if height // patch_size[0] == 0 and width // patch_size[1]:
+        return pixel_values, None
     if function == "split":
         pading_width = patch_size[1] - width % patch_size[1]
         pading_height = patch_size[0] - height % patch_size[0]

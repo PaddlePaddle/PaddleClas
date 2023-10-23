@@ -147,6 +147,8 @@ def pading_for_not_divisible(pixel_values,
                              function="split"):
     if isinstance(patch_size, int):
         patch_size = (patch_size, patch_size)
+    if height // patch_size[0] == 0 and width // patch_size[1] == 0:
+        return pixel_values, (0, 0, 0, 0, 0, 0, 0, 0)
     if function == "split":
         pading_width = patch_size[1] - width % patch_size[1]
         pading_height = patch_size[0] - height % patch_size[0]
@@ -407,7 +409,7 @@ class SwinTransformerBlock(nn.Layer):
                        act_layer=act_layer,
                        drop=drop)
         H, W = self.input_resolution
-        attn_mask = paddle.zeros([1, H, W, 1])
+        attn_mask = self.get_attn_mask(H, W, self.mlp._dtype)
 
         self.register_buffer("attn_mask", attn_mask)
 
@@ -450,6 +452,8 @@ class SwinTransformerBlock(nn.Layer):
         x, pad_values = pading_for_not_divisible(x, H, W, self.window_size,
                                                  "BHWC")
         _, height_pad, width_pad, _ = x.shape
+
+        was_padded = pad_values[3] > 0 or pad_values[5] > 0
         # cyclic shift
         if self.shift_size > 0:
             shifted_x = RollWrapper.roll(
@@ -465,7 +469,13 @@ class SwinTransformerBlock(nn.Layer):
              C])  # nW*B, window_size*window_size, C
 
         # W-MSA/SW-MSA
-        attn_mask = self.get_attn_mask(height_pad, width_pad, x.dtype)
+        #check did it need to calculate again
+        if was_padded:
+            attn_mask = self.get_attn_mask(height_pad, width_pad, x.dtype)
+            self.attn_mask = attn_mask  #cache
+        else:
+            attn_mask = self.attn_mask
+
         attn_windows = self.attn(
             x_windows, mask=attn_mask)  # nW*B, window_size*window_size, C
 
@@ -484,7 +494,6 @@ class SwinTransformerBlock(nn.Layer):
         else:
             x = shifted_x
 
-        was_padded = pad_values[3] > 0 or pad_values[5] > 0
         if was_padded:
             x = x[:, :H, :W, :]
         x = x.reshape([B, H * W, C])
