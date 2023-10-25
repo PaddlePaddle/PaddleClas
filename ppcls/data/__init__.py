@@ -112,13 +112,15 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
         batch_transform = config_dataset.pop('batch_transform_ops')
     else:
         batch_transform = None
-
     dataset = eval(dataset_name)(**config_dataset)
 
     logger.debug("build dataset({}) success...".format(dataset))
 
     # build sampler
     config_sampler = config[mode]['sampler']
+    while config_sampler["batch_size"] > len(dataset.images):
+        dataset.images.extend(dataset.images)
+        dataset.labels.extend(dataset.labels)
     if config_sampler and "name" not in config_sampler:
         batch_sampler = None
         batch_size = config_sampler["batch_size"]
