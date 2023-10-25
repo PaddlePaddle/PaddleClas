@@ -47,9 +47,9 @@ MLDecoder:
 ```
 注意：
 1. 当所选择的Backbone无法调取class_num属性时，MLDecoder需要在配置文件中手动添加`class_num`属性。
-2. 实际使用时可根据对应Backbone中的实际的层的名称来修改`remove_layers`和`replace_layer`参数。
+2. 实际使用时可根据对应Backbone中的实际的层的名称来修改`remove_layers`和`replace_layer`参数。 Backbone中的实际的层的名称可根据选取的主干模型名在`ppcls/arch/backbone`路径下查找对应的实现代码，并查看改模型相应输出层的名称。
 
-下面是选择`RepVGG_A0`为例时对应的MLDecoder配置示例：
+下面是选择`RepVGG_A0`为例， 对应查看`ppcls/arch/backbone/model_zoo/repvgg.py`, 适应性添加或修改`class_num`, `remove_layers`和`replace_layer`后的MLDecoder配置示例：
 ```yaml
 # model architecture
 Arch:
@@ -144,7 +144,7 @@ python3 tools/train.py \
 ```bash
 python3 tools/eval.py \
     -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml \
-    -o Arch.pretrained_model="./output/ResNet101_ml_decoder_448/best_model"
+    -o Global.pretrained_model="./output/ResNet101_ml_decoder_448/best_model"
 ```
 
 <a name="5"></a>
@@ -153,7 +153,7 @@ python3 tools/eval.py \
 ```bash
 python3 tools/infer.py \
     -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml \
-    -o Arch.pretrained_model="./output/ResNet101_ml_decoder_448/best_model"
+    -o Global.pretrained_model="./output/ResNet101_ml_decoder_448/best_model"
 ```
 
 得到类似下面的输出：
@@ -170,7 +170,7 @@ python3 tools/infer.py \
 ```bash
 python3 tools/export_model.py \
     -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml \
-    -o Arch.pretrained_model="./output/ResNet101_ml_decoder_448/best_model"
+    -o Global.pretrained_model="./output/ResNet101_ml_decoder_448/best_model"
 ```
 inference model 的路径默认在当前路径下 `./inference`
 `./inference` 文件夹下应有如下文件结构：

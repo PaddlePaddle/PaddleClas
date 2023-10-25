@@ -48,6 +48,7 @@ def add_ml_decoder_head(model, config):
                 'Please manually add parameter `class_num` '
                 'for MLDecoder in the config file.')
 
+    # remove_layers: list of layer names that need to be deleted from backbone
     if 'remove_layers' in config:
         remove_layers = config.pop('remove_layers')
     else:
@@ -60,6 +61,7 @@ def add_ml_decoder_head(model, config):
             raise AttributeError(
                 f"{remove_layer} does not have attribute the model.")
 
+    # replace_layer: layer name that need to be replaced in backbone
     if 'replace_layer' in config:
         replace_layer = config.pop('replace_layer')
     else:
