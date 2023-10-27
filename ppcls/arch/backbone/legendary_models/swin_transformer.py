@@ -453,7 +453,8 @@ class SwinTransformerBlock(nn.Layer):
                                                  "BHWC")
         _, height_pad, width_pad, _ = x.shape
 
-        was_padded = pad_values[3] > 0 or pad_values[5] > 0
+        padding_state = pad_values[3] > 0 or pad_values[
+            5] > 0  # change variable name
         # cyclic shift
         if self.shift_size > 0:
             shifted_x = RollWrapper.roll(
@@ -470,7 +471,7 @@ class SwinTransformerBlock(nn.Layer):
 
         # W-MSA/SW-MSA
         #check did it need to calculate again
-        if was_padded:
+        if padding_state:
             attn_mask = self.get_attn_mask(height_pad, width_pad, x.dtype)
             self.attn_mask = attn_mask  #cache
         else:
@@ -494,7 +495,7 @@ class SwinTransformerBlock(nn.Layer):
         else:
             x = shifted_x
 
-        if was_padded:
+        if padding_state:
             x = x[:, :H, :W, :]
         x = x.reshape([B, H * W, C])
 
