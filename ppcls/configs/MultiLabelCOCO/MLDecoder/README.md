@@ -39,8 +39,36 @@ Arch:
 # ml-decoder head
 MLDecoder:
   query_num: 80 # default: 80, query_num <= class_num
-  in_chans: 2048
+  in_channels: 2048
+  # optional args
+  # class_num: 80
+  # remove_layers: ['avg_pool', 'flatten']
+  # replace_layer: 'fc'
 ```
+注意：
+1. 当所选择的Backbone无法调取class_num属性时，MLDecoder需要在配置文件中手动添加`class_num`属性。
+2. 实际使用时可根据对应Backbone中的实际的层的名称来修改`remove_layers`和`replace_layer`参数。 Backbone中的实际的层的名称可根据选取的主干模型名在`ppcls/arch/backbone`路径下查找对应的实现代码，并查看改模型相应输出层的名称。
+
+下面是选择`RepVGG_A0`为例， 对应查看`ppcls/arch/backbone/model_zoo/repvgg.py`, 适应性添加或修改`class_num`, `remove_layers`和`replace_layer`后的MLDecoder配置示例：
+```yaml
+# model architecture
+Arch:
+  name: RepVGG_A0
+  class_num: 80
+  pretrained: True
+  # use ml-decoder head to replace avg_pool and fc
+  use_ml_decoder: True
+
+# ml-decoder head
+MLDecoder:
+  query_num: 80 # default: 80, query_num <= class_num
+  in_channels: 1280
+  # optional args
+  class_num: 80
+  remove_layers: ['gap']
+  replace_layer: 'linear'
+```
+
 开发者可以自行尝试使用不同的主干模型来结合ML-Decoder。
 
 目前使用ResNet结合ML-Decoder在COCO2017的多标签分类任务上的性能指标如下：
@@ -65,11 +93,10 @@ cd path_to_PaddleClas
 * 创建并进入 `dataset/COCO2017` 目录，下载并解压 COCO2017 数据集。
 
 ```shell
-mkdir dataset/COCO2017
-cd dataset/COCO2017
-curl http://images.cocodataset.org/zips/train2017.zip | unzip -d .
-curl http://images.cocodataset.org/zips/val2017.zip | unzip -d .
-curl http://images.cocodataset.org/annotations/annotations_trainval2017.zip | unzip -d .
+mkdir dataset/COCO2017 && cd dataset/COCO2017
+wget http://images.cocodataset.org/zips/train2017.zip -O t.zip && unzip t.zip -d . && rm t.zip
+wget http://images.cocodataset.org/zips/val2017.zip -O t.zip && unzip t.zip -d . && rm t.zip
+wget http://images.cocodataset.org/annotations/annotations_trainval2017.zip -O t.zip && unzip t.zip -d . && rm t.zip
 ```
 
 * 返回 `PaddleClas` 根目录
@@ -117,7 +144,7 @@ python3 tools/train.py \
 ```bash
 python3 tools/eval.py \
     -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml \
-    -o Arch.pretrained="./output/ResNet101_ml_decoder_448/best_model"
+    -o Global.pretrained_model="./output/ResNet101_ml_decoder_448/best_model"
 ```
 
 <a name="5"></a>
@@ -126,7 +153,7 @@ python3 tools/eval.py \
 ```bash
 python3 tools/infer.py \
     -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml \
-    -o Arch.pretrained="./output/ResNet101_ml_decoder_448/best_model"
+    -o Global.pretrained_model="./output/ResNet101_ml_decoder_448/best_model"
 ```
 
 得到类似下面的输出：
@@ -143,7 +170,7 @@ python3 tools/infer.py \
 ```bash
 python3 tools/export_model.py \
     -c ./ppcls/configs/MultiLabelCOCO/MLDecoder/ResNet101_ml_decoder_448.yaml \
-    -o Arch.pretrained="./output/ResNet101_ml_decoder_448/best_model"
+    -o Global.pretrained_model="./output/ResNet101_ml_decoder_448/best_model"
 ```
 inference model 的路径默认在当前路径下 `./inference`
 `./inference` 文件夹下应有如下文件结构：

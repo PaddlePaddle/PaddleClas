@@ -15,4 +15,3 @@ nohup.out
 .idea
 inference/
 test.py
-ppcls/arch/backbone/legendary_models/swin_bug_version.py
