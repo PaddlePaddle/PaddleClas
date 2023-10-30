@@ -19,7 +19,7 @@ import paddle
 import paddle.nn as nn
 from paddle.nn.initializer import XavierUniform, TruncatedNormal, Constant
 
-from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain
 
 MODEL_URLS = {
     "CvT_13_224":
@@ -522,7 +522,7 @@ def _load_pretrained(pretrained,
     if pretrained is False:
         pass
     elif pretrained is True:
-        load_dygraph_pretrain_from_url(
+        load_dygraph_pretrain(
             model,
             model_url,
             use_ssld=use_ssld,

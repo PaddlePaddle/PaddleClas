@@ -24,7 +24,7 @@ import math
 
 from .vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPath, Identity
 from ..base.theseus_layer import TheseusLayer
-from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain
 
 MODEL_URLS = {
     "SwinTransformerV2_tiny_patch4_window8_256":
@@ -885,7 +885,7 @@ def _load_pretrained(pretrained,
     if pretrained is False:
         pass
     elif pretrained is True:
-        load_dygraph_pretrain_from_url(
+        load_dygraph_pretrain(
             model,
             model_url,
             use_ssld=use_ssld,

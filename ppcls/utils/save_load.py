@@ -50,46 +50,49 @@ def _extract_student_weights(all_params, student_prefix="Student."):
     return s_params
 
 
-def load_dygraph_pretrain(model, path=None):
-    if path.startswith(("http://", "https://")):
-        path = get_weights_path_from_url(path)
-    if not path.endswith('.pdparams'):
-        path = path + '.pdparams'
-    if not os.path.exists(path):
+def _set_ssld_pretrained(pretrained_path,
+                         use_ssld=False,
+                         use_ssld_stage1_pretrained=False):
+    if use_ssld and "ssld" not in pretrained_path:
+        pretrained_path = pretrained_path.replace("_pretrained",
+                                                  "_ssld_pretrained")
+    if use_ssld_stage1_pretrained and "ssld" in pretrained_path:
+        pretrained_path = pretrained_path.replace("ssld_pretrained",
+                                                  "ssld_stage1_pretrained")
+    return pretrained_path
+
+
+def load_dygraph_pretrain(model,
+                          pretrained_path,
+                          use_ssld=False,
+                          use_ssld_stage1_pretrained=False,
+                          use_imagenet22k_pretrained=False,
+                          use_imagenet22kto1k_pretrained=False):
+    if pretrained_path.startswith(("http://", "https://")):
+        pretrained_path = _set_ssld_pretrained(
+            pretrained_path,
+            use_ssld=use_ssld,
+            use_ssld_stage1_pretrained=use_ssld_stage1_pretrained)
+        if use_imagenet22k_pretrained:
+            pretrained_path = pretrained_path.replace("_pretrained",
+                                                      "_22k_pretrained")
+        if use_imagenet22kto1k_pretrained:
+            pretrained_path = pretrained_path.replace("_pretrained",
+                                                      "_22kto1k_pretrained")
+        pretrained_path = get_weights_path_from_url(pretrained_path)
+    if not pretrained_path.endswith('.pdparams'):
+        pretrained_path = pretrained_path + '.pdparams'
+    if not os.path.exists(pretrained_path):
         raise ValueError("Model pretrain path {} does not "
-                         "exists.".format(path))
-    param_state_dict = paddle.load(path)
+                         "exists.".format(pretrained_path))
+    param_state_dict = paddle.load(pretrained_path)
     if isinstance(model, list):
         for m in model:
             if hasattr(m, 'set_dict'):
                 m.set_dict(param_state_dict)
     else:
         model.set_dict(param_state_dict)
-    logger.info("Finish load pretrained model from {}".format(path))
-    return
-
-
-def load_dygraph_pretrain_from_url(model,
-                                   pretrained_url,
-                                   use_ssld=False,
-                                   use_imagenet22k_pretrained=False,
-                                   use_imagenet22kto1k_pretrained=False):
-    if "ssld" not in pretrained_url:
-        if use_ssld:
-            pretrained_url = pretrained_url.replace("_pretrained",
-                                                    "_ssld_pretrained")
-    else:
-        pretrained_url = pretrained_url.replace("ssld_pretrained",
-                                                "ssld_stage1_pretrained")
-    if use_imagenet22k_pretrained:
-        pretrained_url = pretrained_url.replace("_pretrained",
-                                                "_22k_pretrained")
-    if use_imagenet22kto1k_pretrained:
-        pretrained_url = pretrained_url.replace("_pretrained",
-                                                "_22kto1k_pretrained")
-    local_weight_path = get_weights_path_from_url(pretrained_url).replace(
-        ".pdparams", "")
-    load_dygraph_pretrain(model, path=local_weight_path)
+    logger.info("Finish load pretrained model from {}".format(pretrained_path))
     return
 
 
