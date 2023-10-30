@@ -409,7 +409,7 @@ class SwinTransformerBlock(nn.Layer):
                        act_layer=act_layer,
                        drop=drop)
         H, W = self.input_resolution
-        attn_mask = self.get_attn_mask(H, W, self.mlp._dtype)
+        attn_mask = None
 
         self.register_buffer("attn_mask", attn_mask)
 
@@ -471,11 +471,7 @@ class SwinTransformerBlock(nn.Layer):
 
         # W-MSA/SW-MSA
         #check did it need to calculate again
-        if padding_state:
-            attn_mask = self.get_attn_mask(height_pad, width_pad, x.dtype)
-            self.attn_mask = attn_mask  #cache
-        else:
-            attn_mask = self.attn_mask
+        attn_mask = self.get_attn_mask(height_pad, width_pad, x.dtype)
 
         attn_windows = self.attn(
             x_windows, mask=attn_mask)  # nW*B, window_size*window_size, C
