@@ -40,15 +40,35 @@ def build_gear(config):
 
 
 def add_ml_decoder_head(model, config):
-    config['class_num'] = model.class_num
-    for layer_name, new_layer in zip(
-            ["avg_pool", "flatten", "fc"],
-            [Identity(), Identity(), MLDecoder(**config)]):
-
-        if hasattr(model, layer_name):
-            delattr(model, layer_name)
-            setattr(model, layer_name, new_layer)
+    if 'class_num' not in config:
+        if hasattr(model, 'class_num'):
+            config['class_num'] = model.class_num
         else:
             raise AttributeError(
-                "Please carefully check that the last three layers of the model "
-                "you need to add a are `avg_pool`, `flatten`, and `fc`.")
+                'Please manually add parameter `class_num` '
+                'for MLDecoder in the config file.')
+
+    # remove_layers: list of layer names that need to be deleted from backbone
+    if 'remove_layers' in config:
+        remove_layers = config.pop('remove_layers')
+    else:
+        remove_layers = ['avg_pool', 'flatten']
+    for remove_layer in remove_layers:
+        if hasattr(model, remove_layer):
+            delattr(model, remove_layer)
+            setattr(model, remove_layer, Identity())
+        else:
+            raise AttributeError(
+                f"{remove_layer} does not have attribute the model.")
+
+    # replace_layer: layer name that need to be replaced in backbone
+    if 'replace_layer' in config:
+        replace_layer = config.pop('replace_layer')
+    else:
+        replace_layer = 'fc'
+    if hasattr(model, replace_layer):
+        delattr(model, replace_layer)
+        setattr(model, replace_layer, MLDecoder(**config))
+    else:
+        raise AttributeError(
+            f"{replace_layer} does not have attribute the model.")

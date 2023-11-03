@@ -30,7 +30,11 @@
 
 ### 1.1 模型简介
 
-PP-HGNetV2(High Performance GPU Network V2) 是百度飞桨视觉团队自研的 PP-HGNet 的下一代版本，其在 PP-HGNet 的基础上，做了进一步优化和改进，最终在 NVIDIA GPU 设备上，将 "Accuracy-Latency Balance" 做到了极致，精度大幅超过了其他同样推理速度的模型。其在单标签分类、多标签分类、目标检测、语义分割等任务中，均有较强的表现。
+PP-HGNetV2(High Performance GPU Network V2) 是百度飞桨视觉团队自研的 PP-HGNet 的下一代版本，其在 PP-HGNet 的基础上，做了进一步优化和改进，最终在 NVIDIA GPU 设备上，将 "Accuracy-Latency Balance" 做到了极致，精度大幅超过了其他同样推理速度的模型。其在单标签分类、多标签分类、目标检测、语义分割等任务中，均有较强的表现，与常见的服务器端模型在精度-预测耗时的比较如下图所示。
+
+![](../../../images/models/V100_benchmark/v100.fp32.bs1.main_fps_top1_s.png)
+
+* GPU 评估环境基于 V100 机器，在 FP32+TensorRT 配置下运行 2100 次测得（去除前 100 次的 warmup 时间）。
 
 <a name='1.2'></a>
 
