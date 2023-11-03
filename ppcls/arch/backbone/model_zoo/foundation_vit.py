@@ -21,10 +21,10 @@ import numpy as np
 import paddle
 import paddle.nn as nn
 import sys
-from paddle.nn.initializer import TruncatedNormal, Constant, Normal
+from paddle.nn.initializer import TruncatedNormal, Constant, Normal, Assign
 
 from ....utils import logger
-from ....utils.save_load import load_dygraph_pretrain
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "CLIP_vit_base_patch32_224":
@@ -502,9 +502,10 @@ class Block(nn.Layer):
                 self.norm1(x), rel_pos_bias=rel_pos_bias))
             x = x + self.drop_path(self.gamma_2 * self.mlp(self.norm2(x)))
         else:
-            x = x + self.drop_path(
+            atten_result = self.drop_path(
                 self.attn(
                     self.norm1(x), rel_pos_bias=rel_pos_bias))
+            x = x + atten_result
             x = x + self.drop_path(self.mlp(self.norm2(x)))
         return x
 
@@ -576,24 +577,6 @@ class PatchEmbed(nn.Layer):
             stride=patch_size,
             bias_attr=False)
 
-    def maybe_pad(self, pixel_values, height, width):
-        if width % self.patch_size[1] != 0:
-            pad_values = (0, 0, 0, 0, 0, 0, 0,
-                          self.patch_size[1] - width % self.patch_size[1])
-            pixel_values = nn.functional.pad(pixel_values, pad_values)
-        if height % self.patch_size[0] != 0:
-            pad_values = (
-                0,
-                0,
-                0,
-                0,
-                0,
-                self.patch_size[0] - height % self.patch_size[0],
-                0,
-                0, )
-            pixel_values = nn.functional.pad(pixel_values, pad_values)
-        return pixel_values
-
     def forward(self, x):
         B, C, H, W = x.shape
         x, _ = pading_for_not_divisible(x, H, W, patch_size=self.patch_size)
@@ -654,11 +637,14 @@ class VisionTransformer(nn.Layer):
                  in_chans=3,
                  class_num=1000,
                  embed_dim=768,
+                 output_dim=512,
                  depth=12,
                  num_heads=12,
                  mlp_ratio=4,
                  qkv_bias=False,
                  qk_scale=None,
+                 image_project=False,
+                 hugging_face_framework=False,
                  drop_rate=0.,
                  attn_drop_rate=0.,
                  drop_path_rate=0.,
@@ -674,6 +660,34 @@ class VisionTransformer(nn.Layer):
         self.model_size = '_'.join(_model_split[1:])
         _model_size = self.model_size
         _model_diff = eval(f'_{self.model_name}_diff')
+        # for LaClip
+        if image_project:
+            image_projection = self.create_parameter(
+                shape=(img_size, embed_dim),
+                default_initializer=Assign(
+                    paddle.empty((img_size, embed_dim))))
+            self.add_parameter("image_projection", image_projection)
+        else:
+            self.image_projection = None
+        self.hugging_face_framework = hugging_face_framework
+        #for path size hugging face plan
+        if hugging_face_framework:
+            #proj
+            proj = self.create_parameter(
+                shape=(embed_dim, ),
+                default_initializer=Assign((embed_dim**-0.5) * paddle.randn((
+                    (embed_dim, output_dim)))))
+            self.add_parameter("proj", proj)
+            self.ln_pre = nn.LayerNorm(embed_dim)
+            self.pos_embed = None
+        else:
+            self.ln_pre = nn.Identity() if _model_size not in _model_diff[
+                'add_layer_norm_before_encoder'] else nn.LayerNorm(embed_dim)
+            if _model_size in _model_diff['remove_abs_pos_emb']:
+                self.pos_embed = None
+            else:
+                self.add_parameter("pos_embed", self.pos_embed)
+            self.proj = None
 
         self.class_num = class_num
         self.return_embed = kwargs.get('return_embed', True)
@@ -693,8 +707,8 @@ class VisionTransformer(nn.Layer):
             self.rel_pos_bias = RelativePositionBias(
                 window_size=self.window_size, num_heads=num_heads)
 
-        self.ln_pre = nn.LayerNorm(embed_dim) if _model_size in _model_diff[
-            'add_layer_norm_before_encoder'] else nn.Identity()
+        #self.ln_pre = nn.LayerNorm(embed_dim) if _model_size in _model_diff[
+        #    'add_layer_norm_before_encoder'] else nn.Identity()
 
         if _model_size in _model_diff['remove_cls_token']:
             self.pos_embed = self.create_parameter(
@@ -707,11 +721,6 @@ class VisionTransformer(nn.Layer):
             self.cls_token = self.create_parameter(
                 shape=(1, 1, embed_dim), default_initializer=zeros_)
             self.add_parameter("cls_token", self.cls_token)
-
-        if _model_size in _model_diff['remove_abs_pos_emb']:
-            self.pos_embed = None
-        else:
-            self.add_parameter("pos_embed", self.pos_embed)
 
         self.pos_drop = nn.Dropout(p=drop_rate)
 
@@ -794,12 +803,21 @@ class VisionTransformer(nn.Layer):
 
         if _model_size in _model_diff['remove_cls_token_in_forward']:
             x = x[:, 1:, :]
-        x = self.norm(x)
+        if self.hugging_face_framework:
+            pooled, token = x[:, 0], x[:, 1:]
+        else:
+            x = self.norm(x)
+        x = self.norm(pooled)
         return x
 
     def forward(self, x):
         x = self.forward_features(x)
         x = self.head(x)
+
+        if self.proj is not None:
+            x = x @self.proj
+        if isinstance(self.image_projection, paddle.Tensor):
+            x = x @self.image_projection
         return x
 
 
@@ -807,7 +825,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
     elif pretrained is True:
-        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
+        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
     elif isinstance(pretrained, str):
         load_dygraph_pretrain(model, pretrained)
     else:
@@ -831,6 +849,104 @@ def CLIP_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
         **kwargs, )
     _load_pretrained(
         pretrained, model, MODEL_URLS[model_name], use_ssld=use_ssld)
+    return model
+
+
+def CLIP_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+    model_name = sys._getframe().f_code.co_name
+    model = VisionTransformer(
+        model_name=model_name,
+        img_size=224,
+        patch_size=16,
+        embed_dim=768,
+        depth=12,
+        num_heads=12,
+        mlp_ratio=4,
+        qkv_bias=True,
+        epsilon=1e-5,
+        **kwargs, )
+    _load_pretrained(
+        pretrained, model, MODEL_URLS[model_name], use_ssld=use_ssld)
+    return model
+
+
+def CLIP_vit_base_patch32_224_huggingface(pretrained=False,
+                                          use_ssld=False,
+                                          **kwargs):
+    model_name = sys._getframe().f_code.co_name
+    model = VisionTransformer(
+        model_name=model_name,
+        img_size=224,
+        patch_size=32,
+        embed_dim=768,
+        depth=12,
+        num_heads=12,
+        mlp_ratio=4,
+        qkv_bias=True,
+        hugging_face_framework=True,
+        epsilon=1e-5,
+        **kwargs, )
+    return model
+
+
+def CLIP_vit_base_patch16_224_huggingface(pretrained=False,
+                                          use_ssld=False,
+                                          **kwargs):
+    model_name = sys._getframe().f_code.co_name
+    model = VisionTransformer(
+        model_name=model_name,
+        img_size=224,
+        patch_size=16,
+        embed_dim=768,
+        depth=12,
+        num_heads=12,
+        mlp_ratio=4,
+        qkv_bias=True,
+        hugging_face_framework=True,
+        epsilon=1e-5,
+        **kwargs, )
+    return model
+
+
+def CLIP_vit_base_patch32_224_LaClip(pretrained=False,
+                                     use_ssld=False,
+                                     **kwargs):
+    model_name = sys._getframe().f_code.co_name
+    model = VisionTransformer(
+        model_name=model_name,
+        img_size=224,
+        patch_size=32,
+        embed_dim=768,
+        depth=12,
+        num_heads=12,
+        mlp_ratio=4,
+        qkv_bias=True,
+        hugging_face_framework=True,
+        image_project=True,
+        epsilon=1e-5,
+        **kwargs, )
+
+    return model
+
+
+def CLIP_vit_base_patch16_224_LaClip(pretrained=False,
+                                     use_ssld=False,
+                                     **kwargs):
+    model_name = sys._getframe().f_code.co_name
+    model = VisionTransformer(
+        model_name=model_name,
+        img_size=224,
+        patch_size=16,
+        embed_dim=768,
+        depth=12,
+        num_heads=12,
+        mlp_ratio=4,
+        qkv_bias=True,
+        hugging_face_framework=True,
+        image_project=True,
+        epsilon=1e-5,
+        **kwargs, )
+
     return model
 
 
