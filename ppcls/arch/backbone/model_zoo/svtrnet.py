@@ -580,38 +580,38 @@ class SVTRNet(nn.Layer):
         return x
 
 
-# TODO: add SVTR_tiny and SVTR_base by zhangyubo
-# def SVTR_tiny(pretrained=False, use_ssld=False, **kwargs):
-#     model = SVTRNet(
-#         img_size=[48, 320],
-#         embed_dim=[192, 256, 512],
-#         depth=[6, 6, 9],
-#         num_heads=[6, 8, 16],
-#         mixer=['Conv'] * 9 + ['Global'] *12,
-#         local_mixer=[[5, 5], [5, 5], [5, 5]],
-#         mlp_ratio=4,
-#         qkv_bias=True,
-#         out_channels=512,
-#         out_char_num=40,
-#         epsilon=1e-6,
-#         **kwargs)
-#     return model
+def SVTR_tiny(pretrained=False, use_ssld=False, **kwargs):
+    model = SVTRNet(
+        img_size=[48, 320],
+        embed_dim=[64, 128, 256],
+        depth=[3, 6, 3],
+        num_heads=[2, 4, 8],
+        mixer=['Conv'] * 6 + ['Global'] * 6,
+        local_mixer=[[5, 5], [5, 5], [5, 5]],
+        mlp_ratio=4,
+        qkv_bias=True,
+        out_channels=256,
+        out_char_num=40,
+        epsilon=1e-6,
+        **kwargs)
+    return model
 
-# def SVTR_base(pretrained=False, use_ssld=False, **kwargs):
-#     model = SVTRNet(
-#         img_size=[48, 320],
-#         embed_dim=[192, 256, 512],
-#         depth=[6, 6, 9],
-#         num_heads=[6, 8, 16],
-#         mixer=['Conv'] * 9 + ['Global'] *12,
-#         local_mixer=[[5, 5], [5, 5], [5, 5]],
-#         mlp_ratio=4,
-#         qkv_bias=True,
-#         out_channels=512,
-#         out_char_num=40,
-#         epsilon=1e-6,
-#         **kwargs)
-#     return model
+
+def SVTR_base(pretrained=False, use_ssld=False, **kwargs):
+    model = SVTRNet(
+        img_size=[48, 320],
+        embed_dim=[128, 256, 384],
+        depth=[6, 6, 6],
+        num_heads=[4, 8, 12],
+        mixer=['Conv'] * 9 + ['Global'] * 12,
+        local_mixer=[[5, 5], [5, 5], [5, 5]],
+        mlp_ratio=4,
+        qkv_bias=True,
+        out_channels=384,
+        out_char_num=40,
+        epsilon=1e-6,
+        **kwargs)
+    return model
 
 
 def SVTR_large(pretrained=False, use_ssld=False, **kwargs):
