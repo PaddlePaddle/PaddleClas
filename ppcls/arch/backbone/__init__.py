@@ -82,6 +82,7 @@ from .model_zoo.mobilenext import MobileNeXt_x0_35, MobileNeXt_x0_5, MobileNeXt_
 from .model_zoo.mobilevit_v2 import MobileViTV2_x0_5, MobileViTV2_x0_75, MobileViTV2_x1_0, MobileViTV2_x1_25, MobileViTV2_x1_5, MobileViTV2_x1_75, MobileViTV2_x2_0
 from .model_zoo.tinynet import TinyNet_A, TinyNet_B, TinyNet_C, TinyNet_D, TinyNet_E
 from .model_zoo.mobilevit_v3 import MobileViTV3_XXS, MobileViTV3_XS, MobileViTV3_S, MobileViTV3_XXS_L2, MobileViTV3_XS_L2, MobileViTV3_S_L2, MobileViTV3_x0_5, MobileViTV3_x0_75, MobileViTV3_x1_0
+from .model_zoo.rec_svtrnet import SVTR_large
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1
 from .variant_models.resnet_variant import ResNet50_adaptive_max_pool2d
@@ -91,7 +92,7 @@ from .variant_models.pp_lcnet_variant import PPLCNet_x2_5_Tanh
 from .variant_models.pp_lcnetv2_variant import PPLCNetV2_base_ShiTu
 from .variant_models.efficientnet_variant import EfficientNetB3_watermark
 from .variant_models.foundation_vit_variant import CLIP_large_patch14_224_aesthetic
-from .variant_models.swin_transformer_variant import SwinTransformer_tiny_patch4_window7_224_SOLIDER,SwinTransformer_small_patch4_window7_224_SOLIDER,SwinTransformer_base_patch4_window7_224_SOLIDER
+from .variant_models.swin_transformer_variant import SwinTransformer_tiny_patch4_window7_224_SOLIDER, SwinTransformer_small_patch4_window7_224_SOLIDER, SwinTransformer_base_patch4_window7_224_SOLIDER
 from .model_zoo.adaface_ir_net import AdaFace_IR_18, AdaFace_IR_34, AdaFace_IR_50, AdaFace_IR_101, AdaFace_IR_152, AdaFace_IR_SE_50, AdaFace_IR_SE_101, AdaFace_IR_SE_152, AdaFace_IR_SE_200
 from .model_zoo.wideresnet import WideResNet
 from .model_zoo.uniformer import UniFormer_small, UniFormer_small_plus, UniFormer_small_plus_dim64, UniFormer_base, UniFormer_base_ls
