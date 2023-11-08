@@ -18,6 +18,8 @@ import numpy as np
 import paddle
 import paddle.nn as nn
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal
+from ..legendary_models.swin_transformer import masked_fill, pading_for_not_divisible
+from ..model_zoo.foundation_vit import resize_pos_embed
 
 trunc_normal_ = TruncatedNormal(std=.02)
 normal_ = Normal
@@ -133,9 +135,8 @@ class ConvMixer(nn.Layer):
             groups=num_heads,
             weight_attr=ParamAttr(initializer=KaimingNormal()))
 
-    def forward(self, x):
-        h = self.HW[0]
-        w = self.HW[1]
+    def forward(self, x, input_dimension):
+        h, w = input_dimension
         x = x.transpose([0, 2, 1]).reshape([0, self.dim, h, w])
         x = self.local_mixer(x)
         x = x.flatten(2).transpose([0, 2, 1])
@@ -164,6 +165,7 @@ class Attention(nn.Layer):
         self.proj = nn.Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
         self.HW = HW
+        self.local_k = local_k
         if HW is not None:
             H = HW[0]
             W = HW[1]
@@ -183,8 +185,27 @@ class Attention(nn.Layer):
             mask = paddle.where(mask_paddle < 1, mask_paddle, mask_inf)
             self.mask = mask.unsqueeze([0, 1])
         self.mixer = mixer
-
-    def forward(self, x):
+    def get_mask(self,input_dimension):
+        if self.HW is not None:
+            H = input_dimension[0]
+            W = input_dimension[1]
+            self.N = H * W
+            self.C = self.dim
+        if self.mixer == 'Local' and self.HW is not None:
+            hk = self.local_k[0]
+            wk = self.local_k[1]
+            mask = paddle.ones(
+                [H * W, H + hk - 1, W + wk - 1], dtype='float32')
+            for h in range(0, H):
+                for w in range(0, W):
+                    mask[h * W + w, h:h + hk, w:w + wk] = 0.
+            mask_paddle = mask[:, hk // 2:H + hk // 2, wk // 2:W + wk //
+                               2].flatten(1)
+            mask_inf = paddle.full([H * W, H * W], '-inf', dtype='float32')
+            mask = paddle.where(mask_paddle < 1, mask_paddle, mask_inf)
+            return mask
+        return None
+    def forward(self, x, input_dimension):
         qkv = self.qkv(x).reshape(
             (0, -1, 3, self.num_heads, self.head_dim)).transpose(
                 (2, 0, 3, 1, 4))
@@ -192,7 +213,7 @@ class Attention(nn.Layer):
 
         attn = (q.matmul(k.transpose((0, 1, 3, 2))))
         if self.mixer == 'Local':
-            attn += self.mask
+            attn += self.get_mask(input_dimension)
         attn = nn.functional.softmax(attn, axis=-1)
         attn = self.attn_drop(attn)
 
@@ -254,9 +275,9 @@ class Block(nn.Layer):
                        drop=drop)
         self.prenorm = prenorm
 
-    def forward(self, x):
+    def forward(self, x,input_dimension):
         if self.prenorm:
-            x = self.norm1(x + self.drop_path(self.mixer(x)))
+            x = self.norm1(x + self.drop_path(self.mixer(x,input_dimension)))
             x = self.norm2(x + self.drop_path(self.mlp(x)))
         else:
             x = x + self.drop_path(self.mixer(self.norm1(x)))
@@ -276,12 +297,14 @@ class PatchEmbed(nn.Layer):
                  patch_size=[4, 4],
                  mode='pope'):
         super().__init__()
+        self.window_size = ((img_size[1] // (2 ** sub_num)),(img_size[0] // (2 ** sub_num)))
         num_patches = (img_size[1] // (2 ** sub_num)) * \
                       (img_size[0] // (2 ** sub_num))
         self.img_size = img_size
         self.num_patches = num_patches
         self.embed_dim = embed_dim
         self.norm = None
+        self.patch_size = patch_size
         if mode == 'pope':
             if sub_num == 2:
                 self.proj = nn.Sequential(
@@ -335,10 +358,14 @@ class PatchEmbed(nn.Layer):
 
     def forward(self, x):
         B, C, H, W = x.shape
-        assert H == self.img_size[0] and W == self.img_size[1], \
-            f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
-        x = self.proj(x).flatten(2).transpose((0, 2, 1))
-        return x
+        #assert H == self.img_size[0] and W == self.img_size[1], \
+        #    f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
+        x, _ = pading_for_not_divisible(x, H, W, self.patch_size, "BCHW")
+        x = self.proj(x)
+        _, _, height, width = x.shape
+        output_dimensions = (height, width)
+        x = x.flatten(2).transpose((0, 2, 1))
+        return x, output_dimensions
 
 
 class SubSample(nn.Layer):
@@ -377,15 +404,17 @@ class SubSample(nn.Layer):
             x1 = self.avgpool(x)
             x2 = self.maxpool(x)
             x = (x1 + x2) * 0.5
+            output_dimension = (x.shape[2],x.shape[3])
             out = self.proj(x.flatten(2).transpose((0, 2, 1)))
         else:
             x = self.conv(x)
+            output_dimension = (x.shape[2],x.shape[3])
             out = x.flatten(2).transpose((0, 2, 1))
         out = self.norm(out)
         if self.act is not None:
             out = self.act(out)
 
-        return out
+        return out, output_dimension
 
 
 class SVTRNet(nn.Layer):
@@ -432,6 +461,7 @@ class SVTRNet(nn.Layer):
             embed_dim=embed_dim[0],
             sub_num=sub_num)
         num_patches = self.patch_embed.num_patches
+        self.embed_dim = embed_dim
         self.HW = [img_size[0] // (2**sub_num), img_size[1] // (2**sub_num)]
         self.pos_embed = self.create_parameter(
             shape=[1, num_patches, embed_dim[0]], default_initializer=zeros_)
@@ -552,23 +582,24 @@ class SVTRNet(nn.Layer):
             ones_(m.weight)
 
     def forward_features(self, x):
-        x = self.patch_embed(x)
-        x = x + self.pos_embed
+        x, output_dimensions = self.patch_embed(x)
+        
+        x = x + resize_pos_embed(self.pos_embed,self.patch_embed.window_size,output_dimensions,num_extra_tokens=0)
         x = self.pos_drop(x)
         for blk in self.blocks1:
-            x = blk(x)
+            x = blk(x, output_dimensions) #[batch_size, seq_length, hidden_size]
         if self.patch_merging is not None:
-            x = self.sub_sample1(
+            x, output_dimensions = self.sub_sample1(
                 x.transpose([0, 2, 1]).reshape(
-                    [0, self.embed_dim[0], self.HW[0], self.HW[1]]))
+                    [0, self.embed_dim[0], output_dimensions[0], output_dimensions[1]]))
         for blk in self.blocks2:
-            x = blk(x)
+            x = blk(x, output_dimensions)
         if self.patch_merging is not None:
-            x = self.sub_sample2(
+            x, output_dimensions = self.sub_sample2(
                 x.transpose([0, 2, 1]).reshape(
-                    [0, self.embed_dim[1], self.HW[0] // 2, self.HW[1]]))
+                    [0, self.embed_dim[1], output_dimensions[0], output_dimensions[1]]))
         for blk in self.blocks3:
-            x = blk(x)
+            x = blk(x,output_dimensions)
         if not self.prenorm:
             x = self.norm(x)
         return x
@@ -594,6 +625,8 @@ def SVTR_tiny(pretrained=False, use_ssld=False, **kwargs):
         out_char_num=40,
         epsilon=1e-6,
         **kwargs)
+    if pretrained:
+        model.set_state_dict(paddle.load("pretrain/svtr_tiny_imagenet_test"))
     return model
 
 
@@ -611,6 +644,8 @@ def SVTR_base(pretrained=False, use_ssld=False, **kwargs):
         out_char_num=40,
         epsilon=1e-6,
         **kwargs)
+    if pretrained:
+        model.set_state_dict(paddle.load("pretrain/svtr_tiny_imagenet_test"))
     return model
 
 
