@@ -18,13 +18,87 @@ import numpy as np
 import paddle
 import paddle.nn as nn
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal
-from ..legendary_models.swin_transformer import masked_fill, pading_for_not_divisible
-from ..model_zoo.foundation_vit import resize_pos_embed
+import paddle.nn.functional as F
 
 trunc_normal_ = TruncatedNormal(std=.02)
 normal_ = Normal
 zeros_ = Constant(value=0.)
 ones_ = Constant(value=1.)
+
+
+def resize_pos_embed(pos_embed,
+                     src_shape,
+                     dst_shape,
+                     mode='bicubic',
+                     num_extra_tokens=1):
+    """Resize pos_embed weights.
+
+    Args:
+        pos_embed (torch.Tensor): Position embedding weights with shape
+            [1, L, C].
+        src_shape (tuple): The resolution of downsampled origin training
+            image, in format (H, W).
+        dst_shape (tuple): The resolution of downsampled new training
+            image, in format (H, W).
+        mode (str): Algorithm used for upsampling. Choose one from 'nearest',
+            'linear', 'bilinear', 'bicubic' and 'trilinear'.
+            Defaults to 'bicubic'.
+        num_extra_tokens (int): The number of extra tokens, such as cls_token.
+            Defaults to 1.
+
+    Returns:
+        torch.Tensor: The resized pos_embed of shape [1, L_new, C]
+    """
+    if src_shape[0] == dst_shape[0] and src_shape[1] == dst_shape[1]:
+        return pos_embed
+    assert pos_embed.ndim == 3, 'shape of pos_embed must be [1, L, C]'
+    _, L, C = pos_embed.shape
+    src_h, src_w = src_shape
+    assert L == src_h * src_w + num_extra_tokens, \
+        f"The length of `pos_embed` ({L}) doesn't match the expected " \
+        f'shape ({src_h}*{src_w}+{num_extra_tokens}). Please check the' \
+        '`img_size` argument.'
+    extra_tokens = pos_embed[:, :num_extra_tokens]
+
+    src_weight = pos_embed[:, num_extra_tokens:]
+    src_weight = src_weight.reshape([-1, src_h, src_w, C]).transpose(
+        [0, 3, 1, 2])
+
+    # The cubic interpolate algorithm only accepts float32
+    dst_weight = paddle.nn.functional.interpolate(
+        paddle.cast(src_weight, paddle.float32),
+        size=dst_shape,
+        align_corners=False,
+        mode=mode)
+    dst_weight = paddle.flatten(dst_weight, 2).transpose([0, 2, 1])
+    dst_weight = paddle.cast(dst_weight, src_weight.dtype)
+
+    return paddle.concat((extra_tokens, dst_weight), axis=1)
+
+def pading_for_not_divisible(pixel_values,
+                             height,
+                             width,
+                             patch_size,
+                             format="BCHW",
+                             function="split"):
+    if isinstance(patch_size, int):
+        patch_size = (patch_size, patch_size)
+    if height % patch_size[0] == 0 and width % patch_size[1] == 0:
+        return pixel_values, (0, 0, 0, 0, 0, 0, 0, 0)
+    if function == "split":
+        pading_width = patch_size[1] - width % patch_size[1]
+        pading_height = patch_size[0] - height % patch_size[0]
+    elif function == "merge":
+        pading_width = width % 2
+        pading_height = height % 2
+    if format == "BCHW":
+        pad_index = (0, 0, 0, 0, 0, pading_height, 0, pading_width)
+    elif format == "BHWC":
+        pad_index = (0, 0, 0, pading_height, 0, pading_width, 0, 0)
+    else:
+        assert ("vaild format")
+
+    return F.pad(pixel_values, pad_index), pad_index
 
 
 def drop_path(x, drop_prob=0., training=False):
