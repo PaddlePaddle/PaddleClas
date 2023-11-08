@@ -93,6 +93,8 @@ def log_at_trainer0(log):
 
     def wrapper(fmt, *args):
         if dist.get_rank() == 0:
+            if _logger is None:
+                init_logger()
             log(fmt, *args)
 
     return wrapper
