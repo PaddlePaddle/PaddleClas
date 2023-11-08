@@ -625,8 +625,6 @@ def SVTR_tiny(pretrained=False, use_ssld=False, **kwargs):
         out_char_num=40,
         epsilon=1e-6,
         **kwargs)
-    if pretrained:
-        model.set_state_dict(paddle.load("pretrain/svtr_tiny_imagenet_test"))
     return model
 
 
@@ -644,8 +642,6 @@ def SVTR_base(pretrained=False, use_ssld=False, **kwargs):
         out_char_num=40,
         epsilon=1e-6,
         **kwargs)
-    if pretrained:
-        model.set_state_dict(paddle.load("pretrain/svtr_tiny_imagenet_test"))
     return model
 
 
