@@ -351,7 +351,8 @@ class Block(nn.Layer):
 
     def forward(self, x,input_dimension):
         if self.prenorm:
-            x = self.norm1(x + self.drop_path(self.mixer(x,input_dimension)))
+            x = self.mixer(x,input_dimension)
+            x = self.norm1(x + self.drop_path(x))
             x = self.norm2(x + self.drop_path(self.mlp(x)))
         else:
             x = x + self.drop_path(self.mixer(self.norm1(x)))
@@ -371,7 +372,7 @@ class PatchEmbed(nn.Layer):
                  patch_size=[4, 4],
                  mode='pope'):
         super().__init__()
-        self.window_size = ((img_size[1] // (2 ** sub_num)),(img_size[0] // (2 ** sub_num)))
+        self.window_size = ((img_size[0] // (2 ** sub_num), (img_size[1] // (2 ** sub_num))))
         num_patches = (img_size[1] // (2 ** sub_num)) * \
                       (img_size[0] // (2 ** sub_num))
         self.img_size = img_size
@@ -657,6 +658,7 @@ class SVTRNet(nn.Layer):
 
     def forward_features(self, x):
         x, output_dimensions = self.patch_embed(x)
+        output_dimensions_cache = output_dimensions
         
         x = x + resize_pos_embed(self.pos_embed,self.patch_embed.window_size,output_dimensions,num_extra_tokens=0)
         x = self.pos_drop(x)
@@ -671,7 +673,7 @@ class SVTRNet(nn.Layer):
         if self.patch_merging is not None:
             x, output_dimensions = self.sub_sample2(
                 x.transpose([0, 2, 1]).reshape(
-                    [0, self.embed_dim[1], output_dimensions[0], output_dimensions[1]]))
+                    [0, self.embed_dim[1], -1, output_dimensions_cache[1]]))
         for blk in self.blocks3:
             x = blk(x,output_dimensions)
         if not self.prenorm:
