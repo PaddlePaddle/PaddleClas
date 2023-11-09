@@ -92,9 +92,9 @@ def pading_for_not_divisible(pixel_values,
         pading_width = width % 2
         pading_height = height % 2
     if format == "BCHW":
-        pad_index = (0, 0, 0, 0, 0, pading_height, 0, pading_width)
+        pad_index = [0, 0, 0, 0, 0, pading_height, 0, pading_width]
     elif format == "BHWC":
-        pad_index = (0, 0, 0, pading_height, 0, pading_width, 0, 0)
+        pad_index = [0, 0, 0, pading_height, 0, pading_width, 0, 0]
     else:
         assert ("vaild format")
 
@@ -437,7 +437,7 @@ class PatchEmbed(nn.Layer):
         #    f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
         x, _ = pading_for_not_divisible(x, H, W, self.patch_size, "BCHW")
         x = self.proj(x)
-        _, _, height, width = x.shape
+        _, _, height, width = paddle.shape(x)
         output_dimensions = (height, width)
         x = x.flatten(2).transpose((0, 2, 1))
         return x, output_dimensions
@@ -479,11 +479,11 @@ class SubSample(nn.Layer):
             x1 = self.avgpool(x)
             x2 = self.maxpool(x)
             x = (x1 + x2) * 0.5
-            output_dimension = (x.shape[2],x.shape[3])
+            output_dimension = (paddle.shape(x)[2],paddle.shape(x)[3])
             out = self.proj(x.flatten(2).transpose((0, 2, 1)))
         else:
             x = self.conv(x)
-            output_dimension = (x.shape[2],x.shape[3])
+            output_dimension = (paddle.shape(x)[2],paddle.shape(x)[3])
             out = x.flatten(2).transpose((0, 2, 1))
         out = self.norm(out)
         if self.act is not None:
