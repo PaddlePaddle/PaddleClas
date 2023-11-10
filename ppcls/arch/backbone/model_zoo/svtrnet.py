@@ -673,7 +673,7 @@ class SVTRNet(nn.Layer):
         if self.patch_merging is not None:
             x, output_dimensions = self.sub_sample2(
                 x.transpose([0, 2, 1]).reshape(
-                    [0, self.embed_dim[1], -1, output_dimensions_cache[1]]))
+                    [0, self.embed_dim[1], output_dimensions[0], output_dimensions[1]]))
         for blk in self.blocks3:
             x = blk(x,output_dimensions)
         if not self.prenorm:
