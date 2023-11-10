@@ -1,14 +1,30 @@
+# copyright (c) 2022 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from paddle import ParamAttr
 from paddle.nn.initializer import KaimingNormal
 import numpy as np
 import paddle
 import paddle.nn as nn
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal
+import paddle.nn.functional as F
 
 trunc_normal_ = TruncatedNormal(std=.02)
 normal_ = Normal
 zeros_ = Constant(value=0.)
 ones_ = Constant(value=1.)
+
 
 def resize_pos_embed(pos_embed,
                      src_shape,
@@ -82,7 +98,8 @@ def pading_for_not_divisible(pixel_values,
     else:
         assert ("vaild format")
 
-    return paddle.nn.functional.pad(pixel_values, pad_index), pad_index
+    return F.pad(pixel_values, pad_index), pad_index
+
 
 def drop_path(x, drop_prob=0., training=False):
     """Drop paths (Stochastic Depth) per sample (when applied in main path of residual blocks).
@@ -222,6 +239,25 @@ class Attention(nn.Layer):
         self.proj = nn.Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
         self.HW = HW
+        self.local_k = local_k
+        if HW is not None:
+            H = HW[0]
+            W = HW[1]
+            self.N = H * W
+            self.C = dim
+        if mixer == 'Local' and HW is not None:
+            hk = local_k[0]
+            wk = local_k[1]
+            mask = paddle.ones(
+                [H * W, H + hk - 1, W + wk - 1], dtype='float32')
+            for h in range(0, H):
+                for w in range(0, W):
+                    mask[h * W + w, h:h + hk, w:w + wk] = 0.
+            mask_paddle = mask[:, hk // 2:H + hk // 2, wk // 2:W + wk //
+                               2].flatten(1)
+            mask_inf = paddle.full([H * W, H * W], '-inf', dtype='float32')
+            mask = paddle.where(mask_paddle < 1, mask_paddle, mask_inf)
+            self.mask = mask.unsqueeze([0, 1])
         self.mixer = mixer
     def get_mask(self,input_dimension):
         if self.HW is not None:
@@ -313,12 +349,13 @@ class Block(nn.Layer):
                        drop=drop)
         self.prenorm = prenorm
 
-    def forward(self, x, input_dimension):
+    def forward(self, x,input_dimension):
         if self.prenorm:
-            x = self.norm1(x + self.drop_path(self.mixer(x,input_dimension)))
+            x = self.mixer(x,input_dimension)
+            x = self.norm1(x + self.drop_path(x))
             x = self.norm2(x + self.drop_path(self.mlp(x)))
         else:
-            x = x + self.drop_path(self.mixer(self.norm1(x),input_dimension))
+            x = x + self.drop_path(self.mixer(self.norm1(x)))
             x = x + self.drop_path(self.mlp(self.norm2(x)))
         return x
 
@@ -335,14 +372,14 @@ class PatchEmbed(nn.Layer):
                  patch_size=[4, 4],
                  mode='pope'):
         super().__init__()
+        self.window_size = ((img_size[1] // (2 ** sub_num), (img_size[0] // (2 ** sub_num))))
         num_patches = (img_size[1] // (2 ** sub_num)) * \
                       (img_size[0] // (2 ** sub_num))
         self.img_size = img_size
         self.num_patches = num_patches
         self.embed_dim = embed_dim
-        self.patch_size = patch_size
-        self.window_size = ((img_size[0] // (2 ** sub_num), (img_size[1] // (2 ** sub_num))))
         self.norm = None
+        self.patch_size = patch_size
         if mode == 'pope':
             if sub_num == 2:
                 self.proj = nn.Sequential(
@@ -499,6 +536,7 @@ class SVTRNet(nn.Layer):
             embed_dim=embed_dim[0],
             sub_num=sub_num)
         num_patches = self.patch_embed.num_patches
+        self.embed_dim = embed_dim
         self.HW = [img_size[0] // (2**sub_num), img_size[1] // (2**sub_num)]
         self.pos_embed = self.create_parameter(
             shape=[1, num_patches, embed_dim[0]], default_initializer=zeros_)
@@ -619,11 +657,12 @@ class SVTRNet(nn.Layer):
             ones_(m.weight)
 
     def forward_features(self, x):
-        x,output_dimensions = self.patch_embed(x)
-        x = x + resize_pos_embed(self.pos_embed,self.patch_embed.window_size,output_dimensions,num_extra_tokens=0)
+        x, output_dimensions = self.patch_embed(x)
+        
+        x = x + self.pos_embed
         x = self.pos_drop(x)
         for blk in self.blocks1:
-            x = blk(x, output_dimensions)
+            x = blk(x, output_dimensions) #[batch_size, seq_length, hidden_size]
         if self.patch_merging is not None:
             x, output_dimensions = self.sub_sample1(
                 x.transpose([0, 2, 1]).reshape(
@@ -635,7 +674,7 @@ class SVTRNet(nn.Layer):
                 x.transpose([0, 2, 1]).reshape(
                     [0, self.embed_dim[1], output_dimensions[0], output_dimensions[1]]))
         for blk in self.blocks3:
-            x = blk(x, output_dimensions)
+            x = blk(x,output_dimensions)
         if not self.prenorm:
             x = self.norm(x)
         return x

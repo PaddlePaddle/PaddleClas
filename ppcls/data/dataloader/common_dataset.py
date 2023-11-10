@@ -53,7 +53,7 @@ class CommonDataset(Dataset):
                  label_ratio=False):
         self._img_root = image_root
         self._cls_path = cls_label_path
-        self._transform_ops = create_operators(transform_ops)
+        self._transform_ops = transform_ops
 
         self.images = []
         self.labels = []
@@ -67,11 +67,9 @@ class CommonDataset(Dataset):
 
     def __getitem__(self, idx):
         try:
-            with open(self.images[idx], 'rb') as f:
-                img = f.read()
-            if self._transform_ops:
-                img = transform(img, self._transform_ops)
-            img = img.transpose((2, 0, 1))
+            img = cv2.imread(self.images[idx])
+            img = img.astype('float32')
+            img = self._transform_ops(img),
             return (img, self.labels[idx])
 
         except Exception as ex:
