@@ -74,7 +74,8 @@ class Engine(object):
         # init logger
         self.output_dir = self.config['Global']['output_dir']
         log_file = os.path.join(self.output_dir, f"{mode}.log")
-        init_logger(log_file=log_file)
+        log_ranks = self.config['Global'].get("log_ranks", [0])
+        init_logger(log_file=log_file, log_ranks=log_ranks)
         print_config(config)
 
         # init train_func and eval_func
@@ -100,8 +101,9 @@ class Engine(object):
             self.vdl_writer = LogWriter(logdir=vdl_writer_path)
 
         # set device
-        assert self.config["Global"][
-            "device"] in ["cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"]
+        assert self.config["Global"]["device"] in [
+            "cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"
+        ]
         self.device = paddle.set_device(self.config["Global"]["device"])
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
@@ -487,9 +489,8 @@ class Engine(object):
             False) or "ATTRMetric" in self.config["Metric"]["Eval"][0]
         model = ExportModel(self.config["Arch"], self.model, use_multilabel)
         if self.config["Global"]["pretrained_model"] is not None:
-            load_dygraph_pretrain(
-                model.base_model,
-                self.config["Global"]["pretrained_model"])
+            load_dygraph_pretrain(model.base_model,
+                                  self.config["Global"]["pretrained_model"])
 
         model.eval()
 
@@ -517,7 +518,8 @@ class Engine(object):
             paddle.jit.save(model, save_path)
         if self.config["Global"].get("export_for_fd", False):
             src_path = self.config["Global"]["infer_config_path"]
-            dst_path = os.path.join(self.config["Global"]["save_inference_dir"], 'inference.yml')
+            dst_path = os.path.join(
+                self.config["Global"]["save_inference_dir"], 'inference.yml')
             shutil.copy(src_path, dst_path)
         logger.info(
             f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
