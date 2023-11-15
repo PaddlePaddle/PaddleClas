@@ -4,6 +4,7 @@ import numpy as np
 import paddle
 import paddle.nn as nn
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal
+from paddle.nn import functional as F
 
 trunc_normal_ = TruncatedNormal(std=.02)
 normal_ = Normal
@@ -31,7 +32,7 @@ def resize_pos_embed(pos_embed,
             Defaults to 1.
 
     Returns:
-        torch.Tensor: The resized pos_embed of shape [1, L_new, C]
+        paddle.Tensor: The resized pos_embed of shape [1, L_new, C]
     """
     if src_shape[0] == dst_shape[0] and src_shape[1] == dst_shape[1]:
         return pos_embed
@@ -49,7 +50,7 @@ def resize_pos_embed(pos_embed,
         [0, 3, 1, 2])
 
     # The cubic interpolate algorithm only accepts float32
-    dst_weight = paddle.nn.functional.interpolate(
+    dst_weight = F.interpolate(
         paddle.cast(src_weight, paddle.float32),
         size=dst_shape,
         align_corners=False,
@@ -63,7 +64,7 @@ def pading_for_not_divisible(pixel_values,
                              height,
                              width,
                              patch_size,
-                             format="BCHW",
+                             format="NCHW",
                              function="split"):
     if isinstance(patch_size, int):
         patch_size = (patch_size, patch_size)
@@ -75,14 +76,14 @@ def pading_for_not_divisible(pixel_values,
     elif function == "merge":
         pading_width = width % 2
         pading_height = height % 2
-    if format == "BCHW":
+    if format == "NCHW":
         pad_index = [0, 0, 0, 0, 0, pading_height, 0, pading_width]
-    elif format == "BHWC":
+    elif format == "NHWC":
         pad_index = [0, 0, 0, pading_height, 0, pading_width, 0, 0]
     else:
         assert ("vaild format")
 
-    return paddle.nn.functional.pad(pixel_values, pad_index), pad_index
+    return F.pad(pixel_values, pad_index), pad_index
 
 def drop_path(x, drop_prob=0., training=False):
     """Drop paths (Stochastic Depth) per sample (when applied in main path of residual blocks).
@@ -222,6 +223,7 @@ class Attention(nn.Layer):
         self.proj = nn.Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
         self.HW = HW
+        self.local_k = local_k
         self.mixer = mixer
     def get_mask(self,input_dimension):
         if self.HW is not None:
@@ -396,8 +398,7 @@ class PatchEmbed(nn.Layer):
 
     def forward(self, x):
         B, C, H, W = x.shape
-        #assert H == self.img_size[0] and W == self.img_size[1], \
-        #    f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
+
         x, _ = pading_for_not_divisible(x, H, W, self.patch_size, "BCHW")
         x = self.proj(x)
         _, _, height, width = paddle.shape(x)
