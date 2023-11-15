@@ -25,7 +25,7 @@ _logger = None
 class LoggerHook(object):
     """
     logs will print multi-times when calling Fleet API.
-    As a general rule, only display single log at rank0 and ignore the others.
+    Commonly, only need to display single log at rank0 and ignore the others.
     """
     block = False
 
@@ -40,7 +40,7 @@ class LoggerHook(object):
 def init_logger(name='ppcls',
                 log_file=None,
                 log_level=logging.INFO,
-                log_ranks=[0]):
+                log_ranks="0"):
     """Initialize and get a logger by name.
     If the logger has not been initialized, this method will initialize the
     logger by adding one or two handlers, otherwise the initialized logger will
@@ -53,6 +53,7 @@ def init_logger(name='ppcls',
         log_level (int): The logger level. Note that only the process of
             rank 0 is affected, and other processes will set the level to
             "Error" thus be silent most of the time.
+        log_ranks (str): The ids of gpu to log which are separated by "," when more than 1, "0" by default.
     Returns:
         logging.Logger: The expected logger.
     """
@@ -96,7 +97,9 @@ def init_logger(name='ppcls',
             if i == len(_logger.handlers) - 1:
                 _logger.addHandler(file_handler)
 
-    if isinstance(log_ranks, int):
+    if isinstance(log_ranks, str):
+        log_ranks = [int(i) for i in log_ranks.split(',')]
+    elif isinstance(log_ranks, int):
         log_ranks = [log_ranks]
     if dist.get_rank() in log_ranks:
         _logger.setLevel(log_level)

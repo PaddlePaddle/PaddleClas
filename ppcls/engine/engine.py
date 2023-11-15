@@ -74,7 +74,7 @@ class Engine(object):
         # init logger
         self.output_dir = self.config['Global']['output_dir']
         log_file = os.path.join(self.output_dir, f"{mode}.log")
-        log_ranks = self.config['Global'].get("log_ranks", [0])
+        log_ranks = self.config['Global'].get("log_ranks", "0")
         init_logger(log_file=log_file, log_ranks=log_ranks)
         print_config(config)
 
