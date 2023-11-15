@@ -419,10 +419,12 @@ def run(dataloader,
         else:
             epoch_str = "epoch:{:<3d}".format(epoch)
             step_str = "{:s} step:{:<4d}".format(mode, idx)
-
+            max_mem_reserved_str = f"max_mem_reserved: {paddle.device.cuda.max_memory_reserved()}"
+            max_mem_allocated_str = f"max_mem_allocated: {paddle.device.cuda.max_memory_allocated()}"
             if idx % config.get('print_interval', 10) == 0:
-                logger.info("{:s} {:s} {:s}".format(epoch_str, step_str,
-                                                    fetchs_str))
+                logger.info(
+                    f"{epoch_str} {step_str} {fetchs_str} {max_mem_reserved_str} {max_mem_allocated_str}"
+                )
 
         tic = time.time()
 
