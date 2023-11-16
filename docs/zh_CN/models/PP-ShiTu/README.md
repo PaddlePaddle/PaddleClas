@@ -85,7 +85,7 @@ PP-ShiTuV2 是基于 PP-ShiTuV1 改进的一个实用轻量级通用图像识别
   cd PaddleClas
 
   # 安装paddleclas
-  python3.7 setup.py install
+  pip install -v -e .
   ```
 
 - 然后执行以下命令下载并解压好demo数据，最后执行命令体验索引库构建和图像识别

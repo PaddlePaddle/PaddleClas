@@ -43,8 +43,7 @@ function func_get_url_file_name() {
 model_name=$(func_parser_value "${lines[1]}")
 
 # install paddleclas whl
-python_name=$(func_parser_value "${lines[2]}")
-${python_name} setup.py install
+python setup.py install
 
 if [[ ${MODE} = "cpp_infer" ]]; then
     if [ -d "./deploy/cpp/opencv-3.4.7/opencv3/" ] && [ $(md5sum ./deploy/cpp/opencv-3.4.7.tar.gz | awk -F ' ' '{print $1}') = "faa2b5950f8bee3f03118e600c74746a" ]; then
@@ -180,7 +179,9 @@ fi
 
 if [[ ${FILENAME} == *ultra* ]] || [[ ${FILENAME} == *dali* ]]; then
     python_name=$(func_parser_value "${lines[2]}")
-    ${python_name} -m pip install https://paddle-wheel.bj.bcebos.com/benchmark/nvidia_dali_cuda110-1.25.0-7922357-py3-none-manylinux2014_x86_64.whl
+    # only nightly dali support paddle develop version because the fluid has been removed in paddle develop.
+    # ${python_name} -m pip install https://paddle-wheel.bj.bcebos.com/benchmark/nvidia_dali_cuda110-1.25.0-7922357-py3-none-manylinux2014_x86_64.whl
+    ${python_name} -m pip install --extra-index-url https://developer.download.nvidia.com/compute/redist/nightly --upgrade nvidia-dali-nightly-cuda110
 fi
 
 if [[ ${MODE} = "lite_train_lite_infer" ]] || [[ ${MODE} = "lite_train_whole_infer" ]]; then

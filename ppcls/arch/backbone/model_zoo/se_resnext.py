@@ -29,7 +29,7 @@ from paddle.nn.initializer import Uniform
 
 import math
 
-from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain
 
 MODEL_URLS = {
     "SE_ResNeXt50_32x4d":
@@ -308,29 +308,32 @@ class ResNeXt(nn.Layer):
 
     def forward(self, inputs):
         with paddle.static.amp.fp16_guard():
-            if self.data_format == "NHWC":
-                inputs = paddle.tensor.transpose(inputs, [0, 2, 3, 1])
-                inputs.stop_gradient = True
-            if self.layers < 152:
-                y = self.conv(inputs)
-            else:
-                y = self.conv1_1(inputs)
-                y = self.conv1_2(y)
-                y = self.conv1_3(y)
-            y = self.pool2d_max(y)
-            for i, block in enumerate(self.block_list):
-                y = block(y)
-            y = self.pool2d_avg(y)
-            y = paddle.reshape(y, shape=[-1, self.pool2d_avg_channels])
-            y = self.out(y)
-            return y
+            return self._forward(inputs)
+
+    def _forward(self, inputs):
+        if self.data_format == "NHWC":
+            inputs = paddle.tensor.transpose(inputs, [0, 2, 3, 1])
+            inputs.stop_gradient = True
+        if self.layers < 152:
+            y = self.conv(inputs)
+        else:
+            y = self.conv1_1(inputs)
+            y = self.conv1_2(y)
+            y = self.conv1_3(y)
+        y = self.pool2d_max(y)
+        for i, block in enumerate(self.block_list):
+            y = block(y)
+        y = self.pool2d_avg(y)
+        y = paddle.reshape(y, shape=[-1, self.pool2d_avg_channels])
+        y = self.out(y)
+        return y
 
 
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
     elif pretrained is True:
-        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
     elif isinstance(pretrained, str):
         load_dygraph_pretrain(model, pretrained)
     else:

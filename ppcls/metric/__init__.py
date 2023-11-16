@@ -22,6 +22,7 @@ from .metrics import GoogLeNetTopkAcc
 from .metrics import HammingDistance, AccuracyScore
 from .metrics import ATTRMetric
 from .metrics import TprAtFpr, MultilabelMeanAccuracy
+from .metrics import MultiLabelMAP
 
 
 class CombinedMetrics(AvgMetrics):

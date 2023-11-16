@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function
 
+import paddle
 import datetime
 from ppcls.utils import logger
 from ppcls.utils.misc import AverageMeter
@@ -54,13 +55,16 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
     ips_msg = "ips: {:.5f} samples/s".format(
         batch_size / trainer.time_info["batch_cost"].avg)
 
+    global_epochs = trainer.config["Global"]["epochs"]
     eta_sec = (
         (trainer.config["Global"]["epochs"] - epoch_id + 1) *
         trainer.iter_per_epoch - iter_id) * trainer.time_info["batch_cost"].avg
     eta_msg = "eta: {:s}".format(str(datetime.timedelta(seconds=int(eta_sec))))
-    logger.info("[Train][Epoch {}/{}][Iter: {}/{}]{}, {}, {}, {}, {}".format(
-        epoch_id, trainer.config["Global"]["epochs"], iter_id, trainer.
-        iter_per_epoch, lr_msg, metric_msg, time_msg, ips_msg, eta_msg))
+    max_mem_reserved_msg = f"max_mem_reserved: {paddle.device.cuda.max_memory_reserved()}"
+    max_mem_allocated_msg = f"max_mem_allocated: {paddle.device.cuda.max_memory_allocated()}"
+    logger.info(
+        f"[Train][Epoch {epoch_id}/{global_epochs}][Iter: {iter_id}/{trainer.iter_per_epoch}]{lr_msg}, {metric_msg}, {time_msg}, {ips_msg}, {eta_msg}, {max_mem_reserved_msg}, {max_mem_allocated_msg}"
+    )
 
     for i, lr in enumerate(trainer.lr_sch):
         logger.scaler(

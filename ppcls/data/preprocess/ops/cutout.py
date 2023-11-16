@@ -15,19 +15,22 @@
 # This code is based on https://github.com/uoguelph-mlrg/Cutout
 # reference: https://arxiv.org/abs/1708.04552
 
-import numpy as np
 import random
+
+import numpy as np
+import cv2
 
 
 class Cutout(object):
-    def __init__(self, n_holes=1, length=112):
+    def __init__(self, n_holes=1, length=112, fill_value=(0, 0, 0)):
         self.n_holes = n_holes
         self.length = length
+        if fill_value == 'none' or fill_value is None:
+            self.fill_value = None
 
     def __call__(self, img):
         """ cutout_image """
         h, w = img.shape[:2]
-        mask = np.ones((h, w), np.float32)
 
         for n in range(self.n_holes):
             y = np.random.randint(h)
@@ -38,5 +41,15 @@ class Cutout(object):
             x1 = np.clip(x - self.length // 2, 0, w)
             x2 = np.clip(x + self.length // 2, 0, w)
 
-            img[y1:y2, x1:x2] = 0
+            fill_value = self.fill_value
+            if fill_value is None:
+                if img.ndim == 2:
+                    fill_value = random.randint(0, 255)
+                else:
+                    fill_value = [random.randint(0, 255),
+                                  random.randint(0, 255),
+                                  random.randint(0, 255)]
+
+                img = cv2.rectangle(img, (x1, y1), (x2, y2), fill_value, -1)
+
         return img

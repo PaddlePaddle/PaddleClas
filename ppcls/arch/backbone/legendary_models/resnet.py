@@ -29,7 +29,7 @@ import math
 from ....utils import logger
 from ..base.theseus_layer import TheseusLayer
 from ..base.dbb.dbb_block import DiverseBranchBlock
-from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain
 
 MODEL_URLS = {
     "ResNet18":
@@ -346,7 +346,7 @@ class ResNet(TheseusLayer):
                    [32, 32, 3, 1], [32, 64, 3, 1]]
         }
 
-        self.stem = nn.Sequential(* [
+        self.stem = nn.Sequential(*[
             ConvBNLayer(
                 num_channels=in_c,
                 num_filters=out_c,
@@ -403,15 +403,18 @@ class ResNet(TheseusLayer):
 
     def forward(self, x):
         with paddle.static.amp.fp16_guard():
-            if self.data_format == "NHWC":
-                x = paddle.transpose(x, [0, 2, 3, 1])
-                x.stop_gradient = True
-            x = self.stem(x)
-            x = self.max_pool(x)
-            x = self.blocks(x)
-            x = self.avg_pool(x)
-            x = self.flatten(x)
-            x = self.fc(x)
+            return self._forward(x)
+
+    def _forward(self, x):
+        if self.data_format == "NHWC":
+            x = paddle.transpose(x, [0, 2, 3, 1])
+            x.stop_gradient = True
+        x = self.stem(x)
+        x = self.max_pool(x)
+        x = self.blocks(x)
+        x = self.avg_pool(x)
+        x = self.flatten(x)
+        x = self.fc(x)
         return x
 
 
@@ -419,12 +422,9 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
     if pretrained is False:
         pass
     elif pretrained is True:
-        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
     elif isinstance(pretrained, str):
-        if 'http' in pretrained:
-            load_dygraph_pretrain_from_url(model, pretrained, use_ssld=False)
-        else:
-            load_dygraph_pretrain(model, pretrained)
+        load_dygraph_pretrain(model, pretrained)
     else:
         raise RuntimeError(
             "pretrained type is not available. Please use `string` or `boolean` type."

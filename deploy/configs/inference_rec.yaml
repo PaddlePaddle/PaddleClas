@@ -20,7 +20,7 @@ RecPreProcess:
         interpolation: bilinear
         backend: cv2
     - NormalizeImage:
-        scale: 1.0/255.0
+        scale: 0.00392157
         mean: [0.485, 0.456, 0.406]
         std: [0.229, 0.224, 0.225]
         order: hwc

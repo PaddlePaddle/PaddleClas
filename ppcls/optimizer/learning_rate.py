@@ -255,7 +255,7 @@ class Cosine(LRBase):
 
 class Cyclic(LRBase):
     """Cyclic learning rate decay
-    
+
     Args:
         epochs (int): Total epoch(s).
         step_each_epoch (int): Number of iterations within an epoch.
@@ -403,10 +403,29 @@ class Piecewise(LRBase):
                  warmup_start_lr=0.0,
                  last_epoch=-1,
                  by_epoch=False,
+                 learning_rate=None,
                  **kwargs):
+        if learning_rate:
+            decay_epochs = list(range(0, epochs, 30))
+            values = [
+                learning_rate * (0.1**i) for i in range(len(decay_epochs))
+            ]
+            # when total epochs < 30, decay_epochs and values should be
+            # [] and [lr] respectively, but paddle dont support.
+            if len(decay_epochs) == 1:
+                decay_epochs = [epochs]
+                values = [values[0], values[0]]
+            else:
+                decay_epochs = decay_epochs[1:]
+            logger.warning(
+                "When 'learning_rate' of Piecewise has beed set, "
+                "the learning rate scheduler would be set by the rule that lr decay 10 times every 30 epochs. "
+                f"So, the 'decay_epochs' and 'values' have been set to {decay_epochs} and {values} respectively."
+            )
         super(Piecewise,
               self).__init__(epochs, step_each_epoch, values[0], warmup_epoch,
                              warmup_start_lr, last_epoch, by_epoch)
+
         self.values = values
         self.boundaries_steps = [e * step_each_epoch for e in decay_epochs]
         if self.by_epoch is True:
@@ -598,5 +617,71 @@ class CosineFixmatch(LRBase):
             learning_rate=self.learning_rate,
             lr_lambda=_lr_lambda,
             last_epoch=self.last_epoch)
+        setattr(learning_rate, "by_epoch", self.by_epoch)
+        return learning_rate
+
+
+class OneCycleLR(LRBase):
+    """OneCycleLR learning rate decay
+
+    Args:
+        epochs (int): Total epoch(s).
+        step_each_epoch (int): Number of iterations within an epoch.
+        max_learning_rate (float): Maximum learning rate in the cycle. It defines the cycle amplitude as above.
+            Since there is some scaling operation during process of learning rate adjustment,
+            max_learning_rate may not actually be reached.
+        warmup_epoch (int): Number of warmup epoch(s).
+        warmup_start_lr (float): Start learning rate within warmup.
+        divide_factor (float, optional): Initial learning rate will be determined by initial_learning_rate = max_learning_rate / divide_factor. Default: 25.
+        phase_pct (float): The percentage of total steps which used to increasing learning rate. Default: 0.3.
+        end_learning_rate (float, optional): The minimum learning rate during training, it should be much less than initial learning rate.
+        anneal_strategy (str, optional): Strategy of adjusting learning rate.'cos' for cosine annealing, 'linear' for linear annealing. Default: 'cos'.
+        three_phase (bool, optional): Whether to use three-phase.
+        last_epoch (int, optional): The index of last epoch. Can be set to restart training. Default: -1, means initial learning rate.
+        by_epoch (bool): Learning rate decays by epoch when by_epoch is True, else by iter.
+        verbose: (bool, optional): If True, prints a message to stdout for each update. Defaults to False.
+    """
+
+    def __init__(self,
+                 epochs,
+                 step_each_epoch,
+                 max_learning_rate,
+                 warmup_epoch=0,
+                 warmup_start_lr=0.0,
+                 divide_factor=25.0,
+                 end_learning_rate=1e-10,
+                 phase_pct=0.3,
+                 anneal_strategy='cos',
+                 three_phase=False,
+                 by_epoch=False,
+                 last_epoch=-1,
+                 verbose=False):
+        super().__init__(
+            epochs, step_each_epoch, max_learning_rate,
+            warmup_epoch, warmup_start_lr, last_epoch, by_epoch, verbose)
+        self.max_learning_rate = max_learning_rate
+        self.total_steps = epochs * step_each_epoch
+        self.divide_factor = divide_factor
+        self.end_learning_rate = end_learning_rate
+        self.phase_pct = phase_pct
+        self.anneal_strategy = anneal_strategy
+        self.three_phase = three_phase
+        self.last_epoch = last_epoch
+
+    def __call__(self):
+        learning_rate = lr.OneCycleLR(
+            max_learning_rate=self.max_learning_rate,
+            total_steps=self.total_steps,
+            end_learning_rate=self.end_learning_rate,
+            divide_factor=self.divide_factor,
+            phase_pct=self.phase_pct,
+            anneal_strategy=self.anneal_strategy,
+            three_phase=self.three_phase,
+            last_epoch=self.last_epoch,
+            verbose=self.verbose)
+
+        if self.warmup_steps > 0:
+            learning_rate = self.linear_warmup(learning_rate)
+
         setattr(learning_rate, "by_epoch", self.by_epoch)
         return learning_rate

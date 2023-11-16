@@ -17,6 +17,9 @@ from __future__ import division
 from __future__ import print_function
 
 import inspect
+# for python3.11
+if not hasattr(inspect, 'getargspec'):
+    inspect.getargspec = inspect.getfullargspec
 
 from paddle import optimizer as optim
 from ppcls.utils import logger
@@ -307,8 +310,9 @@ class AdamW(object):
 
         if self.one_dim_param_no_weight_decay:
             self.no_weight_decay_param_name_list += [
-                p.name for model in model_list
-                for n, p in model.named_parameters() if len(p.shape) == 1
+                p.name
+                for model in model_list for n, p in model.named_parameters()
+                if len(p.shape) == 1
             ] if model_list else []
 
         opt = optim.AdamW(
@@ -371,7 +375,7 @@ class AdamWDL(object):
                      name_dict=None,
                      name=None):
             if not isinstance(layerwise_decay, float) and \
-                    not isinstance(layerwise_decay, fluid.framework.Variable):
+                    not isinstance(layerwise_decay, paddle.static.Variable):
                 raise TypeError("coeff should be float or Tensor.")
             self.layerwise_decay = layerwise_decay
             self.name_dict = name_dict

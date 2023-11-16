@@ -34,7 +34,7 @@ pip3 install paddleclas
 * Please build and install locally if you need to use the develop branch of PaddleClas to experience the latest functions, or need to redevelop based on PaddleClas. The command is as follows:
 
 ```bash
-python3 setup.py install
+pip install -v -e .
 ```
 
 <a name="2"></a>

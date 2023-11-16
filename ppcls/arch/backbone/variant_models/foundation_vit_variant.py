@@ -30,7 +30,7 @@ class MLP(nn.Layer):
 class Aesthetic_Score_Predictor(nn.Layer):
     def __init__(self):
         super().__init__()
-        self.model = CLIP_large_patch14_224()
+        self.model = CLIP_vit_large_patch14_224()
         self.fc_head = nn.Linear(1024, 768, bias_attr=False)
         self.mlp = MLP(768)
 

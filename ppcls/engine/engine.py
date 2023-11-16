@@ -36,9 +36,9 @@ from ppcls.metric import build_metrics
 from ppcls.optimizer import build_optimizer
 from ppcls.utils.amp import AutoCast, build_scaler
 from ppcls.utils.ema import ExponentialMovingAverage
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.utils.save_load import init_model
-from ppcls.utils import save_load
+from ppcls.utils import save_load, save_predict_result
 
 from ppcls.data.utils.get_image_list import get_image_list
 from ppcls.data.postprocess import build_postprocess
@@ -74,7 +74,8 @@ class Engine(object):
         # init logger
         self.output_dir = self.config['Global']['output_dir']
         log_file = os.path.join(self.output_dir, f"{mode}.log")
-        init_logger(log_file=log_file)
+        log_ranks = self.config['Global'].get("log_ranks", "0")
+        init_logger(log_file=log_file, log_ranks=log_ranks)
         print_config(config)
 
         # init train_func and eval_func
@@ -100,8 +101,9 @@ class Engine(object):
             self.vdl_writer = LogWriter(logdir=vdl_writer_path)
 
         # set device
-        assert self.config["Global"][
-            "device"] in ["cpu", "gpu", "xpu", "npu", "mlu", "ascend"]
+        assert self.config["Global"]["device"] in [
+            "cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"
+        ]
         self.device = paddle.set_device(self.config["Global"]["device"])
         logger.info('train with paddle {} and device {}'.format(
             paddle.__version__, self.device))
@@ -228,14 +230,9 @@ class Engine(object):
 
         # load_pretrain
         if self.config["Global"]["pretrained_model"] is not None:
-            if self.config["Global"]["pretrained_model"].startswith("http"):
-                load_dygraph_pretrain_from_url(
-                    [self.model, getattr(self, 'train_loss_func', None)],
-                    self.config["Global"]["pretrained_model"])
-            else:
-                load_dygraph_pretrain(
-                    [self.model, getattr(self, 'train_loss_func', None)],
-                    self.config["Global"]["pretrained_model"])
+            load_dygraph_pretrain(
+                [self.model, getattr(self, 'train_loss_func', None)],
+                self.config["Global"]["pretrained_model"])
 
         # build optimizer
         if self.mode == 'train':
@@ -442,7 +439,9 @@ class Engine(object):
         results = []
         total_trainer = dist.get_world_size()
         local_rank = dist.get_rank()
-        image_list = get_image_list(self.config["Infer"]["infer_imgs"])
+        infer_imgs = self.config["Infer"]["infer_imgs"]
+        infer_list = self.config["Infer"].get("infer_list", None)
+        image_list = get_image_list(infer_imgs, infer_list=infer_list)
         # data split
         image_list = image_list[local_rank::total_trainer]
 
@@ -450,6 +449,7 @@ class Engine(object):
         self.model.eval()
         batch_data = []
         image_file_list = []
+        save_path = self.config["Infer"].get("save_dir", None)
         for idx, image_file in enumerate(image_list):
             with open(image_file, 'rb') as f:
                 x = f.read()
@@ -473,10 +473,13 @@ class Engine(object):
                     out = out["output"]
 
                 result = self.postprocess_func(out, image_file_list)
-                logger.info(result)
+                if not save_path:
+                    logger.info(result)
                 results.extend(result)
                 batch_data.clear()
                 image_file_list.clear()
+        if save_path:
+            save_predict_result(save_path, results)
         return results
 
     def export(self):
@@ -486,14 +489,8 @@ class Engine(object):
             False) or "ATTRMetric" in self.config["Metric"]["Eval"][0]
         model = ExportModel(self.config["Arch"], self.model, use_multilabel)
         if self.config["Global"]["pretrained_model"] is not None:
-            if self.config["Global"]["pretrained_model"].startswith("http"):
-                load_dygraph_pretrain_from_url(
-                    model.base_model,
-                    self.config["Global"]["pretrained_model"])
-            else:
-                load_dygraph_pretrain(
-                    model.base_model,
-                    self.config["Global"]["pretrained_model"])
+            load_dygraph_pretrain(model.base_model,
+                                  self.config["Global"]["pretrained_model"])
 
         model.eval()
 
@@ -521,7 +518,8 @@ class Engine(object):
             paddle.jit.save(model, save_path)
         if self.config["Global"].get("export_for_fd", False):
             src_path = self.config["Global"]["infer_config_path"]
-            dst_path = os.path.join(self.config["Global"]["save_inference_dir"], 'inference.yml')
+            dst_path = os.path.join(
+                self.config["Global"]["save_inference_dir"], 'inference.yml')
             shutil.copy(src_path, dst_path)
         logger.info(
             f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."

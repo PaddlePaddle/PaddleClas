@@ -86,13 +86,13 @@ python -c "import paddle; print(paddle.__version__)"
 从 GitHub 下载：
 
 ```shell
-git clone https://github.com/PaddlePaddle/PaddleClas.git -b release/2.4
+git clone https://github.com/PaddlePaddle/PaddleClas.git -b develop
 ```
 
 如果访问 GitHub 网速较慢，可以从 Gitee 下载，命令如下：
 
 ```shell
-git clone https://gitee.com/paddlepaddle/PaddleClas.git -b release/2.4
+git clone https://gitee.com/paddlepaddle/PaddleClas.git -b develop
 ```
 <a name='1.3'></a>
 
@@ -107,7 +107,7 @@ pip install paddleclas
 * 如需使用 PaddleClas develop 分支体验最新功能，或是需要基于 PaddleClas 进行二次开发，请本地构建安装，命令如下：
 
 ```shell
-python setup.py install
+pip install -v -e .
 ```
 
 <a name='2'></a>

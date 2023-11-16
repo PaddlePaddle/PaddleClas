@@ -99,7 +99,7 @@ One can preview it according to the instructions in [Function Experience - Previ
 
 ### 2.1 Environment configuration
 
-* Installation: Please refer to the document [Environment Preparation](../installation/install_paddleclas_en.md) to configure the PaddleClas operating environment.
+* Installation: Please refer to the document [Environment Preparation](../installation.md) to configure the PaddleClas operating environment.
 
 * Go to the `deploy` run directory. All the content and scripts in this section need to be run in the `deploy` directory, you can enter the `deploy` directory with the following scripts.
 

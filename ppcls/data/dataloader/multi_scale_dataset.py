@@ -30,14 +30,25 @@ from ppcls.data.dataloader.common_dataset import create_operators
 
 
 class MultiScaleDataset(Dataset):
+    """MultiScaleDataset
+
+    Args:
+        image_root (str): image root
+        cls_label_path (str): path to annotation file `train_list.txt` or `val_list.txt`
+        transform_ops (list, optional): list of transform op(s). Defaults to None.
+        delimiter (str, optional): delimiter. Defaults to None.
+    """
+
     def __init__(
             self,
             image_root,
             cls_label_path,
-            transform_ops=None, ):
+            transform_ops=None,
+            delimiter=None, ):
         self._img_root = image_root
         self._cls_path = cls_label_path
         self.transform_ops = transform_ops
+        self.delimiter = delimiter if delimiter is not None else " "
         self.images = []
         self.labels = []
         self._load_anno()
@@ -54,7 +65,7 @@ class MultiScaleDataset(Dataset):
             if seed is not None:
                 np.random.RandomState(seed).shuffle(lines)
             for l in lines:
-                l = l.strip().split(" ")
+                l = l.strip().split(self.delimiter)
                 self.images.append(os.path.join(self._img_root, l[0]))
                 self.labels.append(np.int64(l[1]))
                 assert os.path.exists(self.images[-1])

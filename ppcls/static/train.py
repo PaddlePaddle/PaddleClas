@@ -83,15 +83,17 @@ def main(args):
 
     log_file = os.path.join(global_config['output_dir'],
                             config["Arch"]["name"], f"{mode}.log")
-    init_logger(log_file=log_file)
+    log_ranks = config["Global"].get("log_ranks", "0")
+    init_logger(log_file=log_file, log_ranks=log_ranks)
     print_config(config)
 
     if global_config.get("is_distributed", True):
         fleet.init(is_collective=True)
 
     # assign the device
-    assert global_config[
-        "device"] in ["cpu", "gpu", "xpu", "npu", "mlu", "ascend"]
+    assert global_config["device"] in [
+        "cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps"
+    ]
     device = paddle.set_device(global_config["device"])
 
     # amp related config

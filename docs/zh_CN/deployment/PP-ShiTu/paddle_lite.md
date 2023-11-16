@@ -245,7 +245,7 @@ cp general_PPLCNetV2_base_pretrained_v1.0_infer/rec.nb deploy/lite_shitu/models/
 # 进入PaddleClas根目录
 cd $PaddleClas
 # 安装PaddleClas
-python setup.py install
+pip install -v -e .
 cd deploy
 # 下载瓶装饮料数据集
 wget https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/data/drink_dataset_v2.0.tar && tar -xf drink_dataset_v2.0.tar

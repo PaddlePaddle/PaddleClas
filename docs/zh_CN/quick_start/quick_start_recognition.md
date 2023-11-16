@@ -93,7 +93,7 @@ pip3 install paddleclas
 * 如需使用 PaddleClas develop 分支体验最新功能，或是需要基于 PaddleClas 进行二次开发，请本地构建安装：
 
 ```bash
-python3 setup.py install
+pip install -v -e .
 ```
 
 <a name="图像识别体验"></a>
