@@ -60,8 +60,8 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
         (trainer.config["Global"]["epochs"] - epoch_id + 1) *
         trainer.iter_per_epoch - iter_id) * trainer.time_info["batch_cost"].avg
     eta_msg = "eta: {:s}".format(str(datetime.timedelta(seconds=int(eta_sec))))
-    max_mem_reserved_msg = f"max_mem_reserved: {paddle.device.cuda.max_memory_reserved()}"
-    max_mem_allocated_msg = f"max_mem_allocated: {paddle.device.cuda.max_memory_allocated()}"
+    max_mem_reserved_msg = f"max_mem_reserved: {paddle.device.cuda.max_memory_reserved()} B"
+    max_mem_allocated_msg = f"max_mem_allocated: {paddle.device.cuda.max_memory_allocated()} B"
     logger.info(
         f"[Train][Epoch {epoch_id}/{global_epochs}][Iter: {iter_id}/{trainer.iter_per_epoch}]{lr_msg}, {metric_msg}, {time_msg}, {ips_msg}, {eta_msg}, {max_mem_reserved_msg}, {max_mem_allocated_msg}"
     )
