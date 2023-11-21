@@ -262,10 +262,11 @@ else
                 # fi
 
                 set_save_model=$(func_set_params "${save_model_key}" "${save_log}")
+                log_rank="-o Global.log_ranks=0,1,2,3,4,5,6,7"
                 if [ ${#gpu} -le 2 ]; then # train with cpu or single gpu
                     cmd="${python} ${run_train} ${set_use_gpu} ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} "
                 elif [ ${#ips} -le 15 ]; then # train with multi-gpu
-                    cmd="${python} -m paddle.distributed.launch --devices=${gpu} ${run_train} ${set_use_gpu} ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1}"
+                    cmd="${python} -m paddle.distributed.launch --devices=${gpu} ${run_train} ${set_use_gpu} ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} ${log_rank}"
                 else # train with multi-machine
                     cmd="${python} -m paddle.distributed.launch --ips=${ips} --devices=${gpu} ${run_train} ${set_use_gpu} ${set_save_model} ${set_pretrain} ${set_epoch} ${set_autocast} ${set_batchsize} ${set_train_params1}"
                 fi

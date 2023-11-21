@@ -55,7 +55,7 @@ function _train(){
 	        train_cmd="python ppcls/static/train.py ${train_cmd}"
         else
             rm -rf ./mylog
-            train_cmd="python -m paddle.distributed.launch --gpus 0,1,2,3,4,5,6,7 ppcls/static/train.py ${train_cmd}"
+            train_cmd="python -m paddle.distributed.launch --gpus 0,1,2,3,4,5,6,7 ppcls/static/train.py ${train_cmd} -o Global.log_ranks=0,1,2,3,4,5,6,7"
         fi
         ;;
     DP1-MP1-PP1)  echo "run run_mode: DP1-MP1-PP1" ;;
