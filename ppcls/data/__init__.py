@@ -93,7 +93,7 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
     ], "Dataset mode should be Train, Eval, Test, Gallery, Query, UnLabelTrain"
     assert mode in config.keys(), "{} config not in yaml".format(mode)
     # build dataset
-    if use_dali:
+    if use_dali and paddle.device.is_compiled_with_cuda():
         from ppcls.data.dataloader.dali import dali_dataloader
         return dali_dataloader(
             config,
