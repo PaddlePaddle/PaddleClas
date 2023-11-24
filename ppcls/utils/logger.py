@@ -22,7 +22,25 @@ import paddle.distributed as dist
 _logger = None
 
 
-def init_logger(name='ppcls', log_file=None, log_level=logging.INFO):
+class LoggerHook(object):
+    """
+    logs will print multi-times when calling Fleet API.
+    Commonly, only need to display single log at rank0 and ignore the others.
+    """
+    block = False
+
+    def __init__(self, log):
+        self.log = log
+
+    def __call__(self, *args, **kwargs):
+        if not self.block:
+            self.log(*args, **kwargs)
+
+
+def init_logger(name='ppcls',
+                log_file=None,
+                log_level=logging.INFO,
+                log_ranks="0"):
     """Initialize and get a logger by name.
     If the logger has not been initialized, this method will initialize the
     logger by adding one or two handlers, otherwise the initialized logger will
@@ -35,6 +53,7 @@ def init_logger(name='ppcls', log_file=None, log_level=logging.INFO):
         log_level (int): The logger level. Note that only the process of
             rank 0 is affected, and other processes will set the level to
             "Error" thus be silent most of the time.
+        log_ranks (str): The ids of gpu to log which are separated by "," when more than 1, "0" by default.
     Returns:
         logging.Logger: The expected logger.
     """
@@ -78,42 +97,35 @@ def init_logger(name='ppcls', log_file=None, log_level=logging.INFO):
             if i == len(_logger.handlers) - 1:
                 _logger.addHandler(file_handler)
 
-    if dist.get_rank() == 0:
+    if isinstance(log_ranks, str):
+        log_ranks = [int(i) for i in log_ranks.split(',')]
+    elif isinstance(log_ranks, int):
+        log_ranks = [log_ranks]
+    if dist.get_rank() in log_ranks:
         _logger.setLevel(log_level)
+        LoggerHook.block = False
     else:
         _logger.setLevel(logging.ERROR)
+        LoggerHook.block = True
     _logger.propagate = False
 
 
-def log_at_trainer0(log):
-    """
-    logs will print multi-times when calling Fleet API.
-    Only display single log and ignore the others.
-    """
-
-    def wrapper(fmt, *args):
-        if dist.get_rank() == 0:
-            log(fmt, *args)
-
-    return wrapper
-
-
-@log_at_trainer0
+@LoggerHook
 def info(fmt, *args):
     _logger.info(fmt, *args)
 
 
-@log_at_trainer0
+@LoggerHook
 def debug(fmt, *args):
     _logger.debug(fmt, *args)
 
 
-@log_at_trainer0
+@LoggerHook
 def warning(fmt, *args):
     _logger.warning(fmt, *args)
 
 
-@log_at_trainer0
+@LoggerHook
 def error(fmt, *args):
     _logger.error(fmt, *args)
 

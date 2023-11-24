@@ -79,7 +79,7 @@ def main():
     logger.info("Start converting {}:".format(anno_path))
     with open(save_path, 'w') as fp:
         lines = []
-        for img_id in tqdm(sorted(list(coco.imgToAnns.keys()))):
+        for img_id in tqdm(sorted(coco.getImgIds())):
             img_info = coco.loadImgs([img_id])[0]
             img_filename = img_info['file_name']
             img_w = img_info['width']
