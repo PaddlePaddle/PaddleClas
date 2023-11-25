@@ -117,6 +117,23 @@ def load_distillation_model(model, pretrained_model):
             pretrained_model))
 
 
+def get_pretrain_state_dict(path=None):
+    if not (os.path.isdir(path) or os.path.exists(path + '.pdparams')):
+        raise ValueError("Model pretrain path {}.pdparams does not "
+                         "exists.".format(path))
+    param_state_dict = paddle.load(path + ".pdparams")
+    return param_state_dict
+
+
+def get_pretrain_state_dict_from_url(pretrained_url, use_ssld=False):
+    if use_ssld:
+        pretrained_url = pretrained_url.replace("_pretrained",
+                                                "_ssld_pretrained")
+    local_weight_path = get_weights_path_from_url(pretrained_url).replace(
+        ".pdparams", "")
+    return get_pretrain_state_dict(path=local_weight_path)
+
+
 def init_model(config,
                net,
                optimizer=None,
