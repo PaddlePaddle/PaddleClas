@@ -179,8 +179,8 @@ class FusedVisionTransformer(nn.Layer):
 
         if self.use_weight_only:
             assert (
-                self.quant_type == "weight_only_int8"
-            ), "Expected quant_type equal to 'weight_only_int8', \
+                self.quant_type == "weight_only_int8" or self.quant_type == "weight_only_int4"
+            ), "Expected quant_type equal to 'weight_only_int8' or 'weight_only_int4' \
                 but received quant_type: {}".format(
                 self.quant_type
             )
@@ -406,6 +406,12 @@ class FusedVisionTransformer(nn.Layer):
             else [mlp_hidden_dim, self.embed_dim]
         )
         self.mlp_fc2_bias_shape = [self.embed_dim]
+
+        if self.use_weight_only and self.quant_bits == 4:
+            self.attn_qkv_weight_shape[0] //= 2
+            self.attn_proj_weight_shape[0] //= 2
+            self.mlp_fc1_weight_shape[0] //= 2
+            self.mlp_fc2_weight_shape[0] //= 2
 
     def get_weight_create_dtype(self):
         if self.use_weight_only:
