@@ -24,7 +24,6 @@ import sys
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal, Assign
 
 from ....utils import logger
-#from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 from ....utils.save_load import load_dygraph_pretrain
 
 MODEL_URLS = {
@@ -406,7 +405,7 @@ class Attention(nn.Layer):
 
     def forward(self, x, rel_pos_bias=None):
         # B= paddle.shape(x)[0]
-        N, C = x.shape[1:]
+        N, C = paddle.shape(x)[1], paddle.shape(x)[2]
         qkv = self.qkv(x).reshape((-1, N, 3, self.num_heads, C //
                                    self.num_heads)).transpose((2, 0, 3, 1, 4))
         q, k, v = qkv[0], qkv[1], qkv[2]
@@ -591,7 +590,7 @@ class PatchEmbed(nn.Layer):
         x, _ = pading_for_not_divisible(x, H, W, patch_size=self.patch_size)
 
         x = self.proj(x)
-        _, _, H, W = x.shape
+        _, _, H, W = paddle.shape(x)
 
         x = x.flatten(2).transpose((0, 2, 1))
         return x, (H, W)
@@ -794,8 +793,7 @@ class VisionTransformer(nn.Layer):
         return {'pos_embed', 'cls_token'}
 
     def forward_features(self, x):
-        # B = x.shape[0]
-        B, C, H, W = x.shape
+        B = x.shape[0]
         x, output_dimensions = self.patch_embed(x)
         if not _model_size in _model_diff['remove_cls_token']:
             cls_tokens = self.cls_token.expand((B, -1, -1))
@@ -816,6 +814,8 @@ class VisionTransformer(nn.Layer):
             x = x[:, 1:, :]
         if self.hugging_face_framework:
             pooled, token = x[:, 0], x[:, 1:]
+        else:
+            pooled = x
         x = self.norm(pooled)
         return x
 
@@ -834,7 +834,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
     elif pretrained is True:
-        load_dygraph_pretrain_from_url(model, model_url, use_ssld=use_ssld)
+        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
     elif isinstance(pretrained, str):
         load_dygraph_pretrain(model, pretrained)
     else:
