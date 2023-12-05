@@ -63,8 +63,8 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
     max_mem_reserved_msg = ""
     max_mem_allocated_msg = ""
     if paddle.device.is_compiled_with_cuda():
-        max_mem_reserved_msg = f"max_mem_reserved: {paddle.device.cuda.max_memory_reserved()} B"
-        max_mem_allocated_msg = f"max_mem_allocated: {paddle.device.cuda.max_memory_allocated()} B"
+        max_mem_reserved_msg = f"max_mem_reserved: {format(paddle.device.cuda.max_memory_reserved() / (1024 ** 2), '.2f')} MB"
+        max_mem_allocated_msg = f"max_mem_allocated: {format(paddle.device.cuda.max_memory_allocated() / (1024 ** 2), '.2f')} MB"
     logger.info(
         f"[Train][Epoch {epoch_id}/{global_epochs}][Iter: {iter_id}/{trainer.iter_per_epoch}]{lr_msg}, {metric_msg}, {time_msg}, {ips_msg}, {eta_msg}, {max_mem_reserved_msg}, {max_mem_allocated_msg}"
     )
