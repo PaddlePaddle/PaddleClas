@@ -622,7 +622,7 @@ class Head(nn.Layer):
                     x = self.fc_norm(t)
                 else:
                     x = self.fc_norm(t.mean(1))
-        else:
+        elif isinstance(self.fc_head, Identity):
             if self.return_all_tokens:
                 x = x
             elif self.return_patch_tokens:
@@ -631,6 +631,8 @@ class Head(nn.Layer):
                 x = x.mean(1)
             else:
                 x = x[:, 0]
+        else:
+            x = x
         return self.fc_head(x)
 
 
@@ -823,10 +825,9 @@ class VisionTransformer(nn.Layer):
         x = self.forward_features(x)
         x = self.head(x)
 
-        if self.proj is not None:
+        if self.proj is not None and isinstance(self.head,Identity):
             x = x @self.proj
-        if isinstance(self.image_projection, paddle.Tensor):
-            x = x @self.image_projection
+
         return x
 
 
@@ -890,6 +891,7 @@ def React_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=12,
         mlp_ratio=4,
         qkv_bias=True,
+        return_embed = False,
         hugging_face_framework=True,
         epsilon=1e-5,
         **kwargs, )
@@ -907,6 +909,7 @@ def React_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=12,
         mlp_ratio=4,
         qkv_bias=True,
+        return_embed = False,
         hugging_face_framework=True,
         epsilon=1e-5,
         **kwargs, )
@@ -924,6 +927,7 @@ def LaCLIP_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=12,
         mlp_ratio=4,
         qkv_bias=True,
+        return_embed = False,
         hugging_face_framework=True,
         image_project=True,
         epsilon=1e-5,
@@ -943,6 +947,7 @@ def LaCLIP_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=12,
         mlp_ratio=4,
         qkv_bias=True,
+        return_embed = False,
         hugging_face_framework=True,
         image_project=True,
         epsilon=1e-5,
@@ -962,6 +967,7 @@ def Unicom_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=12,
         mlp_ratio=4,
         qkv_bias=True,
+        return_embed = False,
         hugging_face_framework=True,
         image_project=True,
         epsilon=1e-5,
@@ -983,6 +989,7 @@ def Unicom_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         qkv_bias=True,
         hugging_face_framework=False,
         image_project=False,
+        return_embed = False,
         conv_bias=True,
         epsilon=1e-5,
         **kwargs, )
