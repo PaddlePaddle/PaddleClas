@@ -59,6 +59,8 @@ class MultiLabelLoss(nn.Layer):
         if isinstance(x, dict):
             x = x["logits"]
         class_num = x.shape[-1]
+        target = F.one_hot(target, num_classes=class_num)
+        target = paddle.reshape(target, shape=[-1, class_num])
         loss = self._binary_crossentropy(x, target, class_num)
         loss = loss.mean()
         return {"MultiLabelLoss": loss}
