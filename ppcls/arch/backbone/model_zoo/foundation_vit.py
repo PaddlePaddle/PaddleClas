@@ -814,7 +814,7 @@ class VisionTransformer(nn.Layer):
 
         if _model_size in _model_diff['remove_cls_token_in_forward']:
             x = x[:, 1:, :]
-        if self.hugging_face_framework:
+        if self.hugging_face_framework or self.return_embed == False:
             pooled, token = x[:, 0], x[:, 1:]
         else:
             pooled = x
