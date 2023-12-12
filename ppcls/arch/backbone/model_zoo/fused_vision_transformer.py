@@ -663,9 +663,9 @@ class FusedVisionTransformer(nn.Layer):
         x = x + self.pos_embed
 
         batch, seq_len, _ = x.shape
-        padding_offset = paddle.to_tensor([0] * seq_len * batch, dtype='int32')
-        seq_lens = paddle.to_tensor([seq_len, ] * batch, dtype='int32')
-        input_ids = paddle.to_tensor([[0] * seq_len] * batch, dtype='int32')
+        padding_offset = paddle.zeros([seq_len * batch], dtype='int32')
+        seq_lens = paddle.full([batch], seq_len, dtype='int32')
+        input_ids = paddle.full([batch, seq_len], 0, dtype='int32')
 
         x = x.reshape([-1, x.shape[-1]])
         residual_input = x
@@ -693,7 +693,8 @@ class FusedVisionTransformer(nn.Layer):
             tmp_out, residual_input = self.compute_bias_residual_layernorm(ffn2_out, residual_input, i, self.depth)
             x = tmp_out
         x = x.reshape((batch, seq_len, -1))
-        x = x[:, 0]
+        index = paddle.zeros([1], dtype="int32")
+        x = paddle.index_select(x, index, axis=1).reshape((batch, self.embed_dim))
         x = self.compute_head_linear(x)
 
         return x
