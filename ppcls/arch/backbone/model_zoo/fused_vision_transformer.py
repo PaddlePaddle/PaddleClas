@@ -24,9 +24,6 @@ from paddle.incubate.nn.functional import (
     fused_linear,
     variable_length_memory_efficient_attention
 )
-from paddle.nn.functional import (
-    layer_norm
-)
 from paddle.nn.quant import weight_quantize, weight_only_linear
 from ....utils.save_load import get_pretrain_state_dict, get_pretrain_state_dict_from_url
 from ....utils.import_utils import is_paddleclas_ops_available
@@ -176,6 +173,7 @@ class FusedVisionTransformer(nn.Layer):
         self.use_weight_only = use_weight_only
         self.quant_type = quant_type
         self.create_params_type = self.get_weight_create_dtype()
+        self._norm_weight_dtype = "float32"
 
         if self.use_weight_only:
             assert (
@@ -223,13 +221,13 @@ class FusedVisionTransformer(nn.Layer):
             norm1_weight = self.create_parameter(
                 shape=self.norm1_weight_shape,
                 default_initializer=ones_,
-                dtype=self.dtype
+                dtype=self._norm_weight_dtype
             )
             norm1_bias = self.create_parameter(
                 shape=self.norm1_bias_shape,
                 default_initializer=zeros_,
                 is_bias=True,
-                dtype=self.dtype
+                dtype=self._norm_weight_dtype
             )
 
             attn_qkv_weight = self.create_parameter(
@@ -259,13 +257,13 @@ class FusedVisionTransformer(nn.Layer):
             norm2_weight = self.create_parameter(
                 shape=self.norm2_weight_shape,
                 default_initializer=ones_,
-                dtype=self.dtype
+                dtype=self._norm_weight_dtype
             )
             norm2_bias = self.create_parameter(
                 shape=self.norm2_bias_shape,
                 default_initializer=zeros_,
                 is_bias=True,
-                dtype=self.dtype
+                dtype=self._norm_weight_dtype
             )
 
             mlp_fc1_weight = self.create_parameter(
@@ -357,13 +355,13 @@ class FusedVisionTransformer(nn.Layer):
         self.norm_weight = self.create_parameter(
             shape=[embed_dim],
             default_initializer=ones_,
-            dtype=self.dtype
+            dtype=self._norm_weight_dtype
         )
         self.norm_bias = self.create_parameter(
             shape=[embed_dim],
             is_bias=True,
             default_initializer=zeros_,
-            dtype=self.dtype
+            dtype=self._norm_weight_dtype
         )
         self.head_weight = self.create_parameter(
             shape=[embed_dim, class_num],
@@ -426,8 +424,8 @@ class FusedVisionTransformer(nn.Layer):
         self.patch_embed_proj.weight.set_value(state_dict["patch_embed.proj.weight"].astype(self.dtype))
         self.patch_embed_proj.bias.set_value(state_dict["patch_embed.proj.bias"].astype(self.dtype))
         for i in range(self.depth):
-            self.norm1_weights[i].set_value(state_dict["blocks.{}.norm1.weight".format(i)].astype(self.dtype))
-            self.norm1_biases[i].set_value(state_dict["blocks.{}.norm1.bias".format(i)].astype(self.dtype))
+            self.norm1_weights[i].set_value(state_dict["blocks.{}.norm1.weight".format(i)].astype(self._norm_weight_dtype))
+            self.norm1_biases[i].set_value(state_dict["blocks.{}.norm1.bias".format(i)].astype(self._norm_weight_dtype))
 
             if self.use_weight_only:
                 attn_qkv_weight_tensor = paddle.to_tensor(state_dict["blocks.{}.attn.qkv.weight".format(i)].astype(self.dtype))
@@ -451,8 +449,8 @@ class FusedVisionTransformer(nn.Layer):
                 self.attn_proj_weights[i].set_value(state_dict["blocks.{}.attn.proj.weight".format(i)].astype(self.dtype))
             self.attn_proj_biases[i].set_value(state_dict["blocks.{}.attn.proj.bias".format(i)].astype(self.dtype))
 
-            self.norm2_weights[i].set_value(state_dict["blocks.{}.norm2.weight".format(i)].astype(self.dtype))
-            self.norm2_biases[i].set_value(state_dict["blocks.{}.norm2.bias".format(i)].astype(self.dtype))
+            self.norm2_weights[i].set_value(state_dict["blocks.{}.norm2.weight".format(i)].astype(self._norm_weight_dtype))
+            self.norm2_biases[i].set_value(state_dict["blocks.{}.norm2.bias".format(i)].astype(self._norm_weight_dtype))
 
             if self.use_weight_only:
                 mlp_fc1_weight_tensor = paddle.to_tensor(state_dict["blocks.{}.mlp.fc1.weight".format(i)].astype(self.dtype))
@@ -476,23 +474,14 @@ class FusedVisionTransformer(nn.Layer):
                 self.mlp_fc2_weights[i].set_value(state_dict["blocks.{}.mlp.fc2.weight".format(i)].astype(self.dtype))
             self.mlp_fc2_biases[i].set_value(state_dict["blocks.{}.mlp.fc2.bias".format(i)].astype(self.dtype))
 
-        self.norm_weight.set_value(state_dict["norm.weight"].astype(self.dtype))
-        self.norm_bias.set_value(state_dict["norm.bias"].astype(self.dtype))
+        self.norm_weight.set_value(state_dict["norm.weight"].astype(self._norm_weight_dtype))
+        self.norm_bias.set_value(state_dict["norm.bias"].astype(self._norm_weight_dtype))
         self.head_weight.set_value(state_dict["head.weight"].astype(self.dtype))
         self.head_bias.set_value(state_dict["head.bias"].astype(self.dtype))
 
     def compute_layernorm_before_qkv(self, src, i):
         if i == 0:
-            if self.dtype == "float32":
-                ln_out = self.norm_func(src, self.norm1_weights[i], self.norm1_biases[i], self.epsilon)
-            else:
-                ln_out = layer_norm(
-                    src,
-                    normalized_shape=[self.embed_dim],
-                    weight=self.norm1_weights[i],
-                    bias=self.norm1_biases[i],
-                    epsilon=self.epsilon
-                )
+            ln_out = self.norm_func(src, self.norm1_weights[i], self.norm1_biases[i], self.epsilon)
         else:
             ln_out = src
 
@@ -557,26 +546,15 @@ class FusedVisionTransformer(nn.Layer):
         """
         tmp_out = layernorm(out_linear_out + attn_proj_biases[i] + residual_input)
         """
-        if self.dtype == "float32":
-            norm_out = self.norm_func(
-                out_linear_out,
-                norm_weight=self.norm2_weights[i],
-                norm_bias=self.norm2_biases[i],
-                epsilon=self.epsilon,
-                bias=self.attn_proj_biases[i],
-                residual=residual_input,
-            )
-            tmp_out, residual_input = norm_out[0], norm_out[1]
-        else:
-            tmp_out = out_linear_out + self.attn_proj_biases[i] + residual_input
-            residual_input = tmp_out
-            tmp_out = layer_norm(
-                tmp_out,
-                normalized_shape=[self.embed_dim],
-                weight=self.norm2_weights[i],
-                bias=self.norm2_biases[i],
-                epsilon=self.epsilon
-            )
+        norm_out = self.norm_func(
+            out_linear_out,
+            norm_weight=self.norm2_weights[i],
+            norm_bias=self.norm2_biases[i],
+            epsilon=self.epsilon,
+            bias=self.attn_proj_biases[i],
+            residual=residual_input,
+        )
+        tmp_out, residual_input = norm_out[0], norm_out[1]
         return tmp_out, residual_input
 
     def compute_ffn1(self, tmp_out, i):
@@ -602,45 +580,25 @@ class FusedVisionTransformer(nn.Layer):
         return paddle.matmul(ffn1_out, self.mlp_fc2_weights[i])
 
     def compute_bias_residual_layernorm(self, ffn2_out, residual_input, i, num_layers):
-        if self.dtype == "float32":
-            if i != num_layers - 1:
-                norm_out = self.norm_func(
-                    ffn2_out,
-                    norm_weight=self.norm1_weights[i + 1],
-                    norm_bias=self.norm1_biases[i + 1],
-                    epsilon=self.epsilon,
-                    bias=self.mlp_fc2_biases[i],
-                    residual=residual_input
-                )
-                tmp_out, residual_input = norm_out[0], norm_out[1]
-            else:
-                tmp_out = self.norm_func(
-                    ffn2_out,
-                    norm_weight=self.norm_weight,
-                    norm_bias=self.norm_bias,
-                    epsilon=self.epsilon,
-                    bias=self.mlp_fc2_biases[i],
-                    residual=residual_input
-                )[0]
+        if i != num_layers - 1:
+            norm_out = self.norm_func(
+                ffn2_out,
+                norm_weight=self.norm1_weights[i + 1],
+                norm_bias=self.norm1_biases[i + 1],
+                epsilon=self.epsilon,
+                bias=self.mlp_fc2_biases[i],
+                residual=residual_input
+            )
+            tmp_out, residual_input = norm_out[0], norm_out[1]
         else:
-            tmp_out = ffn2_out + self.mlp_fc2_biases[i] + residual_input
-            if i != num_layers - 1:
-                residual_input = tmp_out
-                tmp_out = layer_norm(
-                    tmp_out,
-                    normalized_shape=[self.embed_dim],
-                    weight=self.norm1_weights[i + 1],
-                    bias=self.norm1_biases[i + 1],
-                    epsilon=self.epsilon
-                )
-            else:
-                tmp_out = layer_norm(
-                    tmp_out,
-                    normalized_shape=[self.embed_dim],
-                    weight=self.norm_weight,
-                    bias=self.norm_bias,
-                    epsilon=self.epsilon
-                )
+            tmp_out = self.norm_func(
+                ffn2_out,
+                norm_weight=self.norm_weight,
+                norm_bias=self.norm_bias,
+                epsilon=self.epsilon,
+                bias=self.mlp_fc2_biases[i],
+                residual=residual_input
+            )[0]
         return tmp_out, residual_input
 
     def compute_head_linear(self, ln_out):
