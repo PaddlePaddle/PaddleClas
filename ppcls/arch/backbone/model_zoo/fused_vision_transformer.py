@@ -320,25 +320,25 @@ class FusedVisionTransformer(nn.Layer):
                 attn_qkv_weight_scale = self.create_parameter(
                     shape=[3 * self.num_heads * self.head_dim],
                     default_initializer=zeros_,
-                    dtype=paddle.float32,
+                    dtype=self.dtype,
                     is_bias=False
                 )
                 attn_proj_weight_scale = self.create_parameter(
                     shape=[self.embed_dim],
                     default_initializer=zeros_,
-                    dtype=paddle.float32,
+                    dtype=self.dtype,
                     is_bias=False
                 )
                 mlp_fc1_weight_scale = self.create_parameter(
                     shape=[mlp_hidden_dim],
                     default_initializer=zeros_,
-                    dtype=paddle.float32,
+                    dtype=self.dtype,
                     is_bias=False
                 )
                 mlp_fc2_weight_scale = self.create_parameter(
                     shape=[self.embed_dim],
                     default_initializer=zeros_,
-                    dtype=paddle.float32,
+                    dtype=self.dtype,
                     is_bias=False
                 )
 
