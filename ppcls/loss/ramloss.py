@@ -19,7 +19,7 @@ class RAMLoss(nn.Layer):
         super().__init__()
         self.mode = mode
 
-    ## **kwargs 加入备注交代
+    ## **kwargs 参数没有实际意义，仅作为兼容框架本身所使用的参数
     def forward(self, loss_tag, loss_dis, loss_alignment, **kwargs):
         loss = loss_tag + loss_dis + loss_alignment
         return {"RAMLoss": loss}
