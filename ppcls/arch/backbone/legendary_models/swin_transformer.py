@@ -444,7 +444,10 @@ class SwinTransformerBlock(nn.Layer):
     def forward(self, x, input_dimensions):
         H, W = input_dimensions
         B, L, C = x.shape
-
+        if min(H, W) <= self.window_size:
+            # if window size is larger than input resolution, we don't partition windows
+            self.shift_size = 0
+            self.window_size = min(self.input_resolution)
         shortcut = x
         x = self.norm1(x)
         x = x.reshape([B, H, W, C])
