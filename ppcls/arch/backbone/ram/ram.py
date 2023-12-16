@@ -325,7 +325,7 @@ class RAM(nn.Layer):
         for layer in self.tagging_head.encoder.layer:
             del layer.attention
 
-    def forward(self, image, caption=None, image_tag=None, parse_tag=None, image224=None):
+    def forward(self, image_ram, caption=None, image_tag=None, parse_tag=None, image_clip=None):
         """
         image-》 image_ram
         image224 -> image_clip
@@ -341,9 +341,9 @@ class RAM(nn.Layer):
         """
         assert self.stage == 'train'
         label_embed = nn.functional.relu(self.wordvec_proj(self.label_embed))
-        clip_feature = self.CLIP.encode_image(image224)
+        clip_feature = self.CLIP.encode_image(image_clip)
 
-        image_embeds = self.image_proj(self.visual_encoder(image))
+        image_embeds = self.image_proj(self.visual_encoder(image_ram))
         image_atts = paddle.ones(paddle.shape(image_embeds)[:-1],
                                 dtype=paddle.int32)
         
