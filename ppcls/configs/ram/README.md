@@ -189,8 +189,8 @@ python3 tools/train_multimodal.py \
 ```
 
 **注意:**
-1. 目前多标签分类的损失函数默认使用`MultiLabelAsymmetricLoss`。
-2. 目前多标签分类的评估指标默认使用`MultiLabelMAP(integral)`。
+1. 目前多标签分类的损失函数默认使用`AsymmetricLoss`。
+2. 目前多标签分类的评估指标默认使用`MAP(integral)`。
 
 <a name="4"></a>
 
