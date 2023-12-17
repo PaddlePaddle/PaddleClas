@@ -1,9 +1,10 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
+# copyright (c) 2023 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,7 +39,7 @@ class EngineMultimodal(engine.Engine):
     def __init__(self, config, mode="train"):
         super().__init__(config, mode)
         self.train_epoch_func = train_method.train_epoch_multimodal
-        
+
     @paddle.no_grad()
     def eval(self, epoch_id=0):
         assert self.mode in ["train", "eval"]
@@ -86,13 +87,12 @@ class EngineMultimodal(engine.Engine):
         if save_path:
             save_predict_result(save_path, results)
         return results
-    
+
     def export(self):
         assert self.mode == "export"
-        use_multilabel = self.config["Global"].get(
-            "use_multilabel",
-            False)
-        model = ExportModelMultiModal(self.config["Arch"], self.model, use_multilabel)
+        use_multilabel = self.config["Global"].get("use_multilabel", False)
+        model = ExportModelMultiModal(self.config["Arch"], self.model,
+                                      use_multilabel)
         if self.config["Global"]["pretrained_model"] is not None:
             load_dygraph_pretrain(model.base_model,
                                   self.config["Global"]["pretrained_model"])
@@ -129,6 +129,7 @@ class EngineMultimodal(engine.Engine):
         logger.info(
             f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
         )
+
 
 class ExportModelMultiModal(ExportModel):
     def forward(self, x):

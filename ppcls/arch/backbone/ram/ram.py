@@ -1,7 +1,7 @@
 from paddle import nn
 import paddle
 from ..model_zoo.vision_transformer import VisionTransformer
-from .bert import * 
+from .bert import *
 from paddlenlp.transformers import BertTokenizer
 from paddle.nn import functional as F
 from paddle.nn.initializer import Constant
@@ -13,12 +13,13 @@ from ..legendary_models.swin_transformer import SwinTransformer
 import yaml
 import numpy as np
 
-class RamVis(VisionTransformer):   
+
+class RamVis(VisionTransformer):
     def forward_features(self, x):
         return self.forward_features(x)
-    
-class RamSwin(SwinTransformer):
 
+
+class RamSwin(SwinTransformer):
     def forward_features(self, x):
         x, output_dimensions = self.patch_embed(x)
         if self.ape:
@@ -35,89 +36,103 @@ class RamSwin(SwinTransformer):
     def forward(self, x):
         x = self.forward_features(x)
         return x
-    
+
+
 def RamSwin_large_patch4_window12_384():
     return RamSwin(
-                img_size=384,
-                patch_size=4,
-                in_chans=3,
-                embed_dim=192,
-                depths=[ 2, 2, 18, 2 ],
-                num_heads=[ 6, 12, 24, 48 ],
-                window_size=12,
-                mlp_ratio=4.,
-                qkv_bias=True,
-                drop_rate=0.0,
-                drop_path_rate=0.1,
-                ape=False,
-                patch_norm=True,
-                use_checkpoint=False)
+        img_size=384,
+        patch_size=4,
+        in_chans=3,
+        embed_dim=192,
+        depths=[2, 2, 18, 2],
+        num_heads=[6, 12, 24, 48],
+        window_size=12,
+        mlp_ratio=4.,
+        qkv_bias=True,
+        drop_rate=0.0,
+        drop_path_rate=0.1,
+        ape=False,
+        patch_norm=True,
+        use_checkpoint=False)
+
 
 def RamSwin_large_patch4_window7_224():
     return RamSwin(
-                img_size=224,
-                patch_size=4,
-                in_chans=3,
-                embed_dim=192,
-                depths=[ 2, 2, 18, 2 ],
-                num_heads=[ 6, 12, 24, 48 ],
-                window_size=7,
-                mlp_ratio=4.,
-                qkv_bias=True,
-                drop_rate=0.0,
-                drop_path_rate=0.1,
-                ape=False,
-                patch_norm=True,
-                use_checkpoint=False)
+        img_size=224,
+        patch_size=4,
+        in_chans=3,
+        embed_dim=192,
+        depths=[2, 2, 18, 2],
+        num_heads=[6, 12, 24, 48],
+        window_size=7,
+        mlp_ratio=4.,
+        qkv_bias=True,
+        drop_rate=0.0,
+        drop_path_rate=0.1,
+        ape=False,
+        patch_norm=True,
+        use_checkpoint=False)
+
 
 def RamSwin_base_patch4_window12_384():
     return RamSwin(
-                img_size=384,
-                patch_size=4,
-                in_chans=3,
-                embed_dim=128,
-                depths=[ 2, 2, 18, 2 ],
-                num_heads=[ 4, 8, 16, 32 ],
-                window_size=12,
-                mlp_ratio=4.,
-                qkv_bias=True,
-                drop_rate=0.0,
-                drop_path_rate=0.1,
-                ape=False,
-                patch_norm=True,
-                use_checkpoint=False)
+        img_size=384,
+        patch_size=4,
+        in_chans=3,
+        embed_dim=128,
+        depths=[2, 2, 18, 2],
+        num_heads=[4, 8, 16, 32],
+        window_size=12,
+        mlp_ratio=4.,
+        qkv_bias=True,
+        drop_rate=0.0,
+        drop_path_rate=0.1,
+        ape=False,
+        patch_norm=True,
+        use_checkpoint=False)
+
 
 def RamSwin_base_patch4_window7_224():
     return RamSwin(
-                img_size=224,
-                patch_size=4,
-                in_chans=3,
-                embed_dim=128,
-                depths=[ 2, 2, 18, 2 ],
-                num_heads=[ 4, 8, 16, 32 ],
-                window_size=7,
-                mlp_ratio=4.,
-                qkv_bias=True,
-                drop_rate=0.0,
-                drop_path_rate=0.1,
-                ape=False,
-                patch_norm=True,
-                use_checkpoint=False)
-    
+        img_size=224,
+        patch_size=4,
+        in_chans=3,
+        embed_dim=128,
+        depths=[2, 2, 18, 2],
+        num_heads=[4, 8, 16, 32],
+        window_size=7,
+        mlp_ratio=4.,
+        qkv_bias=True,
+        drop_rate=0.0,
+        drop_path_rate=0.1,
+        ape=False,
+        patch_norm=True,
+        use_checkpoint=False)
+
+
 CONFIG_PATH = 'ppcls'
+
+
 def masked_fill(x, mask, value):
     y = paddle.full(x.shape, value, x.dtype)
     return paddle.where(mask, y, x)
 
-def build_text_embed(model_clip, tokenizer ,caption):
+
+def build_text_embed(model_clip, tokenizer, caption):
     with paddle.no_grad():
-        texts = tokenize(caption,tokenizer)
+        texts = tokenize(caption, tokenizer)
         text_embeddings = model_clip.encode_text(texts)
         text_embeddings /= text_embeddings.norm(axis=-1, keepdim=True)
     return text_embeddings
 
+
 class AsymmetricLoss(nn.Layer):
-    def __init__(self, gamma_neg=4, gamma_pos=1, clip=0.05, eps=1e-8, disable_torch_grad_focal_loss=True):
+    def __init__(self,
+                 gamma_neg=4,
+                 gamma_pos=1,
+                 clip=0.05,
+                 eps=1e-8,
+                 disable_torch_grad_focal_loss=True):
         super(AsymmetricLoss, self).__init__()
 
         self.gamma_neg = gamma_neg
@@ -162,7 +177,8 @@ class AsymmetricLoss(nn.Layer):
             loss *= one_sided_w
 
         return -loss.sum()
-    
+
+
 def init_tokenizer():
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     tokenizer.add_special_tokens({'bos_token': '[DEC]'})
@@ -170,10 +186,12 @@ def init_tokenizer():
     tokenizer.enc_token_id = tokenizer.additional_special_tokens_ids[0]
     return tokenizer
 
+
 def read_yaml(rpath):
     with open(rpath, 'r') as f:
         return yaml.safe_load(f)
-    
+
+
 def create_vit(vit,
                image_size,
                use_grad_checkpointing=False,
@@ -188,7 +206,7 @@ def create_vit(vit,
             patch_size=16,
             embed_dim=vision_width,
             depth=12,
-            class_num = 0,
+            class_num=0,
             num_heads=12,
             use_grad_checkpointing=use_grad_checkpointing,
             ckpt_layer=ckpt_layer,
@@ -198,7 +216,7 @@ def create_vit(vit,
         visual_encoder = RamVis(
             img_size=image_size,
             patch_size=16,
-            class_num = 0,
+            class_num=0,
             embed_dim=vision_width,
             depth=24,
             num_heads=16,
@@ -207,23 +225,25 @@ def create_vit(vit,
             drop_path_rate=0.1 or drop_path_rate)
     return visual_encoder, vision_width
 
+
 class RAM(nn.Layer):
-    def __init__(self,
-                 med_config=f'{CONFIG_PATH}/configs/RAM/config_bert.yaml',
-                 image_size=384,
-                 vit='base',
-                 vit_grad_ckpt=False,
-                 vit_ckpt_layer=0,
-                 prompt='a picture of ',
-                 pretrain_clip = None,
-                 threshold=0.68,
-                 delete_tag_index=[],
-                 tag_list=f'{CONFIG_PATH}/utils/RAM/ram_tag_list.txt',
-                 tag_list_chinese=f'{CONFIG_PATH}/utils/RAM/ram_tag_list_chinese.txt',
-                 clip_version='vit-b-32-224',
-                 q2l_config=f'{CONFIG_PATH}/configs/ram/config_q2l.yaml',
-                 ram_class_threshold_path=f'{CONFIG_PATH}/utils/RAM/ram_tag_list_threshold.txt',
-                 stage='eval'):
+    def __init__(
+            self,
+            med_config=f'{CONFIG_PATH}/configs/RAM/config_bert.yaml',
+            image_size=384,
+            vit='base',
+            vit_grad_ckpt=False,
+            vit_ckpt_layer=0,
+            prompt='a picture of ',
+            pretrain_clip=None,
+            threshold=0.68,
+            delete_tag_index=[],
+            tag_list=f'{CONFIG_PATH}/utils/RAM/ram_tag_list.txt',
+            tag_list_chinese=f'{CONFIG_PATH}/utils/RAM/ram_tag_list_chinese.txt',
+            clip_version='vit-b-32-224',
+            q2l_config=f'{CONFIG_PATH}/configs/ram/config_q2l.yaml',
+            ram_class_threshold_path=f'{CONFIG_PATH}/utils/RAM/ram_tag_list_threshold.txt',
+            stage='eval'):
 
         super().__init__()
 
@@ -232,7 +252,8 @@ class RAM(nn.Layer):
         if self.stage == 'train':
             assert pretrain_clip
             self.clip_tokenizer = Tokenizer()
-            assert clip_version in CLIP_DICT.keys(), 'please check the clip structure'
+            assert clip_version in CLIP_DICT.keys(
+            ), 'please check the clip structure'
             self.CLIP, _ = CLIP_DICT[clip_version]
             params = paddle.load(pretrain_clip)
             self.CLIP.set_state_dict(params)
@@ -244,14 +265,14 @@ class RAM(nn.Layer):
                 self.visual_encoder = RamSwin_base_patch4_window7_224()
             elif image_size == 384:
                 self.visual_encoder = RamSwin_base_patch4_window12_384()
-        
+
         elif vit == 'swin_l':
             vision_width = 1536
             if image_size == 224:
                 self.visual_encoder = RamSwin_large_patch4_window7_224()
             elif image_size == 384:
                 self.visual_encoder = RamSwin_large_patch4_window12_384()
-            
+
         else:
             self.visual_encoder, vision_width = create_vit(
                 vit, image_size, vit_grad_ckpt, vit_ckpt_layer)
@@ -263,7 +284,8 @@ class RAM(nn.Layer):
         # create image-tag interaction encoder
         encoder_config = BertConfig.from_dict(read_yaml(med_config))
         encoder_config.encoder_width = 512
-        self.tag_encoder = BertModel(config=encoder_config, add_pooling_layer=False)
+        self.tag_encoder = BertModel(
+            config=encoder_config, add_pooling_layer=False)
 
         # create image-tag-text decoder
         decoder_config = BertConfig.from_dict(read_yaml(med_config))
@@ -282,12 +304,12 @@ class RAM(nn.Layer):
         self.num_class = len(self.tag_list)
         q2l_config = BertConfig.from_dict(read_yaml(q2l_config))
         q2l_config.encoder_width = 512
-        self.tagging_head = BertModel(config=q2l_config, add_pooling_layer=False)
+        self.tagging_head = BertModel(
+            config=q2l_config, add_pooling_layer=False)
         self.tagging_head.resize_token_embeddings(len(self.tokenizer))
         self.label_embed = self.create_parameter(
             shape=(self.num_class, q2l_config.encoder_width),
-            default_initializer= Constant()
-        )
+            default_initializer=Constant())
 
         if q2l_config.hidden_size != 512:
             self.wordvec_proj = nn.Linear(512, q2l_config.hidden_size)
@@ -298,10 +320,8 @@ class RAM(nn.Layer):
 
         self.del_selfattention()
 
-        self.tagging_loss_function = AsymmetricLoss(gamma_neg=7,
-                                                    gamma_pos=0,
-                                                    clip=0.05)
-
+        self.tagging_loss_function = AsymmetricLoss(
+            gamma_neg=7, gamma_pos=0, clip=0.05)
 
         self.image_proj = nn.Linear(vision_width, 512)
 
@@ -310,7 +330,7 @@ class RAM(nn.Layer):
         ram_class_threshold_path = ram_class_threshold_path
         with open(ram_class_threshold_path, 'r', encoding='utf-8') as f:
             ram_class_threshold = [float(s.strip()) for s in f]
-        for key,value in enumerate(ram_class_threshold):
+        for key, value in enumerate(ram_class_threshold):
             self.class_threshold[key] = value
 
     def load_tag_list(self, tag_list_file):
@@ -325,7 +345,12 @@ class RAM(nn.Layer):
         for layer in self.tagging_head.encoder.layer:
             del layer.attention
 
-    def forward(self, image_ram, caption=None, image_tag=None, parse_tag=None, image_clip=None):
+    def forward(self,
+                image_ram,
+                caption=None,
+                image_tag=None,
+                parse_tag=None,
+                image_clip=None):
         """
         image-》 image_ram
         image224 -> image_clip
@@ -344,20 +369,18 @@ class RAM(nn.Layer):
         clip_feature = self.CLIP.encode_image(image_clip)
 
         image_embeds = self.image_proj(self.visual_encoder(image_ram))
-        image_atts = paddle.ones(paddle.shape(image_embeds)[:-1],
-                                dtype=paddle.int32)
-        
+        image_atts = paddle.ones(
+            paddle.shape(image_embeds)[:-1], dtype=paddle.int32)
+
         ##================= Distillation from CLIP ================##
         image_cls_embeds = image_embeds[:, 0, :]
         image_spatial_embeds = image_embeds[:, 1:, :]
-        
+
         loss_dis = 0.
-        if isinstance(clip_feature,paddle.Tensor):
+        if isinstance(clip_feature, paddle.Tensor):
             loss_dis = F.l1_loss(image_cls_embeds, clip_feature)
-        
 
-
-        ##================= Image Tagging ================##
+##================= Image Tagging ================##
         bs = paddle.shape(image_embeds)[0]
         #label_embed = paddle.repeat_interleave(label_embed.unsqueeze(0),[bs, 1, 1])
         label_embed = label_embed.unsqueeze(0).tile([bs, 1, 1]).squeeze(1)
@@ -367,14 +390,13 @@ class RAM(nn.Layer):
             encoder_hidden_states=image_embeds,
             encoder_attention_mask=image_atts,
             return_dict=False,
-            mode='tagging',
-        )
+            mode='tagging', )
 
         logits = self.fc(tagging_embed[0]).squeeze(-1)
         loss_tag = 0.
-        if isinstance(image_tag,paddle.Tensor):
+        if isinstance(image_tag, paddle.Tensor):
             loss_tag = self.tagging_loss_function(logits, image_tag)
-        
+
         ##================= Image-Tag-Text Generation ================##
         tag = parse_tag.cpu().numpy()
         tag_input = []
@@ -382,14 +404,15 @@ class RAM(nn.Layer):
             index = np.argwhere(tag[b] == 1)
             token = self.tag_list[index].squeeze(axis=1)
             tag_input.append(' | '.join(token))
-        
+
         # tokenizer input tags
-        tag_input_tokenzier = self.tokenizer(tag_input,
-                                             padding='max_length',
-                                             truncation=True,
-                                             max_length=40,
-                                             return_attention_mask=True,
-                                             return_tensors='pd')
+        tag_input_tokenzier = self.tokenizer(
+            tag_input,
+            padding='max_length',
+            truncation=True,
+            max_length=40,
+            return_attention_mask=True,
+            return_tensors='pd')
         encoder_input_ids = tag_input_tokenzier.input_ids
         encoder_input_ids[:, 0] = self.tokenizer.enc_token_id
 
@@ -399,45 +422,45 @@ class RAM(nn.Layer):
             attention_mask=tag_input_tokenzier.attention_mask,
             encoder_hidden_states=image_embeds,
             encoder_attention_mask=image_atts,
-            return_dict=True,
-        )
+            return_dict=True, )
 
-        text = self.tokenizer(caption,
-                              padding='longest',
-                              truncation=True,
-                              max_length=40,
-                              return_attention_mask=True,
-                                return_tensors='pd')
-        
+        text = self.tokenizer(
+            caption,
+            padding='longest',
+            truncation=True,
+            max_length=40,
+            return_attention_mask=True,
+            return_tensors='pd')
+
         decoder_input_ids = text.input_ids
-        decoder_input_ids[:,0] = self.tokenizer.bos_token_id
+        decoder_input_ids[:, 0] = self.tokenizer.bos_token_id
 
-        decoder_targets = masked_fill(decoder_input_ids,decoder_input_ids == self.tokenizer.pad_token_id, -100)
-        decoder_targets[:,:self.prompt_length] = -100
-        
-        decoder_output = self.text_decoder(decoder_input_ids, 
-                                           attention_mask = text.attention_mask, 
-                                           encoder_hidden_states = output_tagembedding.last_hidden_state,
-                                           encoder_attention_mask = None,                  
-                                           labels = decoder_targets,
-                                           return_dict = True,   
-                                          )   
-        
+        decoder_targets = masked_fill(decoder_input_ids, decoder_input_ids ==
+                                      self.tokenizer.pad_token_id, -100)
+        decoder_targets[:, :self.prompt_length] = -100
+
+        decoder_output = self.text_decoder(
+            decoder_input_ids,
+            attention_mask=text.attention_mask,
+            encoder_hidden_states=output_tagembedding.last_hidden_state,
+            encoder_attention_mask=None,
+            labels=decoder_targets,
+            return_dict=True, )
+
         loss_t2t = decoder_output.loss
 
         return loss_t2t, loss_tag, loss_dis
 
-    def inference(self,
-                 image,
-                 threshold=0.4,
-                 tag_input=None,
-                 ):
-            
+    def inference(
+            self,
+            image,
+            threshold=0.4,
+            tag_input=None, ):
+
         label_embed = F.relu(self.wordvec_proj(self.label_embed))
 
         image_embeds = self.image_proj(self.visual_encoder(image))
-        image_atts = paddle.ones(image_embeds.shape[:-1],
-                                dtype=paddle.int32)
+        image_atts = paddle.ones(image_embeds.shape[:-1], dtype=paddle.int32)
 
         # recognized image tags using image-tag recogntiion decoder
         image_cls_embeds = image_embeds[:, 0, :]
@@ -450,24 +473,23 @@ class RAM(nn.Layer):
             encoder_hidden_states=image_embeds,
             encoder_attention_mask=image_atts,
             return_dict=False,
-            mode='tagging',
-        )
+            mode='tagging', )
 
         logits = self.fc(tagging_embed[0]).squeeze(-1)
 
         return logits, bs
 
-    def generate_tag_openset(self,
-                 image,
-                 threshold=0.68,
-                 tag_input=None,
-                 ):
-            
+    def generate_tag_openset(
+            self,
+            image,
+            threshold=0.68,
+            tag_input=None, ):
+
         label_embed = F.relu(self.wordvec_proj(self.label_embed))
 
         image_embeds = self.image_proj(self.visual_encoder(image))
-        image_atts = paddle.ones([image_embeds.size()[:-1]],
-                                dtype=paddle.int32)
+        image_atts = paddle.ones(
+            [image_embeds.size()[:-1]], dtype=paddle.int32)
 
         # recognized image tags using image-tag recogntiion decoder
         image_cls_embeds = image_embeds[:, 0, :]
@@ -480,14 +502,11 @@ class RAM(nn.Layer):
             encoder_hidden_states=image_embeds,
             encoder_attention_mask=image_atts,
             return_dict=False,
-            mode='tagging',
-        )
+            mode='tagging', )
 
         logits = self.fc(tagging_embed[0]).squeeze(-1)
 
-
         return logits
-
 
 
 # load RAM pretrained model parameters

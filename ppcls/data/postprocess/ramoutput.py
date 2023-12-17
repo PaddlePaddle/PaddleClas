@@ -5,14 +5,18 @@ import paddle.nn.functional as F
 
 
 class RamOutPut(object):
-
-    def __init__(self, language="cn", tag_list="", tag_list_chinese="", threshold=0.68, delete_tag_index=[]):
+    def __init__(self,
+                 language="cn",
+                 tag_list="",
+                 tag_list_chinese="",
+                 threshold=0.68,
+                 delete_tag_index=[]):
         """
         """
         self.language = language
         assert tag_list, tag_list_chinese
         self.tag_list = self.load_tag_list(tag_list)
-        self.delete_tag_index = delete_tag_index #需要优化
+        self.delete_tag_index = delete_tag_index  #需要优化
         self.tag_list_chinese = self.load_tag_list(tag_list_chinese)
         self.num_class = len(self.tag_list)
         self.class_threshold = paddle.ones([self.num_class]) * threshold
@@ -27,7 +31,7 @@ class RamOutPut(object):
             tag_list = f.read().splitlines()
         tag_list = np.array(tag_list)
         return tag_list
-    
+
     def __call__(self, logits, bs, file_names):
         """
         logits is the result from model
@@ -36,12 +40,11 @@ class RamOutPut(object):
         """
         targets = paddle.where(
             F.sigmoid(logits) > self.class_threshold,
-            paddle.to_tensor([1.0]),
-            paddle.zeros(self.num_class))
-        targets = targets.reshape([bs,-1])
+            paddle.to_tensor([1.0]), paddle.zeros(self.num_class))
+        targets = targets.reshape([bs, -1])
         res = {}
         tag = targets.cpu().numpy()
-        tag[:,self.delete_tag_index] = 0
+        tag[:, self.delete_tag_index] = 0
         tag_output = []
         tag_output_chinese = []
         for b in range(bs):
@@ -55,9 +58,9 @@ class RamOutPut(object):
         res["all"] = f"en : {tag_output}, cn: {tag_output_chinese}"
 
         outputformat = {
-                "class_ids": targets.nonzero(),
-                "scores": logits,
-                "label_names": res[self.language]    
-            }
-        
+            "class_ids": targets.nonzero(),
+            "scores": logits,
+            "label_names": res[self.language]
+        }
+
         return outputformat

@@ -1,16 +1,17 @@
 from paddle import nn
 from paddle.nn import functional as F
 import paddle
-from .bert import * 
+from .bert import *
 from ..clip.clip import tokenize
 from .ram import RAM, AsymmetricLoss
 from paddle.nn.initializer import Constant
 
 import numpy as np
 
-def build_text_embed(model_clip, tokenizer ,caption):
+
+def build_text_embed(model_clip, tokenizer, caption):
     with paddle.no_grad():
-        texts = tokenize(caption,tokenizer)
+        texts = tokenize(caption, tokenizer)
         text_embeddings = model_clip.encode_text(texts)
         text_embeddings /= text_embeddings.norm(axis=-1, keepdim=True)
     return text_embeddings
@@ -18,57 +19,52 @@ def build_text_embed(model_clip, tokenizer ,caption):
 
 CONFIG_PATH = 'ppcls'
 
-    
+
 class RAM_plus(RAM):
-    def __init__(self,
-                 med_config=f'{CONFIG_PATH}/configs/ram/config_bert.yaml',
-                 image_size=384,
-                 vit='base',
-                 vit_grad_ckpt=False,
-                 vit_ckpt_layer=0,
-                 prompt='a picture of ',
-                 threshold=0.68,
-                 delete_tag_index=[],
-                 pretrain_clip = '',
-                 tag_list=f'{CONFIG_PATH}/utils/ram/ram_tag_list.txt',
-                 tag_list_chinese=f'{CONFIG_PATH}/utils/ram/ram_tag_list_chinese.txt',
-                 clip_version = 'vit-b-32-224',
-                 q2l_config=f'{CONFIG_PATH}/configs/ram/config_q2l.yaml',
-                 ram_class_threshold_path=f'{CONFIG_PATH}/utils/RAM/ram_tag_list_threshold.txt',
-                 stage='eval'):
+    def __init__(
+            self,
+            med_config=f'{CONFIG_PATH}/configs/ram/config_bert.yaml',
+            image_size=384,
+            vit='base',
+            vit_grad_ckpt=False,
+            vit_ckpt_layer=0,
+            prompt='a picture of ',
+            threshold=0.68,
+            delete_tag_index=[],
+            pretrain_clip='',
+            tag_list=f'{CONFIG_PATH}/utils/ram/ram_tag_list.txt',
+            tag_list_chinese=f'{CONFIG_PATH}/utils/ram/ram_tag_list_chinese.txt',
+            clip_version='vit-b-32-224',
+            q2l_config=f'{CONFIG_PATH}/configs/ram/config_q2l.yaml',
+            ram_class_threshold_path=f'{CONFIG_PATH}/utils/RAM/ram_tag_list_threshold.txt',
+            stage='eval'):
 
-        super().__init__(med_config=med_config,
-                 image_size=image_size,
-                 vit=vit,
-                 vit_grad_ckpt=vit_grad_ckpt,
-                 vit_ckpt_layer=vit_ckpt_layer,
-                 prompt=prompt,
-                 threshold=threshold,
-                 delete_tag_index=delete_tag_index,
-                 pretrain_clip=pretrain_clip,
-                 tag_list=tag_list,
-                 clip_version=clip_version,
-                 tag_list_chinese=tag_list_chinese,
-                 q2l_config=q2l_config,
-                 ram_class_threshold_path=ram_class_threshold_path,
-                 stage=stage)
-
+        super().__init__(
+            med_config=med_config,
+            image_size=image_size,
+            vit=vit,
+            vit_grad_ckpt=vit_grad_ckpt,
+            vit_ckpt_layer=vit_ckpt_layer,
+            prompt=prompt,
+            threshold=threshold,
+            delete_tag_index=delete_tag_index,
+            pretrain_clip=pretrain_clip,
+            tag_list=tag_list,
+            clip_version=clip_version,
+            tag_list_chinese=tag_list_chinese,
+            q2l_config=q2l_config,
+            ram_class_threshold_path=ram_class_threshold_path,
+            stage=stage)
 
         self.label_embed = self.create_parameter(
-            shape=(self.num_class * 51, 512),
-            
-            default_initializer= Constant()
-        )
+            shape=(self.num_class * 51, 512), default_initializer=Constant())
         self.reweight_scale = self.create_parameter(
-            shape=(1,),
-            default_initializer= Constant(1. * np.log(1 / 0.07))
-        )
-        self.text_alignment_loss_function = AsymmetricLoss(gamma_neg=4,
-                                                    gamma_pos=0,
-                                                    clip=0.05)
+            shape=(1, ), default_initializer=Constant(1. * np.log(1 / 0.07)))
+        self.text_alignment_loss_function = AsymmetricLoss(
+            gamma_neg=4, gamma_pos=0, clip=0.05)
 
-
-    def forward(self, image_ram, caption, image_tag, parse_tag, imageclip=None):
+    def forward(self, image_ram, caption, image_tag, parse_tag,
+                imageclip=None):
         """
         call function as forward
 
@@ -84,24 +80,25 @@ class RAM_plus(RAM):
         """
         assert self.stage == 'train'
         clip_feature = self.CLIP.encode_image(imageclip)
-        batch_text_embed = build_text_embed(self.CLIP,self.clip_tokenizer,caption)
+        batch_text_embed = build_text_embed(self.CLIP, self.clip_tokenizer,
+                                            caption)
         image_embeds = self.image_proj(self.visual_encoder(image_ram))
-        image_atts = paddle.ones(image_embeds.shape[:-1],
-                                dtype=paddle.int32)
+        image_atts = paddle.ones(image_embeds.shape[:-1], dtype=paddle.int32)
         ##================= Distillation from CLIP ================##
         image_cls_embeds = image_embeds[:, 0, :]
         image_spatial_embeds = image_embeds[:, 1:, :]
 
         loss_dis = F.l1_loss(image_cls_embeds, clip_feature)
 
-
         ##================= Image Tagging ================##
         bs = paddle.shape(image_embeds)[0]
         des_per_class = int(self.label_embed.shape[0] / self.num_class)
-        image_cls_embeds = image_cls_embeds / image_cls_embeds.norm(axis=-1, keepdim=True)
+        image_cls_embeds = image_cls_embeds / image_cls_embeds.norm(
+            axis=-1, keepdim=True)
         reweight_scale = self.reweight_scale.exp()
-        logits_per_image = (reweight_scale * image_cls_embeds @ self.label_embed.t())
-        logits_per_image = logits_per_image.reshape([bs, -1,des_per_class])
+        logits_per_image = (reweight_scale * image_cls_embeds
+                            @self.label_embed.t())
+        logits_per_image = logits_per_image.reshape([bs, -1, des_per_class])
         weight_normalized = nn.functional.softmax(logits_per_image, axis=2)
         label_embed_reweight = paddle.empty([bs, self.num_class, 512])
         for i in range(bs):
@@ -109,49 +106,46 @@ class RAM_plus(RAM):
             product = weight_normalized[i].unsqueeze(-1) * reshaped_value
             label_embed_reweight[i] = product.sum(axis=1)
 
-        label_embed = nn.functional.relu(self.wordvec_proj(label_embed_reweight))
+        label_embed = nn.functional.relu(
+            self.wordvec_proj(label_embed_reweight))
 
         tagging_embed = self.tagging_head(
             encoder_embeds=label_embed,
             encoder_hidden_states=image_embeds,
             encoder_attention_mask=image_atts,
             return_dict=False,
-            mode='tagging',
-        )
+            mode='tagging', )
 
         logits = self.fc(tagging_embed[0]).squeeze(-1)
         loss_tag = self.tagging_loss_function(logits, image_tag)
 
-
         ##================= Image-text Alignment ================##
 
-        batch_text_embed = F.relu(self.wordvec_proj(batch_text_embed.astype(self.label_embed.dtype)))
+        batch_text_embed = F.relu(
+            self.wordvec_proj(
+                batch_text_embed.astype(self.label_embed.dtype)))
         batch_text_embed = batch_text_embed.unsqueeze(0).tile([bs, 1, 1])
         alignment_embedding = self.tagging_head(
             encoder_embeds=batch_text_embed,
             encoder_hidden_states=image_embeds,
             encoder_attention_mask=image_atts,
             return_dict=False,
-            mode='tagging',
-        )
+            mode='tagging', )
         alignment_logits = self.fc(alignment_embedding[0]).squeeze(-1)
 
         with paddle.no_grad():
             alignment_targets = paddle.zeros(alignment_logits.shape)
             alignment_targets.fill_diagonal_(1)
 
-        loss_alignment = self.text_alignment_loss_function(alignment_logits,alignment_targets)
+        loss_alignment = self.text_alignment_loss_function(alignment_logits,
+                                                           alignment_targets)
 
         return loss_tag, loss_dis, loss_alignment
 
-
-    def inference(self,
-                 image
-                 ):
+    def inference(self, image):
 
         image_embeds = self.image_proj(self.visual_encoder(image))
-        image_atts = paddle.ones(image_embeds.shape[:-1],
-                                dtype=paddle.int32)
+        image_atts = paddle.ones(image_embeds.shape[:-1], dtype=paddle.int32)
 
         image_cls_embeds = image_embeds[:, 0, :]
         image_spatial_embeds = image_embeds[:, 1:, :]
@@ -160,10 +154,12 @@ class RAM_plus(RAM):
 
         des_per_class = int(self.label_embed.shape[0] / self.num_class)
 
-        image_cls_embeds = image_cls_embeds / image_cls_embeds.norm(axis=-1, keepdim=True)
+        image_cls_embeds = image_cls_embeds / image_cls_embeds.norm(
+            axis=-1, keepdim=True)
         reweight_scale = self.reweight_scale.exp()
-        logits_per_image = (reweight_scale * image_cls_embeds @ self.label_embed.t())
-        logits_per_image = logits_per_image.reshape([bs, -1,des_per_class])
+        logits_per_image = (reweight_scale * image_cls_embeds
+                            @self.label_embed.t())
+        logits_per_image = logits_per_image.reshape([bs, -1, des_per_class])
 
         weight_normalized = F.softmax(logits_per_image, axis=2)
         label_embed_reweight = paddle.empty([bs, self.num_class, 512])
@@ -182,23 +178,20 @@ class RAM_plus(RAM):
             encoder_hidden_states=image_embeds,
             encoder_attention_mask=image_atts,
             return_dict=False,
-            mode='tagging',
-        )
+            mode='tagging', )
 
         logits = self.fc(tagging_embed[0]).squeeze(-1)
 
-
         return logits, bs
 
-    def generate_tag_openset(self,
-                 image,
-                 threshold=0.68,
-                 tag_input=None,
-                 ):
+    def generate_tag_openset(
+            self,
+            image,
+            threshold=0.68,
+            tag_input=None, ):
 
         image_embeds = self.image_proj(self.visual_encoder(image))
-        image_atts = paddle.ones(image_embeds.shape[:-1],
-                                dtype=paddle.int32)
+        image_atts = paddle.ones(image_embeds.shape[:-1], dtype=paddle.int32)
 
         image_cls_embeds = image_embeds[:, 0, :]
         image_spatial_embeds = image_embeds[:, 1:, :]
@@ -207,14 +200,16 @@ class RAM_plus(RAM):
 
         des_per_class = int(self.label_embed.shape[0] / self.num_class)
 
-        image_cls_embeds = image_cls_embeds / image_cls_embeds.norm(axis=-1, keepdim=True)
+        image_cls_embeds = image_cls_embeds / image_cls_embeds.norm(
+            axis=-1, keepdim=True)
         reweight_scale = self.reweight_scale.exp()
-        logits_per_image = (reweight_scale * image_cls_embeds @ self.label_embed.t())
-        logits_per_image = logits_per_image.reshape([bs, -1,des_per_class])
+        logits_per_image = (reweight_scale * image_cls_embeds
+                            @self.label_embed.t())
+        logits_per_image = logits_per_image.reshape([bs, -1, des_per_class])
 
         weight_normalized = F.softmax(logits_per_image, axis=2)
         label_embed_reweight = paddle.empty([bs, self.num_class, 512])
-                     
+
         for i in range(bs):
             # 这里对 value_ori 进行 reshape，然后使用 broadcasting
             reshaped_value = self.label_embed.reshape([-1, des_per_class, 512])
@@ -229,12 +224,12 @@ class RAM_plus(RAM):
             encoder_hidden_states=image_embeds,
             encoder_attention_mask=image_atts,
             return_dict=False,
-            mode='tagging',
-        )
+            mode='tagging', )
 
         logits = self.fc(tagging_embed[0]).squeeze(-1)
 
         return logits
+
 
 # load RAM pretrained model parameters
 def ram_plus(pretrained='', **kwargs):

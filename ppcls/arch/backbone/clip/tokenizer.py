@@ -1,3 +1,16 @@
+# copyright (c) 2023 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 import gzip
 import html
 import os
@@ -31,7 +44,7 @@ def bytes_to_unicode():
     for b in range(2**8):
         if b not in bs:
             bs.append(b)
-            cs.append(2**8+n)
+            cs.append(2**8 + n)
             n += 1
     cs = [chr(n) for n in cs]
     return dict(zip(bs, cs))
@@ -62,37 +75,40 @@ def whitespace_clean(text):
 
 
 class Tokenizer(object):
-    def __init__(self, bpe_path: str = default_bpe()):
+    def __init__(self, bpe_path: str=default_bpe()):
         self.byte_encoder = bytes_to_unicode()
         self.byte_decoder = {v: k for k, v in self.byte_encoder.items()}
         merges = gzip.open(bpe_path).read().decode("utf-8").split('\n')
-        merges = merges[1:49152-256-2+1]
+        merges = merges[1:49152 - 256 - 2 + 1]
         merges = [tuple(merge.split()) for merge in merges]
         vocab = list(bytes_to_unicode().values())
-        vocab = vocab + [v+'</w>' for v in vocab]
+        vocab = vocab + [v + '</w>' for v in vocab]
         for merge in merges:
             vocab.append(''.join(merge))
         vocab.extend(['<|startoftext|>', '<|endoftext|>'])
         self.encoder = dict(zip(vocab, range(len(vocab))))
         self.decoder = {v: k for k, v in self.encoder.items()}
         self.bpe_ranks = dict(zip(merges, range(len(merges))))
-        self.cache = {'<|startoftext|>': '<|startoftext|>',
-                      '<|endoftext|>': '<|endoftext|>'}
+        self.cache = {
+            '<|startoftext|>': '<|startoftext|>',
+            '<|endoftext|>': '<|endoftext|>'
+        }
         self.pat = re.compile(
-            r"""<\|startoftext\|>|<\|endoftext\|>|'s|'t|'re|'ve|'m|'ll|'d|[\p{L}]+|[\p{N}]|[^\s\p{L}\p{N}]+""", re.IGNORECASE)
+            r"""<\|startoftext\|>|<\|endoftext\|>|'s|'t|'re|'ve|'m|'ll|'d|[\p{L}]+|[\p{N}]|[^\s\p{L}\p{N}]+""",
+            re.IGNORECASE)
 
     def bpe(self, token):
         if token in self.cache:
             return self.cache[token]
-        word = tuple(token[:-1]) + (token[-1] + '</w>',)
+        word = tuple(token[:-1]) + (token[-1] + '</w>', )
         pairs = get_pairs(word)
 
         if not pairs:
-            return token+'</w>'
+            return token + '</w>'
 
         while True:
-            bigram = min(pairs, key=lambda pair: self.bpe_ranks.get(
-                pair, float('inf')))
+            bigram = min(
+                pairs, key=lambda pair: self.bpe_ranks.get(pair, float('inf')))
             if bigram not in self.bpe_ranks:
                 break
             first, second = bigram
@@ -107,8 +123,9 @@ class Tokenizer(object):
                     new_word.extend(word[i:])
                     break
 
-                if word[i] == first and i < len(word)-1 and word[i+1] == second:
-                    new_word.append(first+second)
+                if word[i] == first and i < len(word) - 1 and word[
+                        i + 1] == second:
+                    new_word.append(first + second)
                     i += 2
                 else:
                     new_word.append(word[i])

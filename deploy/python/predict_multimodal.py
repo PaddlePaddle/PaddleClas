@@ -1,3 +1,16 @@
+# copyright (c) 2023 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 import os
 
 import cv2
@@ -38,7 +51,8 @@ def main(config):
                     continue
                 batch_results = cls_predictor.predict(batch_imgs)
                 for number, result_key in enumerate(batch_results.keys()):
-                    print(f"{img_name}-{result_key}:{batch_results[result_key]}")
+                    print(
+                        f"{img_name}-{result_key}:{batch_results[result_key]}")
             batch_imgs = []
             batch_names = []
     if cls_predictor.benchmark:

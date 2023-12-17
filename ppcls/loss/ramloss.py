@@ -13,8 +13,8 @@
 # limitations under the License.
 import paddle.nn as nn
 
-class RAMLoss(nn.Layer):
 
+class RAMLoss(nn.Layer):
     def __init__(self, mode="pretrain"):
         super().__init__()
         self.mode = mode

@@ -14,9 +14,7 @@ class ClipLoss(nn.Layer):
         super().__init__()
 
     def forward(self, logits_per_image, logits_per_text, labels):
-        total_loss = (
-            F.cross_entropy(logits_per_image, labels) +
-            F.cross_entropy(logits_per_text, labels)
-        ) / 2
+        total_loss = (F.cross_entropy(logits_per_image, labels) +
+                      F.cross_entropy(logits_per_text, labels)) / 2
 
         return {"contrastive_loss": total_loss}
