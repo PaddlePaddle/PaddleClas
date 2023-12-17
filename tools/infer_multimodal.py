@@ -24,6 +24,7 @@ from ppcls.engine.engine_multimodal import EngineMultimodal
 
 if __name__ == "__main__":
     args = config.parse_args()
+    args.config = "./ppcls/configs/ram/config_train.yaml"
     config = config.get_config(
         args.config, overrides=args.override, show=False)
     engine = EngineMultimodal(config, mode="infer")

@@ -10,17 +10,18 @@ class RamOutPut(object):
                  tag_list="",
                  tag_list_chinese="",
                  threshold=0.68,
+                 ram_class_threshold_path="ppcls/utils/RAM/ram_tag_list_threshold.txt",
                  delete_tag_index=[]):
         """
         """
         self.language = language
         assert tag_list, tag_list_chinese
         self.tag_list = self.load_tag_list(tag_list)
-        self.delete_tag_index = delete_tag_index  #需要优化
+        self.delete_tag_index = delete_tag_index 
         self.tag_list_chinese = self.load_tag_list(tag_list_chinese)
         self.num_class = len(self.tag_list)
         self.class_threshold = paddle.ones([self.num_class]) * threshold
-        ram_class_threshold_path = "ppcls/utils/RAM/ram_tag_list_threshold.txt"
+        ram_class_threshold_path = ram_class_threshold_path
         with open(ram_class_threshold_path, "r", encoding="utf-8") as f:
             ram_class_threshold = [float(s.strip()) for s in f]
         for key, value in enumerate(ram_class_threshold):
