@@ -13,6 +13,7 @@
 # limitations under the License.
 # Code was based on https://github.com/AgentMaker/Paddle-CLIP, https://github.com/openai/CLIP/
 # reference: https://arxiv.org/abs/2103.00020
+
 import paddle
 import paddle.nn as nn
 from paddle.nn.initializer import Assign, Normal, Constant
