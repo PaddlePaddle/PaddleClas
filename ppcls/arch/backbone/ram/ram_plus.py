@@ -154,6 +154,7 @@ class RAM_plus(RAM):
 
         return loss_tag, loss_dis, loss_alignment
 
+    # to support paddle framework
     def inference(self, image):
 
         image_embeds = self.image_proj(self.visual_encoder(image))

@@ -496,10 +496,16 @@ class TableAttribute(object):
                         ).astype(np.int8).tolist()
             batch_res.append({"attributes": label_res, "output": pred_res})
         return batch_res
-    
-class RamOutPut(object):
 
-    def __init__(self, language="cn",tag_list="", tag_list_chinese="", threshold=0.68, delete_tag_index=[], ram_class_threshold_path="ppcls/utils/RAM/ram_tag_list_threshold.txt"):
+
+class RamOutPut(object):
+    def __init__(self,
+                 language="cn",
+                 tag_list="",
+                 tag_list_chinese="",
+                 threshold=0.68,
+                 delete_tag_index=[],
+                 ram_class_threshold_path=""):
         self.language = language
         assert tag_list, tag_list_chinese
         self.tag_list = self.load_tag_list(tag_list)
@@ -510,7 +516,7 @@ class RamOutPut(object):
         ram_class_threshold_path = ram_class_threshold_path
         with open(ram_class_threshold_path, "r", encoding="utf-8") as f:
             ram_class_threshold = [float(s.strip()) for s in f]
-        for key,value in enumerate(ram_class_threshold):
+        for key, value in enumerate(ram_class_threshold):
             self.class_threshold[key] = value
 
     def load_tag_list(self, tag_list_file):
@@ -518,23 +524,22 @@ class RamOutPut(object):
             tag_list = f.read().splitlines()
         tag_list = np.array(tag_list)
         return tag_list
-    
+
     def __call__(self, logits, bs, file_names=None):
         batch_res = []
         logits = paddle.to_tensor(logits)
         if bs is None:
-            if len(logits.shape) <2:
+            if len(logits.shape) < 2:
                 bs = 1
             else:
                 bs = logits.shape[0]
         targets = paddle.where(
             F.sigmoid(logits) > self.class_threshold,
-            paddle.to_tensor([1.0]),
-            paddle.zeros(self.num_class))
-        targets = targets.reshape([bs,-1])
+            paddle.to_tensor([1.0]), paddle.zeros(self.num_class))
+        targets = targets.reshape([bs, -1])
         res = {}
         tag = targets.cpu().numpy()
-        tag[:,self.delete_tag_index] = 0
+        tag[:, self.delete_tag_index] = 0
         tag_output = []
         tag_output_chinese = []
         for b in range(bs):
@@ -551,6 +556,6 @@ class RamOutPut(object):
             "class_ids": targets.nonzero().numpy().tolist(),
             "scores": logits.argmax(axis=1).numpy().tolist(),
             "label_names": res[self.language]
-            }
+        }
         batch_res.append(outputformat)
         return outputformat

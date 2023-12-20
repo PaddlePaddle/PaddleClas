@@ -467,6 +467,7 @@ class RAM(nn.Layer):
 
         return loss_t2t, loss_tag, loss_dis
 
+    # to support paddle framework
     def inference(
             self,
             image,
