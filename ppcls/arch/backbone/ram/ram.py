@@ -1,3 +1,19 @@
+# copyright (c) 2023 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Code was based on https://github.com/xinyu1205/recognize-anything/tree/main
+# reference: https://arxiv.org/abs/2306.03514
+
 from paddle import nn
 import paddle
 from ..model_zoo.vision_transformer import VisionTransformer
@@ -16,7 +32,7 @@ import numpy as np
 
 class RamVis(VisionTransformer):
     def forward_features(self, x):
-        return self.forward_features(x)
+        return x
 
 
 class RamSwin(SwinTransformer):
@@ -229,20 +245,20 @@ def create_vit(vit,
 class RAM(nn.Layer):
     def __init__(
             self,
-            med_config=f'{CONFIG_PATH}/configs/RAM/config_bert.yaml',
+            med_config="",
             image_size=384,
             vit='base',
             vit_grad_ckpt=False,
             vit_ckpt_layer=0,
-            prompt='a picture of ',
-            pretrain_clip=None,
+            prompt='',
+            clip_pretraind=None,
             threshold=0.68,
             delete_tag_index=[],
-            tag_list=f'{CONFIG_PATH}/utils/RAM/ram_tag_list.txt',
-            tag_list_chinese=f'{CONFIG_PATH}/utils/RAM/ram_tag_list_chinese.txt',
-            clip_version='vit-b-32-224',
-            q2l_config=f'{CONFIG_PATH}/configs/ram/config_q2l.yaml',
-            ram_class_threshold_path=f'{CONFIG_PATH}/utils/RAM/ram_tag_list_threshold.txt',
+            tag_list='',
+            tag_list_chinese='',
+            clip_version='',
+            q2l_config='',
+            ram_class_threshold_path='',
             stage='eval'):
 
         super().__init__()
@@ -250,12 +266,12 @@ class RAM(nn.Layer):
         # create image encoder
         self.stage = stage
         if self.stage == 'train':
-            assert pretrain_clip
+            assert clip_pretraind
             self.clip_tokenizer = Tokenizer()
             assert clip_version in CLIP_DICT.keys(
             ), 'please check the clip structure'
             self.CLIP, _ = CLIP_DICT[clip_version]
-            params = paddle.load(pretrain_clip)
+            params = paddle.load(clip_pretraind)
             self.CLIP.set_state_dict(params)
             self.CLIP.eval()
 

@@ -1,3 +1,19 @@
+# copyright (c) 2023 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Code was based on https://github.com/xinyu1205/recognize-anything/tree/main
+# reference: https://arxiv.org/abs/2310.15200
+
 from paddle import nn
 from paddle.nn import functional as F
 import paddle
@@ -17,26 +33,24 @@ def build_text_embed(model_clip, tokenizer, caption):
     return text_embeddings
 
 
-CONFIG_PATH = 'ppcls'
-
 
 class RAM_plus(RAM):
     def __init__(
             self,
-            med_config=f'{CONFIG_PATH}/configs/ram/config_bert.yaml',
-            image_size=384,
-            vit='base',
+            med_config="",
+            image_size=None,
+            vit='',
             vit_grad_ckpt=False,
             vit_ckpt_layer=0,
-            prompt='a picture of ',
+            prompt='',
             threshold=0.68,
             delete_tag_index=[],
-            pretrain_clip='',
-            tag_list=f'{CONFIG_PATH}/utils/ram/ram_tag_list.txt',
-            tag_list_chinese=f'{CONFIG_PATH}/utils/ram/ram_tag_list_chinese.txt',
-            clip_version='vit-b-32-224',
-            q2l_config=f'{CONFIG_PATH}/configs/ram/config_q2l.yaml',
-            ram_class_threshold_path=f'{CONFIG_PATH}/utils/RAM/ram_tag_list_threshold.txt',
+            clip_pretraind='',
+            tag_list='',
+            tag_list_chinese='',
+            clip_version='',
+            q2l_config='',
+            ram_class_threshold_path='',
             stage='eval'):
 
         super().__init__(
@@ -48,7 +62,7 @@ class RAM_plus(RAM):
             prompt=prompt,
             threshold=threshold,
             delete_tag_index=delete_tag_index,
-            pretrain_clip=pretrain_clip,
+            clip_pretraind=clip_pretraind,
             tag_list=tag_list,
             clip_version=clip_version,
             tag_list_chinese=tag_list_chinese,
@@ -165,7 +179,7 @@ class RAM_plus(RAM):
         label_embed_reweight = paddle.empty([bs, self.num_class, 512])
 
         for i in range(bs):
-            # 这里对 value_ori 进行 reshape，然后使用 broadcasting
+            # boardingcast 
             reshaped_value = self.label_embed.reshape([-1, des_per_class, 512])
             product = weight_normalized[i].unsqueeze(-1) * reshaped_value
             label_embed_reweight[i] = product.sum(axis=1)

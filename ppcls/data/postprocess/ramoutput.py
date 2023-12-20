@@ -1,3 +1,17 @@
+# copyright (c) 2023 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 import numpy as np
 import paddle
@@ -10,7 +24,7 @@ class RamOutPut(object):
                  tag_list="",
                  tag_list_chinese="",
                  threshold=0.68,
-                 ram_class_threshold_path="ppcls/utils/RAM/ram_tag_list_threshold.txt",
+                 ram_class_threshold_path="",
                  delete_tag_index=[]):
         """
         """
@@ -59,8 +73,8 @@ class RamOutPut(object):
         res["all"] = f"en : {tag_output}, cn: {tag_output_chinese}"
 
         outputformat = {
-            "class_ids": targets.nonzero(),
-            "scores": logits,
+            "class_ids": targets.nonzero().numpy().tolist(),
+            "scores": logits.argmax(axis=1).numpy().tolist(),
             "label_names": res[self.language]
         }
 

@@ -1,4 +1,4 @@
-# RAM, RAM_plus 图文标签模型
+# RAM, RAM++ 图文标签模型
 
 ## 目录
 
@@ -15,38 +15,57 @@
 <a name="1"></a>
 ## 1. 模型介绍
 
-RAM以及RAM_plus为类CLIP模型，其中RAM的核心为提出了集训练-推理-打标签一体化的框架，通过堆叠vision encoder以及text encoder，实现多种打标签的下游任务，其核心方法：
+RAM以及RAM++（下文简称RAM类模型）主要用于标注类任务，其中两个模型的主要贡献为提出了集训练-推理-tag一体化的框架。其通过堆叠vision encoder以及text encoder，实现多种下游任务。核心方法包括：
 
-1. RAM基于CLIP，提出Image-Tag recognition Decoder，image-text alignment encoder，image-tag interaction encoder，image-tag-text generation decoder以及generation encoder 5个组件分别实现text-image对齐，text-tag对齐。
-2. RAM_plus作为RAM的升级版，进一步引出语言大模型（large language model，LLM）的语义信息，提升text-image对齐的能力。
-3. RAM以及RAM_plus能够实现segmentation，tag等多种下游任务。
+1. 结合CLIP架构，提出 Image-Tag recognition Decoder，image-text alignment encoder，image-tag interaction encoder，image-tag-text generation decoder以及generation encoder 5个组件分别实现text-image对齐，text-tag对齐。
+2. RAM++进一步使用语言大模型（large language model，LLM）的语义信息，提升text-image对齐的能力。
 
-使用RAM以及RAM_plus时，作者在多个分类任务上取得了最先进的结果：
+使用RAM类模型时，作者在多个分类任务上取得了最先进的结果：
 1. 在OpenImages零样本tag任务上，达到86.6%的mAP；
 3. 在ImageNet零样本多标签分类上，达到72.4%的mAP。
 
-`PaddleClas` paddleclas分别实现了基于不同backbone的ram，ram_plus:
+`PaddleClas` paddleclas分别实现了基于不同backbone的RAM类模型:
 ```yaml
 # model architecture
 Arch:
-  name: ram_plus # ram模型可以指定为ram，ram_plus可以指定为ram_plus默认为ram 
-  vit: swin_l # 视觉主干网络参数，包括 vit：vision transformer，swin_b： swin base模型，swin_l, swin large模型
-  image_size: 384 #图片分辨率
-  pretrain_clip: ./ViT-B-32.pdparams # 训练所使用的CLIP 预训练参数路径，当需要训练ram时，不能为None
-  stage: train # 指定ram，ram_plus模型是否进行训练，stage = train表示需要训练，此时pretrain_clip不能为None，stage = eval表示无需训练
-  med_config: ppcls/configs/RAM/config_bert.yaml # bert based text encoder配置文件，默认 ppcls/configs/RAM/config_bert.yaml
-  tag_list: ppcls/utils/RAM/ram_tag_list.txt # 英文tag标签文件路劲，默认ppcls/utils/RAM/ram_tag_list.txt
-  tag_list_chinese: ppcls/utils/RAM/ram_tag_list.txt # 中文tag标签文件路劲，默认ppcls/utils/RAM/ram_tag_list.txt
-  q2l_config: ppcls/configs/ram/config_q2l.yaml # 基于bert 的text-tag alignment encoder模型配置文件默认  ppcls/configs/ram/config_q2l.yaml 
-  clip_version: vit-b-32-224 #训练时所需的CLIP架构
-  ram_class_threshold_path: ppcls/utils/RAM/ram_tag_list_threshold.txt # tag生成阈值文件默认ppcls/utils/RAM/ram_tag_list_threshold.txt
+  name: ram_plus
+  vit: swin_l
+  med_config: 'ppcls/configs/ram/config_bert.yaml'
+  clip_pretraind: ./ViT-B-32.pdparams #for CLIP a necessary part for training ram
+  stage: train
+  image_size: 384
+  vit_grad_ckpt: False
+  vit_ckpt_layer: 0
+  prompt: 'a picture of '
+  threshold: 0.68
+  delete_tag_index: []
+  tag_list: 'ppcls/utils/ram/ram_tag_list.txt'
+  tag_list_chinese: 'ppcls/utils/ram/ram_tag_list_chinese.txt'
+  clip_version: 'vit-b-32-224'
+  q2l_config: 'ppcls/configs/ram/config_q2l.yaml'
+  ram_class_threshold_path: 'ppcls/utils/RAM/ram_tag_list_threshold.txt'
 ```
-注意，以上模型使用时，需要使用 tools/train_multimodal.py, tools/infer_multimodal.py 以及predict_multimodal.py分别进行支持多模态输入的动态图训练，推理以及静态图推理。
+参数注释：
+  - name  模型参数，使用RAM模型可以指定为ram，使用RAM++模型可以指定为ram_plus，默认为ram 
+  - vit  视觉主干网络参数，包括 vit：vision transformer，swin_b： swin base模型，swin_l, swin large模型
+  - med_config RAM类模型所使用的Bert模型配置文件，默认配置路径：'ppcls/configs/ram/config_bert.yaml'
+  - clip_pretraind 训练所使用的CLIP预训练参数路径，当需要训练RAM类模型时，不能为None
+  - stage  指定RAM，RAM++模型是否进行训练，stage = train表示需要训练，训练时clip_pretraind不能为None，stage = eval表示无需训练
+  - image_size  图片分辨率
+  - prompt RAM训练时所使用的文本提示前缀
+  - threshold 输出TAG所需的阈值数值，表示当该tag对应概率大于该值，则认为属于该tag
+  - delete_tag_index 屏蔽tag所用参数，例如传递[1,3,2]则表示屏蔽index为1，2，3的tag标签
+  - tag_list  英文tag标签文件路劲，默认ppcls/utils/RAM/ram_tag_list.txt
+  - tag_list_chinese 中文tag标签文件路劲，默认ppcls/utils/RAM/ram_tag_list.txt
+  - clip_version  所使用的CLIP结构，默认 vit-b-32-224
+  - q2l_config  基于bert 的text-tag alignment encoder模型配置文件默认  ppcls/configs/ram/config_q2l.yaml 
+  - ram_class_threshold_path  tag生成阈值文件默认ppcls/utils/RAM/ram_tag_list_threshold.txt
+注意，RAM类模型的推理和训练，需要使用tools/train_multimodal.py, tools/infer_multimodal.py 以及predict_multimodal.py接口，支持多模态输入的动态图训练，推理以及静态图推理。
 
 <a name="2"></a>
 ## 2. 数据和模型准备
 
-* 基于 https://github.com/xinyu1205/recognize-anything/tree/main 下载对应数据集json文件，以及按照json文件目录格式，准备相应的数据。目录格式为：
+* 前往官方[repo](https://github.com/xinyu1205/recognize-anything/tree/main)下载对应数据集json文件。同时按照json文件目录格式，准备相应的数据。目录格式为：
 ```json
 {
     {
@@ -57,16 +76,14 @@ Arch:
     }
 }
 ```
-其中务必保证数据集文件路径符合image-path
-* 基于ppcls/configs/config_train.yaml，调整相关参数：
-
+其中务必保证数据集文件路径符合image_path
+* 本文档中，为RAM类模型提供了统一的动态训练以及推理配置文件，结构如下：
 ```yaml
-# global configs
 Global:
   checkpoints: null
-  pretrained_model: "ram_plus.pdparams"
+  pretrained_model: "ram.pdparams" # pretrain model for ram and ram plus, default random initilize
   output_dir: ./output/
-  device: cpu
+  device: gpu
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
@@ -80,7 +97,7 @@ Global:
 
 # mixed precision
 AMP:
-  use_amp: False
+  use_amp: True
   use_fp16_test: False
   scale_loss: 128.0
   use_dynamic_loss_scaling: True
@@ -91,12 +108,24 @@ AMP:
 
 # model architecture
 Arch:
-  name: ram_plus
+  name: ram
   vit: swin_l
-  pretrain_clip: ./ViT-B-32.pdparams
+  med_config: 'ppcls/configs/ram/config_bert.yaml'
+  clip_pretraind: ./ViT-B-32.pdparams # for CLIP a necessary part for training ram
   stage: train
+  image_size: 384
+  vit_grad_ckpt: False
+  vit_ckpt_layer: 0
+  prompt: 'a picture of '
+  threshold: 0.68
+  delete_tag_index: []
+  tag_list: 'ppcls/utils/ram/ram_tag_list.txt'
+  tag_list_chinese: 'ppcls/utils/ram/ram_tag_list_chinese.txt'
+  clip_version: 'vit-b-32-224'
+  q2l_config: 'ppcls/configs/ram/config_q2l.yaml'
+  ram_class_threshold_path: 'ppcls/utils/RAM/ram_tag_list_threshold.txt'
  
-# loss function config for ram and ram_loss please note that RAMLoss only support ram and ram_plus
+# loss function config for traing/eval process
 Loss:
   Train:
     - RAMLoss:
@@ -107,46 +136,93 @@ Loss:
         weight: 1.0
         mode: "pretrain"
 
-
 Optimizer:
-  name: Momentum
-  momentum: 0.9
+  name: AdamW
+  beta1: 0.9
+  beta2: 0.999
+  epsilon: 1e-8
+  weight_decay: 0.05
+  layerwise_decay: 0.6
+  filter_bias_and_bn: True
   lr:
-    name: Piecewise
-    decay_epochs: [30, 60, 90]
-    values: [0.01, 0.001, 0.0001, 0.00001]
-  regularizer:
-    name: 'L2'
-    coeff: 0.0001
+    name: Cosine
+    learning_rate: 0.0004
+    eta_min: 1e-6
+    warmup_epoch: 10
+    warmup_start_lr: 5e-7
 
-
-# data loader for ram and ram_plus dataset
+# data loader for train and eval
 DataLoader:
   Train:
     dataset:
-      name: RAM_pretrain_dataset
-      ann_file: [./visual-genome/vg_ram.json] # 步骤1中所涉及的文件参数，可以同时输入多个文件
+      name: RAMPretrainDataset
+      ann_file: [./visual-genome/vg_ram.json]
+      transform_ops_ram:
+        - ResizeImage:
+            size: 384
+            interpolation: bicubic
+            backend: pil
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - ToCHWImage:
+      transform_ops_clip:        
+        - ResizeImage:
+            resize_short: 224
+            interpolation: bicubic
+            backend: pil
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - ToCHWImage:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 1
+      batch_size: 52
       drop_last: False
       shuffle: True
     loader:
-      num_workers: 1
+      num_workers: 4
       use_shared_memory: True
 
   Eval:
     dataset: 
-      name: RAM_pretrain_dataset
-      ann_file: [./visual-genome/vg_ram.json] # 步骤1中所涉及的文件参数，可以同时输入多个文件
+      name: RAMPretrainDataset
+      ann_file: [./visual-genome/vg_ram.json]
+      transform_ops_ram:
+        - ResizeImage:
+            size: 384
+            interpolation: bicubic
+            backend: pil
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - ToCHWImage:
+      transform_ops_clip:        
+        - ResizeImage:
+            resize_short: 224
+            interpolation: bicubic
+            backend: pil
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - ToCHWImage:
+
     sampler:
       name: DistributedBatchSampler
-      batch_size: 1
+      batch_size: 52
       drop_last: False
-      shuffle: False
+      shuffle: True
     loader:
-      num_workers: 1
+      num_workers: 4
       use_shared_memory: True
 
 Infer:
@@ -161,33 +237,46 @@ Infer:
     - CropImage:
         size: 384
     - NormalizeImage:
-        scale: 1.0/255.0
-        mean: [0.485, 0.456, 0.406]
-        std: [0.229, 0.224, 0.225]
-        order: ''
+          scale: 1.0/255.0
+          mean: [0.485, 0.456, 0.406]
+          std: [0.229, 0.224, 0.225]
+          order: ''
     - ToCHWImage:
-  PostProcess: # RAM 以及RAM_plus 专用后处理，用于根据模型的输出组词
+  PostProcess:
     name: RamOutPut
-    language: "cn" # tag输出的语言，"cn"表示中文，"en"表示英文，"all"表示同时输出中英文，仅支持"cn","en" and "all"
-    tag_list: "ppcls/utils/RAM/ram_tag_list.txt" # 英文标签文件
-    tag_list_chinese: "ppcls/utils/RAM/ram_tag_list_chinese.txt" #中文标签文件
-    ram_class_threshold_path: "ppcls/utils/RAM/ram_tag_list_threshold.txt" # 组词阈值文件，参照ram paper
+    language: "cn"
+    tag_list: "ppcls/utils/RAM/ram_tag_list.txt"
+    tag_list_chinese: "ppcls/utils/RAM/ram_tag_list_chinese.txt"
+    ram_class_threshold_path: "ppcls/utils/RAM/ram_tag_list_threshold.txt"
+
 ```
+用户可以根据自身需求，更改相应配置。注意arch参数请参照本文档。
 
 ## 3. 模型训练
-
+以RAM为例：
 ```shell
 # 多卡
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train_multimodal.py \
-        -c ./ppcls/configs/ram/config_train.yaml
+        -c ./ppcls/configs/ram/config_train_ram.yaml
 # 单卡
 python3 tools/train_multimodal.py \
-        -c ./ppcls/configs//ram/config_train.yaml
+        -c ./ppcls/configs//ram/config_train_ram.yaml
 ```
-
+以RAM++为例：
+```shell
+# 多卡
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+python3 -m paddle.distributed.launch \
+    --gpus="0,1,2,3" \
+    tools/train_multimodal.py \
+        -c ./ppcls/configs/ram/config_train_ram_plus.yaml
+# 单卡
+python3 tools/train_multimodal.py \
+        -c ./ppcls/configs//ram/config_train_ram_plus.yaml
+```
 **注意:**
 1. 目前多标签分类的损失函数默认使用`AsymmetricLoss`。
 2. 目前多标签分类的评估指标默认使用`MAP(integral)`。
@@ -213,18 +302,7 @@ python3 tools/infer_multimodal.py \
 
 得到类似下面的输出：
 ```
-{'class_ids': Tensor(shape=[6, 2], dtype=int64, place=Place(cpu), stop_gradient=True,
-       [[0   , 593 ],
-        [0   , 871 ],
-        [0   , 998 ],
-        [0   , 2071],
-        [0   , 3336],
-        [0   , 3862]]),
-'scores': Tensor(shape=[1, 4585], dtype=float32, place=Place(cpu), stop_gradient=True,
-       [[-0.81945127, -1.42842841, -1.68710935, ..., -1.40692604,
-         -1.96643567, -0.52991331]]), 
-        
-'label_names': ['棕色 | 鸡 | 公鸡 | 母鸡  | 红色 | 站/矗立/摊位']}
+{'class_ids': [[0, 593], [0, 871], [0, 998], [0, 2071], [0, 3336], [0, 3862]], 'scores': [871], 'label_names': ['棕色 | 鸡 | 公鸡 | 母鸡  | 红色 | 站/矗立/摊位']}
 ```
 
 <a name="6"></a>
@@ -280,7 +358,7 @@ python3 python/predict_multimodal.py \
 # 使用下面的命令使用 CPU 进行预测
 #更改 `config_infer.yaml` 配置文件后
 python3 python/predict_multimodal.py \
-    -c ppcls/configs/ram/config_infer.yaml \
+    -c deploy/configs/ram/config_infer.yaml \
     -o Global.inference_model_dir=../inference/ \
     -o Global.infer_imgs=docs/images/inference_deployment/whl_demo.jpg 
 ```
@@ -288,17 +366,8 @@ python3 python/predict_multimodal.py \
 输出结果如下：
 
 ```
-whl_demo.jpg-class_ids: Tensor(shape=[6, 2], dtype=int64, place=Place(cpu), stop_gradient=True,
-       [[0   , 593 ],
-        [0   , 871 ],
-        [0   , 998 ],
-        [0   , 2071],
-        [0   , 3336],
-        [0   , 3862]]),
-whl_demo.jpg-scores: Tensor(shape=[1, 4585], dtype=float32, place=Place(cpu), stop_gradient=True,
-       [[-0.81945127, -1.42842841, -1.68710935, ..., -1.40692604,
-         -1.96643567, -0.52991331]]), 
-        
+whl_demo.jpg-class_ids: [[0, 593], [0, 871], [0, 998], [0, 2071], [0, 3336], [0, 3862]],
+whl_demo.jpg-scores: [871], 
 whl_demo.jpg-label_names: ['棕色 | 鸡 | 公鸡 | 母鸡  | 红色 | 站/矗立/摊位']
 ```
 

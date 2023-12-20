@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Code was based on https://github.com/AgentMaker/Paddle-CLIP, https://github.com/openai/CLIP/
+# reference: https://arxiv.org/abs/2103.00020
 import paddle
 import paddle.nn as nn
 from paddle.nn.initializer import Assign, Normal, Constant

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import paddle.nn as nn
 
 
@@ -18,8 +19,9 @@ class RAMLoss(nn.Layer):
     def __init__(self, mode="pretrain"):
         super().__init__()
         self.mode = mode
+    
+    def forward(self, loss_tag, loss_dis, loss_alignment, *kwargs):
 
-    ## **kwargs 参数没有实际意义，仅作为兼容框架本身所使用的参数
-    def forward(self, loss_tag, loss_dis, loss_alignment, **kwargs):
+        ## **kwargs is useless but to be compatiable with the framework
         loss = loss_tag + loss_dis + loss_alignment
         return {"RAMLoss": loss}

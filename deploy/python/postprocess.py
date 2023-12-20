@@ -548,9 +548,9 @@ class RamOutPut(object):
         res["all"] = f"en : {tag_output}, cn: {tag_output_chinese}"
 
         outputformat = {
-                "class_ids": targets.nonzero(),
-                "scores": logits,
-                "label_names": res[self.language]    
+            "class_ids": targets.nonzero().numpy().tolist(),
+            "scores": logits.argmax(axis=1).numpy().tolist(),
+            "label_names": res[self.language]
             }
         batch_res.append(outputformat)
         return outputformat

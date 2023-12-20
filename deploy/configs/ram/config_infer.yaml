@@ -5,7 +5,7 @@ Global:
   use_gpu: False
   enable_mkldnn: False
   cpu_num_threads: 10
-  enable_benchmark: True
+  enable_benchmark: False
   use_fp16: False
   ir_optim: True
   use_tensorrt: False
