@@ -55,7 +55,7 @@ def main(args):
 
     sum_rate = args.train_list_rate + args.val_list_rate + args.test_list_rate
     if sum_rate != 100:
-        return "训练集、验证集、测试集比例之和需要等于100，请修改后重试"
+        raise Exception("训练集、验证集、测试集比例之和需要等于100，请修改后重试")
     tags = ["train", "val", "test"]
 
     for index, label_name in enumerate(label_name_list):
