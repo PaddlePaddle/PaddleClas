@@ -243,23 +243,22 @@ def create_vit(vit,
 
 
 class RAM(nn.Layer):
-    def __init__(
-            self,
-            med_config="",
-            image_size=384,
-            vit='base',
-            vit_grad_ckpt=False,
-            vit_ckpt_layer=0,
-            prompt='',
-            clip_pretraind=None,
-            threshold=0.68,
-            delete_tag_index=[],
-            tag_list='',
-            tag_list_chinese='',
-            clip_version='',
-            q2l_config='',
-            ram_class_threshold_path='',
-            stage='eval'):
+    def __init__(self,
+                 med_config="",
+                 image_size=384,
+                 vit='base',
+                 vit_grad_ckpt=False,
+                 vit_ckpt_layer=0,
+                 prompt='',
+                 clip_pretraind=None,
+                 threshold=0.68,
+                 delete_tag_index=[],
+                 tag_list='',
+                 tag_list_chinese='',
+                 clip_version='',
+                 q2l_config='',
+                 ram_class_threshold_path='',
+                 stage='eval'):
 
         super().__init__()
 
@@ -451,8 +450,9 @@ class RAM(nn.Layer):
         decoder_input_ids = text.input_ids
         decoder_input_ids[:, 0] = self.tokenizer.bos_token_id
 
-        decoder_targets = masked_fill(decoder_input_ids, decoder_input_ids ==
-                                      self.tokenizer.pad_token_id, -100)
+        decoder_targets = masked_fill(
+            decoder_input_ids,
+            decoder_input_ids == self.tokenizer.pad_token_id, -100)
         decoder_targets[:, :self.prompt_length] = -100
 
         decoder_output = self.text_decoder(

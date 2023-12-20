@@ -33,25 +33,23 @@ def build_text_embed(model_clip, tokenizer, caption):
     return text_embeddings
 
 
-
 class RAM_plus(RAM):
-    def __init__(
-            self,
-            med_config="",
-            image_size=None,
-            vit='',
-            vit_grad_ckpt=False,
-            vit_ckpt_layer=0,
-            prompt='',
-            threshold=0.68,
-            delete_tag_index=[],
-            clip_pretraind='',
-            tag_list='',
-            tag_list_chinese='',
-            clip_version='',
-            q2l_config='',
-            ram_class_threshold_path='',
-            stage='eval'):
+    def __init__(self,
+                 med_config="",
+                 image_size=None,
+                 vit='',
+                 vit_grad_ckpt=False,
+                 vit_ckpt_layer=0,
+                 prompt='',
+                 threshold=0.68,
+                 delete_tag_index=[],
+                 clip_pretraind='',
+                 tag_list='',
+                 tag_list_chinese='',
+                 clip_version='',
+                 q2l_config='',
+                 ram_class_threshold_path='',
+                 stage='eval'):
 
         super().__init__(
             med_config=med_config,

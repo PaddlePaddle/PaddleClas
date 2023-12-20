@@ -19,7 +19,7 @@ class RAMLoss(nn.Layer):
     def __init__(self, mode="pretrain"):
         super().__init__()
         self.mode = mode
-    
+
     def forward(self, loss_tag, loss_dis, loss_alignment, *kwargs):
 
         ## **kwargs is useless but to be compatiable with the framework

@@ -1339,8 +1339,8 @@ class BertForSequenceClassification(BertPretrainedModel):
             elif self.config.problem_type == "single_label_classification":
                 loss_fct = paddle.nn.CrossEntropyLoss()
                 loss = loss_fct(
-                    logits.reshape(
-                        (-1, self.num_labels)), labels.reshape((-1, )))
+                    logits.reshape((-1, self.num_labels)),
+                    labels.reshape((-1, )))
             elif self.config.problem_type == "multi_label_classification":
                 loss_fct = paddle.nn.BCEWithLogitsLoss()
                 loss = loss_fct(logits, labels)

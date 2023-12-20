@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import json
-import os ,glob
+import os, glob
 import random
 import re
 import numpy as np
@@ -29,7 +29,6 @@ from PIL import ImageFile
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 Image.MAX_IMAGE_PIXELS = None
-
 
 
 def pre_caption(caption, max_words=50):
@@ -53,7 +52,13 @@ def pre_caption(caption, max_words=50):
 
 
 class RAMPretrainDataset(Dataset):
-    def __init__(self, ann_file, width=384, class_num=4585, root='',transform_ops_ram=None, transform_ops_clip=None):
+    def __init__(self,
+                 ann_file,
+                 width=384,
+                 class_num=4585,
+                 root='',
+                 transform_ops_ram=None,
+                 transform_ops_clip=None):
 
         self.ann = []
         for f in ann_file:
@@ -96,13 +101,18 @@ class RAMPretrainDataset(Dataset):
         parse_tag = np.zeros([self.class_num])
         parse_tag[num] = 1
         parse_tag = paddle.to_tensor(parse_tag, dtype=paddle.int32)
-        
 
         return (image_ram, caption, image_tag, parse_tag, image224)
 
 
 class RAMFinetuneDataset(Dataset):
-    def __init__(self, ann_file, width=384, class_num=4585, root='', transform_ops_ram=None, transform_ops_clip=None):
+    def __init__(self,
+                 ann_file,
+                 width=384,
+                 class_num=4585,
+                 root='',
+                 transform_ops_ram=None,
+                 transform_ops_clip=None):
 
         self.ann = []
         for f in ann_file:

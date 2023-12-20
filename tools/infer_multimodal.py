@@ -21,7 +21,6 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 from ppcls.utils import config
 from ppcls.engine.engine_multimodal import EngineMultimodal
 
-
 if __name__ == "__main__":
     args = config.parse_args()
     config = config.get_config(

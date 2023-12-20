@@ -31,7 +31,7 @@ class RamOutPut(object):
         self.language = language
         assert tag_list, tag_list_chinese
         self.tag_list = self.load_tag_list(tag_list)
-        self.delete_tag_index = delete_tag_index 
+        self.delete_tag_index = delete_tag_index
         self.tag_list_chinese = self.load_tag_list(tag_list_chinese)
         self.num_class = len(self.tag_list)
         self.class_threshold = paddle.ones([self.num_class]) * threshold
