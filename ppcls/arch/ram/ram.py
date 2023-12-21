@@ -14,20 +14,21 @@
 # Code was based on https://github.com/xinyu1205/recognize-anything/tree/main
 # reference: https://arxiv.org/abs/2306.03514
 
+import yaml
+import numpy as np
+
 from paddle import nn
 import paddle
-from ..model_zoo.vision_transformer import VisionTransformer
-from .bert import *
 from paddlenlp.transformers import BertTokenizer
 from paddle.nn import functional as F
 from paddle.nn.initializer import Constant
 from paddlenlp.transformers.bert.configuration import BertConfig
+
+from ..backbone.model_zoo.vision_transformer import VisionTransformer
+from .bert import *
 from ..clip.clip import CLIP_DICT, tokenize
 from ..clip.tokenizer import Tokenizer
-from ..legendary_models.swin_transformer import SwinTransformer
-
-import yaml
-import numpy as np
+from ..backbone.legendary_models.swin_transformer import SwinTransformer
 
 
 class RamVis(VisionTransformer):

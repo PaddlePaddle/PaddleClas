@@ -22,6 +22,7 @@ from .attr_rec import VehicleAttribute, PersonAttribute, TableAttribute
 from .scoreoutput import ScoreOutput
 from .ramoutput import RamOutPut
 
+
 def build_postprocess(config):
     config = copy.deepcopy(config)
     model_name = config.pop("name")

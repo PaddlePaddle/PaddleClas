@@ -16,6 +16,7 @@
 
 import paddle
 import paddle.nn as nn
+
 from paddle.nn.initializer import Assign, Normal, Constant
 from paddle.vision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
 
@@ -407,8 +408,9 @@ class CLIP(nn.Layer):
         logits_per_image = logit_scale * image_features @text_features.t()
         logits_per_text = logit_scale * text_features @image_features.t()
 
-        # shape = [global_batch_size, global_batch_size]
-        return logits_per_image, logits_per_text
+        # unify the format for paddle loss
+        results = {"image": logits_per_image, "text":logits_per_text}
+        return results
 
 
 def get_transforms(image_resolution):
@@ -456,7 +458,7 @@ def tokenize(texts, tokenizer, context_length=77):
     return result
 
 
-def clip_vit_b_32_224():
+def CLIP_vit_base_patch32_224_with_TextEncoder():
     model = CLIP(
         embed_dim=512,
         image_resolution=224,
@@ -471,7 +473,7 @@ def clip_vit_b_32_224():
     return model, get_transforms(224)
 
 
-def clip_vit_b_16_224():
+def CLIP_vit_base_patch16_224_with_TextEncoder():
     model = CLIP(
         embed_dim=512,
         image_resolution=224,
@@ -486,7 +488,7 @@ def clip_vit_b_16_224():
     return model, get_transforms(224)
 
 
-def clip_vit_l_14_336():
+def CLIP_vit_large_patch14_336_with_TextEncoder():
     model = CLIP(
         embed_dim=1024,
         image_resolution=336,
@@ -501,7 +503,7 @@ def clip_vit_l_14_336():
     return model, get_transforms(336)
 
 
-def clip_vit_l_14_224():
+def CLIP_vit_large_patch14_224_with_TextEncoder():
     model = CLIP(
         embed_dim=1024,
         image_resolution=224,
@@ -517,8 +519,8 @@ def clip_vit_l_14_224():
 
 
 CLIP_DICT = {
-    "vit-b-32-224": clip_vit_b_32_224(),
-    "vit-b-16-224": clip_vit_b_16_224(),
-    "vit-l-24-224": clip_vit_l_14_224(),
-    "vit-l-24-336": clip_vit_l_14_336(),
+    "vit-b-32-224": CLIP_vit_base_patch32_224_with_TextEncoder(),
+    "vit-b-16-224": CLIP_vit_base_patch16_224_with_TextEncoder(),
+    "vit-l-24-224": CLIP_vit_large_patch14_224_with_TextEncoder(),
+    "vit-l-24-336": CLIP_vit_large_patch14_336_with_TextEncoder(),
 }

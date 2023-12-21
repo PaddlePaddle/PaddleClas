@@ -11,12 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from __future__ import annotations
+# Code was based on https://github.com/PaddlePaddle/PaddleNLP/
 
 import warnings
 from typing import Optional, Tuple
 import math
+from dataclasses import dataclass
 
 import paddle
 import paddle.nn as nn
@@ -28,10 +28,7 @@ try:
     from paddle.incubate.nn import FusedTransformerEncoderLayer
 except ImportError:
     FusedTransformerEncoderLayer = None
-from dataclasses import dataclass
-
 from paddlenlp.transformers.model_utils import PretrainedModel, register_base_model, prune_linear_layer, find_pruneable_heads_and_indices, apply_chunking_to_forward
-
 from paddlenlp.layers import Linear as TransposedLinear
 from paddlenlp.utils.converter import StateDictNameMapping, init_name_mappings
 from paddlenlp.utils.env import CONFIG_NAME

@@ -30,7 +30,7 @@ AMP:
 Arch:
   name: ram_plus
   vit: swin_l
-  med_config: 'ppcls/configs/ram/config_bert.yaml'
+  med_config: 'ppcls/configs/ram/RAM_bert.yaml'
   clip_pretraind: ./ViT-B-32.pdparams #for CLIP a necessary part for training ram
   stage: train
   image_size: 384
@@ -42,7 +42,7 @@ Arch:
   tag_list: 'ppcls/utils/ram/ram_tag_list.txt'
   tag_list_chinese: 'ppcls/utils/ram/ram_tag_list_chinese.txt'
   clip_version: 'vit-b-32-224'
-  q2l_config: 'ppcls/configs/ram/config_q2l.yaml'
+  q2l_config: 'ppcls/configs/ram/RAM_q2l.yaml'
   ram_class_threshold_path: 'ppcls/utils/RAM/ram_tag_list_threshold.txt'
  
 # loss function config for traing/eval process

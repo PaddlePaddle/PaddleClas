@@ -14,15 +14,15 @@
 # Code was based on https://github.com/xinyu1205/recognize-anything/tree/main
 # reference: https://arxiv.org/abs/2310.15200
 
+import paddle
+import numpy as np
 from paddle import nn
 from paddle.nn import functional as F
-import paddle
+from paddle.nn.initializer import Constant
+
 from .bert import *
 from ..clip.clip import tokenize
 from .ram import RAM, AsymmetricLoss
-from paddle.nn.initializer import Constant
-
-import numpy as np
 
 
 def build_text_embed(model_clip, tokenizer, caption):
@@ -224,7 +224,7 @@ class RAM_plus(RAM):
         label_embed_reweight = paddle.empty([bs, self.num_class, 512])
 
         for i in range(bs):
-            # 这里对 value_ori 进行 reshape，然后使用 broadcasting
+            # boardingcast
             reshaped_value = self.label_embed.reshape([-1, des_per_class, 512])
             product = weight_normalized[i].unsqueeze(-1) * reshaped_value
             label_embed_reweight[i] = product.sum(axis=1)

@@ -15,6 +15,7 @@
 import paddle.nn as nn
 
 
+# loss for RAM and RAM++
 class RAMLoss(nn.Layer):
     def __init__(self, mode="pretrain"):
         super().__init__()
