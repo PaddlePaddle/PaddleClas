@@ -14,9 +14,11 @@
 # Code was based on https://github.com/AgentMaker/Paddle-CLIP, https://github.com/openai/CLIP/
 # reference: https://arxiv.org/abs/2103.00020
 
+import math
+
 import paddle
 import paddle.nn as nn
-
+from paddle.nn import functional as F
 from paddle.nn.initializer import Assign, Normal, Constant
 from paddle.vision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
 
@@ -34,10 +36,80 @@ class QuickGELU(nn.Layer):
         return x * nn.functional.sigmoid(1.702 * x)
 
 
-class MultiHeadAttention(nn.MultiHeadAttention):
-    def __init__(self, embed_dim, num_heads, output_dim=None):
-        super(MultiHeadAttention, self).__init__(embed_dim, num_heads)
-        self.out_proj = nn.Linear(embed_dim, output_dim or embed_dim)
+
+
+class Attention(nn.Layer):
+    def __init__(
+            self,
+            embed_dim,
+            num_heads=8,
+            output_dim=None,
+            qkv_bias=True,
+            scaled_cosine=False,
+            scale_heads=False,
+            logit_scale_max=math.log(1. / 0.01),
+            attn_drop=0.,
+            proj_drop=0.
+    ):
+        super().__init__()
+        self.scaled_cosine = scaled_cosine
+        self.scale_heads = scale_heads
+        assert embed_dim % num_heads == 0, 'dim should be divisible by num_heads'
+        self.num_heads = num_heads
+        self.head_dim = embed_dim // num_heads
+        self.scale = self.head_dim ** -0.5
+        self.logit_scale_max = logit_scale_max
+
+        # keeping in_proj in this form (instead of nn.Linear) to match weight scheme of original
+        self.in_proj = nn.Linear(embed_dim, embed_dim * 3, bias_attr=qkv_bias)
+
+        if self.scaled_cosine:
+            self.logit_scale = paddle.log(10 * paddle.ones((num_heads, 1, 1)))
+        else:
+            self.logit_scale = None
+        self.attn_drop = nn.Dropout(attn_drop)
+        if self.scale_heads:
+            self.head_scale = paddle.ones((num_heads, 1, 1))
+        else:
+            self.head_scale = None
+        self.out_proj = nn.Linear(embed_dim, output_dim) if output_dim else nn.Linear(embed_dim, embed_dim)
+        self.out_drop = nn.Dropout(proj_drop)
+
+    def forward(self, x, attn_mask=None):
+        L, N, C = paddle.shape(x)
+        q, k, v = self.in_proj(x).chunk(3, axis=-1) 
+
+        q = q.reshape([L, N * self.num_heads, -1]).transpose([1, 0, 2]) * self.scale
+        k = k.reshape([L, N * self.num_heads, -1]).transpose([1, 0, 2]) * self.scale
+        v = v.reshape([L, N * self.num_heads, -1]).transpose([1, 0, 2]) * self.scale
+
+        if self.logit_scale is not None:
+            attn = paddle.bmm(F.normalize(q, dim=-1), F.normalize(k, axis=-1).transpose([0, 2, 1]))
+            logit_scale = paddle.clip(self.logit_scale, max=self.logit_scale_max).exp()
+            attn = attn.reshape([N, self.num_heads, L, L]) * logit_scale
+            attn = attn.reshape([-1, L, L])
+        else:
+            q = q * self.scale
+            attn = paddle.bmm(q, k.transpose([0, 2, 1]))
+
+        if attn_mask is not None:
+            if attn_mask.dtype == paddle.bool:
+                new_attn_mask = paddle.zeros_like(attn_mask, dtype=q.dtype)
+                new_attn_mask.masked_fill_(attn_mask, float("-inf"))
+                attn_mask = new_attn_mask
+            attn += attn_mask
+
+        attn = F.softmax(attn, axis=-1)
+        attn = self.attn_drop(attn)
+
+        x = paddle.bmm(attn, v)
+        if self.head_scale is not None:
+            x = x.reshape([N, self.num_heads, L, C]) * self.head_scale
+            x = x.reshape([-1, L, C])
+        x = x.transpose([1, 0, 2]).reshape([L, N, C])
+        x = self.out_proj(x)
+        x = self.out_drop(x)
+        return x
 
 
 class Bottleneck(nn.Layer):
@@ -97,7 +169,7 @@ class AttentionPool2D(nn.Layer):
                 **0.5))
         self.add_parameter("positional_embedding", positional_embedding)
 
-        self.attn = MultiHeadAttention(embed_dim, num_heads, output_dim)
+        self.attn = Attention(embed_dim, num_heads, output_dim)
 
     def forward(self, x):
         x = x.reshape((x.shape[0], x.shape[1],
@@ -177,7 +249,7 @@ class ModifiedResNet(nn.Layer):
 class ResidualAttentionBlock(nn.Layer):
     def __init__(self, d_model, n_head, attn_mask=None):
         super().__init__()
-        self.attn = MultiHeadAttention(d_model, n_head)
+        self.attn = Attention(d_model, n_head)
         self.ln_1 = nn.LayerNorm(d_model)
         self.mlp = nn.Sequential(("c_fc", nn.Linear(d_model, d_model * 4)),
                                  ("gelu", QuickGELU()),
@@ -186,14 +258,13 @@ class ResidualAttentionBlock(nn.Layer):
         self.attn_mask = attn_mask
 
     def attention(self, x):
-        self.attn_mask = self.attn_mask if self.attn_mask is not None else None
-        return self.attn(x, x, x, attn_mask=self.attn_mask)
+        return self.attn(x, attn_mask=self.attn_mask)
 
     def forward(self, x):
         x = x + self.attention(self.ln_1(x))
         x = x + self.mlp(self.ln_2(x))
         return x
-
+    
 
 class Transformer(nn.Layer):
     def __init__(self, width, layers, heads, attn_mask=None):
@@ -259,7 +330,7 @@ class VisualTransformer(nn.Layer):
         x = self.ln_post(x[:, 0, :])
 
         if self.proj is not None:
-            x = x @self.proj
+            x = x @ self.proj
 
         return x
 
@@ -301,7 +372,7 @@ class CLIP(nn.Layer):
                 heads=vision_heads,
                 output_dim=embed_dim)
 
-        self.transformer = Transformer(
+        self.transformer  = Transformer(
             width=transformer_width,
             layers=transformer_layers,
             heads=transformer_heads,
@@ -358,9 +429,7 @@ class CLIP(nn.Layer):
 
         for resblock in self.transformer.resblocks:
             normal_ = Normal(std=attn_std)
-            normal_(resblock.attn.q_proj.weight)
-            normal_(resblock.attn.k_proj.weight)
-            normal_(resblock.attn.v_proj.weight)
+            normal_(resblock.attn.in_proj.weight)
             Normal(std=proj_std)(resblock.attn.out_proj.weight)
             Normal(std=fc_std)(resblock.mlp.c_fc.weight)
             Normal(std=proj_std)(resblock.mlp.c_proj.weight)
@@ -488,32 +557,32 @@ def CLIP_vit_base_patch16_224_with_TextEncoder():
     return model, get_transforms(224)
 
 
-def CLIP_vit_large_patch14_336_with_TextEncoder():
-    model = CLIP(
-        embed_dim=1024,
-        image_resolution=336,
-        vision_layers=24,
-        vision_width=768,
-        vision_patch_size=14,
-        context_length=77,
-        vocab_size=49408,
-        transformer_width=512,
-        transformer_heads=16,
-        transformer_layers=12)
-    return model, get_transforms(336)
-
-
 def CLIP_vit_large_patch14_224_with_TextEncoder():
     model = CLIP(
-        embed_dim=1024,
+        embed_dim=768,
         image_resolution=224,
         vision_layers=24,
-        vision_width=768,
+        vision_width=1024,
         vision_patch_size=14,
         context_length=77,
         vocab_size=49408,
-        transformer_width=512,
-        transformer_heads=16,
+        transformer_width=768,
+        transformer_heads=12,
+        transformer_layers=12)
+    return model, get_transforms(224)
+
+
+def CLIP_vit_large_patch16_224_with_TextEncoder():
+    model = CLIP(
+        embed_dim=768,
+        image_resolution=224,
+        vision_layers=24,
+        vision_width=1024,
+        vision_patch_size=16,
+        context_length=77,
+        vocab_size=49408,
+        transformer_width=768,
+        transformer_heads=12,
         transformer_layers=12)
     return model, get_transforms(224)
 
@@ -521,6 +590,6 @@ def CLIP_vit_large_patch14_224_with_TextEncoder():
 CLIP_DICT = {
     "vit-b-32-224": CLIP_vit_base_patch32_224_with_TextEncoder(),
     "vit-b-16-224": CLIP_vit_base_patch16_224_with_TextEncoder(),
-    "vit-l-24-224": CLIP_vit_large_patch14_224_with_TextEncoder(),
-    "vit-l-24-336": CLIP_vit_large_patch14_336_with_TextEncoder(),
+    "vit-l-16-224": CLIP_vit_base_patch16_224_with_TextEncoder(),
+    "vit-l-14-224": CLIP_vit_large_patch14_224_with_TextEncoder(),
 }

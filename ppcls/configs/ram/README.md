@@ -21,8 +21,11 @@ RAM以及RAM++（下文简称RAM类模型）主要用于标注类任务，其中
 2. RAM++进一步使用语言大模型（large language model，LLM）的语义信息，提升text-image对齐的能力。
 
 使用RAM类模型时，作者在多个分类任务上取得了最先进的结果：
-1. 在OpenImages零样本tag任务上，达到86.6%的mAP；
-3. 在ImageNet零样本多标签分类上，达到72.4%的mAP。
+
+| Model | BackBone   | Size   | Inference Prompt | OpenImages-MAP |
+|-------|------------|--------|------------------|----------------|
+| RAM   | Swin-large | 5.63GB | LLM Tag Dec      | 82.2           |
+| RAM++ | Swin-base  | 3.01GB | LLM Tag Dec      | 86.6           |
 
 `PaddleClas` paddleclas分别实现了基于不同backbone的RAM类模型:
 ```yaml
@@ -30,7 +33,7 @@ RAM以及RAM++（下文简称RAM类模型）主要用于标注类任务，其中
 Arch:
   name: ram_plus
   vit: swin_l
-  med_config: 'ppcls/configs/ram/config_bert.yaml'
+  med_config: 'ppcls/configs/ram/ram_bert.yaml'
   clip_pretraind: ./ViT-B-32.pdparams #for CLIP a necessary part for training ram
   stage: train
   image_size: 384
@@ -42,7 +45,7 @@ Arch:
   tag_list: 'ppcls/utils/ram/ram_tag_list.txt'
   tag_list_chinese: 'ppcls/utils/ram/ram_tag_list_chinese.txt'
   clip_version: 'vit-b-32-224'
-  q2l_config: 'ppcls/configs/ram/config_q2l.yaml'
+  q2l_config: 'ppcls/configs/ram/ram_q2l.yaml'
   ram_class_threshold_path: 'ppcls/utils/RAM/ram_tag_list_threshold.txt'
 ```
 参数注释：
@@ -110,7 +113,7 @@ AMP:
 Arch:
   name: ram
   vit: swin_l
-  med_config: 'ppcls/configs/ram/config_bert.yaml'
+  med_config: 'ppcls/configs/ram/ram_bert.yaml'
   clip_pretraind: ./ViT-B-32.pdparams # for CLIP a necessary part for training ram
   stage: train
   image_size: 384
@@ -122,7 +125,7 @@ Arch:
   tag_list: 'ppcls/utils/ram/ram_tag_list.txt'
   tag_list_chinese: 'ppcls/utils/ram/ram_tag_list_chinese.txt'
   clip_version: 'vit-b-32-224'
-  q2l_config: 'ppcls/configs/ram/config_q2l.yaml'
+  q2l_config: 'ppcls/configs/ram/ram_q2l.yaml'
   ram_class_threshold_path: 'ppcls/utils/RAM/ram_tag_list_threshold.txt'
  
 # loss function config for traing/eval process
@@ -260,10 +263,10 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train_multimodal.py \
-        -c ./ppcls/configs/ram/config_train_ram.yaml
+        -c ./ppcls/configs/ram/RAM.yaml
 # 单卡
 python3 tools/train_multimodal.py \
-        -c ./ppcls/configs//ram/config_train_ram.yaml
+        -c ./ppcls/configs//ram/RAM.yaml
 ```
 以RAM++为例：
 ```shell
@@ -272,10 +275,10 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train_multimodal.py \
-        -c ./ppcls/configs/ram/config_train_ram_plus.yaml
+        -c ./ppcls/configs/ram/RAM_plus.yaml
 # 单卡
 python3 tools/train_multimodal.py \
-        -c ./ppcls/configs//ram/config_train_ram_plus.yaml
+        -c ./ppcls/configs//ram/RAM_plus.yaml
 ```
 **注意:**
 1. 目前多标签分类的损失函数默认使用`AsymmetricLoss`。
@@ -287,7 +290,7 @@ python3 tools/train_multimodal.py \
 
 ```bash
 python3 tools/infer_multimodal.py \
-    -c ./ppcls/configs/ram/config_train.yaml \
+    -c ./ppcls/configs/ram/RAM.yaml \
     -o Global.pretrained_model="./output/ram/best_model"
 ```
 
@@ -296,7 +299,7 @@ python3 tools/infer_multimodal.py \
 
 ```bash
 python3 tools/infer_multimodal.py \
-    -c ./ppcls/configs/ram/config_train.yaml \
+    -c ./ppcls/configs/ram/RAM.yaml \
     -o Global.pretrained_model="./output/ram/best_model"
 ```
 
@@ -313,7 +316,7 @@ python3 tools/infer_multimodal.py \
 
 ```bash
 python3 tools/export_model.py \
-    -c ./ppcls/configs/ram/config_train.yaml \
+    -c ./ppcls/configs/ram/RAM.yaml \
     -o Global.pretrained_model="./output/ram/"
 ```
 inference model 的路径默认在当前路径下 `./inference`
@@ -352,13 +355,13 @@ cd deploy
 # linux使用`python3`，windows使用`python (-m)`来执行脚本
 # 使用下面的命令使用 GPU 进行预测
 python3 python/predict_multimodal.py \
-    -c ppcls/configs/ram/config_infer.yaml \
+    -c deploy/configs/inference_ram.yaml \
     -o Global.inference_model_dir=../inference/ \
     -o Global.infer_imgs=docs/images/inference_deployment/whl_demo.jpg 
 # 使用下面的命令使用 CPU 进行预测
 #更改 `config_infer.yaml` 配置文件后
 python3 python/predict_multimodal.py \
-    -c deploy/configs/ram/config_infer.yaml \
+    -c deploy/configs/inference_ram.yaml \
     -o Global.inference_model_dir=../inference/ \
     -o Global.infer_imgs=docs/images/inference_deployment/whl_demo.jpg 
 ```
