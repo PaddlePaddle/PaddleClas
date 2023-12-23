@@ -15,4 +15,3 @@ nohup.out
 .idea
 inference/
 test.py
-clip_text.py
