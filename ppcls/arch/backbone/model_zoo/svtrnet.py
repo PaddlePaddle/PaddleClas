@@ -19,7 +19,7 @@ def resize_pos_embed(pos_embed,
     """Resize pos_embed weights.
 
     Args:
-        pos_embed (torch.Tensor): Position embedding weights with shape
+        pos_embed (paddle.Tensor): Position embedding weights with shape
             [1, L, C].
         src_shape (tuple): The resolution of downsampled origin training
             image, in format (H, W).
