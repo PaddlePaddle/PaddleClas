@@ -20,7 +20,7 @@ from paddle import nn
 from paddle.nn import functional as F
 from paddle.nn.initializer import Constant
 
-from .bert import *
+from .bert import BertModel, BertLMHeadModel
 from ..clip.clip import tokenize
 from .ram import RAM, AsymmetricLoss
 
@@ -35,7 +35,7 @@ def build_text_embed(model_clip, tokenizer, caption):
 
 class RAM_plus(RAM):
     def __init__(self,
-                 med_config="",
+                 med_config='',
                  image_size=None,
                  vit='',
                  vit_grad_ckpt=False,
@@ -49,6 +49,7 @@ class RAM_plus(RAM):
                  clip_version='',
                  q2l_config='',
                  ram_class_threshold_path='',
+                 pretrained='',
                  stage='eval'):
 
         super().__init__(
@@ -246,5 +247,5 @@ class RAM_plus(RAM):
 
 # load RAM pretrained model parameters
 def ram_plus(pretrained='', **kwargs):
-    model = RAM_plus(**kwargs)
+    model = RAM_plus(pretrained='', **kwargs)
     return model

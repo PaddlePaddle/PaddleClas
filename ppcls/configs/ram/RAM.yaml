@@ -30,31 +30,29 @@ AMP:
 Arch:
   name: ram
   vit: swin_l
-  med_config: 'ppcls/configs/ram/RAM_bert.yaml'
-  clip_pretraind: ./ViT-B-32.pdparams # for CLIP a necessary part for training ram
-  stage: train
-  image_size: 384
   vit_grad_ckpt: False
   vit_ckpt_layer: 0
+  image_size: 384
   prompt: 'a picture of '
-  threshold: 0.68
+  med_config: 'ppcls/configs/ram/ram_bert.yaml'
   delete_tag_index: []
   tag_list: 'ppcls/utils/ram/ram_tag_list.txt'
   tag_list_chinese: 'ppcls/utils/ram/ram_tag_list_chinese.txt'
+  clip_pretraind: ./ViT-B-32.pdparams #for CLIP a necessary part for training ram
   clip_version: 'vit-b-32-224'
-  q2l_config: 'ppcls/configs/ram/RAM_q2l.yaml'
+  q2l_config: 'ppcls/configs/ram/ram_q2l.yaml'
   ram_class_threshold_path: 'ppcls/utils/RAM/ram_tag_list_threshold.txt'
+  stage: train
+  threshold: 0.68
  
 # loss function config for traing/eval process
 Loss:
   Train:
     - RAMLoss:
         weight: 1.0
-        mode: "pretrain"
   Eval:
     - RAMLoss:
         weight: 1.0
-        mode: "pretrain"
 
 Optimizer:
   name: AdamW
@@ -95,8 +93,8 @@ DataLoader:
             backend: pil
         - NormalizeImage:
             scale: 1.0/255.0
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
+            mean: [0.48145466, 0.4578275, 0.40821073]
+            std: [0.26862954, 0.26130258, 0.27577711]
             order: ''
         - ToCHWImage:
 
@@ -131,8 +129,8 @@ DataLoader:
             backend: pil
         - NormalizeImage:
             scale: 1.0/255.0
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
+            mean: [0.48145466, 0.4578275, 0.40821073]
+            std: [0.26862954, 0.26130258, 0.27577711]
             order: ''
         - ToCHWImage:
 

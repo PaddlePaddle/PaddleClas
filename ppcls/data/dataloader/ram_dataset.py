@@ -13,14 +13,12 @@
 # limitations under the License.
 
 import json
-import os, glob
-import random
+import os
 import re
 import numpy as np
 
 from paddle.io import Dataset
 import paddle
-from paddle.vision.transforms import Resize, Compose, Resize, ToTensor, Normalize
 from .common_dataset import create_operators
 from ppcls.data.preprocess import transform
 
@@ -105,52 +103,3 @@ class RAMPretrainDataset(Dataset):
         return (image_ram, caption, image_tag, parse_tag, image224)
 
 
-class RAMFinetuneDataset(Dataset):
-    def __init__(self,
-                 ann_file,
-                 width=384,
-                 class_num=4585,
-                 root='',
-                 transform_ops_ram=None,
-                 transform_ops_clip=None):
-
-        self.ann = []
-        for f in ann_file:
-            print('loading ' + f)
-            ann = json.load(open(f, 'r'))
-            self.ann += ann
-        self.width = width
-        self.transform_clip = create_operators(transform_ops_clip)
-        self.transform = create_operators(transform_ops_ram)
-        self.class_num = class_num
-        self.root = root
-
-    def __len__(self):
-        return len(self.ann)
-
-    def __getitem__(self, index):
-
-        ann = self.ann[index]
-
-        image_path_use = os.path.join(self.root, ann['image_path'])
-        image = Image.open(image_path_use).convert('RGB')
-        image_ram = transform(image, self.transform)
-
-        image_224 = Image.open(image_path_use).convert('RGB')
-        image_224 = transform(image, self.transform_clip)
-
-        num = ann['union_label_id']
-        image_tag = np.zeros([self.class_num])
-        image_tag[num] = 1
-        image_tag = paddle.to_tensor(image_tag, dtype=paddle.int32)
-
-        caption_index = np.random.randint(0, len(ann['caption']))
-
-        caption = pre_caption(ann['caption'][caption_index], 30)
-
-        num = ann['parse_label_id'][caption_index]
-        parse_tag = np.zeros([self.class_num])
-        parse_tag[num] = 1
-        parse_tag = paddle.to_tensor(parse_tag, dtype=paddle.int32)
-
-        return (image_ram, caption, image_tag, parse_tag, image_224)

@@ -17,9 +17,8 @@ import paddle.nn as nn
 
 # loss for RAM and RAM++
 class RAMLoss(nn.Layer):
-    def __init__(self, mode="pretrain"):
+    def __init__(self):
         super().__init__()
-        self.mode = mode
 
     def forward(self, loss_tag, loss_dis, loss_alignment, *kwargs):
 

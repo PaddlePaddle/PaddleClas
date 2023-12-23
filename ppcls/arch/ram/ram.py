@@ -25,7 +25,7 @@ from paddle.nn.initializer import Constant
 from paddlenlp.transformers.bert.configuration import BertConfig
 
 from ..backbone.model_zoo.vision_transformer import VisionTransformer
-from .bert import *
+from .bert import BertModel, BertLMHeadModel
 from ..clip.clip import CLIP_DICT, tokenize
 from ..clip.tokenizer import Tokenizer
 from ..backbone.legendary_models.swin_transformer import SwinTransformer
@@ -245,7 +245,7 @@ def create_vit(vit,
 
 class RAM(nn.Layer):
     def __init__(self,
-                 med_config="",
+                 med_config='',
                  image_size=384,
                  vit='base',
                  vit_grad_ckpt=False,
@@ -259,6 +259,7 @@ class RAM(nn.Layer):
                  clip_version='',
                  q2l_config='',
                  ram_class_threshold_path='',
+                 pretrained='',
                  stage='eval'):
 
         super().__init__()
@@ -270,7 +271,7 @@ class RAM(nn.Layer):
             self.clip_tokenizer = Tokenizer()
             assert clip_version in CLIP_DICT.keys(
             ), 'please check the clip structure'
-            self.CLIP, _ = CLIP_DICT[clip_version]
+            self.CLIP = CLIP_DICT[clip_version]
             params = paddle.load(clip_pretraind)
             self.CLIP.set_state_dict(params)
             self.CLIP.eval()
@@ -529,5 +530,5 @@ class RAM(nn.Layer):
 
 # load RAM pretrained model parameters
 def ram(pretrained='', **kwargs):
-    model = RAM(**kwargs)
+    model = RAM(pretrained='', **kwargs)
     return model

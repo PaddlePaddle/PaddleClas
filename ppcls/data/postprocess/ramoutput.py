@@ -73,9 +73,20 @@ class RamOutPut(object):
         res["en"] = tag_output
         res["all"] = f"en : {tag_output}, cn: {tag_output_chinese}"
 
+        scores = F.sigmoid(logits).numpy()
+        class_ids_list = []
+        scores_list = []
+
+        for b in range(bs):
+            index = np.argwhere(tag[b] == 1)
+            class_ids_list.append(index.tolist())
+            scores_list.append(scores[b][index].tolist())
+
+
+
         outputformat = {
-            "class_ids": targets.nonzero().numpy().tolist(),
-            "scores": logits.argmax(axis=1).numpy().tolist(),
+            "class_ids": class_ids_list,
+            "scores": scores_list,
             "label_names": res[self.language]
         }
 

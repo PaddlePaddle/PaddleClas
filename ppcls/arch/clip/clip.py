@@ -20,7 +20,6 @@ import paddle
 import paddle.nn as nn
 from paddle.nn import functional as F
 from paddle.nn.initializer import Assign, Normal, Constant
-from paddle.vision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
 
 
 class Identity(nn.Layer):
@@ -482,18 +481,6 @@ class CLIP(nn.Layer):
         return results
 
 
-def get_transforms(image_resolution):
-    transforms = Compose([
-        Resize(
-            image_resolution, interpolation='bicubic'),
-        CenterCrop(image_resolution),
-        lambda image: image.convert("RGB"),
-        ToTensor(),
-        Normalize((0.48145466, 0.4578275, 0.40821073),
-                  (0.26862954, 0.26130258, 0.27577711)),
-    ])
-    return transforms
-
 
 def tokenize(texts, tokenizer, context_length=77):
     """
@@ -539,7 +526,7 @@ def CLIP_vit_base_patch32_224_with_TextEncoder():
         transformer_width=512,
         transformer_heads=8,
         transformer_layers=12)
-    return model, get_transforms(224)
+    return model
 
 
 def CLIP_vit_base_patch16_224_with_TextEncoder():
@@ -554,7 +541,7 @@ def CLIP_vit_base_patch16_224_with_TextEncoder():
         transformer_width=512,
         transformer_heads=8,
         transformer_layers=12)
-    return model, get_transforms(224)
+    return model
 
 
 def CLIP_vit_large_patch14_224_with_TextEncoder():
@@ -569,7 +556,7 @@ def CLIP_vit_large_patch14_224_with_TextEncoder():
         transformer_width=768,
         transformer_heads=12,
         transformer_layers=12)
-    return model, get_transforms(224)
+    return model
 
 
 def CLIP_vit_large_patch16_224_with_TextEncoder():
@@ -584,7 +571,7 @@ def CLIP_vit_large_patch16_224_with_TextEncoder():
         transformer_width=768,
         transformer_heads=12,
         transformer_layers=12)
-    return model, get_transforms(224)
+    return model
 
 
 CLIP_DICT = {
