@@ -160,6 +160,7 @@ _CLIP_diff = {
     'remove_cls_token_in_forward': ['vit_base_patch16_224'],
 }
 
+
 _MOCOV3_diff = {
     'add_layer_norm_before_encoder': [],
     'add_relative_position_bias_in_msa': [],
@@ -881,9 +882,9 @@ def CLIP_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
 
 
 def React_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
-    model_name = "CLIP_vit_base_patch16_224"
+    model_name = "React_vit_base_patch16_224"
     model = VisionTransformer(
-        model_name=model_name,
+        model_name=model_name.replace("React","CLIP"),
         img_size=224,
         patch_size=16,
         embed_dim=768,
@@ -899,9 +900,9 @@ def React_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
 
 
 def React_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
-    model_name = "CLIP_vit_base_patch32_224"
+    model_name = "React_vit_base_patch32_224"
     model = VisionTransformer(
-        model_name=model_name,
+        model_name=model_name.replace("React","CLIP"),
         img_size=224,
         patch_size=32,
         embed_dim=768,
@@ -917,9 +918,9 @@ def React_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
 
 
 def LaCLIP_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
-    model_name = "CLIP_vit_base_patch32_224"
+    model_name = "LaCLIP_vit_base_patch32_224"
     model = VisionTransformer(
-        model_name=model_name,
+        model_name=model_name.replace("LaCLIP","CLIP"),
         img_size=224,
         patch_size=32,
         embed_dim=768,
@@ -937,9 +938,9 @@ def LaCLIP_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
 
 
 def LaCLIP_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
-    model_name = "CLIP_vit_base_patch16_224"
+    model_name = "LaCLIP_vit_base_patch16_224"
     model = VisionTransformer(
-        model_name=model_name,
+        model_name=model_name.replace("LaCLIP","CLIP"),
         img_size=224,
         patch_size=16,
         embed_dim=768,
@@ -957,9 +958,9 @@ def LaCLIP_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
 
 
 def Unicom_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
-    model_name = "CLIP_vit_base_patch32_224"
+    model_name = "Unicom_vit_base_patch32_224"
     model = VisionTransformer(
-        model_name=model_name,
+        model_name=model_name.replace("Unicom","CLIP"),
         img_size=224,
         patch_size=32,
         embed_dim=768,
@@ -977,9 +978,9 @@ def Unicom_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
 
 
 def Unicom_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
-    model_name = "CLIP_vit_base_patch16_224"
+    model_name = "Unicom_vit_base_patch16_224"
     model = VisionTransformer(
-        model_name=model_name,
+        model_name=model_name.replace("Unicom","CLIP"),
         img_size=224,
         patch_size=16,
         embed_dim=768,
