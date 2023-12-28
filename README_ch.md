@@ -61,11 +61,6 @@ PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级�
 <img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "170" height = "170" />
 </div>
 
-- 飞桨AI套件（PaddleX）中训练、推理、高性能部署全流程体验：
-    - 通用图像分类：https://aistudio.baidu.com/modelsdetail/287?modelId=287
-    - PP-ShiTuV2通用图像识别系统：https://aistudio.baidu.com/modelsdetail/307?modelId=307
-
-
 ## 📖 技术交流合作
 
 - 飞桨低代码开发工具（PaddleX）—— 面向国内外主流AI硬件的飞桨精选模型一站式开发工具。包含如下核心优势：
