@@ -674,7 +674,7 @@ class VisionTransformer(nn.Layer):
         _model_diff = eval(f'_{self.model_name}_diff')
 
         self.class_num = class_num
-        self.return_embed = kwargs.get('return_embed', True)
+        self.return_embed = kwargs.get('return_embed', False)
         self.num_features = self.embed_dim = embed_dim
         _img_size = to_2tuple(img_size)
         _patch_size = to_2tuple(patch_size)
@@ -892,7 +892,6 @@ def React_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=12,
         mlp_ratio=4,
         qkv_bias=True,
-        return_embed = False,
         hugging_face_framework=True,
         epsilon=1e-5,
         **kwargs, )
@@ -910,7 +909,6 @@ def React_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=12,
         mlp_ratio=4,
         qkv_bias=True,
-        return_embed = False,
         hugging_face_framework=True,
         epsilon=1e-5,
         **kwargs, )
@@ -928,7 +926,6 @@ def LaCLIP_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=12,
         mlp_ratio=4,
         qkv_bias=True,
-        return_embed = False,
         hugging_face_framework=True,
         image_project=True,
         epsilon=1e-5,
@@ -948,7 +945,6 @@ def LaCLIP_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=12,
         mlp_ratio=4,
         qkv_bias=True,
-        return_embed = False,
         hugging_face_framework=True,
         image_project=True,
         epsilon=1e-5,
@@ -968,7 +964,6 @@ def Unicom_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=12,
         mlp_ratio=4,
         qkv_bias=True,
-        return_embed = False,
         hugging_face_framework=True,
         image_project=True,
         epsilon=1e-5,
@@ -990,7 +985,6 @@ def Unicom_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         qkv_bias=True,
         hugging_face_framework=False,
         image_project=False,
-        return_embed = False,
         conv_bias=True,
         epsilon=1e-5,
         **kwargs, )
