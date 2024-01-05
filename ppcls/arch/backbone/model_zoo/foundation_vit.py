@@ -950,7 +950,6 @@ def LaCLIP_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
         mlp_ratio=4,
         qkv_bias=True,
         hugging_face_framework=True,
-        image_project=True,
         epsilon=1e-5,
         **kwargs, )
 
@@ -969,7 +968,6 @@ def LaCLIP_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         mlp_ratio=4,
         qkv_bias=True,
         hugging_face_framework=True,
-        image_project=True,
         epsilon=1e-5,
         **kwargs, )
 
