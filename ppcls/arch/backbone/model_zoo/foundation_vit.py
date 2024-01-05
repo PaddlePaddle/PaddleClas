@@ -656,6 +656,7 @@ class VisionTransformer(nn.Layer):
                  qk_scale=None,
                  image_project=False,
                  conv_bias=False,
+                 feature_frame=False,
                  hugging_face_framework=False,
                  drop_rate=0.,
                  attn_drop_rate=0.,
@@ -669,6 +670,7 @@ class VisionTransformer(nn.Layer):
         global _model_size
         _model_split = model_name.split('_')
         self.model_name = _model_split[0]
+        self.feature_frame = feature_frame
         self.model_size = '_'.join(_model_split[1:])
         _model_size = self.model_size
         _model_diff = eval(f'_{self.model_name}_diff')
@@ -695,7 +697,7 @@ class VisionTransformer(nn.Layer):
         #self.ln_pre = nn.LayerNorm(embed_dim) if _model_size in _model_diff[
         #    'add_layer_norm_before_encoder'] else nn.Identity()
 
-        if _model_size in _model_diff['remove_cls_token']:
+        if _model_size in _model_diff['remove_cls_token'] or self.feature_frame:
             self.pos_embed = self.create_parameter(
                 shape=(1, num_patches, embed_dim), default_initializer=zeros_)
             self.cls_token = None
@@ -721,7 +723,7 @@ class VisionTransformer(nn.Layer):
         #for path size hugging face plan
         if hugging_face_framework:
             self.ln_pre = nn.LayerNorm(embed_dim)
-            self.pos_embed = None
+            self.add_parameter("pos_embed", self.pos_embed)
         else:
             self.ln_pre = nn.Identity() if _model_size not in _model_diff[
                 'add_layer_norm_before_encoder'] else nn.LayerNorm(embed_dim)
@@ -763,10 +765,25 @@ class VisionTransformer(nn.Layer):
 
         if self.pos_embed is not None:
             trunc_normal_(self.pos_embed)
-        if not _model_size in _model_diff['remove_cls_token']:
+        if not _model_size in _model_diff['remove_cls_token'] and self.feature_frame == False:
             trunc_normal_(self.cls_token)
 
         self.apply(self._init_weights)
+
+        if feature_frame:
+            self.feature = nn.Sequential(
+            nn.Linear(embed_dim * self.patch_embed.num_patches, embed_dim,bias_attr=False),
+            nn.BatchNorm1D(embed_dim, epsilon=2e-5),
+            nn.Linear(embed_dim, output_dim, bias_attr=False),
+            nn.BatchNorm1D(output_dim, epsilon=2e-5))
+            self.pos_drop = Identity()
+            self.cls_token = None
+            self.image_projection = Identity()
+            self.proj = None
+            self.ln_pre = Identity()
+
+
+
 
         if head_init_scale != 1:
             if not self.return_embed and class_num > 0:
@@ -798,7 +815,7 @@ class VisionTransformer(nn.Layer):
     def forward_features(self, x):
         B = x.shape[0]
         x, output_dimensions = self.patch_embed(x)
-        if not _model_size in _model_diff['remove_cls_token']:
+        if not _model_size in _model_diff['remove_cls_token'] and (self.feature_frame==False):
             cls_tokens = self.cls_token.expand((B, -1, -1))
             x = paddle.concat((cls_tokens, x), axis=1)
 
@@ -824,6 +841,12 @@ class VisionTransformer(nn.Layer):
 
     def forward(self, x):
         x = self.forward_features(x)
+
+        if self.feature_frame:
+            B, L, C = paddle.shape(x)
+            x = paddle.reshape(x,[B, -1])
+            x = self.feature(x)
+
         x = self.head(x)
 
         if self.proj is not None and isinstance(self.head,Identity):
@@ -963,9 +986,11 @@ def Unicom_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
         depth=12,
         num_heads=12,
         mlp_ratio=4,
-        qkv_bias=True,
-        hugging_face_framework=True,
-        image_project=True,
+        qkv_bias=False,
+        conv_bias=True, 
+        feature_frame=True,
+        hugging_face_framework=False,
+        image_project=False,
         epsilon=1e-5,
         **kwargs, )
 
@@ -982,9 +1007,10 @@ def Unicom_vit_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         depth=12,
         num_heads=12,
         mlp_ratio=4,
-        qkv_bias=True,
+        qkv_bias=False,
         hugging_face_framework=False,
         image_project=False,
+        feature_frame=True,
         conv_bias=True,
         epsilon=1e-5,
         **kwargs, )
