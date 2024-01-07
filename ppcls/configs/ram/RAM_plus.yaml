@@ -3,7 +3,7 @@ Global:
   checkpoints: null
   pretrained_model: "ram_plus.pdparams" # pretrain model for ram and ram plus, default random initilize
   output_dir: ./output/
-  device: cpu
+  device: gpu
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
@@ -34,13 +34,13 @@ Arch:
   vit_ckpt_layer: 0
   image_size: 384
   prompt: 'a picture of '
-  med_config: 'ppcls/configs/ram/ram_bert.yaml'
+  med_config: 'ppcls/configs/ram/RAM_bert.yaml'
   delete_tag_index: []
   tag_list: 'ppcls/utils/ram/ram_tag_list.txt'
   tag_list_chinese: 'ppcls/utils/ram/ram_tag_list_chinese.txt'
   clip_pretraind: ./ViT-B-32.pdparams #for CLIP a necessary part for training ram
   clip_version: 'vit-b-32-224'
-  q2l_config: 'ppcls/configs/ram/ram_q2l.yaml'
+  q2l_config: 'ppcls/configs/ram/RAM_q2l.yaml'
   ram_class_threshold_path: 'ppcls/utils/RAM/ram_tag_list_threshold.txt'
   stage: train
   threshold: 0.68

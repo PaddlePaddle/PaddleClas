@@ -526,12 +526,12 @@ class RamOutPut(object):
 
     def __call__(self, logits, bs, file_names=None):
         batch_res = []
-        logits = paddle.to_tensor(logits)
         if bs is None:
             if len(logits.shape) < 2:
                 bs = 1
             else:
                 bs = logits.shape[0]
+        logits = paddle.to_tensor(logits).reshape([bs,-1])
         targets = paddle.where(
             F.sigmoid(logits) > self.class_threshold,
             paddle.to_tensor([1.0]), paddle.zeros(self.num_class))
