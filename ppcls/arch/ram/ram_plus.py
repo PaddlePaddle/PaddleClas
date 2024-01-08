@@ -74,7 +74,7 @@ class RAM_plus(RAM):
             shape=(1, ), default_initializer=Constant(1. * np.log(1 / 0.07)))
         self.text_alignment_loss_function = AsymmetricLoss(
             gamma_neg=4, gamma_pos=0, clip=0.05)
-
+    
     def forward(self, image_ram, caption, image_tag, parse_tag,
                 imageclip=None):
         """
@@ -194,7 +194,7 @@ class RAM_plus(RAM):
 
         logits = self.fc(tagging_embed[0]).squeeze(-1)
 
-        return logits, bs
+        return logits
 
     def generate_tag_openset(
             self,

@@ -5,9 +5,9 @@ Global:
   use_gpu: False
   enable_mkldnn: False
   cpu_num_threads: 10
-  enable_benchmark: False
+  enable_benchmark: True
   use_fp16: False
-  ir_optim: True
+  ir_optim: False # do not set it as True since there is a bug which leads the invaild initilize for predictor
   use_tensorrt: False
   gpu_mem: 8000
   enable_profile: False
@@ -19,7 +19,7 @@ PreProcess:
     - CropImage:
         size: 384
     - NormalizeImage:
-        scale: 0.00392157
+        scale: 1.0/255.0
         mean: [0.485, 0.456, 0.406]
         std: [0.229, 0.224, 0.225]
         order: ""
@@ -33,6 +33,4 @@ PostProcess:
     tag_list_chinese: "ppcls/utils/RAM/ram_tag_list_chinese.txt"
     ram_class_threshold_path: "ppcls/utils/RAM/ram_tag_list_threshold.txt"
 
-  SavePreLabel:
-    save_dir: ./pre_label/
 

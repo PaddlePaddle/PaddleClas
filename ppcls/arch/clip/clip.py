@@ -441,10 +441,10 @@ class CLIP(nn.Layer):
                            float("-inf"))
         mask = paddle.triu(mask, diagonal=1)
         return mask
-
+    @paddle.jit.to_static()
     def encode_image(self, image):
         return self.visual(image)
-
+    @paddle.jit.to_static()
     def encode_text(self, text):
         x = self.token_embedding(text)
         x = x + self.positional_embedding

@@ -473,7 +473,7 @@ class RAM(nn.Layer):
 
         logits = self.fc(tagging_embed[0]).squeeze(-1)
 
-        return logits, bs
+        return logits
 
     def generate_tag_openset(
             self,
