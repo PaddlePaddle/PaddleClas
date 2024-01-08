@@ -29,8 +29,8 @@ PostProcess:
   main_indicator: RamOutPut
   RamOutPut:
     language: "en"
-    tag_list: "ppcls/utils/RAM/ram_tag_list.txt"
-    tag_list_chinese: "ppcls/utils/RAM/ram_tag_list_chinese.txt"
-    ram_class_threshold_path: "ppcls/utils/RAM/ram_tag_list_threshold.txt"
+    tag_list: "ppcls/utils/RAM/RAM_tag_list.txt"
+    tag_list_chinese: "ppcls/utils/RAM/RAM_tag_list_chinese.txt"
+    ram_class_threshold_path: "ppcls/utils/RAM/RAM_tag_list_threshold.txt"
 
 
