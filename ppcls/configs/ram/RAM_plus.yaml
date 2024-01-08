@@ -34,14 +34,14 @@ Arch:
   vit_ckpt_layer: 0
   image_size: 384
   prompt: 'a picture of '
-  med_config: 'ppcls/configs/RAM/RAM_bert.yaml'
+  med_config: 'ppcls/configs/ram/RAM_bert.yaml'
   delete_tag_index: []
-  tag_list: 'ppcls/utils/RAM/RAM_tag_list.txt'
-  tag_list_chinese: 'ppcls/utils/RAM/RAM_tag_list_chinese.txt'
+  tag_list: 'ppcls/utils/ram/ram_tag_list.txt'
+  tag_list_chinese: 'ppcls/utils/ram/ram_tag_list_chinese.txt'
   clip_pretraind: ./ViT-B-32.pdparams #for CLIP a necessary part for training ram
   clip_version: 'vit-b-32-224'
-  q2l_config: 'ppcls/configs/RAM/RAM_q2l.yaml'
-  ram_class_threshold_path: 'ppcls/utils/RAM/RAM_tag_list_threshold.txt'
+  q2l_config: 'ppcls/configs/ram/RAM_q2l.yaml'
+  ram_class_threshold_path: 'ppcls/utils/ram/ram_tag_list_threshold.txt'
   stage: train
   threshold: 0.68
  
@@ -78,7 +78,7 @@ DataLoader:
     dataset:
       name: RAMPretrainDataset
       ann_file: [./visual-genome/vg_ram.json]
-      tag_list: 'ppcls/utils/RAM/ram_tag_list.txt'
+      tag_list: 'ppcls/utils/ram/ram_tag_list.txt'
       model_name: "RAM_plus"
       transform_ops_ram:
         - ResizeImage:
@@ -116,7 +116,7 @@ DataLoader:
     dataset: 
       name: RAMPretrainDataset
       ann_file: [./visual-genome/vg_ram.json]
-      tag_list: 'ppcls/utils/RAM/ram_tag_list.txt'
+      tag_list: 'ppcls/utils/ram/ram_tag_list.txt'
       model_name: "RAM_plus"
       transform_ops_ram:
         - ResizeImage:
@@ -170,7 +170,7 @@ Infer:
   PostProcess:
     name: RamOutPut
     language: "cn"
-    tag_list: "ppcls/utils/RAM/RAM_tag_list.txt"
-    tag_list_chinese: "ppcls/utils/RAM/RAM_tag_list_chinese.txt"
-    ram_class_threshold_path: "ppcls/utils/RAM/RAM_tag_list_threshold.txt"
+    tag_list: "ppcls/utils/ram/ram_tag_list.txt"
+    tag_list_chinese: "ppcls/utils/ram/ram_tag_list_chinese.txt"
+    ram_class_threshold_path: "ppcls/utils/ram/ram_tag_list_threshold.txt"
 
