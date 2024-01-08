@@ -21,6 +21,9 @@ from paddle.io import Dataset
 import paddle
 from .common_dataset import create_operators
 from ppcls.data.preprocess import transform
+from ppcls.arch.clip.tokenizer import Tokenizer
+from ppcls.arch.clip.clip import tokenize
+from ppcls.arch.ram.ram import init_tokenizer
 
 from PIL import Image
 from PIL import ImageFile
@@ -55,6 +58,8 @@ class RAMPretrainDataset(Dataset):
                  width=384,
                  class_num=4585,
                  root='',
+                 tag_list='',
+                 model_name='',
                  transform_ops_ram=None,
                  transform_ops_clip=None):
 
@@ -64,13 +69,65 @@ class RAMPretrainDataset(Dataset):
             ann = json.load(open(f, 'r'))
             self.ann += ann
         self.width = width
+        self.name = model_name.lower()
         self.transform_clip = create_operators(transform_ops_clip)
         self.transform = create_operators(transform_ops_ram)
         self.class_num = class_num
         self.root = root
+        self.tag_list = self.load_tag_list(tag_list)
+        self.bert_tokenizer = init_tokenizer()
+        self.clip_tokenizer = Tokenizer()
+        
 
     def __len__(self):
         return len(self.ann)
+    
+    def load_tag_list(self, tag_list_file):
+        with open(tag_list_file, 'r', encoding='utf-8') as f:
+            tag_list = f.read().splitlines()
+        tag_list = np.array(tag_list)
+        return tag_list
+    
+    def collect_fn_list(self, data):
+        image_ram_list = []
+        text_list = []
+        image_tag_list = []
+        image_parse_tag_list = []
+        image_clip_list = []
+        for item in data:
+            i1,i2,i3,i4,i5 = item
+            image_ram_list.append(i1)
+            text_list.append(i2)
+            image_tag_list.append(i3)
+            image_parse_tag_list.append(i4)
+            image_clip_list.append(i5)
+        image_rams = paddle.stack(image_ram_list)
+        if self.name == "ram":
+            text_list = self.bert_tokenizer(
+                text_list,
+                padding='longest',
+                truncation=True,
+                max_length=40,
+                return_attention_mask=True,
+                return_tensors='pd')
+        else:
+            text_list = tokenize(text_list, self.clip_tokenizer)
+        image_tags = paddle.stack(image_tag_list)
+        image_parse_tag_list = np.stack(image_parse_tag_list)
+        tag_input = []
+        for b in range(len(image_ram_list)):
+            index = np.argwhere(image_parse_tag_list[b] == 1)
+            token = self.tag_list[index].squeeze(axis=1)
+            tag_input.append(' | '.join(token))
+        image_parse_tags = self.bert_tokenizer(
+            tag_input,
+            padding='max_length',
+            truncation=True,
+            max_length=40,
+            return_attention_mask=True,
+            return_tensors='pd')
+        image_clips = paddle.stack(image_clip_list)
+        return [image_rams, text_list , image_tags, image_parse_tags, image_clips]
 
     def __getitem__(self, index):
 
@@ -98,8 +155,7 @@ class RAMPretrainDataset(Dataset):
         num = ann['parse_label_id'][caption_index]
         parse_tag = np.zeros([self.class_num])
         parse_tag[num] = 1
-        parse_tag = paddle.to_tensor(parse_tag, dtype=paddle.int32)
-
-        return (image_ram, caption, image_tag, parse_tag, image224)
+        
+        return [image_ram, caption, image_tag, parse_tag, image224]
 
 

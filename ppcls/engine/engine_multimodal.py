@@ -31,32 +31,14 @@ from ppcls.engine import engine
 from ppcls.engine import train as train_method
 from ppcls.engine.engine import ExportModel, load_dygraph_pretrain
 
-def collect_fn_list(data):
-    image_ram_list = []
-    caption_list = []
-    image_tag_list = []
-    image_parse_tag_list = []
-    image_clip_list = []
-    for item in data:
-        i1,i2,i3,i4,i5 = item
-        image_ram_list.append(i1)
-        caption_list.append(i2)
-        image_tag_list.append(i3)
-        image_parse_tag_list.append(i4)
-        image_clip_list.append(i5)
-    
-    image_rams = paddle.stack(image_ram_list)
-    image_tags = paddle.stack(image_tag_list)
-    image_parse_tags = paddle.stack(image_parse_tag_list)
-    image_clips = paddle.stack(image_clip_list)
-    return (image_rams, caption_list , image_tags, image_parse_tags, image_clips)
 
 class EngineMultimodal(engine.Engine):
     def __init__(self, config, mode="train"):
         super().__init__(config, mode)
         self.train_epoch_func = train_method.train_epoch_multimodal
-        self.train_dataloader.collate_fn = collect_fn_list
-        self.eval_dataloader.collate_fn = collect_fn_list
+        if mode == "train":
+            self.train_dataloader.collate_fn = self.train_dataloader.dataset.collect_fn_list
+            self.eval_dataloader.collate_fn = self.train_dataloader.dataset.collect_fn_list
 
     @paddle.no_grad()
     def eval(self, epoch_id=0):
@@ -150,12 +132,14 @@ class EngineMultimodal(engine.Engine):
 
 
 class ExportModelMultiModal(ExportModel):
+    def __init__(self, config, model, use_multilabel):
+        super().__init__(config, model, use_multilabel)
+        self.CLIP_model = config.get("clip","")
     def forward(self, x):
-        x = self.base_model.inference(x)
-        if isinstance(x, list):
-            x = x[0]
-        if self.infer_model_name is not None:
-            x = x[self.infer_model_name]
-        if self.infer_output_key is not None:
-            x = x[self.infer_output_key]
+        if self.CLIP_model == "image":
+            return self.base_model.encode_image(x)
+        elif self.CLIP_model == "text":
+            return self.base_model.encode_text(x)
+        else:
+            x = self.base_model.inference(x)
         return x

@@ -25,9 +25,8 @@ from ..clip.clip import tokenize
 from .ram import RAM, AsymmetricLoss
 
 
-def build_text_embed(model_clip, tokenizer, caption):
+def build_text_embed(model_clip, texts):
     with paddle.no_grad():
-        texts = tokenize(caption, tokenizer)
         text_embeddings = model_clip.encode_text(texts)
         text_embeddings /= text_embeddings.norm(axis=-1, keepdim=True)
     return text_embeddings
@@ -93,8 +92,7 @@ class RAM_plus(RAM):
         """
         assert self.stage == 'train'
         clip_feature = self.CLIP.encode_image(imageclip)
-        batch_text_embed = build_text_embed(self.CLIP, self.clip_tokenizer,
-                                            caption)
+        batch_text_embed = build_text_embed(self.CLIP, caption)
         image_embeds = self.image_proj(self.visual_encoder(image_ram))
         image_atts = paddle.ones(image_embeds.shape[:-1], dtype=paddle.int32)
         ##================= Distillation from CLIP ================##

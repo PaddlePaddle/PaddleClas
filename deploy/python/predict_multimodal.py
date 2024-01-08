@@ -19,7 +19,7 @@ import numpy as np
 
 from paddleclas.deploy.utils import logger, config
 from paddleclas.deploy.utils.get_image_list import get_image_list
-from paddleclas.predict_cls import ClsPredictor
+from paddleclas.deploy.python.predict_cls import ClsPredictor
 
 
 def main(config):

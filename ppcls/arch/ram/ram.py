@@ -196,8 +196,8 @@ class AsymmetricLoss(nn.Layer):
         return -loss.sum()
 
 
-def init_tokenizer():
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+def init_tokenizer(tokenizer_name="bert-base-uncased"):
+    tokenizer = BertTokenizer.from_pretrained(tokenizer_name)
     tokenizer.add_special_tokens({'bos_token': '[DEC]'})
     tokenizer.add_special_tokens({'additional_special_tokens': ['[ENC]']})
     tokenizer.enc_token_id = tokenizer.additional_special_tokens_ids[0]
@@ -364,9 +364,9 @@ class RAM(nn.Layer):
 
     def forward(self,
                 image_ram,
-                caption=None,
+                text=None,
                 image_tag=None,
-                parse_tag=None,
+                tag_input_tokenzier=None,
                 image_clip=None):
         """
         image-》 image_ram
@@ -375,7 +375,7 @@ class RAM(nn.Layer):
 
         Args:
             image: type: paddle.Tensor  shape: batch_size * 3 * 384 * 384
-            caption: type: list[string]  len: batch_size
+            caption: type: paddle.Tensor  len: batch_size * embedding_size
             tag: type: paddle.Tensor   shape: batch * class_num (e.g. 3429)   value: positive sample is 1.0, negative sample is 0.0
 
         Returns:
@@ -415,42 +415,19 @@ class RAM(nn.Layer):
             loss_tag = self.tagging_loss_function(logits, image_tag)
 
         ##================= Image-Tag-Text Generation ================##
-        tag = parse_tag.cpu().numpy()
-        tag_input = []
-        for b in range(bs):
-            index = np.argwhere(tag[b] == 1)
-            token = self.tag_list[index].squeeze(axis=1)
-            tag_input.append(' | '.join(token))
-
-        # tokenizer input tags
-        tag_input_tokenzier = self.tokenizer(
-            tag_input,
-            padding='max_length',
-            truncation=True,
-            max_length=40,
-            return_attention_mask=True,
-            return_tensors='pd')
-        encoder_input_ids = tag_input_tokenzier.input_ids
+        encoder_input_ids = tag_input_tokenzier.get("input_ids")
         encoder_input_ids[:, 0] = self.tokenizer.enc_token_id
 
         # put input tag into image-tag interaction encoder to interact with image embeddings
         output_tagembedding = self.tag_encoder(
             encoder_input_ids,
-            attention_mask=tag_input_tokenzier.attention_mask,
+            attention_mask=tag_input_tokenzier.get("attention_mask"),
             encoder_hidden_states=image_embeds,
             encoder_attention_mask=image_atts,
             return_dict=True, )
 
-        text = self.tokenizer(
-            caption,
-            padding='longest',
-            truncation=True,
-            max_length=40,
-            return_attention_mask=True,
-            return_tensors='pd')
-
-        decoder_input_ids = text.input_ids
-        decoder_input_ids[:, 0] = self.tokenizer.bos_token_id
+        decoder_input_ids = text.get("input_ids")
+        decoder_input_ids[:, 0] = self.tokenizer.enc_token_id
 
         decoder_targets = masked_fill(
             decoder_input_ids,
@@ -459,7 +436,7 @@ class RAM(nn.Layer):
 
         decoder_output = self.text_decoder(
             decoder_input_ids,
-            attention_mask=text.attention_mask,
+            attention_mask=text.get("attention_mask"),
             encoder_hidden_states=output_tagembedding.last_hidden_state,
             encoder_attention_mask=None,
             labels=decoder_targets,

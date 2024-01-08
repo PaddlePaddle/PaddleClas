@@ -448,7 +448,9 @@ class CLIP(nn.Layer):
     def encode_text(self, text):
         x = self.token_embedding(text)
         x = x + self.positional_embedding
+        x = x.transpose([1, 0, 2])
         x = self.transformer(x)
+        x = x.transpose([1, 0, 2])
         x = self.ln_final(x)
 
         select = []
