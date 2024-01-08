@@ -398,7 +398,7 @@ class BertEncoder(nn.Layer):
         self.layer = nn.LayerList(
             [BertLayer(config, i) for i in range(config.num_hidden_layers)])
         self.gradient_checkpointing = False
-    @paddle.jit.to_static
+
     def forward(
             self,
             hidden_states,
@@ -428,7 +428,28 @@ class BertEncoder(nn.Layer):
             past_key_value = past_key_values[
                 i] if past_key_values is not None else None
 
-            layer_outputs = layer_module(
+            if self.gradient_checkpointing and self.training:
+
+                if use_cache:
+                    use_cache = False
+
+                def create_custom_forward(module):
+                    def custom_forward(*inputs):
+                        return module(*inputs, past_key_value,
+                                      output_attentions)
+
+                    return custom_forward
+
+                layer_outputs = paddle.utils.checkpoint.checkpoint(
+                    create_custom_forward(layer_module),
+                    hidden_states,
+                    attention_mask,
+                    layer_head_mask,
+                    encoder_hidden_states,
+                    encoder_attention_mask,
+                    mode=mode, )
+            else:
+                layer_outputs = layer_module(
                     hidden_states,
                     attention_mask,
                     layer_head_mask,
@@ -875,7 +896,7 @@ class BertModel(BertPretrainedModel):
         ) * paddle.finfo(paddle.float16).min
 
         return encoder_extended_attention_mask
-    
+
     def forward(
             self,
             input_ids: Tensor=None,
@@ -1039,7 +1060,7 @@ class BertModel(BertPretrainedModel):
                                        self.config.num_hidden_layers)
         extended_attention_mask = self.get_extended_attention_mask(
             attention_mask, input_shape, is_decoder)
-        encoder_outputs = self.encoder.forward(
+        encoder_outputs = self.encoder(
             embedding_output,
             attention_mask=extended_attention_mask,
             head_mask=head_mask,
