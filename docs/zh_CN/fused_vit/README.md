@@ -322,6 +322,7 @@ if __name__ == "__main__":
 <img src="imgs/performance_dynamic.jpg" alt="performance_dynamic" style="zoom:50%;" />
 
 * 此处的提升是与`naive vit`对应精度实现的对比
+  * `int8`实现的对比基准为`fp16`
 
 ### 性能数据—静态图
 
