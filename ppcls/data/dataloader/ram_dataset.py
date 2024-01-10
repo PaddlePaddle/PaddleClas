@@ -138,7 +138,9 @@ class RAMPretrainDataset(Dataset):
         try:
             image = Image.open(image_path_use).convert('RGB')
             image_ram = transform(image, self.transform)
+            image_ram = paddle.to_tensor(image_ram)
             image224 = transform(image, self.transform_clip)
+            image224 = paddle.to_tensor(image224)
         except:
             image224 = paddle.ones([3, 224, 224])
             image_ram = paddle.ones([3, self.width, self.width])
