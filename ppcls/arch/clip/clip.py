@@ -86,7 +86,6 @@ class Attention(nn.Layer):
             attn = paddle.bmm(F.normalize(q, dim=-1), F.normalize(k, axis=-1).transpose([0, 2, 1]))
             logit_scale = paddle.clip(self.logit_scale, max=self.logit_scale_max).exp()
             attn = attn.reshape([N, self.num_heads, L, L]) * logit_scale
-            attn = attn.reshape([-1, L, L])
         else:
             q = q * self.scale
             attn = paddle.bmm(q, k.transpose([0, 2, 1]))
@@ -100,7 +99,7 @@ class Attention(nn.Layer):
 
         attn = F.softmax(attn, axis=-1)
         attn = self.attn_drop(attn)
-
+        attn = attn.reshape([-1, L, L])
         x = paddle.bmm(attn, v)
         if self.head_scale is not None:
             x = x.reshape([N, self.num_heads, L, C]) * self.head_scale
@@ -442,6 +441,21 @@ class CLIP(nn.Layer):
         mask = paddle.triu(mask, diagonal=1)
         return mask
     
+    def text_global_pool(self, x, text=None, pool_type='first'):
+        if pool_type == 'first':
+            pooled, tokens = x[:, 0], x[:, 1:]
+        elif pool_type == 'last':
+            pooled, tokens = x[:, -1], x[:, :-1]
+        elif pool_type == 'argmax':
+            # take features from the eot embedding (eot_token is the highest number in each sequence)
+            assert text is not None
+            index = paddle.to_tensor( [paddle.arange(x.shape[0]), text.argmax(axis=-1)])
+            pooled, tokens = paddle.index_select(x, index), x
+        else:
+            pooled = tokens = x
+
+        return pooled, tokens
+    
     def encode_image(self, image):
         return self.visual(image)
     
@@ -453,14 +467,12 @@ class CLIP(nn.Layer):
         x = x.transpose([1, 0, 2])
         x = self.ln_final(x)
 
-        select = []
-        index = zip(paddle.arange(x.shape[0]).numpy(),
-                    text.argmax(axis=-1).numpy())
-        for i, j in index:
-            select.append(x[int(i), int(j)])
-
-        x = paddle.stack(select) @self.text_projection
-
+        x, _ = self.text_global_pool(x , text)
+        if self.text_projection  is not None:
+            if isinstance(self.text_projection, paddle.nn.Linear):
+                x = self.text_projection(x)
+            else:
+                x = x @ self.text_projection
         return x
 
     def forward(self, image, text):
@@ -516,7 +528,7 @@ def tokenize(texts, tokenizer, context_length=77):
     return result
 
 
-def CLIP_vit_base_patch32_224_with_TextEncoder():
+def CLIP_vit_base_patch32_224_with_TextEncoder(**kwargs):
     model = CLIP(
         embed_dim=512,
         image_resolution=224,
@@ -531,7 +543,7 @@ def CLIP_vit_base_patch32_224_with_TextEncoder():
     return model
 
 
-def CLIP_vit_base_patch16_224_with_TextEncoder():
+def CLIP_vit_base_patch16_224_with_TextEncoder(**kwargs):
     model = CLIP(
         embed_dim=512,
         image_resolution=224,
@@ -546,7 +558,7 @@ def CLIP_vit_base_patch16_224_with_TextEncoder():
     return model
 
 
-def CLIP_vit_large_patch14_224_with_TextEncoder():
+def CLIP_vit_large_patch14_224_with_TextEncoder(**kwargs):
     model = CLIP(
         embed_dim=768,
         image_resolution=224,
@@ -561,7 +573,7 @@ def CLIP_vit_large_patch14_224_with_TextEncoder():
     return model
 
 
-def CLIP_vit_large_patch16_224_with_TextEncoder():
+def CLIP_vit_large_patch16_224_with_TextEncoder(**kwargs):
     model = CLIP(
         embed_dim=768,
         image_resolution=224,

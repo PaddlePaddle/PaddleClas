@@ -90,7 +90,7 @@ DataLoader:
         - ToCHWImage:
       transform_ops_clip:        
         - ResizeImage:
-            resize_short: 224
+            size: 224
             interpolation: bicubic
             backend: pil
         - NormalizeImage:
@@ -102,7 +102,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 2
+      batch_size: 52
       drop_last: False
       shuffle: True
     loader:
@@ -128,7 +128,7 @@ DataLoader:
         - ToCHWImage:
       transform_ops_clip:        
         - ResizeImage:
-            resize_short: 224
+            size: 224
             interpolation: bicubic
             backend: pil
         - NormalizeImage:
@@ -140,7 +140,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 2
+      batch_size: 52
       drop_last: False
       shuffle: True
     loader:
