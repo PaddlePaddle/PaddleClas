@@ -37,6 +37,7 @@ def main(config):
                 format(img_path))
         else:
             img = img[:, :, ::-1]
+            print(img.shape)
             batch_imgs.append(img)
             img_name = os.path.basename(img_path)
             batch_names.append(img_name)
@@ -50,7 +51,6 @@ def main(config):
             for number, result_dict in enumerate(batch_results):
                 if len(batch_imgs) == 0:
                     continue
-                batch_results = cls_predictor.predict(batch_imgs)
                 for number, result_key in enumerate(batch_results.keys()):
                     print(
                         f"{img_name}-{result_key}:{batch_results[result_key]}")
@@ -59,6 +59,7 @@ def main(config):
     if cls_predictor.benchmark:
         cls_predictor.auto_logger.report()
     return
+
 
 
 if __name__ == "__main__":
