@@ -48,12 +48,13 @@ class RamOutPut(object):
         tag_list = np.array(tag_list)
         return tag_list
 
-    def __call__(self, logits, bs, file_names):
+    def __call__(self, logits, file_names=None):
         """
         logits is the result from model
         bs is the batch size from model
         file_names is useless but need in order to fit support framework of ppcls
         """
+        bs = len(file_names)
         targets = paddle.where(
             F.sigmoid(logits) > self.class_threshold,
             paddle.to_tensor([1.0]), paddle.zeros(self.num_class))
@@ -73,7 +74,7 @@ class RamOutPut(object):
         res["en"] = tag_output
         res["all"] = f"en : {tag_output}, cn: {tag_output_chinese}"
 
-        scores = F.sigmoid(logits).numpy()
+        scores = F.sigmoid(logits).numpy().reshape([bs, -1])
         class_ids_list = []
         scores_list = []
 
