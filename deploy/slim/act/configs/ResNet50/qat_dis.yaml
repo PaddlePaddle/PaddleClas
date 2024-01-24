@@ -24,8 +24,6 @@ QuantAware:
   quantize_op_types:
   - conv2d
   - depthwise_conv2d
-  - matmul
-  - matmul_v2
   weight_bits: 8
 
 TrainConfig:
@@ -33,7 +31,7 @@ TrainConfig:
   eval_iter: 500
   learning_rate: 
     type: CosineAnnealingDecay 
-    learning_rate: 0.015
+    learning_rate: 0.0015
   optimizer_builder:
     optimizer:
       type: Momentum

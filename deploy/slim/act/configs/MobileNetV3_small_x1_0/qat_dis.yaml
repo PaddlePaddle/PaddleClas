@@ -7,7 +7,7 @@ Global:
 
 Distillation:
   alpha: 1.0
-  loss: soft_label
+  loss: l2
 
 QuantAware:
   use_pact: true
@@ -20,17 +20,14 @@ QuantAware:
   - skip_quant
   quantize_op_types:
   - conv2d
-  - depthwise_conv2d
-  - matmul
-  - matmul_v2
   weight_bits: 8
 
 TrainConfig:
   epochs: 2
-  eval_iter: 5000
+  eval_iter: 500
   learning_rate: 
     type: CosineAnnealingDecay 
-    learning_rate: 0.001
+    learning_rate: 0.0001
   optimizer_builder:
     optimizer:
       type: Momentum
