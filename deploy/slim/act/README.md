@@ -12,8 +12,8 @@
       - [3.4 自动压缩并产出模型](#34-自动压缩并产出模型)
   - [4.预测部署](#4预测部署)
       - [4.1 Paddle Inference 验证性能](#41-paddle-inference-验证性能)
-      - [4.2 PaddleLite端侧部署](#42-paddlelite端侧部署)
-  - [5.FAQ](#5faq)
+  - [5. FAQ:](#5-faq)
+    - [5.1 CPU上推理精度异常？](#51-cpu上推理精度异常)
 
 
 ## 1. 简介
@@ -25,28 +25,29 @@
 
 |           模型           | 策略 | 压缩训练评估 Top-1 Acc | GPU 耗时(ms) | CPU 耗时(ms) | 配置文件 | Inference模型 |
 |:----------------------:|:------:|:---------:|:----------:|:--------------:|:------:|:-----:|
-| MobileNetV3_small_x1_0 | Baseline |   68.00   |     7.3      |    1.1           | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileNetV3_small_x1_0_infer.tar) | 
-| MobileNetV3_small_x1_0 | 量化+蒸馏 |   65.97   |     5.9      |    0.9           | [Config](./configs/MobileNetV3_small_x1_0/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_Mobilenet.zip) |
-|      ResNet50_vd       | Baseline |    76.36     |   1.4         |      23.5       | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar) |
-|      ResNet50_vd       | 量化+蒸馏 |  75.99   |      1.4      |      17.8       | [Config](./configs/ResNet50/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_ResNet50_7614.zip) |
-|      PP-HGNet_small       | Baseline |    81.51      |   3.1         |       22.6        | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_infer.tar) |
-|      PP-HGNet_small       | 量化+蒸馏 |  79.60  |      1.6      |       22.9       | [Config](./configs/PPHGNet_small/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_PPHGNet_small_7960.zip) |
-|      SwinTransformer_base_patch4_window7_224       | Baseline |     83.25    |   7.3          |      942.7       | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_base_patch4_window7_224_infer.tar) |
-|      SwinTransformer_base_patch4_window7_224       | 量化+蒸馏 |  83.26   |    5.9        |       955.1       | [Config](./configs/SwinTransformer_base/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_swin_8329.zip) |
-|      PP-LCNet_x1_0       | Baseline |      71.32    |       1.0     |       6.0        | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_0_infer.tar) |
-|      PP-LCNet_x1_0       | 量化+蒸馏 |   55.96  |   0.9         |       6.5       | [Config](./configs/PPLCNet_x1_0/qat_dis.yaml) |  [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_PPLCNet_5596.zip) |
-|      CLIP_vit_base_patch16_224       | Baseline |      85.48   |   7.4          |       68.9        | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CLIP_vit_base_patch16_224_ft_in1k_infer.tar) |
-|      CLIP_vit_base_patch16_224       | 量化+蒸馏 |  83.71   |      7.2      |       66.5       | [Config](./configs/CLIP_vit_base_patch16_224/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_clip_vit.zip) |
+| MobileNetV3_small_x1_0 | Baseline |   68.01   |     2.4      |      27.2         | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileNetV3_small_x1_0_infer.tar) | 
+| MobileNetV3_small_x1_0 | 量化+蒸馏 |   66.94   |     1.6      |    27.5           | [Config](./configs/MobileNetV3_small_x1_0/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_Mobilenet.zip) |
+|      ResNet50_vd       | Baseline |    79.05     |   5.9         |      23.5       | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar) |
+|      ResNet50_vd       | 量化+蒸馏 |  78.62   |      2.8      |      17.8       | [Config](./configs/ResNet50/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_ResNet50_7614.zip) |
+|      PP-HGNet_small       | Baseline |    81.33      |   6.5        |       22.6        | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_infer.tar) |
+|      PP-HGNet_small       | 量化+蒸馏 |  81.25  |      4.0      |       22.9       | [Config](./configs/PPHGNet_small/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_PPHGNet_small_7960.zip) |
+|      SwinTransformer_base_patch4_window7_224       | Baseline |     83.26    |   18.5          |      942.7       | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_base_patch4_window7_224_infer.tar) |
+|      SwinTransformer_base_patch4_window7_224       | 量化+蒸馏 |  83.26   |    9.2        |       955.1       | [Config](./configs/SwinTransformer_base/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_swin_8329.zip) |
+|      PP-LCNet_x1_0       | Baseline |      71.05    |       2.3     |       45.7        | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_0_infer.tar) |
+|      PP-LCNet_x1_0       | 量化+蒸馏 |   70.70  |   1.6         |       43.2       | [Config](./configs/PPLCNet_x1_0/qat_dis.yaml) |  [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_PPLCNet_5596.zip) |
+|      CLIP_vit_base_patch16_224       | Baseline |      85.36   |   13.9          |       68.9        | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CLIP_vit_base_patch16_224_ft_in1k_infer.tar) |
+|      CLIP_vit_base_patch16_224       | 量化+蒸馏 |  85.36   |      8.3      |       66.5       | [Config](./configs/CLIP_vit_base_patch16_224/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_clip_vit.zip) |
 
 
 - CPU测试环境：
   - Intel(R) Xeon(R) Gold 6271C CPU @ 2.60GHz
   - cpu thread: 10
+  - 测试配置：batch_size: 4
 
 
 - Nvidia GPU测试环境：
   - 硬件：NVIDIA Tesla V100 单卡
-  - 软件：CUDA 11.2, cudnn 8.1.0, TensorRT-8.0.3.4
+  - 软件：CUDA 11.2, cudnn 8.2.1, TensorRT-8.0.3.4
   - 测试配置：batch_size: 4
 
 ## 3. 自动压缩流程
@@ -60,14 +61,16 @@
 安装paddlepaddle：
 ```shell
 # CPU
-pip install paddlepaddle==2.5.1
+pip install paddlepaddle==2.5.2
 # GPU 以Ubuntu、CUDA 11.2为例
-python -m pip install paddlepaddle-gpu==2.5.1.post112 -f https://www.paddlepaddle.org.cn/whl/linux/mkl/avx/stable.html
+python -m pip install paddlepaddle-gpu==2.5.2.post112 -f https://www.paddlepaddle.org.cn/whl/linux/mkl/avx/stable.html
 ```
 
 安装paddleslim：
 ```shell
-pip install paddleslim
+git clone https://github.com/PaddlePaddle/PaddleSlim.git -b release/2.5
+cd PaddleSlim
+python setup.py install
 ```
 
 若使用`run_ppclas.py`脚本，需安装paddleclas：
@@ -122,7 +125,7 @@ python -m paddle.distributed.launch run_ppclas.py --save_dir='./save_quant_resne
 
 - 参数设置：```learning rate``` 与 ```batch size``` 呈线性关系，这里单卡 ```batch size``` 为32，对应的 ```learning rate``` 为0.015，那么如果 ```batch size``` 减小4倍改为8，```learning rate``` 也需除以4；多卡时 ```batch size``` 为32，```learning rate``` 需乘上卡数。所以改变 ```batch size``` 或改变训练卡数都需要对应修改 ```learning rate```。
 
-- 如需要使用`PaddleClas`中的数据预处理和`DataLoader`，可以使用`run_ppclas.py`脚本启动，启动方式跟以上示例相同，但配置需要对其```PaddleClas```，可参考[ViT配置文件](./configs/VIT/data_reader.yml)。
+- 如需要使用`PaddleClas`中的数据预处理和`DataLoader`，可以使用`run_ppclas.py`脚本启动，启动方式跟以上示例相同，可参考[SwinTransformer配置文件](./configs/SwinTransformer_base/data_reader.yaml)。
 
 
 
@@ -155,7 +158,7 @@ python -m paddle.distributed.launch run_ppclas.py --save_dir='./save_quant_resne
 
 - TensorRT预测：
 
-环境配置：如果使用 TesorRT 预测引擎，需安装的是带有TensorRT的PaddlePaddle，使用以下指令查看本地cuda版本，并且在[下载链接](https://www.paddlepaddle.org.cn/inference/user_guides/download_lib.html#python)中下载对应cuda版本和对应python版本的PaddlePaddle安装包。
+环境配置：如果使用 TensorRT 预测引擎，需安装的是带有TensorRT的PaddlePaddle，使用以下指令查看本地cuda版本，并且在[下载链接](https://www.paddlepaddle.org.cn/inference/user_guides/download_lib.html#python)中下载对应cuda版本和对应python版本的PaddlePaddle安装包。
 
     ```shell
     cat /usr/local/cuda/version.txt ### CUDA Version 10.2.89
@@ -181,3 +184,14 @@ python test_ppclas.py  \
       --use_mkldnn=True \
       --use_int8=True
 ```
+
+## 5. FAQ:
+
+### 5.1 CPU上推理精度异常？
+
+经过测试当使用MKLDNN推理CLIP_vit_base_patch16_224、SwinTransformer_base_patch4_window7_224以及它们对应的压缩模型时，会出现精度严重下降的情况，此时需要加上如下两行代码，删除两个pass，
+```python
+config.delete_pass("fc_mkldnn_pass")
+config.delete_pass("fc_act_mkldnn_fuse_pass")
+```
+这两行代码已经添加到[test_ppclas.py](./test_ppclas.py)的181、182两行了，遇到上述情况将代码取消注释精度即可恢复正常。
