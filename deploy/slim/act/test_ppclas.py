@@ -46,7 +46,7 @@ def argsparser():
         type=str,
         default="inference.pdiparams",
         help="params file name")
-    parser.add_argument("--batch_size", type=int, default=1)
+    parser.add_argument("--batch_size", type=int, default=4)
     parser.add_argument("--img_size", type=int, default=224)
     parser.add_argument("--resize_size", type=int, default=256)
     parser.add_argument(
@@ -73,10 +73,16 @@ def argsparser():
         type=bool,
         default=True,
         help="Whether use dynamic shape or not.")
+    parser.add_argument(
+        "--min_subgraph_size", 
+        type=int, 
+        default=30, 
+        help="Minimum Subgraph Size for TensorRT Acceleration"
+    )
     return parser
 
 
-def eval_reader(data_dir, batch_size, crop_size, resize_size, config, args):
+def eval_reader(data_dir, batch_size, crop_size, resize_size, args, config=None):
     """
     eval reader func
     """
@@ -139,12 +145,11 @@ class Predictor(object):
         else:
             config.disable_gpu()
             config.set_cpu_math_library_num_threads(args.cpu_num_threads)
-            config.switch_ir_optim()
             if args.use_mkldnn:
                 config.enable_mkldnn()
                 if args.use_int8:
                     config.enable_mkldnn_int8({
-                        "conv2d", "depthwise_conv2d", "transpose2", "pool2d"
+                        "conv2d", "depthwise_conv2d"
                     })
 
         config.switch_ir_optim(args.ir_optim)  # default true
@@ -153,7 +158,7 @@ class Predictor(object):
                 precision_mode=precision,
                 max_batch_size=args.batch_size,
                 workspace_size=1 << 30,
-                min_subgraph_size=30,
+                min_subgraph_size=args.min_subgraph_size,
                 use_static=True,
                 use_calib_mode=False, )
 
@@ -170,11 +175,17 @@ class Predictor(object):
                     self.rerun_flag = True
 
         config.enable_memory_optim()
+        # When performing inference on the CPU for the CLIP_vit_base_patch16_224 and 
+        # SwinTransformer_base_patch4_window7_224 models, it is necessary to remove the following two passes 
+        # in order to ensure accurate results.
+        # config.delete_pass("fc_mkldnn_pass")
+        # config.delete_pass("fc_act_mkldnn_fuse_pass")
+        
         predictor = create_predictor(config)
 
         return predictor
 
-    def eval(self):
+    def eval(self): 
         """
         eval func
         """
@@ -183,7 +194,8 @@ class Predictor(object):
                 args.data_path,
                 batch_size=args.batch_size,
                 crop_size=args.img_size,
-                resize_size=args.resize_size)
+                resize_size=args.resize_size,
+                args=args)
         else:
             image = np.ones((args.batch_size, 3, args.img_size,
                              args.img_size)).astype(np.float32)
@@ -230,7 +242,6 @@ class Predictor(object):
             if batch_id % 100 == 0:
                 print("Eval iter:", batch_id)
                 sys.stdout.flush()
-
         result = np.mean(np.array(results), axis=0)
         fp_message = "FP16" if args.use_fp16 else "FP32"
         fp_message = "INT8" if args.use_int8 else fp_message
