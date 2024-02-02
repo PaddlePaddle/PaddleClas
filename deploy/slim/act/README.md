@@ -26,17 +26,17 @@
 |           模型           | 策略 | 压缩训练评估 Top-1 Acc | GPU 耗时(ms) | CPU 耗时(ms) | 配置文件 | Inference模型 |
 |:----------------------:|:------:|:---------:|:----------:|:--------------:|:------:|:-----:|
 | MobileNetV3_small_x1_0 | Baseline |   68.01   |     2.4      |      27.2         | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileNetV3_small_x1_0_infer.tar) | 
-| MobileNetV3_small_x1_0 | 量化+蒸馏 |   66.94   |     1.6      |    27.5           | [Config](./configs/MobileNetV3_small_x1_0/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_Mobilenet.zip) |
+| MobileNetV3_small_x1_0 | 量化+蒸馏 |   66.94   |     1.6      |    27.5           | [Config](./configs/MobileNetV3_small_x1_0/qat_dis.yaml) | [Model](https://paddleclas.bj.bcebos.com/models/act/MobileNetV3_small_x1_0_qat.zip) |
 |      ResNet50_vd       | Baseline |    79.05     |   5.9         |      23.5       | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ResNet50_vd_infer.tar) |
-|      ResNet50_vd       | 量化+蒸馏 |  78.62   |      2.8      |      17.8       | [Config](./configs/ResNet50/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_ResNet50_7614.zip) |
+|      ResNet50_vd       | 量化+蒸馏 |  78.62   |      2.8      |      17.8       | [Config](./configs/ResNet50/qat_dis.yaml) | [Model](https://paddleclas.bj.bcebos.com/models/act/ResNet50_vd_qat.zip) |
 |      PP-HGNet_small       | Baseline |    81.33      |   6.5        |       22.6        | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPHGNet_small_infer.tar) |
-|      PP-HGNet_small       | 量化+蒸馏 |  81.25  |      4.0      |       22.9       | [Config](./configs/PPHGNet_small/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_PPHGNet_small_7960.zip) |
+|      PP-HGNet_small       | 量化+蒸馏 |  81.25  |      4.0      |       22.9       | [Config](./configs/PPHGNet_small/qat_dis.yaml) | [Model](https://paddleclas.bj.bcebos.com/models/act/PPHGNet_small_qat.zip) |
 |      SwinTransformer_base_patch4_window7_224       | Baseline |     83.26    |   18.5          |      942.7       | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/SwinTransformer_base_patch4_window7_224_infer.tar) |
-|      SwinTransformer_base_patch4_window7_224       | 量化+蒸馏 |  83.26   |    9.2        |       955.1       | [Config](./configs/SwinTransformer_base/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_swin_8329.zip) |
+|      SwinTransformer_base_patch4_window7_224       | 量化+蒸馏 |  83.26   |    9.2        |       955.1       | [Config](./configs/SwinTransformer_base/qat_dis.yaml) | [Model](https://paddleclas.bj.bcebos.com/models/act/SwinTransformer_base_patch4_window7_224_qat.zip) |
 |      PP-LCNet_x1_0       | Baseline |      71.05    |       2.3     |       45.7        | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/PPLCNet_x1_0_infer.tar) |
-|      PP-LCNet_x1_0       | 量化+蒸馏 |   70.70  |   1.6         |       43.2       | [Config](./configs/PPLCNet_x1_0/qat_dis.yaml) |  [model](https://paddleclas.bj.bcebos.com/models/act/save_quant_PPLCNet_5596.zip) |
+|      PP-LCNet_x1_0       | 量化+蒸馏 |   70.70  |   1.6         |       43.2       | [Config](./configs/PPLCNet_x1_0/qat_dis.yaml) |  [Model](https://paddleclas.bj.bcebos.com/models/act/PPLCNet_x1_0_qat.zip) |
 |      CLIP_vit_base_patch16_224       | Baseline |      85.36   |   13.9          |       68.9        | - | [Model](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CLIP_vit_base_patch16_224_ft_in1k_infer.tar) |
-|      CLIP_vit_base_patch16_224       | 量化+蒸馏 |  85.36   |      8.3      |       66.5       | [Config](./configs/CLIP_vit_base_patch16_224/qat_dis.yaml) | [model](https://paddleclas.bj.bcebos.com/models/act/save_clip_vit.zip) |
+|      CLIP_vit_base_patch16_224       | 量化+蒸馏 |  85.36   |      8.3      |       66.5       | [Config](./configs/CLIP_vit_base_patch16_224/qat_dis.yaml) | [Model](https://paddleclas.bj.bcebos.com/models/act/CLIP_vit_base_patch16_224_qat.zip) |
 
 
 - CPU测试环境：
