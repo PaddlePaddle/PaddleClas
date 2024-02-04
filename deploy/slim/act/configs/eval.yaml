@@ -1,0 +1,8 @@
+Global:
+  model_dir: './mobilenet_dbb_inference'
+  model_filename: 'inference.pdmodel'
+  params_filename: "inference.pdiparams"
+  batch_size: 128
+  data_dir: './ILSVRC2012/'
+  img_size: 224
+  resize_size: 256
