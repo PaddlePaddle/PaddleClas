@@ -4,142 +4,74 @@
 
 * [1. 综述](#1)
 * [2. CLIP训练](#2)
-* [3. CLIP动态推理](#3)
-* [4. CLIP静态推理](#4)
-* [5. CLIP向量落盘推理](#5)
-* [6. 引用](#6)
+* [3. CLIP动态、静态推理](#3)
+* [5. CLIP向量落盘推理](#4)
+* [6. 引用](#5)
 
 
 <a name="1"></a>
 ## 1. 综述
 
-RAM以及RAM++（下文简称RAM类模型）主要用于标注类任务，其中两个模型的主要贡献为提出了集训练-推理-tag一体化的框架。其通过堆叠vision encoder以及text encoder，实现多种下游任务。核心方法包括：
+CLIP为预训练的文本-图像大模型。其核心是利用对比损失函数（Constrative Loss），使用文本编码器（Text Encoder）和图像编码器(Image Encoder)将输入的本文和图像嵌入到相同的空间的中，通过衡量向量余玄相似度实现文本-图像匹配。本文所包含的内容主要为：1）CLIP模型的训练。2）基于CLIP，向量落盘，实现图文匹配。
 
-1. 结合CLIP架构，提出 Image-Tag Recognition Decoder，Image-Text Alignment Encoder，Image-Tag Interaction Encoder，Image-Tag-Text Generation Decoder以及Generation Encoder 5个组件分别实现text-image对齐，text-tag对齐。
-2. RAM++进一步使用大语言模型（large language model，LLM）的语义信息，提升text-image对齐的能力。
 
-使用RAM类模型时，作者在多个分类任务上取得了最先进的结果：
 
-| Model | BackBone   | Store Size   | Inference Prompt | CLIP | OpenImages-MAP |
-|-------|------------|--------|------------------|------|----------------|
-| RAM   | Swin-large | 5.63GB | LLM Tag Dec      |  VIT-base-patch16-224 | 82.2           |
-| RAM++ | Swin-base  | 3.01GB | LLM Tag Dec      |  VIT-base-patch16-224 | 86.6           |
-注：LLM Tag Dec表示基于LLM改写的文本tag。例如给定prompt："A photo of a cat" 对应LLM tag Dec为："Cat is a small general with sofa".
-
-`PaddleClas` paddleclas分别实现了基于不同backbone的RAM类模型:
 ```yaml
 # model architecture
 Arch:
-  name: ram_plus
-  vit: swin_l
-  vit_grad_ckpt: False
-  vit_ckpt_layer: 0
-  image_size: 384
-  prompt: 'a picture of '
-  med_config: 'ppcls/configs/ram/ram_bert.yaml'
-  delete_tag_index: []
-  tag_list: 'ppcls/utils/ram/ram_tag_list.txt'
-  tag_list_chinese: 'ppcls/utils/ram/ram_tag_list_chinese.txt'
-  clip_pretraind: ./ViT-B-32.pdparams #for CLIP a necessary part for training ram
-  clip_version: 'vit-b-32-224'
-  q2l_config: 'ppcls/configs/ram/ram_q2l.yaml'
-  ram_class_threshold_path: 'ppcls/utils/RAM/ram_tag_list_threshold.txt'
-  stage: train
-  threshold: 0.68
+  name: CLIP_vit_base_patch32_224_with_TextEncoder
+  clip: "text"
+
+
 ```
 参数注释：
-  - name  模型参数，使用RAM模型可以指定为ram，使用RAM++模型可以指定为ram_plus，默认为ram 
-  - vit  视觉主干网络参数，包括 vit：vision transformer，swin_b： swin base模型，swin_l, swin large模型
-  - image_size  图片分辨率
-  - prompt RAM训练时所使用的文本提示前缀
-  - med_config RAM类模型所使用的Bert模型配置文件，默认配置路径：'ppcls/configs/ram/config_bert.yaml'
-  - delete_tag_index 屏蔽tag所用参数，例如传递[1,3,2]则表示屏蔽index为1，2，3的tag标签
-  - tag_list  英文tag标签文件路劲，默认ppcls/utils/RAM/ram_tag_list.txt
-  - tag_list_chinese 中文tag标签文件路劲，默认ppcls/utils/RAM/ram_tag_list.txt
-  - clip_version  所使用的CLIP结构，默认 vit-b-32-224
-  - clip_pretraind 训练所使用的CLIP预训练参数路径，当需要训练RAM类模型时，不能为None
-  - q2l_config  基于bert 的text-tag alignment encoder模型配置文件默认  ppcls/configs/ram/config_q2l.yaml 
-  - ram_class_threshold_path  tag生成阈值文件默认ppcls/utils/RAM/ram_tag_list_threshold.txt
-  - stage  指定RAM，RAM++模型是否进行训练，stage = train表示需要训练，训练时clip_pretraind不能为None，stage = eval表示无需训练
-  - threshold 输出TAG所需的阈值数值，表示当该tag对应概率大于该值，则认为属于该tag
-注意，RAM类模型的推理和训练，需要使用tools/train_multimodal.py, tools/infer_multimodal.py 以及predict_multimodal.py接口，支持多模态输入的动态图训练，推理以及静态图推理。
+  - name  模型参数，目前仅兼容vit为backbone的CLIP。
+  - clip  输入类型参数，用于申明输入的类型。类型包括 "image"-图片以及"text"-文本。该参数仅作用于推理阶段。训练阶段此参数无实际意义。
 
 <a name="2"></a>
-## 2. 数据和模型准备
+## 2. CLIP训练
 
-* 前往官方[repo](https://github.com/xinyu1205/recognize-anything/tree/main)下载对应数据集json文件。同时按照json文件目录格式，准备相应的数据。目录格式为：
-```json
-{
-    {
-        "image_path": "visual-genome/VG_100K/1.jpg", 
-        "caption": ["trees line the sidewalk"],
-        "union_label_id": [4480], 
-        "parse_label_id": [[4253, 2461, 2966]]
-    }
-}
-```
-参数注释：
-  - image_path  数据集路径
-  - caption  对应图片标注
-  - union_label_id 标注对应id
-  - parse_label_id 将标注仅需名词化后，结果对应的id。例如将"trees line the sidewalk"名词化得到 "trees" "line"以及"sidewalk"，其对应的id分别是4253, 2461, 2966
-其中务必保证数据集文件路径符合image_path
-* 本文档中，为RAM类模型提供了统一的动态训练以及推理配置文件，结构如下：
+**数据集准备。** 训练数据结构遵照img2dataset[https://github.com/rom1504/img2dataset]
+
 ```yaml
+# global configs
 # global configs
 Global:
   checkpoints: null
-  pretrained_model: "ram.pdparams" # pretrain model for ram and ram plus, default random initilize
+  pretrained_model: "ViT-B-32.pdparams" # pretrain model for ram and ram plus, default random initilize
   output_dir: ./output/
-  device: gpu
+  device: cpu
   save_interval: 1
   eval_during_train: True
   eval_interval: 1
   epochs: 120
-  print_batch_step: 10
+  print_batch_step: 1
   use_visualdl: False
   # used for static mode and model export
-  image_shape: [3, 384, 384]
-  save_inference_dir: ./inference
+  image_shape: [3, 224, 224]
+  export_shape: [77]
+  export_type: "int64"
+  save_inference_dir: ./inference_text
 
-
-# mixed precision
-AMP:
-  use_amp: True
-  use_fp16_test: False
-  scale_loss: 128.0
-  use_dynamic_loss_scaling: True
-  use_promote: False
-  # O1: mixed fp16, O2: pure fp16
-  level: O1
 
 
 # model architecture
 Arch:
-  name: ram
-  vit: swin_l
-  vit_grad_ckpt: False
-  vit_ckpt_layer: 0
-  image_size: 384
-  prompt: 'a picture of '
-  med_config: 'ppcls/configs/ram/ram_bert.yaml'
-  delete_tag_index: []
-  tag_list: 'ppcls/utils/ram/ram_tag_list.txt'
-  tag_list_chinese: 'ppcls/utils/ram/ram_tag_list_chinese.txt'
-  clip_pretraind: ./ViT-B-32.pdparams #for CLIP a necessary part for training ram
-  clip_version: 'vit-b-32-224'
-  q2l_config: 'ppcls/configs/ram/ram_q2l.yaml'
-  ram_class_threshold_path: 'ppcls/utils/RAM/ram_tag_list_threshold.txt'
-  stage: train
-  threshold: 0.68
- 
-# loss function config for traing/eval process
+  name: CLIP_vit_base_patch32_224_with_TextEncoder
+  clip: "text"
+
 Loss:
   Train:
-    - RAMLoss:
+    - ContrastiveLoss:
+        margin: 1.0
+        embedding_size: 512
+        is_text_image_pairs: True
         weight: 1.0
   Eval:
-    - RAMLoss:
+    - ContrastiveLoss:
+        margin: 1.0
+        embedding_size: 512
+        is_text_image_pairs: True
         weight: 1.0
 
 Optimizer:
@@ -161,22 +93,12 @@ Optimizer:
 DataLoader:
   Train:
     dataset:
-      name: RAMPretrainDataset
-      ann_file: [./visual-genome/vg_ram.json]
-      transform_ops_ram:
+      name: Img2Dataset
+      root_path: "./mscoco"
+      split: "train"
+      transform:        
         - ResizeImage:
-            size: 384
-            interpolation: bicubic
-            backend: pil
-        - NormalizeImage:
-            scale: 1.0/255.0
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
-            order: ''
-        - ToCHWImage:
-      transform_ops_clip:        
-        - ResizeImage:
-            resize_short: 224
+            size: 224
             interpolation: bicubic
             backend: pil
         - NormalizeImage:
@@ -188,7 +110,7 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 52
+      batch_size: 256
       drop_last: False
       shuffle: True
     loader:
@@ -196,23 +118,13 @@ DataLoader:
       use_shared_memory: True
 
   Eval:
-    dataset: 
-      name: RAMPretrainDataset
-      ann_file: [./visual-genome/vg_ram.json]
-      transform_ops_ram:
+    dataset:
+      name: Img2Dataset
+      root_path: "./mscoco"
+      split: "eval"
+      transform:        
         - ResizeImage:
-            size: 384
-            interpolation: bicubic
-            backend: pil
-        - NormalizeImage:
-            scale: 1.0/255.0
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
-            order: ''
-        - ToCHWImage:
-      transform_ops_clip:        
-        - ResizeImage:
-            resize_short: 224
+            size: 224
             interpolation: bicubic
             backend: pil
         - NormalizeImage:
@@ -224,93 +136,45 @@ DataLoader:
 
     sampler:
       name: DistributedBatchSampler
-      batch_size: 52
+      batch_size: 1
       drop_last: False
       shuffle: True
     loader:
       num_workers: 4
       use_shared_memory: True
 
-Infer:
-  infer_imgs: docs/images/inference_deployment/whl_demo.jpg
-  batch_size: 1
-  transforms:
-    - DecodeImage:
-        to_rgb: True
-        channel_first: False
-    - ResizeImage:
-        resize_short: 384
-    - CropImage:
-        size: 384
-    - NormalizeImage:
-          scale: 1.0/255.0
-          mean: [0.485, 0.456, 0.406]
-          std: [0.229, 0.224, 0.225]
-          order: ''
-    - ToCHWImage:
-  PostProcess:
-    name: RamOutPut
-    language: "cn"
-    tag_list: "ppcls/utils/RAM/ram_tag_list.txt"
-    tag_list_chinese: "ppcls/utils/RAM/ram_tag_list_chinese.txt"
-    ram_class_threshold_path: "ppcls/utils/RAM/ram_tag_list_threshold.txt"
-
-
 ```
 用户可以根据自身需求，更改相应配置。注意arch参数请参照本文档。
 
-## 3. 模型训练
-以RAM为例：
+**模型训练**。
 ```shell
 # 多卡
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m paddle.distributed.launch \
     --gpus="0,1,2,3" \
     tools/train_multimodal.py \
-        -c ./ppcls/configs/ram/RAM.yaml
+        -c ./ppcls/configs/ram/CLIP.yaml
 # 单卡
 python3 tools/train_multimodal.py \
-        -c ./ppcls/configs//ram/RAM.yaml
-```
-以RAM++为例：
-```shell
-# 多卡
-export CUDA_VISIBLE_DEVICES=0,1,2,3
-python3 -m paddle.distributed.launch \
-    --gpus="0,1,2,3" \
-    tools/train_multimodal.py \
-        -c ./ppcls/configs/ram/RAM_plus.yaml
-# 单卡
-python3 tools/train_multimodal.py \
-        -c ./ppcls/configs//ram/RAM_plus.yaml
+        -c ./ppcls/configs//ram/CLIP.yaml
 ```
 
 
-<a name="4"></a>
-## 4. 模型预测
+<a name="3"></a>
+## 3. CLIP动态、静态推理
 
+**CLIP动态推理**。目前CLIP动态推理的输出结果为给定图片的embedding。
 ```bash
 python3 tools/infer_multimodal.py \
-    -c ./ppcls/configs/ram/RAM.yaml \
+    -c ./ppcls/configs/ram/CLIP.yaml \
     -o Global.pretrained_model="./output/ram/best_model"
 ```
-
-得到类似下面的输出：
-```
-{'class_ids': [[[593], [871], [998], [2071], [3336], [3862], [4389]]], 'scores': [[[0.9708361625671387], [0.9998403787612915], [0.9122695922851562], 
-[0.8888279795646667], [0.8671568036079407], [0.8900104761123657], [0.811939001083374]]], 'label_names': ['棕色 | 鸡 | 公鸡 | 母鸡  | 红色 | 站/矗立/摊位 | 走 ']}
-```
-
-<a name="5"></a>
-## 5. 基于预测引擎预测
-
-<a name="5.1"></a>
-### 5.1 导出 inference model
+**CLIP静态推理**。导出 inference model
 
 ```bash
 python3 tools/export_model.py \
-    -c ./ppcls/configs/ram/RAM.yaml \
-    -o Global.pretrained_model="./output/ram/"
+    -c ./ppcls/configs/ram/CLIP.yaml \
+    -o Global.pretrained_model="./output/CLIP/"
 ```
 inference model 的路径默认在当前路径下 `./inference`
 `./inference` 文件夹下应有如下文件结构：
@@ -322,9 +186,6 @@ inference model 的路径默认在当前路径下 `./inference`
 │   └── inference.pdmodel
 ```
 
-<a name="5.2"></a>
-
-### 5.2 基于 Python 预测引擎推理
 
 切换到depoly目录下，并且使用deploy中的脚本进行推理前需要确认paddleclas为非本地安装, 如不是请进行切换，不然会出现包的导入错误。 
 
@@ -338,11 +199,7 @@ python setup.py install
 cd deploy
 ```
 
-<a name="5.2.1"></a>  
-
-#### 5.2.1 预测单张图像
-
-运行下面的命令，对图像 `docs/images/inference_deployment/whl_demo.jpg` 进行分类。
+运行下面的命令，获取图像 `docs/images/inference_deployment/whl_demo.jpg` 的embedding。
 
 ```shell
 # linux使用`python3`，windows使用`python (-m)`来执行脚本
@@ -358,31 +215,125 @@ python3 python/predict_multimodal.py \
     -o Global.inference_model_dir=../inference/ \
     -o Global.infer_imgs=docs/images/inference_deployment/whl_demo.jpg 
 ```
+<a name="4"></a>
+## 4. CLIP落盘推理
+CLIP落盘推理实现了将文本-图像嵌入后，使用向量数据库保存相关的嵌入向量。在查询时，可以直接通过对比数据库中，向量的余弦相似度实现文本查询图片，图片查询文本，图片查询图片。主要配置文件如下：
 
-输出结果如下：
+```yaml
+Global:
+  infer_imgs: "docs/images/inference_deployment/whl_demo.jpg"
+  texts: "text_prompts.txt"
+  inference_image_encoder_dir: "./inference_image"
+  inference_text_encoder_dir: "./inference_text"
+  batch_size: 1
+  mode: "text-to-image"
+  use_gpu: False
+  embedding_size: 512
+  enable_mkldnn: False
+  cpu_num_threads: 10
+  enable_benchmark: True
+  use_fp16: False
+  ir_optim: False # do not set it as True since there is a bug which leads the invaild initilize for predictor
+  use_tensorrt: False
+  gpu_mem: 8000
+  enable_profile: False
+
+PreProcess:
+  transform_ops:
+    - ResizeImage:
+        size: 224
+    - CropImage:
+        size: 224
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.48145466, 0.4578275, 0.40821073]
+        std: [0.26862954, 0.26130258, 0.27577711]
+        order: ""
+        channel_num: 3
+    - ToCHWImage:
+
+
+IndexProcess:
+  index_method: "HNSW32" # supported: HNSW32, IVF, Flat
+  image_index_dir: "./clip_image"
+  text_index_dir: "./clip_text"
+  index_operation: "new" # suported: "append", "remove", "new"
+  delimiter: "\t"
+  dist_type: "IP"
+  embedding_size: 512
+  batch_size: 1
+  return_k: 1
+  score_thres: 0.5
 
 ```
-whl_demo.jpg-class_ids:  [[[593], [871], [998], [2071], [3336], [3862], [4389]]],
-whl_demo.jpg-scores: [[[0.9708361625671387], [0.9998403787612915], [0.9122695922851562], 
-[0.8888279795646667], [0.8671568036079407], [0.8900104761123657], [0.811939001083374]]], 
-whl_demo.jpg-label_names: ['棕色 | 鸡 | 公鸡 | 母鸡  | 红色 | 站/矗立/摊位 | 走 ']
+核心参数注释：
+  - infer_imgs  模型参数，目前仅兼容vit为backbone的CLIP。
+  - texts  输入类型参数，用于申明输入的类型。类型包括 "image"-图片以及"text"-文本。该参数仅作用于推理阶段。训练阶段此参数无实际意义。
+  - inference_image_encoder_dir 图像编码器静态参数目录。
+  - inference_text_encoder_dir 文本编码器静态参数目录。
+  - batch_size 推理图片数量
+  - mode 用于决定具体推理任务，具体包括: "image-to-text": 通过给定输入图像查询对应标签,"image-to-image"通过给定输入图像查询与输入图像相匹配的图像,"image_index_build"构建图像向量并且入库,"text_index_build"构建文本向量并且入库,"text-to-image"通过给定输入文本查询对应图像。
+  - embedding_size 嵌入向量的维度，取决于CLIP嵌入向量的维度，默认512。
+  - index_method 向量落库时的存储类型，如无特殊需求，始终默认为NHSW32。
+  - image_index_dir 图像向量库所在路径。
+  - text_index_dir 文本向量库所在路径。
+  - return_k 返回top-k个相关的图像或文本。输出类型取决于mode设定的相关任务类型。
+  - score_thres 相似度阈值。
+
+**向量库构建**。向量库构建是使用CLIP实现下游任务的核心步骤。生成后的向量库路径为：1. 图像向量默认落库到image_index_dir指定的路径。2.文本向量默认落库到text_index_dir指定的路径。落库时，仅需将mode参数更改为"image_index_build"或"text_index_build"，使用如下shell命令生成相关向量库：
+
+```shell
+# linux使用`python3`，windows使用`python (-m)`来执行脚本
+# 使用下面的命令使用 GPU 进行预测
+python3 python/predictor_clip.py \
+    -c deploy/configs/inference_clip.yaml \
+# 使用下面的命令使用 CPU 进行预测
+#更改 `config_infer.yaml` 配置文件后
+python3 python/predictor_clip.py \
+    -c deploy/configs/inference_clip.yaml \
 ```
 
-
-<a name="6"></a>
-## 6. 引用
+**下游任务**。生成相关向量库后，即可以三种下游任务：1. 基于给定图像查询关联图像。2.基于给定图像查询符合图像描述的文本。3.基于给定的文本查询相关的图像。具体任务可以使用mode字段进行配置。配置后可以使用如下shell命令完成任务：
+```shell
+# linux使用`python3`，windows使用`python (-m)`来执行脚本
+# 使用下面的命令使用 GPU 进行预测
+python3 python/predictor_clip.py \
+    -c deploy/configs/inference_clip.yaml \
+# 使用下面的命令使用 CPU 进行预测
+#更改 `config_infer.yaml` 配置文件后
+python3 python/predictor_clip.py \
+    -c deploy/configs/inference_clip.yaml \
 ```
-@article{huang2023inject,
-  title={Inject Semantic Concepts into Image Tagging for Open-Set Recognition},
-  author={Huang, Xinyu and Huang, Yi-Jie and Zhang, Youcai and Tian, Weiwei and Feng, Rui and Zhang, Yuejie and Xie, Yanchun and Li, Yaqian and Zhang, Lei},
-  journal={arXiv preprint arXiv:2310.15200},
-  year={2023}
+任务1和3的输出示例为：
+```python
+[
+  "docs/images/inference_deployment/whl_demo.jpg ",
+]
+```
+任务2的输出示例为：
+```python
+[
+  "a photo of chikien ",
+]
+```
+
+**注意** 由于CLIP模型特性的约束，目前文本仅支持简单的prompts[https://github.com/openai/CLIP]文本.
+<a name="5"></a>
+## 5. 引用
+```
+@misc{beaumont-2021-img2dataset,
+  author = {Romain Beaumont},
+  title = {img2dataset: Easily turn large sets of image urls to an image dataset},
+  year = {2021},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/rom1504/img2dataset}}
 }
-
-@article{zhang2023recognize,
-  title={Recognize Anything: A Strong Image Tagging Model},
-  author={Zhang, Youcai and Huang, Xinyu and Ma, Jinyu and Li, Zhaoyang and Luo, Zhaochuan and Xie, Yanchun and Qin, Yuzhuo and Luo, Tong and Li, Yaqian and Liu, Shilong and others},
-  journal={arXiv preprint arXiv:2306.03514},
+@inproceedings{cherti2023reproducible,
+  title={Reproducible scaling laws for contrastive language-image learning},
+  author={Cherti, Mehdi and Beaumont, Romain and Wightman, Ross and Wortsman, Mitchell and Ilharco, Gabriel and Gordon, Cade and Schuhmann, Christoph and Schmidt, Ludwig and Jitsev, Jenia},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages={2818--2829},
   year={2023}
 }
 ```
