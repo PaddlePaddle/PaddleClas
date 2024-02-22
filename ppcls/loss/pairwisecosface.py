@@ -42,9 +42,9 @@ class PairwiseCosface(nn.Layer):
 
         N = dist_mat.shape[0]
         is_pos = targets.reshape([N, 1]).expand([N, N]).equal(
-            paddle.t(targets.reshape([N, 1]).expand([N, N]))).astype('float')
+            paddle.t(targets.reshape([N, 1]).expand([N, N]))).astype('float32')
         is_neg = targets.reshape([N, 1]).expand([N, N]).not_equal(
-            paddle.t(targets.reshape([N, 1]).expand([N, N]))).astype('float')
+            paddle.t(targets.reshape([N, 1]).expand([N, N]))).astype('float32')
 
         # Mask scores related to itself
         is_pos = is_pos - paddle.eye(N, N)

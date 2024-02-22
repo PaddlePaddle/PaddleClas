@@ -1,29 +1,89 @@
-# copyright (c) 2022 PaddlePaddle Authors. All Rights Reserve.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 from paddle import ParamAttr
 from paddle.nn.initializer import KaimingNormal
 import numpy as np
 import paddle
 import paddle.nn as nn
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal
+from paddle.nn import functional as F
 
 trunc_normal_ = TruncatedNormal(std=.02)
 normal_ = Normal
 zeros_ = Constant(value=0.)
 ones_ = Constant(value=1.)
 
+def resize_pos_embed(pos_embed,
+                     src_shape,
+                     dst_shape,
+                     mode='bicubic',
+                     num_extra_tokens=1):
+    """Resize pos_embed weights.
+
+    Args:
+        pos_embed (paddle.Tensor): Position embedding weights with shape
+            [1, L, C].
+        src_shape (tuple): The resolution of downsampled origin training
+            image, in format (H, W).
+        dst_shape (tuple): The resolution of downsampled new training
+            image, in format (H, W).
+        mode (str): Algorithm used for upsampling. Choose one from 'nearest',
+            'linear', 'bilinear', 'bicubic' and 'trilinear'.
+            Defaults to 'bicubic'.
+        num_extra_tokens (int): The number of extra tokens, such as cls_token.
+            Defaults to 1.
+
+    Returns:
+        paddle.Tensor: The resized pos_embed of shape [1, L_new, C]
+    """
+    if src_shape[0] == dst_shape[0] and src_shape[1] == dst_shape[1]:
+        return pos_embed
+    assert pos_embed.ndim == 3, 'shape of pos_embed must be [1, L, C]'
+    _, L, C = pos_embed.shape
+    src_h, src_w = src_shape
+    assert L == src_h * src_w + num_extra_tokens, \
+        f"The length of `pos_embed` ({L}) doesn't match the expected " \
+        f'shape ({src_h}*{src_w}+{num_extra_tokens}). Please check the' \
+        '`img_size` argument.'
+    extra_tokens = pos_embed[:, :num_extra_tokens]
+
+    src_weight = pos_embed[:, num_extra_tokens:]
+    src_weight = src_weight.reshape([-1, src_h, src_w, C]).transpose(
+        [0, 3, 1, 2])
+
+    # The cubic interpolate algorithm only accepts float32
+    dst_weight = F.interpolate(
+        paddle.cast(src_weight, paddle.float32),
+        size=dst_shape,
+        align_corners=False,
+        mode=mode)
+    dst_weight = paddle.flatten(dst_weight, 2).transpose([0, 2, 1])
+    dst_weight = paddle.cast(dst_weight, src_weight.dtype)
+
+    return paddle.concat((extra_tokens, dst_weight), axis=1)
+
+def pading_for_not_divisible(pixel_values,
+                             height,
+                             width,
+                             patch_size,
+                             format="NCHW",
+                             function="split"):
+    if isinstance(patch_size, int):
+        patch_size = (patch_size, patch_size)
+    if height % patch_size[0] == 0 and width % patch_size[1] == 0:
+        return pixel_values, (0, 0, 0, 0, 0, 0, 0, 0)
+    if function == "split":
+        pading_width = patch_size[1] - width % patch_size[1]
+        pading_height = patch_size[0] - height % patch_size[0]
+    elif function == "merge":
+        pading_width = width % 2
+        pading_height = height % 2
+    if format == "NCHW":
+        pad_index = [0, 0, 0, 0, 0, pading_height, 0, pading_width]
+    elif format == "NHWC":
+        pad_index = [0, 0, 0, pading_height, 0, pading_width, 0, 0]
+    else:
+        assert ("vaild format")
+
+    return F.pad(pixel_values, pad_index), pad_index
 
 def drop_path(x, drop_prob=0., training=False):
     """Drop paths (Stochastic Depth) per sample (when applied in main path of residual blocks).
@@ -133,9 +193,8 @@ class ConvMixer(nn.Layer):
             groups=num_heads,
             weight_attr=ParamAttr(initializer=KaimingNormal()))
 
-    def forward(self, x):
-        h = self.HW[0]
-        w = self.HW[1]
+    def forward(self, x, input_dimension):
+        h, w = input_dimension
         x = x.transpose([0, 2, 1]).reshape([0, self.dim, h, w])
         x = self.local_mixer(x)
         x = x.flatten(2).transpose([0, 2, 1])
@@ -164,14 +223,17 @@ class Attention(nn.Layer):
         self.proj = nn.Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
         self.HW = HW
-        if HW is not None:
-            H = HW[0]
-            W = HW[1]
+        self.local_k = local_k
+        self.mixer = mixer
+    def get_mask(self,input_dimension):
+        if self.HW is not None:
+            H = input_dimension[0]
+            W = input_dimension[1]
             self.N = H * W
-            self.C = dim
-        if mixer == 'Local' and HW is not None:
-            hk = local_k[0]
-            wk = local_k[1]
+            self.C = self.dim
+        if self.mixer == 'Local' and self.HW is not None:
+            hk = self.local_k[0]
+            wk = self.local_k[1]
             mask = paddle.ones(
                 [H * W, H + hk - 1, W + wk - 1], dtype='float32')
             for h in range(0, H):
@@ -181,10 +243,9 @@ class Attention(nn.Layer):
                                2].flatten(1)
             mask_inf = paddle.full([H * W, H * W], '-inf', dtype='float32')
             mask = paddle.where(mask_paddle < 1, mask_paddle, mask_inf)
-            self.mask = mask.unsqueeze([0, 1])
-        self.mixer = mixer
-
-    def forward(self, x):
+            return mask
+        return None
+    def forward(self, x, input_dimension):
         qkv = self.qkv(x).reshape(
             (0, -1, 3, self.num_heads, self.head_dim)).transpose(
                 (2, 0, 3, 1, 4))
@@ -192,7 +253,7 @@ class Attention(nn.Layer):
 
         attn = (q.matmul(k.transpose((0, 1, 3, 2))))
         if self.mixer == 'Local':
-            attn += self.mask
+            attn += self.get_mask(input_dimension)
         attn = nn.functional.softmax(attn, axis=-1)
         attn = self.attn_drop(attn)
 
@@ -254,12 +315,12 @@ class Block(nn.Layer):
                        drop=drop)
         self.prenorm = prenorm
 
-    def forward(self, x):
+    def forward(self, x, input_dimension):
         if self.prenorm:
-            x = self.norm1(x + self.drop_path(self.mixer(x)))
+            x = self.norm1(x + self.drop_path(self.mixer(x,input_dimension)))
             x = self.norm2(x + self.drop_path(self.mlp(x)))
         else:
-            x = x + self.drop_path(self.mixer(self.norm1(x)))
+            x = x + self.drop_path(self.mixer(self.norm1(x),input_dimension))
             x = x + self.drop_path(self.mlp(self.norm2(x)))
         return x
 
@@ -281,6 +342,8 @@ class PatchEmbed(nn.Layer):
         self.img_size = img_size
         self.num_patches = num_patches
         self.embed_dim = embed_dim
+        self.patch_size = patch_size
+        self.window_size = ((img_size[0] // (2 ** sub_num), (img_size[1] // (2 ** sub_num))))
         self.norm = None
         if mode == 'pope':
             if sub_num == 2:
@@ -335,10 +398,13 @@ class PatchEmbed(nn.Layer):
 
     def forward(self, x):
         B, C, H, W = x.shape
-        assert H == self.img_size[0] and W == self.img_size[1], \
-            f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
-        x = self.proj(x).flatten(2).transpose((0, 2, 1))
-        return x
+
+        x, _ = pading_for_not_divisible(x, H, W, self.patch_size, "BCHW")
+        x = self.proj(x)
+        _, _, height, width = paddle.shape(x)
+        output_dimensions = (height, width)
+        x = x.flatten(2).transpose((0, 2, 1))
+        return x, output_dimensions
 
 
 class SubSample(nn.Layer):
@@ -377,15 +443,17 @@ class SubSample(nn.Layer):
             x1 = self.avgpool(x)
             x2 = self.maxpool(x)
             x = (x1 + x2) * 0.5
+            output_dimension = (paddle.shape(x)[2],paddle.shape(x)[3])
             out = self.proj(x.flatten(2).transpose((0, 2, 1)))
         else:
             x = self.conv(x)
+            output_dimension = (paddle.shape(x)[2],paddle.shape(x)[3])
             out = x.flatten(2).transpose((0, 2, 1))
         out = self.norm(out)
         if self.act is not None:
             out = self.act(out)
 
-        return out
+        return out, output_dimension
 
 
 class SVTRNet(nn.Layer):
@@ -552,23 +620,23 @@ class SVTRNet(nn.Layer):
             ones_(m.weight)
 
     def forward_features(self, x):
-        x = self.patch_embed(x)
-        x = x + self.pos_embed
+        x,output_dimensions = self.patch_embed(x)
+        x = x + resize_pos_embed(self.pos_embed,self.patch_embed.window_size,output_dimensions,num_extra_tokens=0)
         x = self.pos_drop(x)
         for blk in self.blocks1:
-            x = blk(x)
+            x = blk(x, output_dimensions)
         if self.patch_merging is not None:
-            x = self.sub_sample1(
+            x, output_dimensions = self.sub_sample1(
                 x.transpose([0, 2, 1]).reshape(
-                    [0, self.embed_dim[0], self.HW[0], self.HW[1]]))
+                    [0, self.embed_dim[0], output_dimensions[0], output_dimensions[1]]))
         for blk in self.blocks2:
-            x = blk(x)
+            x = blk(x, output_dimensions)
         if self.patch_merging is not None:
-            x = self.sub_sample2(
+            x, output_dimensions = self.sub_sample2(
                 x.transpose([0, 2, 1]).reshape(
-                    [0, self.embed_dim[1], self.HW[0] // 2, self.HW[1]]))
+                    [0, self.embed_dim[1], output_dimensions[0], output_dimensions[1]]))
         for blk in self.blocks3:
-            x = blk(x)
+            x = blk(x, output_dimensions)
         if not self.prenorm:
             x = self.norm(x)
         return x

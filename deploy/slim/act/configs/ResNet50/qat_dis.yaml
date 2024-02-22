@@ -1,0 +1,39 @@
+Global:
+  model_dir: ResNet50_infer
+  model_filename: inference.pdmodel
+  params_filename: inference.pdiparams
+  batch_size: 32
+  input_name: inputs
+  input_name: inputs
+
+Distillation:
+  alpha: 1.0
+  loss: l2
+  node:
+  - softmax_0.tmp_0
+
+QuantAware:
+  use_pact: true
+  activation_bits: 8
+  is_full_quantize: false
+  onnx_format: True
+  activation_quantize_type: moving_average_abs_max
+  weight_quantize_type: channel_wise_abs_max
+  not_quant_pattern:
+  - skip_quant
+  quantize_op_types:
+  - conv2d
+  - depthwise_conv2d
+  weight_bits: 8
+
+TrainConfig:
+  epochs: 1
+  eval_iter: 500
+  learning_rate: 
+    type: CosineAnnealingDecay 
+    learning_rate: 0.0015
+  optimizer_builder:
+    optimizer:
+      type: Momentum
+    weight_decay: 0.00002
+  origin_metric: 0.7634556941778631
