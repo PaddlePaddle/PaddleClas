@@ -21,6 +21,7 @@ import inspect
 if not hasattr(inspect, 'getargspec'):
     inspect.getargspec = inspect.getfullargspec
 
+import paddle
 from paddle import optimizer as optim
 from ppcls.utils import logger
 from functools import partial
@@ -380,6 +381,8 @@ class AdamWDL(object):
             self.layerwise_decay = layerwise_decay
             self.name_dict = name_dict
             self.n_layers = n_layers
+            self._coeff = weight_decay
+            self._lr_to_coeff = dict()
             self.set_param_lr_func = partial(
                 self._layerwise_lr_decay, layerwise_decay, name_dict, n_layers)
             super().__init__(
@@ -393,8 +396,7 @@ class AdamWDL(object):
                 apply_decay_param_fun=apply_decay_param_fun,
                 weight_decay=weight_decay,
                 lazy_mode=lazy_mode,
-                multi_precision=multi_precision,
-                lr_ratio=self.set_param_lr_func)
+                multi_precision=multi_precision,)
 
         # Layerwise decay
         def _layerwise_lr_decay(self, decay_rate, name_dict, n_layers, param):
@@ -422,6 +424,68 @@ class AdamWDL(object):
                 ratio = decay_rate**(n_layers + 1)
             # param.optimize_attr["learning_rate"] *= ratio
             return ratio
+        def _append_decoupled_weight_decay(self, block, param_and_grad):
+            """
+            Add decoupled weight decay op.
+                parameter = parameter - parameter * coeff * lr
+            Args:
+                block: block in which variable is to be created
+                param_and_grad: (parameters, gradients) pairs,
+                    the parameters need to decay.
+            Raises:
+                Exception: The type of coeff and parameter is not consistent.
+            """
+            if isinstance(param_and_grad, dict):
+                param_and_grad = self._update_param_group(param_and_grad)
+            param, grad = param_and_grad
+
+            if self._apply_decay_param_fun is not None and not self._apply_decay_param_fun(param.name):
+                return
+
+            if isinstance(self._learning_rate, float):
+                learning_rate = self._learning_rate
+            else:
+                # NOTE. We add this function to the _append_optimize_op(),
+                # for we must make sure _create_param_lr() be called after
+                # optimizer._create_global_learning_rate().
+                learning_rate = self._create_param_lr(param_and_grad)
+
+            with block.program._optimized_guard([param, grad]), paddle.static.name_scope("weight decay"):
+                self._params_name.add(param.name)
+
+                # If it has been calculated, the result will be reused.
+                # NOTE(wangxi): In dygraph mode, apply_gradient will be executed
+                # every step, so need clear _lr_to_coeff every step,
+                # we do this in _create_optimization_pass
+                decay_coeff = self._lr_to_coeff.get(learning_rate, None)
+                if decay_coeff is None:
+                    # NOTE(wangxi): for pipeline to set device:all
+                    with paddle.static.device_guard(None):
+                        decay_coeff = 1.0 - learning_rate * self._coeff
+                    self._lr_to_coeff[learning_rate] = decay_coeff
+
+                find_master = self._multi_precision and param.dtype == paddle.float16
+                if find_master:
+                    master_weight = self._master_weights[param.name]
+                    scaled_param = master_weight * decay_coeff
+                    paddle.assign(scaled_param, output=master_weight)
+                else:
+                    scaled_param = param * decay_coeff
+                    paddle.assign(scaled_param, output=param)
+
+        def _append_optimize_op(self, block, param_and_grad):
+            if self.set_param_lr_func is None:
+                return super()._append_optimize_op(block, param_and_grad)
+
+            self._append_decoupled_weight_decay(block, param_and_grad)
+            prev_lr = param_and_grad[0].optimize_attr["learning_rate"]
+            ratio = self.set_param_lr_func(param_and_grad[0])
+            param_and_grad[0].optimize_attr["learning_rate"] *= ratio
+
+            # excute Adam op
+            res = super()._append_optimize_op(block, param_and_grad)
+            param_and_grad[0].optimize_attr["learning_rate"] = prev_lr
+            return res
 
     def __call__(self, model_list):
         model = model_list[0]
@@ -442,7 +506,6 @@ class AdamWDL(object):
             weight_decay = 0.
         else:
             parameters = model.parameters()
-
         opt_args = dict(
             learning_rate=self.learning_rate, weight_decay=self.weight_decay)
         opt_args['parameters'] = parameters
@@ -458,7 +521,6 @@ class AdamWDL(object):
                 name_dict[p.name] = n
             opt_args['name_dict'] = name_dict
             opt_args['n_layers'] = model.get_num_layers()
-
         optimizer = self.AdamWDLImpl(**opt_args)
 
         return optimizer
