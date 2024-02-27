@@ -1,0 +1,7 @@
+-   id: yapf
+    name: yapf
+    entry: yapf
+    language: python
+    files: \.py$
+    args: [-i]
+
