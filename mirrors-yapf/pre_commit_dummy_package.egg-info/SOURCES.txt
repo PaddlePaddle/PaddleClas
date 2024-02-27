@@ -1,0 +1,7 @@
+README.md
+setup.py
+pre_commit_dummy_package.egg-info/PKG-INFO
+pre_commit_dummy_package.egg-info/SOURCES.txt
+pre_commit_dummy_package.egg-info/dependency_links.txt
+pre_commit_dummy_package.egg-info/requires.txt
+pre_commit_dummy_package.egg-info/top_level.txt

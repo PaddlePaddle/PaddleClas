@@ -1,0 +1,4 @@
+Metadata-Version: 2.1
+Name: pre-commit-dummy-package
+Version: 0.0.0
+Requires-Dist: yapf==0.13.2
