@@ -32,7 +32,7 @@ extract_top1() {
     echo "$top1_acc"
 }
 
-log_dir="./eval_log"
+log_dir="./eval_logs"
 md_path="./eval_list.md"
 mkdir -p "$log_dir"
 touch "$md_path"
