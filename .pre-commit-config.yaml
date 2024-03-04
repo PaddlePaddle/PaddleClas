@@ -1,5 +1,5 @@
 repos:
--   repo: https://github.com/PaddlePaddle/mirrors-yapf.git
+-   repo: https://github.com/cuicheng01/mirrors-yapf.git
     rev: 0d79c0c469bab64f7229c9aca2b1186ef47f0e37
     hooks:
     -   id: yapf
