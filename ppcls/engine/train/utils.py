@@ -62,11 +62,15 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
     eta_msg = "eta: {:s}".format(str(datetime.timedelta(seconds=int(eta_sec))))
     max_mem_reserved_msg = ""
     max_mem_allocated_msg = ""
-    if paddle.device.is_compiled_with_cuda():
-        max_mem_reserved_msg = f"max_mem_reserved: {format(paddle.device.cuda.max_memory_reserved() / (1024 ** 2), '.2f')} MB"
-        max_mem_allocated_msg = f"max_mem_allocated: {format(paddle.device.cuda.max_memory_allocated() / (1024 ** 2), '.2f')} MB"
+    max_mem_msg = ""
+    print_mem_info = trainer.config["Global"].get("print_mem_info", False)
+    if print_mem_info:
+        if paddle.device.is_compiled_with_cuda():
+            max_mem_reserved_msg = f"max_mem_reserved: {format(paddle.device.cuda.max_memory_reserved() / (1024 ** 2), '.2f')} MB"
+            max_mem_allocated_msg = f"max_mem_allocated: {format(paddle.device.cuda.max_memory_allocated() / (1024 ** 2), '.2f')} MB"
+            max_mem_msg = f", {max_mem_reserved_msg}, {max_mem_allocated_msg}"
     logger.info(
-        f"[Train][Epoch {epoch_id}/{global_epochs}][Iter: {iter_id}/{trainer.iter_per_epoch}]{lr_msg}, {metric_msg}, {time_msg}, {ips_msg}, {eta_msg}, {max_mem_reserved_msg}, {max_mem_allocated_msg}"
+        f"[Train][Epoch {epoch_id}/{global_epochs}][Iter: {iter_id}/{trainer.iter_per_epoch}]{lr_msg}, {metric_msg}, {time_msg}, {ips_msg}, {eta_msg}{max_mem_msg}"
     )
 
     for i, lr in enumerate(trainer.lr_sch):
