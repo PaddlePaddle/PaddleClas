@@ -1,5 +1,5 @@
 ===========================train_params===========================
-model_name:ResNeXt101_32x4d
+model_name:ResNeXt152_32x4d
 python:python3.7
 gpu_list:0|0,1
 -o Global.device:gpu
@@ -13,7 +13,7 @@ train_infer_img_dir:./dataset/ILSVRC2012/val
 null:null
 ##
 trainer:amp_train
-amp_train:tools/train.py -c ppcls/configs/ImageNet/ResNeXt/ResNeXt101_32x4d.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o AMP.scale_loss=128 -o AMP.use_dynamic_loss_scaling=True -o AMP.level=O2 -o Global.eval_during_train=False -o Global.save_interval=2
+amp_train:tools/train.py -c ppcls/configs/ImageNet/ResNeXt/ResNeXt152_32x4d.yaml -o Global.seed=1234 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o AMP.scale_loss=128 -o AMP.use_dynamic_loss_scaling=True -o AMP.level=O2 -o Global.eval_during_train=False -o Global.save_interval=2
 pact_train:null
 fpgm_train:null
 distill_train:null
@@ -21,19 +21,19 @@ null:null
 null:null
 ##
 ===========================eval_params=========================== 
-eval:tools/eval.py -c ppcls/configs/ImageNet/ResNeXt/ResNeXt101_32x4d.yaml
+eval:tools/eval.py -c ppcls/configs/ImageNet/ResNeXt/ResNeXt152_32x4d.yaml
 null:null
 ##
 ===========================infer_params==========================
 -o Global.save_inference_dir:./inference
 -o Global.pretrained_model:
-norm_export:tools/export_model.py -c ppcls/configs/ImageNet/ResNeXt/ResNeXt101_32x4d.yaml
+norm_export:tools/export_model.py -c ppcls/configs/ImageNet/ResNeXt/ResNeXt152_32x4d.yaml
 quant_export:null
 fpgm_export:null
 distill_export:null
 kl_quant:null
 export2:null
-pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt101_32x4d_pretrained.pdparams
+pretrained_model_url:https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/ResNeXt152_32x4d_pretrained.pdparams
 infer_model:../inference/
 infer_export:True
 infer_quant:Fasle
