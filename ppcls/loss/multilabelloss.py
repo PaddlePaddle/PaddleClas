@@ -49,7 +49,7 @@ class MultiLabelLoss(nn.Layer):
         if self.weight_ratio:
             targets_mask = paddle.cast(target > 0.5, 'float32')
             weight = ratio2weight(targets_mask, paddle.to_tensor(label_ratio))
-            weight = weight * (target > -1)
+            weight = weight * (target > -1).astype(weight.dtype)
             cost = cost * weight
 
         if self.size_sum:
