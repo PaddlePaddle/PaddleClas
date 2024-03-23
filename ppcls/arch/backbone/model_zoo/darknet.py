@@ -18,7 +18,7 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2D, BatchNorm2D, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 import math
@@ -53,17 +53,16 @@ class ConvBNLayer(nn.Layer):
             bias_attr=False)
 
         bn_name = name + ".bn"
-        self._bn = BatchNorm(
-            num_channels=output_channels,
-            act="relu",
-            param_attr=ParamAttr(name=bn_name + ".scale"),
-            bias_attr=ParamAttr(name=bn_name + ".offset"),
-            moving_mean_name=bn_name + ".mean",
-            moving_variance_name=bn_name + ".var")
+        self._bn = BatchNorm2D(
+            num_features=output_channels,
+            weight_attr=ParamAttr(name=bn_name + ".scale"),
+            bias_attr=ParamAttr(name=bn_name + ".offset"))
+        self.act = nn.ReLU()
 
     def forward(self, inputs):
         x = self._conv(inputs)
         x = self._bn(x)
+        x = self.act(x)
         return x
 
 

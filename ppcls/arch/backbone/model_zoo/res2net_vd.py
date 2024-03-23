@@ -23,7 +23,7 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2D, BatchNorm2D, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
@@ -56,6 +56,7 @@ class ConvBNLayer(nn.Layer):
             name=None, ):
         super(ConvBNLayer, self).__init__()
 
+        self.use_act = act
         self.is_vd_mode = is_vd_mode
         self._pool2d_avg = AvgPool2D(
             kernel_size=2, stride=2, padding=0, ceil_mode=True)
@@ -72,19 +73,20 @@ class ConvBNLayer(nn.Layer):
             bn_name = "bn_" + name
         else:
             bn_name = "bn" + name[3:]
-        self._batch_norm = BatchNorm(
+        self._batch_norm = BatchNorm2D(
             num_filters,
-            act=act,
-            param_attr=ParamAttr(name=bn_name + '_scale'),
-            bias_attr=ParamAttr(bn_name + '_offset'),
-            moving_mean_name=bn_name + '_mean',
-            moving_variance_name=bn_name + '_variance')
+            weight_attr=ParamAttr(name=bn_name + '_scale'),
+            bias_attr=ParamAttr(bn_name + '_offset'))
+        if self.use_act:
+            self.act = nn.ReLU()
 
     def forward(self, inputs):
         if self.is_vd_mode:
             inputs = self._pool2d_avg(inputs)
         y = self._conv(inputs)
         y = self._batch_norm(y)
+        if self.use_act:
+            y = self.act(y)
         return y
 
 

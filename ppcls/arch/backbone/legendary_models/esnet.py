@@ -17,7 +17,7 @@ import math
 import paddle
 from paddle import ParamAttr, reshape, transpose, concat, split
 import paddle.nn as nn
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2D, BatchNorm2D, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D
 from paddle.nn.initializer import KaimingNormal
 from paddle.regularizer import L2Decay
@@ -79,9 +79,9 @@ class ConvBNLayer(TheseusLayer):
             weight_attr=ParamAttr(initializer=KaimingNormal()),
             bias_attr=False)
 
-        self.bn = BatchNorm(
+        self.bn = BatchNorm2D(
             out_channels,
-            param_attr=ParamAttr(regularizer=L2Decay(0.0)),
+            weight_attr=ParamAttr(regularizer=L2Decay(0.0)),
             bias_attr=ParamAttr(regularizer=L2Decay(0.0)))
         self.if_act = if_act
         self.hardswish = nn.Hardswish()

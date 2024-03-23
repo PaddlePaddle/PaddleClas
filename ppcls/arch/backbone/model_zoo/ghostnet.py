@@ -20,7 +20,7 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2D, BatchNorm, AdaptiveAvgPool2D, Linear
+from paddle.nn import Conv2D, BatchNorm2D, AdaptiveAvgPool2D, Linear
 from paddle.regularizer import L2Decay
 from paddle.nn.initializer import Uniform, KaimingNormal
 
@@ -48,6 +48,7 @@ class ConvBNLayer(nn.Layer):
                  act="relu",
                  name=None):
         super(ConvBNLayer, self).__init__()
+        self.use_act = act
         self._conv = Conv2D(
             in_channels=in_channels,
             out_channels=out_channels,
@@ -60,19 +61,20 @@ class ConvBNLayer(nn.Layer):
             bias_attr=False)
         bn_name = name + "_bn"
 
-        self._batch_norm = BatchNorm(
-            num_channels=out_channels,
-            act=act,
-            param_attr=ParamAttr(
+        self._batch_norm = BatchNorm2D(
+            num_features=out_channels,
+            weight_attr=ParamAttr(
                 name=bn_name + "_scale", regularizer=L2Decay(0.0)),
             bias_attr=ParamAttr(
-                name=bn_name + "_offset", regularizer=L2Decay(0.0)),
-            moving_mean_name=bn_name + "_mean",
-            moving_variance_name=bn_name + "_variance")
+                name=bn_name + "_offset", regularizer=L2Decay(0.0)))
+        if self.use_act:
+            self.act = nn.ReLU()
 
     def forward(self, inputs):
         y = self._conv(inputs)
         y = self._batch_norm(y)
+        if self.use_act:
+            y = self.act(y)
         return y
 
 

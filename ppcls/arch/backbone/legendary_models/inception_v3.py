@@ -19,7 +19,7 @@ import math
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2D, BatchNorm2D, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
@@ -73,7 +73,7 @@ class ConvBNLayer(TheseusLayer):
             padding=padding,
             groups=groups,
             bias_attr=False)
-        self.bn = BatchNorm(num_filters)
+        self.bn = BatchNorm2D(num_filters)
         self.relu = nn.ReLU()
 
     def forward(self, x):

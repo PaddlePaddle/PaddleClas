@@ -110,6 +110,7 @@ class ConvBNLayer(nn.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
+        self.use_act = act
         self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
@@ -122,15 +123,16 @@ class ConvBNLayer(nn.Layer):
         bn_name = name + "_bn"
         self._batch_norm = BatchNorm(
             num_filters,
-            act=act,
             param_attr=ParamAttr(name=bn_name + ".output.1.w_0"),
-            bias_attr=ParamAttr(bn_name + ".output.1.b_0"),
-            moving_mean_name=bn_name + "_mean",
-            moving_variance_name=bn_name + "_variance")
+            bias_attr=ParamAttr(bn_name + ".output.1.b_0"))
+        if self.use_act:
+            self.act = nn.ReLU()
 
     def forward(self, inputs):
         y = self._conv(inputs)
         y = self._batch_norm(y)
+        if self.use_act:
+            y = self.act(y)
         return y
 
 

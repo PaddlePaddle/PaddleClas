@@ -18,7 +18,7 @@ from __future__ import absolute_import, division, print_function
 
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2D, BatchNorm, Linear, ReLU, Flatten
+from paddle.nn import Conv2D, BatchNorm2D, Linear, ReLU, Flatten
 from paddle.nn import AdaptiveAvgPool2D
 from paddle.nn.initializer import KaimingNormal
 
@@ -62,7 +62,7 @@ class ConvBNLayer(TheseusLayer):
             groups=num_groups,
             weight_attr=ParamAttr(initializer=KaimingNormal()),
             bias_attr=False)
-        self.bn = BatchNorm(num_filters)
+        self.bn = BatchNorm2D(num_filters)
         self.relu = ReLU()
 
     def forward(self, x):

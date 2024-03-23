@@ -18,7 +18,7 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2D, BatchNorm2D, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
 from ....utils.save_load import load_dygraph_pretrain
@@ -94,6 +94,7 @@ class ConvBNLayer(nn.Layer):
                  name=None):
         super(ConvBNLayer, self).__init__()
 
+        self.use_act = act
         self._conv = Conv2D(
             in_channels=input_channels,
             out_channels=output_channels,
@@ -102,18 +103,18 @@ class ConvBNLayer(nn.Layer):
             padding=padding,
             weight_attr=ParamAttr(name=name + "/weights"),
             bias_attr=False)
-        self._bn = BatchNorm(
-            num_channels=output_channels,
-            act=act,
+        self._bn = BatchNorm2D(
+            num_features=output_channels,
             epsilon=1e-3,
             momentum=0.99,
-            param_attr=ParamAttr(name=name + "/BatchNorm/gamma"),
-            bias_attr=ParamAttr(name=name + "/BatchNorm/beta"),
-            moving_mean_name=name + "/BatchNorm/moving_mean",
-            moving_variance_name=name + "/BatchNorm/moving_variance")
+            weight_attr=ParamAttr(name=name + "/BatchNorm/gamma"),
+            bias_attr=ParamAttr(name=name + "/BatchNorm/beta"))
+        if self.use_act:
+            self.act = nn.ReLU()
 
     def forward(self, inputs):
-        return self._bn(self._conv(inputs))
+        return self.act(self._bn(self._conv(
+            inputs))) if self.use_act else self._bn(self._conv(inputs))
 
 
 class Seperate_Conv(nn.Layer):
@@ -137,15 +138,15 @@ class Seperate_Conv(nn.Layer):
             dilation=dilation,
             weight_attr=ParamAttr(name=name + "/depthwise/weights"),
             bias_attr=False)
-        self._bn1 = BatchNorm(
+        self.use_act1 = act
+        self._bn1 = BatchNorm2D(
             input_channels,
-            act=act,
             epsilon=1e-3,
             momentum=0.99,
-            param_attr=ParamAttr(name=name + "/depthwise/BatchNorm/gamma"),
-            bias_attr=ParamAttr(name=name + "/depthwise/BatchNorm/beta"),
-            moving_mean_name=name + "/depthwise/BatchNorm/moving_mean",
-            moving_variance_name=name + "/depthwise/BatchNorm/moving_variance")
+            weight_attr=ParamAttr(name=name + "/depthwise/BatchNorm/gamma"),
+            bias_attr=ParamAttr(name=name + "/depthwise/BatchNorm/beta"))
+        if self.use_act1:
+            self.act1 = nn.ReLU()
         self._conv2 = Conv2D(
             input_channels,
             output_channels,
@@ -155,21 +156,25 @@ class Seperate_Conv(nn.Layer):
             padding=0,
             weight_attr=ParamAttr(name=name + "/pointwise/weights"),
             bias_attr=False)
-        self._bn2 = BatchNorm(
+        self.use_act2 = act
+        self._bn2 = BatchNorm2D(
             output_channels,
-            act=act,
             epsilon=1e-3,
             momentum=0.99,
-            param_attr=ParamAttr(name=name + "/pointwise/BatchNorm/gamma"),
-            bias_attr=ParamAttr(name=name + "/pointwise/BatchNorm/beta"),
-            moving_mean_name=name + "/pointwise/BatchNorm/moving_mean",
-            moving_variance_name=name + "/pointwise/BatchNorm/moving_variance")
+            weight_attr=ParamAttr(name=name + "/pointwise/BatchNorm/gamma"),
+            bias_attr=ParamAttr(name=name + "/pointwise/BatchNorm/beta"))
+        if self.use_act2:
+            self.act2 = nn.ReLU()
 
     def forward(self, inputs):
         x = self._conv1(inputs)
         x = self._bn1(x)
+        if self.use_act1:
+            x = self.act1(x)
         x = self._conv2(x)
         x = self._bn2(x)
+        if self.use_act2:
+            x = self.act2(x)
         return x
 
 
