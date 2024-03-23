@@ -18,8 +18,102 @@ import math
 import types
 from abc import abstractmethod
 from typing import Union
+
+import numpy as np
 from paddle.optimizer import lr
 from ppcls.utils import logger
+
+
+class NoiseLR(lr.LRScheduler):
+    """
+    refer timm: https://github.com/huggingface/pytorch-image-models/blob/main/timm/scheduler/scheduler.py
+    """
+
+    def __init__(
+            self,
+            learning_rate,
+            noise_range_t=None,
+            noise_type='normal',
+            noise_pct=0.67,
+            noise_std=1.0,
+            noise_seed=None,
+            last_epoch=-1,
+            verbose=False, ):
+        type_check = (isinstance(learning_rate, float) or
+                      isinstance(learning_rate, int) or
+                      isinstance(learning_rate, lr.LRScheduler))
+        if not type_check:
+            raise TypeError(
+                "the type of learning_rate should be [int, float or LRScheduler], the current type is {}".
+                format(learning_rate))
+        self.learning_rate = learning_rate
+        self.noise_range_t = noise_range_t
+        self.noise_pct = noise_pct
+        self.noise_type = noise_type
+        self.noise_std = noise_std
+        self.noise_seed = noise_seed if noise_seed is not None else 42
+
+        start_lr = self.learning_rate() if isinstance(
+            self.learning_rate, lr.LRScheduler) else self.learning_rate
+        super().__init__(start_lr, last_epoch, verbose)
+
+    def _add_noise(self, lr_value, t):
+        if self._is_apply_noise(t):
+            noise = self._calculate_noise(t)
+            lr_value *= (1 + noise)
+        return lr_value
+
+    def _is_apply_noise(self, t) -> bool:
+        """Return True if scheduler in noise range."""
+        apply_noise = False
+        if self.noise_range_t is not None:
+            if isinstance(self.noise_range_t, (list, tuple)):
+                apply_noise = self.noise_range_t[0] <= t < self.noise_range_t[
+                    1]
+            else:
+                apply_noise = t >= self.noise_range_t
+        return apply_noise
+
+    def _calculate_noise(self, t) -> float:
+        rng = np.random.RandomState(self.noise_seed + t)
+        if self.noise_type == 'normal':
+            while True:
+                # resample if noise out of percent limit, brute force but shouldn't spin much
+                noise = rng.randn(1).item()
+                if abs(noise) < self.noise_pct:
+                    return noise
+        else:
+            noise = 2 * (rng.rand(1).item() - 0.5) * self.noise_pct
+        return noise
+
+    def state_dict(self):
+        state_dict = super().state_dict()
+        if isinstance(self.learning_rate, lr.LRScheduler):
+            state_dict["NoiseLR"] = self.learning_rate.state_dict()
+        return state_dict
+
+    def set_state_dict(self, state_dict):
+        super().set_state_dict(state_dict)
+        if isinstance(self.learning_rate, lr.LRScheduler):
+            self.learning_rate.set_state_dict(state_dict["NoiseLR"])
+
+    def step(self, epoch=None):
+        self.last_epoch += 1
+        self.last_lr = self.get_lr(epoch)
+        if self.verbose:
+            print('Epoch {}: {} set learning rate to {}.'.format(
+                self.last_epoch, self.__class__.__name__, self.last_lr))
+
+    def get_lr(self, epoch=None):
+        if isinstance(self.learning_rate, lr.LRScheduler):
+            self.learning_rate.step(self.last_epoch)
+            lr_value = self.learning_rate()
+        else:
+            lr_value = self.learning_rate
+
+        if epoch and self._is_apply_noise(epoch):
+            lr_value = self._add_noise(lr_value, epoch)
+        return lr_value
 
 
 class LRBase(object):
@@ -229,6 +323,11 @@ class Cosine(LRBase):
                  warmup_start_lr=0.0,
                  last_epoch=-1,
                  by_epoch=False,
+                 noise_range_t=None,
+                 noise_type='normal',
+                 noise_pct=0.67,
+                 noise_std=1.0,
+                 noise_seed=None,
                  **kwargs):
         super(Cosine, self).__init__(epochs, step_each_epoch, learning_rate,
                                      warmup_epoch, warmup_start_lr, last_epoch,
@@ -237,6 +336,13 @@ class Cosine(LRBase):
         self.eta_min = eta_min
         if self.by_epoch:
             self.T_max = self.epochs - self.warmup_epoch
+
+        self.learning_rate = learning_rate
+        self.noise_range_t = noise_range_t
+        self.noise_pct = noise_pct
+        self.noise_type = noise_type
+        self.noise_std = noise_std
+        self.noise_seed = noise_seed if noise_seed is not None else 42
 
     def __call__(self):
         learning_rate = lr.CosineAnnealingDecay(
@@ -248,7 +354,15 @@ class Cosine(LRBase):
 
         if self.warmup_steps > 0:
             learning_rate = self.linear_warmup(learning_rate)
-
+        learning_rate = NoiseLR(
+            learning_rate,
+            noise_range_t=self.noise_range_t,
+            noise_type=self.noise_type,
+            noise_pct=self.noise_pct,
+            noise_std=self.noise_std,
+            noise_seed=self.noise_seed,
+            last_epoch=self.last_epoch,
+            verbose=self.verbose)
         setattr(learning_rate, "by_epoch", self.by_epoch)
         return learning_rate
 
