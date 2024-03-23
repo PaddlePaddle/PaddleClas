@@ -24,7 +24,7 @@ from paddle import nn
 import numpy as np
 import random
 
-from ppcls.utils.misc import AverageMeter
+from ppcls.utils.misc import AverageMeter, MovingAverageMeter
 from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
 from ppcls.utils.config import print_config
@@ -305,8 +305,8 @@ class Engine(object):
         # val: metrics list word
         self.output_info = dict()
         self.time_info = {
-            "batch_cost": AverageMeter(
-                "batch_cost", '.5f', postfix=" s,"),
+            "batch_cost": MovingAverageMeter(
+                "batch_cost", 10, '.5f', postfix=" s,"),
             "reader_cost": AverageMeter(
                 "reader_cost", ".5f", postfix=" s,"),
         }
