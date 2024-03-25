@@ -16,7 +16,7 @@ import copy
 from collections import OrderedDict
 
 from .avg_metrics import AvgMetrics
-from .metrics import TopkAcc, mAP, mINP, Recallk, Precisionk
+from .metrics import TopkAcc, mAP, mINP, Recallk, Precisionk,TopkAccVLPretrain,LGRTwoBranchMetric
 from .metrics import DistillationTopkAcc
 from .metrics import GoogLeNetTopkAcc
 from .metrics import HammingDistance, AccuracyScore

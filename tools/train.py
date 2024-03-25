@@ -22,11 +22,14 @@ sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
 from ppcls.utils import config
 from ppcls.engine.engine import Engine
+import paddle
 
 if __name__ == "__main__":
     args = config.parse_args()
+    args.config = "./ppcls/configs/ImageNet/VL_LTR/VL_LTR_pretrain.yaml"
     config = config.get_config(
         args.config, overrides=args.override, show=False)
     config.profiler_options = args.profiler_options
+    a = paddle.zeros([1,1])
     engine = Engine(config, mode="train")
     engine.train()
