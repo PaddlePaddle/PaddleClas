@@ -9,7 +9,7 @@ def ratio2weight(targets, ratio):
     weights = paddle.exp(neg_weights + pos_weights)
 
     # for RAP dataloader, targets element may be 2, with or without smooth, some element must great than 1
-    weights = weights - weights * (targets > 1)
+    weights = weights - weights * (targets > 1).astype(weights.dtype)
 
     return weights
 
@@ -49,7 +49,7 @@ class MultiLabelLoss(nn.Layer):
         if self.weight_ratio:
             targets_mask = paddle.cast(target > 0.5, 'float32')
             weight = ratio2weight(targets_mask, paddle.to_tensor(label_ratio))
-            weight = weight * (target > -1)
+            weight = weight * (target > -1).astype(weight.dtype)
             cost = cost * weight
 
         if self.size_sum:
@@ -104,8 +104,9 @@ class MultiLabelAsymmetricLoss(nn.Layer):
         # Asymmetric Focusing
         if self.disable_focal_loss_grad:
             paddle.set_grad_enabled(False)
-        asymmetric_weight = (1 - pt).pow(
-            self.gamma_pos * target + self.gamma_neg * (1 - target))
+        asymmetric_weight = (
+            1 - pt
+        ).pow(self.gamma_pos * target + self.gamma_neg * (1 - target))
         if self.disable_focal_loss_grad:
             paddle.set_grad_enabled(True)
 
