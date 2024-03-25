@@ -1,6 +1,5 @@
-include LICENSE.txt
+include LICENSE
 include README.md
-include docs/en/whl_en.md
 recursive-include deploy/python *.py
 recursive-include deploy/utils *.py
 recursive-include ppcls/arch *.py
