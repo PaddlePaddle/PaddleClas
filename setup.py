@@ -12,51 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from io import open
 from setuptools import setup
-
-with open('requirements.txt', encoding="utf-8-sig") as f:
-    requirements = f.readlines()
-
-
-def readme():
-    with open(
-            'docs/en/inference_deployment/whl_deploy_en.md',
-            encoding="utf-8-sig") as f:
-        README = f.read()
-    return README
 
 
 setup(
-    name='paddleclas',
     packages=['paddleclas'],
     package_dir={'paddleclas': ''},
     include_package_data=True,
-    entry_points={
-        "console_scripts": ["paddleclas=paddleclas.paddleclas:main"]
-    },
-    version='0.0.0',
-    install_requires=requirements,
-    license='Apache License 2.0',
-    description='A treasure chest for visual recognition powered by PaddlePaddle.',
-    long_description=readme(),
-    long_description_content_type='text/markdown',
     url='https://github.com/PaddlePaddle/PaddleClas',
     download_url='https://github.com/PaddlePaddle/PaddleClas.git',
-    keywords=[
-        'image-classification', 'image-recognition', 'pretrained-models',
-        'knowledge-distillation', 'product-recognition', 'autoaugment',
-        'cutmix', 'randaugment', 'gridmask', 'deit', 'repvgg',
-        'swin-transformer', 'image-retrieval-system'
-    ],
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Operating System :: OS Independent',
-        'Intended Audience :: Developers',
-        'Intended Audience :: Education',
-        'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-    ], )
+)

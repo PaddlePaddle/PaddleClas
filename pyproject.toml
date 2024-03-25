@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta" 
+
+[project]
+name = "paddleclas"
+description = "A treasure chest for visual recognition powered by PaddlePaddle."
+
+keywords=[
+    'image-classification', 'image-recognition', 'pretrained-models',
+    'knowledge-distillation', 'product-recognition', 'autoaugment',
+    'cutmix', 'randaugment', 'gridmask', 'deit', 'repvgg',
+    'swin-transformer', 'image-retrieval-system'
+]
+classifiers=[
+    'Development Status :: 5 - Production/Stable',
+    'Operating System :: OS Independent',
+    'Intended Audience :: Developers',
+    'Intended Audience :: Education',
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: Apache Software License',
+]
+
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.8"
+
+dynamic = ["version", "dependencies"]
+
+[project.scripts]
+paddleclas = "paddleclas.paddleclas:main"
+
+[tool.setuptools.dynamic]
+version = {file = "version.txt"}
+dependencies = {file = "requirements.txt"}
+
+
