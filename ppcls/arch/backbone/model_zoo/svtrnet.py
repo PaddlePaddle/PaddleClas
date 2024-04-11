@@ -93,7 +93,7 @@ def drop_path(x, drop_prob=0., training=False):
     if drop_prob == 0. or not training:
         return x
     keep_prob = paddle.to_tensor(1 - drop_prob, dtype=x.dtype)
-    shape = (paddle.shape(x)[0], ) + (1, ) * (x.ndim - 1)
+    shape = (x.shape[0], ) + (1, ) * (x.ndim - 1)
     random_tensor = keep_prob + paddle.rand(shape, dtype=x.dtype)
     random_tensor = paddle.floor(random_tensor)  # binarize
     output = x.divide(keep_prob) * random_tensor
@@ -401,7 +401,7 @@ class PatchEmbed(nn.Layer):
 
         x, _ = pading_for_not_divisible(x, H, W, self.patch_size, "BCHW")
         x = self.proj(x)
-        _, _, height, width = paddle.shape(x)
+        _, _, height, width = x.shape
         output_dimensions = (height, width)
         x = x.flatten(2).transpose((0, 2, 1))
         return x, output_dimensions
@@ -443,11 +443,11 @@ class SubSample(nn.Layer):
             x1 = self.avgpool(x)
             x2 = self.maxpool(x)
             x = (x1 + x2) * 0.5
-            output_dimension = (paddle.shape(x)[2],paddle.shape(x)[3])
+            output_dimension = (x.shape[2],x.shape[3])
             out = self.proj(x.flatten(2).transpose((0, 2, 1)))
         else:
             x = self.conv(x)
-            output_dimension = (paddle.shape(x)[2],paddle.shape(x)[3])
+            output_dimension = (x.shape[2],x.shape[3])
             out = x.flatten(2).transpose((0, 2, 1))
         out = self.norm(out)
         if self.act is not None:

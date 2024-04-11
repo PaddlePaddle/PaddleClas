@@ -283,7 +283,7 @@ def drop_path(x, drop_prob=0., training=False):
     if drop_prob == 0. or not training:
         return x
     keep_prob = paddle.to_tensor(1 - drop_prob, dtype=x.dtype)
-    shape = (paddle.shape(x)[0], ) + (1, ) * (x.ndim - 1)
+    shape = (x.shape[0], ) + (1, ) * (x.ndim - 1)
     random_tensor = keep_prob + paddle.rand(shape).astype(x.dtype)
     random_tensor = paddle.floor(random_tensor)  # binarize
     output = x.divide(keep_prob) * random_tensor
@@ -405,8 +405,8 @@ class Attention(nn.Layer):
                              relative_position_index)
 
     def forward(self, x, rel_pos_bias=None):
-        # B= paddle.shape(x)[0]
-        N, C = paddle.shape(x)[1], paddle.shape(x)[2]
+        # B= x.shape[0]
+        N, C = x.shape[1], x.shape[2]
         qkv = self.qkv(x).reshape((-1, N, 3, self.num_heads, C //
                                    self.num_heads)).transpose((2, 0, 3, 1, 4))
         q, k, v = qkv[0], qkv[1], qkv[2]
@@ -591,7 +591,7 @@ class PatchEmbed(nn.Layer):
         x, _ = pading_for_not_divisible(x, H, W, patch_size=self.patch_size)
 
         x = self.proj(x)
-        _, _, H, W = paddle.shape(x)
+        _, _, H, W = x.shape
 
         x = x.flatten(2).transpose((0, 2, 1))
         return x, (H, W)
@@ -843,7 +843,7 @@ class VisionTransformer(nn.Layer):
         x = self.forward_features(x)
 
         if self.feature_frame:
-            B, L, C = paddle.shape(x)
+            B, L, C = x.shape
             x = paddle.reshape(x,[B, -1])
             x = self.feature(x)
 
