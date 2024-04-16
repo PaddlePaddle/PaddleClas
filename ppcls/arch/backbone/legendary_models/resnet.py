@@ -21,7 +21,7 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 from paddle.nn import Conv2D, BatchNorm, Linear, BatchNorm2D
-from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
+from paddle.nn import MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 from paddle.regularizer import L2Decay
 import math
@@ -109,6 +109,40 @@ NET_CONFIG = {
         "num_channels": [64, 256, 512, 1024]
     },
 }
+
+
+class AdaptiveAvgPool2D(TheseusLayer):
+    def __init__(self, output_size, data_format="NCHW", name=None):
+        super().__init__()
+
+        if isinstance(output_size, int):
+            output_size = [output_size, output_size]
+        elif isinstance(output_size, (list, tuple)):
+            assert len(output_size) == 2, "Length of `output_size` must be 2."
+        else:
+            raise ValueError(
+                "Wrong type of `output_size`, expect int, list, or tuple, but received {}.".
+                format(type(output_size)))
+
+        self._gap = (output_size[0] == 1) and (output_size[1] == 1)
+        self._output_size = output_size
+        self._data_format = data_format
+        self._name = name
+
+    def forward(self, x):
+        if self._gap:
+            # Global Average Pooling
+            N, C, _, _ = x.shape
+            # x_flat = paddle.reshape(x, [N, C, -1])
+            x_mean = paddle.mean(x, axis=[2, 3])
+            x_mean = paddle.reshape(x_mean, [N, C, 1, 1])
+            return x_mean
+        else:
+            return paddle.nn.functional.adaptive_avg_pool2d(
+                x,
+                output_size=self._output_size,
+                data_format=self._data_format,
+                name=self._name, )
 
 
 class ConvBNLayer(TheseusLayer):

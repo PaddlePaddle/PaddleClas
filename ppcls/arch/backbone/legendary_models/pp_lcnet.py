@@ -17,7 +17,7 @@ from __future__ import absolute_import, division, print_function
 import paddle
 import paddle.nn as nn
 from paddle import ParamAttr
-from paddle.nn import AdaptiveAvgPool2D, BatchNorm2D, Conv2D, Dropout, Linear
+from paddle.nn import BatchNorm2D, Conv2D, Dropout, Linear
 from paddle.regularizer import L2Decay
 from paddle.nn.initializer import KaimingNormal
 
@@ -76,6 +76,40 @@ def make_divisible(v, divisor=8, min_value=None):
     if new_v < 0.9 * v:
         new_v += divisor
     return new_v
+
+
+class AdaptiveAvgPool2D(TheseusLayer):
+    def __init__(self, output_size, data_format="NCHW", name=None):
+        super().__init__()
+
+        if isinstance(output_size, int):
+            output_size = [output_size, output_size]
+        elif isinstance(output_size, (list, tuple)):
+            assert len(output_size) == 2, "Length of `output_size` must be 2."
+        else:
+            raise ValueError(
+                "Wrong type of `output_size`, expect int, list, or tuple, but received {}.".
+                format(type(output_size)))
+
+        self._gap = (output_size[0] == 1) and (output_size[1] == 1)
+        self._output_size = output_size
+        self._data_format = data_format
+        self._name = name
+
+    def forward(self, x):
+        if self._gap:
+            # Global Average Pooling
+            N, C, _, _ = x.shape
+            # x_flat = paddle.reshape(x, [N, C, -1])
+            x_mean = paddle.mean(x, axis=[2, 3])
+            x_mean = paddle.reshape(x_mean, [N, C, 1, 1])
+            return x_mean
+        else:
+            return paddle.nn.functional.adaptive_avg_pool2d(
+                x,
+                output_size=self._output_size,
+                data_format=self._data_format,
+                name=self._name, )
 
 
 class ConvBNLayer(TheseusLayer):
@@ -227,59 +261,64 @@ class PPLCNet(TheseusLayer):
             stride=stride_list[0],
             lr_mult=self.lr_mult_list[0])
 
-        self.blocks2 = nn.Sequential(* [
+        self.blocks2 = nn.Sequential(*[
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
                 dw_size=k,
                 stride=s,
                 use_se=se,
-                lr_mult=self.lr_mult_list[1]) for i, (k, in_c, out_c, s, se) in
-            enumerate(self.net_config["blocks2"])
+                lr_mult=self.lr_mult_list[1])
+            for i, (k, in_c, out_c, s, se
+                    ) in enumerate(self.net_config["blocks2"])
         ])
 
-        self.blocks3 = nn.Sequential(* [
+        self.blocks3 = nn.Sequential(*[
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
                 dw_size=k,
                 stride=s,
                 use_se=se,
-                lr_mult=self.lr_mult_list[2]) for i, (k, in_c, out_c, s, se) in
-            enumerate(self.net_config["blocks3"])
+                lr_mult=self.lr_mult_list[2])
+            for i, (k, in_c, out_c, s, se
+                    ) in enumerate(self.net_config["blocks3"])
         ])
 
-        self.blocks4 = nn.Sequential(* [
+        self.blocks4 = nn.Sequential(*[
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
                 dw_size=k,
                 stride=s,
                 use_se=se,
-                lr_mult=self.lr_mult_list[3]) for i, (k, in_c, out_c, s, se) in
-            enumerate(self.net_config["blocks4"])
+                lr_mult=self.lr_mult_list[3])
+            for i, (k, in_c, out_c, s, se
+                    ) in enumerate(self.net_config["blocks4"])
         ])
 
-        self.blocks5 = nn.Sequential(* [
+        self.blocks5 = nn.Sequential(*[
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
                 dw_size=k,
                 stride=s,
                 use_se=se,
-                lr_mult=self.lr_mult_list[4]) for i, (k, in_c, out_c, s, se) in
-            enumerate(self.net_config["blocks5"])
+                lr_mult=self.lr_mult_list[4])
+            for i, (k, in_c, out_c, s, se
+                    ) in enumerate(self.net_config["blocks5"])
         ])
 
-        self.blocks6 = nn.Sequential(* [
+        self.blocks6 = nn.Sequential(*[
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
                 dw_size=k,
                 stride=s,
                 use_se=se,
-                lr_mult=self.lr_mult_list[5]) for i, (k, in_c, out_c, s, se) in
-            enumerate(self.net_config["blocks6"])
+                lr_mult=self.lr_mult_list[5])
+            for i, (k, in_c, out_c, s, se
+                    ) in enumerate(self.net_config["blocks6"])
         ])
 
         self.avg_pool = AdaptiveAvgPool2D(1)

@@ -19,7 +19,7 @@ from __future__ import absolute_import, division, print_function
 import paddle
 import paddle.nn as nn
 from paddle import ParamAttr
-from paddle.nn import AdaptiveAvgPool2D, BatchNorm, Conv2D, Dropout, Linear
+from paddle.nn import BatchNorm, Conv2D, Dropout, Linear
 from paddle.regularizer import L2Decay
 
 from ..base.theseus_layer import TheseusLayer
@@ -130,6 +130,40 @@ def _create_act(act):
             "The activation function is not supported: {}".format(act))
 
 
+class AdaptiveAvgPool2D(TheseusLayer):
+    def __init__(self, output_size, data_format="NCHW", name=None):
+        super().__init__()
+
+        if isinstance(output_size, int):
+            output_size = [output_size, output_size]
+        elif isinstance(output_size, (list, tuple)):
+            assert len(output_size) == 2, "Length of `output_size` must be 2."
+        else:
+            raise ValueError(
+                "Wrong type of `output_size`, expect int, list, or tuple, but received {}.".
+                format(type(output_size)))
+
+        self._gap = (output_size[0] == 1) and (output_size[1] == 1)
+        self._output_size = output_size
+        self._data_format = data_format
+        self._name = name
+
+    def forward(self, x):
+        if self._gap:
+            # Global Average Pooling
+            N, C, _, _ = x.shape
+            # x_flat = paddle.reshape(x, [N, C, -1])
+            x_mean = paddle.mean(x, axis=[2, 3])
+            x_mean = paddle.reshape(x_mean, [N, C, 1, 1])
+            return x_mean
+        else:
+            return paddle.nn.functional.adaptive_avg_pool2d(
+                x,
+                output_size=self._output_size,
+                data_format=self._data_format,
+                name=self._name, )
+
+
 class MobileNetV3(TheseusLayer):
     """
     MobileNetV3
@@ -176,7 +210,7 @@ class MobileNetV3(TheseusLayer):
             if_act=True,
             act="hardswish")
 
-        self.blocks = nn.Sequential(* [
+        self.blocks = nn.Sequential(*[
             ResidualUnit(
                 in_c=_make_divisible(self.inplanes * self.scale if i == 0 else
                                      self.cfg[i - 1][2] * self.scale),
