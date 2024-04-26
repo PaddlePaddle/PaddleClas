@@ -72,7 +72,8 @@ def log_info(trainer, batch_size, epoch_id, iter_id):
     logger.info(
         f"[Train][Epoch {epoch_id}/{global_epochs}][Iter: {iter_id}/{trainer.iter_per_epoch}]{lr_msg}, {metric_msg}, {time_msg}, {ips_msg}, {eta_msg}{max_mem_msg}"
     )
-    trainer.time_info[key].reset() for key in trainer.time_info
+    for key in trainer.time_info:
+        trainer.time_info[key].reset()
 
     for i, lr in enumerate(trainer.lr_sch):
         logger.scaler(
