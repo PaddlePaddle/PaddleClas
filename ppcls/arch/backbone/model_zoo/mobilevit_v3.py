@@ -136,7 +136,7 @@ class MultiHeadAttention(nn.Layer):
         self.out_proj = nn.Linear(dim, dim, bias_attr=qkv_bias)
 
     def forward(self, x):
-        # B = paddle.shape(x)[0]
+        # B = x.shape[0]
         N, C = x.shape[1:]
         qkv = self.qkv_proj(x).reshape((-1, N, 3, self.num_heads,
                                         C // self.num_heads)).transpose(

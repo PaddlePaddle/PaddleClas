@@ -443,7 +443,7 @@ class SwinTransformerBlock(nn.Layer):
 
     def forward(self, x, input_dimensions):
         H, W = input_dimensions
-        B, L, C = paddle.shape(x)
+        B, L, C = x.shape
 
         shortcut = x
         x = self.norm1(x)
@@ -451,7 +451,7 @@ class SwinTransformerBlock(nn.Layer):
 
         x, pad_values = pading_for_not_divisible(x, H, W, self.window_size,
                                                  "BHWC")
-        _, height_pad, width_pad, _ = paddle.shape(x)
+        _, height_pad, width_pad, _ = x.shape
 
         padding_state = pad_values[3] > 0 or pad_values[
             5] > 0  # change variable name
@@ -550,7 +550,7 @@ class PatchMerging(nn.Layer):
         x1 = x[:, 1::2, 0::2, :]  # B H/2 W/2 C
         x2 = x[:, 0::2, 1::2, :]  # B H/2 W/2 C
         x3 = x[:, 1::2, 1::2, :]  # B H/2 W/2 C
-        x = paddle.reshape(x, paddle.shape(x))
+        x = paddle.reshape(x, x.shape)
         x = paddle.concat([x0, x1, x2, x3], -1)  # B H/2 W/2 4*C
 
         # x = x.reshape([B, H // 2, 2, W // 2, 2, C])

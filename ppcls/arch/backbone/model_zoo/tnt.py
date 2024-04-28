@@ -55,7 +55,7 @@ def drop_path(x, drop_prob=0., training=False):
     if drop_prob == 0. or not training:
         return x
     keep_prob = paddle.to_tensor(1 - drop_prob, dtype=x.dtype)
-    shape = (paddle.shape(x)[0], ) + (1, ) * (x.ndim - 1)
+    shape = (x.shape[0], ) + (1, ) * (x.ndim - 1)
     random_tensor = paddle.add(keep_prob, paddle.rand(shape, dtype=x.dtype))
     random_tensor = paddle.floor(random_tensor)  # binarize
     output = x.divide(keep_prob) * random_tensor
@@ -341,7 +341,7 @@ class TNT(nn.Layer):
             ones_(m.weight)
 
     def forward_features(self, x):
-        B = paddle.shape(x)[0]
+        B = x.shape[0]
         pixel_embed = self.pixel_embed(x, self.pixel_pos)
 
         patch_embed = self.norm2_proj(
