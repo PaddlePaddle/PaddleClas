@@ -22,7 +22,7 @@ import numpy as np
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
+from paddle.nn import Conv2D, BatchNorm2D, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
@@ -58,14 +58,13 @@ class BNACConvLayer(nn.Layer):
                  name=None):
         super(BNACConvLayer, self).__init__()
 
-        self._batch_norm = BatchNorm(
+        self.use_act = act
+        self._batch_norm = BatchNorm2D(
             num_channels,
-            act=act,
-            param_attr=ParamAttr(name=name + '_bn_scale'),
-            bias_attr=ParamAttr(name + '_bn_offset'),
-            moving_mean_name=name + '_bn_mean',
-            moving_variance_name=name + '_bn_variance')
-
+            weight_attr=ParamAttr(name=name + '_bn_scale'),
+            bias_attr=ParamAttr(name + '_bn_offset'))
+        if self.use_act:
+            self.act = nn.ReLU()
         self._conv = Conv2D(
             in_channels=num_channels,
             out_channels=num_filters,
@@ -78,6 +77,8 @@ class BNACConvLayer(nn.Layer):
 
     def forward(self, input):
         y = self._batch_norm(input)
+        if self.use_act:
+            y = self.act(y)
         y = self._conv(y)
         return y
 
@@ -189,17 +190,19 @@ class ConvBNLayer(nn.Layer):
             groups=groups,
             weight_attr=ParamAttr(name=name + "_weights"),
             bias_attr=False)
-        self._batch_norm = BatchNorm(
+        self.use_act = act
+        self._batch_norm = BatchNorm2D(
             num_filters,
-            act=act,
-            param_attr=ParamAttr(name=name + '_bn_scale'),
-            bias_attr=ParamAttr(name + '_bn_offset'),
-            moving_mean_name=name + '_bn_mean',
-            moving_variance_name=name + '_bn_variance')
+            weight_attr=ParamAttr(name=name + '_bn_scale'),
+            bias_attr=ParamAttr(name + '_bn_offset'))
+        if self.use_act:
+            self.act = nn.ReLU()
 
     def forward(self, input):
         y = self._conv(input)
         y = self._batch_norm(y)
+        if self.use_act:
+            y = self.act(y)
         return y
 
 
@@ -263,14 +266,11 @@ class DenseNet(nn.Layer):
                 pre_num_channels = num_features // 2
                 num_features = num_features // 2
 
-        self.batch_norm = BatchNorm(
+        self.batch_norm = BatchNorm2D(
             num_features,
-            act="relu",
-            param_attr=ParamAttr(name='conv5_blk_bn_scale'),
-            bias_attr=ParamAttr(name='conv5_blk_bn_offset'),
-            moving_mean_name='conv5_blk_bn_mean',
-            moving_variance_name='conv5_blk_bn_variance')
-
+            weight_attr=ParamAttr(name='conv5_blk_bn_scale'),
+            bias_attr=ParamAttr(name='conv5_blk_bn_offset'))
+        self.act = nn.ReLU()
         self.pool2d_avg = AdaptiveAvgPool2D(1)
 
         stdv = 1.0 / math.sqrt(num_features * 1.0)
@@ -292,6 +292,7 @@ class DenseNet(nn.Layer):
                 conv = self.transition_func_list[i](conv)
 
         conv = self.batch_norm(conv)
+        conv = self.act(conv)
         y = self.pool2d_avg(conv)
         y = paddle.flatten(y, start_axis=1, stop_axis=-1)
         y = self.out(y)

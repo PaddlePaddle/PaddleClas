@@ -19,8 +19,9 @@ from __future__ import division
 from __future__ import print_function
 
 import paddle
+import paddle.nn as nn
 from paddle import ParamAttr, reshape, transpose, concat, split
-from paddle.nn import Layer, Conv2D, MaxPool2D, AdaptiveAvgPool2D, BatchNorm, Linear
+from paddle.nn import Layer, Conv2D, MaxPool2D, AdaptiveAvgPool2D, BatchNorm2D, Linear
 from paddle.nn.initializer import KaimingNormal
 from paddle.nn.functional import swish
 
@@ -74,6 +75,7 @@ class ConvBNLayer(Layer):
             act=None,
             name=None, ):
         super(ConvBNLayer, self).__init__()
+        self.use_act = act
         self._conv = Conv2D(
             in_channels=in_channels,
             out_channels=out_channels,
@@ -85,17 +87,18 @@ class ConvBNLayer(Layer):
                 initializer=KaimingNormal(), name=name + "_weights"),
             bias_attr=False)
 
-        self._batch_norm = BatchNorm(
+        self._batch_norm = BatchNorm2D(
             out_channels,
-            param_attr=ParamAttr(name=name + "_bn_scale"),
-            bias_attr=ParamAttr(name=name + "_bn_offset"),
-            act=act,
-            moving_mean_name=name + "_bn_mean",
-            moving_variance_name=name + "_bn_variance")
+            weight_attr=ParamAttr(name=name + "_bn_scale"),
+            bias_attr=ParamAttr(name=name + "_bn_offset"))
+        if self.use_act:
+            self.act = nn.ReLU()
 
     def forward(self, inputs):
         y = self._conv(inputs)
         y = self._batch_norm(y)
+        if self.use_act:
+            y = self.act(y)
         return y
 
 

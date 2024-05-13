@@ -19,7 +19,7 @@ from __future__ import absolute_import, division, print_function
 import paddle
 import paddle.nn as nn
 from paddle import ParamAttr
-from paddle.nn import AdaptiveAvgPool2D, BatchNorm, Conv2D, Dropout, Linear
+from paddle.nn import AdaptiveAvgPool2D, BatchNorm2D, Conv2D, Dropout, Linear
 from paddle.regularizer import L2Decay
 
 from ..base.theseus_layer import TheseusLayer
@@ -257,10 +257,9 @@ class ConvBNLayer(TheseusLayer):
             padding=padding,
             groups=num_groups,
             bias_attr=False)
-        self.bn = BatchNorm(
-            num_channels=out_c,
-            act=None,
-            param_attr=ParamAttr(regularizer=L2Decay(0.0)),
+        self.bn = BatchNorm2D(
+            num_features=out_c,
+            weight_attr=ParamAttr(regularizer=L2Decay(0.0)),
             bias_attr=ParamAttr(regularizer=L2Decay(0.0)))
         self.if_act = if_act
         self.act = _create_act(act)

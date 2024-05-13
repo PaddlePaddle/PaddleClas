@@ -80,7 +80,7 @@ class ConvBNLayer(TheseusLayer):
             padding=(filter_size - 1) // 2,
             groups=groups,
             bias_attr=False)
-        self.bn = nn.BatchNorm(num_filters, act=None)
+        self.bn = nn.BatchNorm2D(num_filters, act=None)
         self.act = _create_act(act)
 
     def forward(self, x):
