@@ -21,11 +21,12 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 from paddle.nn import Conv2D, BatchNorm, Linear, BatchNorm2D
-from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
+from paddle.nn import MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 from paddle.regularizer import L2Decay
 import math
 
+from .custom_devices_layers import AdaptiveAvgPool2D
 from ....utils import logger
 from ..base.theseus_layer import TheseusLayer
 from ..base.dbb.dbb_block import DiverseBranchBlock
