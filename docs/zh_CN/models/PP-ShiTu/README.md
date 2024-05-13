@@ -148,7 +148,7 @@ Paddle Inference 是飞桨的原生推理库， 作用于服务器端和云端�
   python3.7 tools/export_model.py \
   -c ./ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_PPLCNetV2_base.yaml \
   -o Global.pretrained_model="https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/rec/models/pretrain/PPShiTuV2/general_PPLCNetV2_base_pretrained_v1.0.pdparams" \
-  -o Global.save_inference_dir=deploy/models/GeneralRecognitionV2_PPLCNetV2_base`
+  -o Global.save_inference_dir=deploy/models/GeneralRecognitionV2_PPLCNetV2_base
   ```
   执行完该脚本后会在 `deploy/models/` 下生成 `GeneralRecognitionV2_PPLCNetV2_base` 文件夹，具有如下文件结构：
 
