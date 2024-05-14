@@ -42,10 +42,6 @@ MODEL_URLS = {
 
 __all__ = list(MODEL_URLS.keys())
 
-# The following re-implementation of roll is inspired by
-# https://gitee.com/ascend/pytorch/blob/master/torch_npu/contrib/function/roll.py
-
-
 def masked_fill(x, mask, value):
     y = paddle.full(x.shape, value, x.dtype)
     return paddle.where(mask, y, x)
@@ -393,7 +389,7 @@ class SwinTransformerBlock(nn.Layer):
             5] > 0  # change variable name
         # cyclic shift
         if self.shift_size > 0:
-            shifted_x = RollWrapper.roll(
+            shifted_x = paddle.roll(
                 x, shifts=(-self.shift_size, -self.shift_size), axis=(1, 2))
         else:
             shifted_x = x
@@ -420,7 +416,7 @@ class SwinTransformerBlock(nn.Layer):
 
         # reverse cyclic shift
         if self.shift_size > 0:
-            x = RollWrapper.roll(
+            x = paddle.roll(
                 shifted_x,
                 shifts=(self.shift_size, self.shift_size),
                 axis=(1, 2))
