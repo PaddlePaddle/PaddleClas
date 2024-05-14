@@ -135,6 +135,7 @@ def init_model(config,
         opti_dict = paddle.load(checkpoints + ".pdopt")
         para_dict = paddle.load(checkpoints + ".pdparams")
         metric_dict = paddle.load(checkpoints + ".pdstates")
+        metric_dict["metric"] = 0.0
         # set state dict
         net.set_state_dict(para_dict)
         loss.set_state_dict(para_dict)
