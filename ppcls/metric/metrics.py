@@ -30,6 +30,70 @@ from ppcls.utils.misc import AverageMeter, AttrMeter
 from ppcls.utils import logger
 
 
+
+class LGRTwoBranchMetric(AvgMetrics):
+    def __init__(self,topk,is_mixup=False):
+        super().__init__()
+        self.Topk = topk
+        self._topk = TopkAcc(topk)
+        self.is_mixup = is_mixup
+        self.reset()
+
+    def reset(self):
+        self.avg_meters = {
+            f"top{k}": AverageMeter(f"top{k}")
+            for k in self.Topk
+        }
+    def forward(self, x, labels):
+        ## 
+        if self.is_mixup:
+            labels = paddle.argmax(labels,axis=1)
+            labels = paddle.unsqueeze(labels,axis=-1)
+        buff_output = F.softmax(x[0],axis=1) * 0.2 + F.softmax(x[1],axis=1)*(1-0.2)
+        metric = self._topk(buff_output,labels)
+        for idx, k in enumerate(metric):
+            self.avg_meters[k].update(metric[k],x[0].shape[0])
+        return metric
+
+
+class TopkAccVLPretrain(AvgMetrics):
+    def __init__(self, topk=(1, 5)):
+        super().__init__()
+        assert isinstance(topk, (int, list, tuple))
+        if isinstance(topk, int):
+            topk = [topk]
+        self.topk = topk
+        self.reset()
+
+    def reset(self):
+        self.avg_meters = {
+            f"top{k}": AverageMeter(f"top{k}")
+            for k in self.topk
+        }
+
+    def forward(self, x, label):
+        if isinstance(x, dict):
+            x = x["logits"]
+
+        #image acc
+        x = x[1][0]
+        output_dims = x.shape[-1]
+
+        metric_dict = dict()
+        for idx, k in enumerate(self.topk):
+            if output_dims < k:
+                msg = f"The output dims({output_dims}) is less than k({k}), and the argument {k} of Topk has been removed."
+                logger.warning(msg)
+                self.avg_meters.pop(f"top{k}")
+                continue
+            metric_dict[f"top{k}"] = paddle.metric.accuracy(x, label, k=k)
+            self.avg_meters[f"top{k}"].update(metric_dict[f"top{k}"],
+                                              x.shape[0])
+
+        self.topk = list(filter(lambda k: k <= output_dims, self.topk))
+
+        return metric_dict
+
 class TopkAcc(AvgMetrics):
     def __init__(self, topk=(1, 5)):
         super().__init__()

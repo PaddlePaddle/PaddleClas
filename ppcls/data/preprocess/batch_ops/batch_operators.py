@@ -58,7 +58,49 @@ class BatchOperator(object):
     def __call__(self, batch):
         return batch
 
+#######
+class MixupOperatorLT(BatchOperator):
+    """ Mixup operator 
+    reference: https://arxiv.org/abs/1710.09412
 
+    """
+
+    def __init__(self, class_num, alpha: float=1.,is_pretrain=False):
+        """Build Mixup operator
+
+        Args:
+            alpha (float, optional): The parameter alpha of mixup. Defaults to 1..
+
+        Raises:
+            Exception: The value of parameter is illegal.
+        """
+        if alpha <= 0:
+            raise Exception(
+                f"Parameter \"alpha\" of Mixup should be greater than 0. \"alpha\": {alpha}."
+            )
+        if not class_num:
+            msg = "Please set \"Arch.class_num\" in config if use \"MixupOperator\"."
+            logger.error(Exception(msg))
+            raise Exception(msg)
+
+        self._alpha = alpha
+        self.class_num = class_num
+        self.is_pretrain = is_pretrain
+
+    def __call__(self, batch):
+        if self.is_pretrain:
+            (imgs,text),labels,bs = self._unpack(batch)
+        else:
+            imgs, labels, bs = self._unpack(batch)
+        idx = np.random.permutation(bs)
+        lam = np.random.beta(self._alpha, self._alpha)
+        imgs = lam * imgs + (1 - lam) * imgs[idx]
+        targets = self._mix_target(labels, labels[idx], lam)
+        if self.is_pretrain:
+            return list(zip((imgs,text),targets))
+        else:
+            return list(zip(imgs, targets))
+#######
 class MixupOperator(BatchOperator):
     """ Mixup operator 
     reference: https://arxiv.org/abs/1710.09412

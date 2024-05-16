@@ -34,7 +34,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
                 paddle.to_tensor(batch[0]['data']),
                 paddle.to_tensor(batch[0]['label'])
             ]
-        batch_size = batch[0].shape[0]
+        batch_size = batch[1].shape[0]
         if not engine.config["Global"].get("use_multilabel", False):
             batch[1] = batch[1].reshape([batch_size, -1])
         engine.global_step += 1
@@ -64,7 +64,7 @@ def train_epoch(engine, epoch_id, print_batch_step):
                 for i in range(len(engine.optimizer)):
                     engine.scaler.minimize(engine.optimizer[i], scaled)
         else:
-            loss.backward()
+            loss.backward(retain_graph=True)
             if (iter_id + 1) % engine.update_freq == 0:
                 for i in range(len(engine.optimizer)):
                     engine.optimizer[i].step()
