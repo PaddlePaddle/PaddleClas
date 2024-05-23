@@ -27,7 +27,7 @@ Arch:
   name: CLIP_vit_large_patch14_224
   class_num: 1000
   return_embed: False
-  use_fused_attn: True # fused attn can be used in AMP O2 mode only, and dont support relative_position yet
+  use_fused_attn: True # fused attn can be used in AMP O2 mode only
   pretrained: True
 
 # loss function config for traing/eval process
