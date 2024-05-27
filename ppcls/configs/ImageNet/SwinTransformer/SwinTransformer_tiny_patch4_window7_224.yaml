@@ -19,19 +19,20 @@ Global:
 
 # mixed precision
 AMP:
-  use_amp: False
-  use_fp16_test: False
+  use_amp: True
+  use_fp16_test: True
   scale_loss: 128.0
   use_dynamic_loss_scaling: True
   use_promote: False
   # O1: mixed fp16, O2: pure fp16
-  level: O1
+  level: O2
 
 
 # model architecture
 Arch:
   name: SwinTransformer_tiny_patch4_window7_224
   class_num: 1000
+  use_fused_attn: True
  
 # loss function config for traing/eval process
 Loss:
