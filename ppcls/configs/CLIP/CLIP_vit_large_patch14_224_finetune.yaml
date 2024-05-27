@@ -28,6 +28,7 @@ Arch:
   class_num: 1000
   return_embed: False
   use_fused_attn: True # fused attn can be used in AMP O2 mode only
+  use_fused_linear: True
   pretrained: True
 
 # loss function config for traing/eval process

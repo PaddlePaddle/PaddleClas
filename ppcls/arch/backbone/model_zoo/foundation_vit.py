@@ -147,10 +147,7 @@ _CLIP_diff = {
     'add_mul_gamma_to_msa_mlp': [],
     'remove_cls_token': [],
     'remove_abs_pos_emb': [],
-    'replace_mlp_GELU': [
-        'vit_base_patch32_224', 'vit_base_patch16_224',
-        'vit_large_patch14_336', 'vit_large_patch14_224'
-    ],
+    'replace_mlp_GELU': [],
     'head': {
         'fc_norm': [],
         'return_all_tokens': [],
@@ -321,14 +318,15 @@ class Mlp(nn.Layer):
                  hidden_features=None,
                  out_features=None,
                  act_layer=nn.GELU,
-                 drop=0.):
+                 drop=0.,
+                 Linear=nn.Linear):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
-        self.fc1 = nn.Linear(in_features, hidden_features)
+        self.fc1 = Linear(in_features, hidden_features)
         self.act = act_layer() if _model_size not in _model_diff[
             'replace_mlp_GELU'] else QuickGELU()
-        self.fc2 = nn.Linear(hidden_features, out_features)
+        self.fc2 = Linear(hidden_features, out_features)
         self.drop = nn.Dropout(drop)
 
     def forward(self, x):
@@ -350,7 +348,8 @@ class Attention(nn.Layer):
                  proj_drop=0.,
                  model_name=None,
                  window_size=None,
-                 use_fused_attn=False):
+                 use_fused_attn=False,
+                 Linear=nn.Linear):
         super().__init__()
         self._model_name = model_name
 
@@ -367,13 +366,13 @@ class Attention(nn.Layer):
         head_dim = dim // num_heads
         self.scale = qk_scale or head_dim**-0.5
 
-        self.qkv = nn.Linear(dim, dim * 3, bias_attr=qkv_bias)
+        self.qkv = Linear(dim, dim * 3, bias_attr=qkv_bias)
         self.attn_drop = nn.Dropout(attn_drop)
-        self.attn_drop_value = attn_drop
-        self.proj = nn.Linear(dim, dim)
+        self.proj = Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
 
         self.use_fused_attn = use_fused_attn
+        # TODO: support mask
         if use_fused_attn:
             if hasattr(self, 'relative_position_bias_table') or (_model_size in _model_diff['add_shared_rel_pos_bias'] and rel_pos_bias is not None):
                 logger.warning("The fused attn don't support `relative_position` yet, so fused attn will not be used.")
@@ -440,7 +439,9 @@ class Attention(nn.Layer):
         else:
             qkv = qkv.transpose((2, 0, 1, 3, 4))
             q, k, v = qkv[0], qkv[1], qkv[2]
-            attn, _ = paddle.nn.functional.flash_attention.flash_attention(q, k, v, dropout=self.attn_drop_value)
+            # TODO: support mask
+            attn = paddle.nn.functional.scaled_dot_product_attention(q, k, v, dropout_p=self.attn_drop.p if self.training else 0.)
+
         x = attn.reshape((-1, N, C))
         x = self.proj(x)
         x = self.proj_drop(x)
@@ -463,7 +464,8 @@ class Block(nn.Layer):
                  norm_layer='nn.LayerNorm',
                  epsilon=1e-5,
                  window_size=None,
-                 use_fused_attn=False):
+                 use_fused_attn=False,
+                 use_fused_linear=False):
         super().__init__()
         global _model_size
         global _model_diff
@@ -475,6 +477,7 @@ class Block(nn.Layer):
         else:
             raise TypeError(
                 "The norm_layer must be str or paddle.nn.layer.Layer class")
+        Linear = paddle.incubate.nn.FusedLinear if use_fused_linear else nn.Linear
         self.attn = Attention(
             dim,
             num_heads=num_heads,
@@ -484,7 +487,8 @@ class Block(nn.Layer):
             proj_drop=drop,
             model_name=self._model_name,
             window_size=window_size,
-            use_fused_attn=use_fused_attn)
+            use_fused_attn=use_fused_attn,
+            Linear=Linear)
         # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
 
@@ -510,7 +514,8 @@ class Block(nn.Layer):
         self.mlp = Mlp(in_features=dim,
                        hidden_features=mlp_hidden_dim,
                        act_layer=act_layer,
-                       drop=drop)
+                       drop=drop,
+                       Linear=Linear)
 
     def forward(self, x, rel_pos_bias=None):
         if self.gamma_1 is not None:
@@ -694,6 +699,7 @@ class VisionTransformer(nn.Layer):
         self.return_embed = kwargs.get('return_embed', False)
         self.num_features = self.embed_dim = embed_dim
         use_fused_attn = kwargs.get('use_fused_attn', False)
+        use_fused_linear = kwargs.get('use_fused_linear', False)
         _img_size = to_2tuple(img_size)
         _patch_size = to_2tuple(patch_size)
         self.window_size = (_img_size[0] // _patch_size[0],
@@ -771,7 +777,8 @@ class VisionTransformer(nn.Layer):
                 norm_layer=norm_layer,
                 epsilon=epsilon,
                 window_size=self.window_size,
-                use_fused_attn=use_fused_attn) for i in range(depth)
+                use_fused_attn=use_fused_attn,
+                use_fused_linear=use_fused_linear) for i in range(depth)
         ])
 
         self.norm = eval(norm_layer)(embed_dim, epsilon=epsilon)
