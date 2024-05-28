@@ -32,7 +32,8 @@ AMP:
 Arch:
   name: SwinTransformer_tiny_patch4_window7_224
   class_num: 1000
-  use_fused_attn: True
+  # fused op can be used in AMP O2 mode only
+  use_fused_attn: False
  
 # loss function config for traing/eval process
 Loss:

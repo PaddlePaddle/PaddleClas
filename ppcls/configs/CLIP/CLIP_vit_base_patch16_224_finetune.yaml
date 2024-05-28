@@ -27,9 +27,10 @@ Arch:
   name: CLIP_vit_base_patch16_224
   class_num: 1000
   return_embed: False
-  use_fused_attn: True # fused attn can be used in AMP O2 mode only
-  use_fused_linear: True
   pretrained: True
+  # fused op can be used in AMP O2 mode only
+  use_fused_attn: False
+  use_fused_linear: False 
 
 # loss function config for traing/eval process
 Loss:
