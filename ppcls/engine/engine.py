@@ -351,7 +351,7 @@ class Engine(object):
                             type_name(self.lr_sch[i]) == "ReduceOnPlateau":
                         self.lr_sch[i].step(acc)
 
-                if acc > best_metric["metric"]:
+                if acc >= best_metric["metric"]:
                     best_metric["metric"] = acc
                     best_metric["epoch"] = epoch_id
                     save_load.save_model(
@@ -453,31 +453,37 @@ class Engine(object):
         for idx, image_file in enumerate(image_list):
             with open(image_file, 'rb') as f:
                 x = f.read()
-            for process in self.preprocess_func:
-                x = process(x)
-            batch_data.append(x)
-            image_file_list.append(image_file)
-            if len(batch_data) >= batch_size or idx == len(image_list) - 1:
-                batch_tensor = paddle.to_tensor(batch_data)
+            try:
+                for process in self.preprocess_func:
+                    x = process(x)
+                batch_data.append(x)
+                image_file_list.append(image_file)
+                if len(batch_data) >= batch_size or idx == len(image_list) - 1:
+                    batch_tensor = paddle.to_tensor(batch_data)
 
-                with self.auto_cast(is_eval=True):
-                    out = self.model(batch_tensor)
+                    with self.auto_cast(is_eval=True):
+                        out = self.model(batch_tensor)
 
-                if isinstance(out, list):
-                    out = out[0]
-                if isinstance(out, dict) and "Student" in out:
-                    out = out["Student"]
-                if isinstance(out, dict) and "logits" in out:
-                    out = out["logits"]
-                if isinstance(out, dict) and "output" in out:
-                    out = out["output"]
+                    if isinstance(out, list):
+                        out = out[0]
+                    if isinstance(out, dict) and "Student" in out:
+                        out = out["Student"]
+                    if isinstance(out, dict) and "logits" in out:
+                        out = out["logits"]
+                    if isinstance(out, dict) and "output" in out:
+                        out = out["output"]
 
-                result = self.postprocess_func(out, image_file_list)
-                if not save_path:
-                    logger.info(result)
-                results.extend(result)
-                batch_data.clear()
-                image_file_list.clear()
+                    result = self.postprocess_func(out, image_file_list)
+                    if not save_path:
+                        logger.info(result)
+                    results.extend(result)
+                    batch_data.clear()
+                    image_file_list.clear()
+            except Exception as ex:
+                logger.error(
+                    "Exception occured when parse line: {} with msg: {}".
+                    format(image_file, ex))
+                continue
         if save_path:
             save_predict_result(save_path, results)
         return results

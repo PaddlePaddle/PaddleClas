@@ -19,9 +19,10 @@ from __future__ import absolute_import, division, print_function
 import paddle
 import paddle.nn as nn
 from paddle import ParamAttr
-from paddle.nn import AdaptiveAvgPool2D, BatchNorm, Conv2D, Dropout, Linear
+from paddle.nn import BatchNorm, Conv2D, Dropout, Linear
 from paddle.regularizer import L2Decay
 
+from .custom_devices_layers import AdaptiveAvgPool2D
 from ..base.theseus_layer import TheseusLayer
 from ....utils.save_load import load_dygraph_pretrain
 
@@ -176,7 +177,7 @@ class MobileNetV3(TheseusLayer):
             if_act=True,
             act="hardswish")
 
-        self.blocks = nn.Sequential(* [
+        self.blocks = nn.Sequential(*[
             ResidualUnit(
                 in_c=_make_divisible(self.inplanes * self.scale if i == 0 else
                                      self.cfg[i - 1][2] * self.scale),

@@ -42,77 +42,9 @@ MODEL_URLS = {
 
 __all__ = list(MODEL_URLS.keys())
 
-# The following re-implementation of roll is inspired by
-# https://gitee.com/ascend/pytorch/blob/master/torch_npu/contrib/function/roll.py
-
-
 def masked_fill(x, mask, value):
     y = paddle.full(x.shape, value, x.dtype)
     return paddle.where(mask, y, x)
-
-
-class RollWithIndexSelect(paddle.autograd.PyLayer):
-    @staticmethod
-    def forward(ctx, input1, index_fp, index_bp):
-        N, H, W, C = input1.shape
-        ctx.input1 = input1
-        ctx.index_bp = index_bp
-        result = input1.reshape([N, H * W, C]).index_select(
-            index_fp, 1).reshape([N, H, W, C])
-        return result
-
-    @staticmethod
-    def backward(ctx, grad):
-        input1 = ctx.input1
-        N, H, W, C = input1.shape
-        index_bp = ctx.index_bp
-        grad_input = grad.reshape([N, H * W, C]).index_select(
-            index_bp, 1).reshape([N, H, W, C])
-        return grad_input, None, None
-
-
-def get_roll_index(H, W, shifts, place):
-    index = np.arange(0, H * W, dtype=np.int64).reshape([H, W])
-    index_fp = np.roll(index, shift=shifts, axis=(0, 1)).reshape([-1])
-    index_bp = {i: idx for idx, i in enumerate(index_fp.tolist())}
-    index_bp = [index_bp[i] for i in range(H * W)]
-    index_fp = paddle.to_tensor(index_fp, place=place)
-    index_bp = paddle.to_tensor(index_fp, dtype='int64', place=place)
-    return [index_fp, index_bp]
-
-
-class NpuRollWithIndexSelect():
-    def __init__(self):
-        self.index_dict = {}
-        self.roll_with_index_select = RollWithIndexSelect.apply
-
-    def __call__(self, x, shifts, axis):
-        assert x.dim() == 4
-        assert len(shifts) == 2
-        assert len(axis) == 2
-        N, H, W, C = x.shape
-        key = (H, W, shifts, axis)
-        if key not in self.index_dict:
-            self.index_dict[key] = get_roll_index(H, W, shifts, x.place)
-        index_fp, index_bp = self.index_dict[key]
-        return self.roll_with_index_select(x, index_fp, index_bp)
-
-
-class RollWrapper(object):
-    _roll = None
-
-    @staticmethod
-    def roll(x, shifts, axis):
-        return RollWrapper._roll(x, shifts, axis)
-
-
-# NOTE(xiongkun): paddle.SOT can't analysis this builtin function, which will cause subgraph break in sot.
-# we do this here will not effect sot translate.
-paddle_custom_device_types = paddle.device.get_all_custom_device_type()
-
-if RollWrapper._roll is None:
-    RollWrapper._roll = NpuRollWithIndexSelect(
-    ) if 'npu' in paddle_custom_device_types else paddle.roll
 
 
 class Mlp(nn.Layer):
@@ -220,7 +152,8 @@ class WindowAttention(nn.Layer):
                  qkv_bias=True,
                  qk_scale=None,
                  attn_drop=0.,
-                 proj_drop=0.):
+                 proj_drop=0.,
+                 use_fused_attn=False):
         super().__init__()
         self.dim = dim
         self.window_size = window_size  # Wh, Ww
@@ -267,6 +200,8 @@ class WindowAttention(nn.Layer):
         trunc_normal_(self.relative_position_bias_table)
         self.softmax = nn.Softmax(axis=-1)
 
+        self.use_fused_attn = use_fused_attn
+
     def eval(self, ):
         # this is used to re-param swin for model export
         relative_position_bias_table = self.relative_position_bias_table
@@ -284,21 +219,7 @@ class WindowAttention(nn.Layer):
         relative_position_bias = relative_position_bias.unsqueeze(0)
         self.register_buffer("relative_position_bias", relative_position_bias)
 
-    def forward(self, x, mask=None):
-        """
-        Args:
-            x: input features with shape of (num_windows*B, N, C)
-            mask: (0/-inf) mask with shape of (num_windows, Wh*Ww, Wh*Ww) or None
-        """
-        B_, N, C = x.shape
-        qkv = self.qkv(x).reshape(
-            [B_, N, 3, self.num_heads, C // self.num_heads]).transpose(
-                [2, 0, 3, 1, 4])
-        q, k, v = qkv[0], qkv[1], qkv[2]
-
-        q = q * self.scale
-        attn = paddle.mm(q, k.transpose([0, 1, 3, 2]))
-
+    def get_relative_position_bias(self):
         if self.training or not hasattr(self, "relative_position_bias"):
             index = self.relative_position_index.reshape([-1])
 
@@ -311,23 +232,47 @@ class WindowAttention(nn.Layer):
 
             relative_position_bias = relative_position_bias.transpose(
                 [2, 0, 1])  # nH, Wh*Ww, Wh*Ww
-            attn = attn + relative_position_bias.unsqueeze(0)
+            return relative_position_bias.unsqueeze(0)
         else:
-            attn = attn + self.relative_position_bias
+            return self.relative_position_bias
 
-        if mask is not None:
-            nW = mask.shape[0]
-            attn = attn.reshape([B_ // nW, nW, self.num_heads, N, N
-                                 ]) + mask.unsqueeze(1).unsqueeze(0)
-            attn = attn.reshape([-1, self.num_heads, N, N])
-            attn = self.softmax(attn)
+    def forward(self, x, mask=None):
+        """
+        Args:
+            x: input features with shape of (num_windows*B, N, C)
+            mask: (0/-inf) mask with shape of (num_windows, Wh*Ww, Wh*Ww) or None
+        """
+        B_, N, C = x.shape
+        qkv = self.qkv(x).reshape(
+            [B_, N, 3, self.num_heads, C // self.num_heads])
+
+        if self.use_fused_attn:
+            qkv = qkv.transpose((2, 0, 1, 3, 4))
+            q, k, v = qkv[0], qkv[1], qkv[2]
+            attn_mask = self.get_relative_position_bias()
+            if mask is not None:
+                nW = mask.shape[0]
+                mask = mask.reshape((1, nW, 1, N, N)).expand((B_ // nW, -1, self.num_heads, -1, -1))
+                attn_mask = attn_mask + mask.reshape((-1, self.num_heads, N, N))
+            attn_mask = attn_mask.expand((B_, -1, -1, -1))
+            attn = paddle.nn.functional.scaled_dot_product_attention(q, k, v, dropout_p=self.attn_drop.p if self.training else 0., attn_mask=attn_mask)
         else:
+            qkv = qkv.transpose((2, 0, 3, 1, 4))
+            q, k, v = qkv[0], qkv[1], qkv[2]
+            q = q * self.scale
+            attn = paddle.mm(q, k.transpose([0, 1, 3, 2]))
+            attn = attn + self.get_relative_position_bias()
+
+            if mask is not None:
+                nW = mask.shape[0]
+                attn = attn.reshape([B_ // nW, nW, self.num_heads, N, N
+                                    ]) + mask.unsqueeze(1).unsqueeze(0)
+                attn = attn.reshape([B_, self.num_heads, N, N])
             attn = self.softmax(attn)
-
-        attn = self.attn_drop(attn)
-
-        # x = (attn @ v).transpose(1, 2).reshape([B_, N, C])
-        x = paddle.mm(attn, v).transpose([0, 2, 1, 3]).reshape([B_, N, C])
+            attn = self.attn_drop(attn)
+            attn = paddle.mm(attn, v)
+            attn = attn.transpose([0, 2, 1, 3])
+        x = attn.reshape([B_, N, C])
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
@@ -382,7 +327,8 @@ class SwinTransformerBlock(nn.Layer):
                  attn_drop=0.,
                  drop_path=0.,
                  act_layer=nn.GELU,
-                 norm_layer=nn.LayerNorm):
+                 norm_layer=nn.LayerNorm,
+                 use_fused_attn=False):
         super().__init__()
         self.dim = dim
         self.input_resolution = input_resolution
@@ -399,7 +345,8 @@ class SwinTransformerBlock(nn.Layer):
             qkv_bias=qkv_bias,
             qk_scale=qk_scale,
             attn_drop=attn_drop,
-            proj_drop=drop)
+            proj_drop=drop,
+            use_fused_attn=use_fused_attn)
 
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
         self.norm2 = norm_layer(dim)
@@ -443,7 +390,7 @@ class SwinTransformerBlock(nn.Layer):
 
     def forward(self, x, input_dimensions):
         H, W = input_dimensions
-        B, L, C = paddle.shape(x)
+        B, L, C = x.shape
 
         shortcut = x
         x = self.norm1(x)
@@ -451,13 +398,13 @@ class SwinTransformerBlock(nn.Layer):
 
         x, pad_values = pading_for_not_divisible(x, H, W, self.window_size,
                                                  "BHWC")
-        _, height_pad, width_pad, _ = paddle.shape(x)
+        _, height_pad, width_pad, _ = x.shape
 
         padding_state = pad_values[3] > 0 or pad_values[
             5] > 0  # change variable name
         # cyclic shift
         if self.shift_size > 0:
-            shifted_x = RollWrapper.roll(
+            shifted_x = paddle.roll(
                 x, shifts=(-self.shift_size, -self.shift_size), axis=(1, 2))
         else:
             shifted_x = x
@@ -484,7 +431,7 @@ class SwinTransformerBlock(nn.Layer):
 
         # reverse cyclic shift
         if self.shift_size > 0:
-            x = RollWrapper.roll(
+            x = paddle.roll(
                 shifted_x,
                 shifts=(self.shift_size, self.shift_size),
                 axis=(1, 2))
@@ -550,7 +497,7 @@ class PatchMerging(nn.Layer):
         x1 = x[:, 1::2, 0::2, :]  # B H/2 W/2 C
         x2 = x[:, 0::2, 1::2, :]  # B H/2 W/2 C
         x3 = x[:, 1::2, 1::2, :]  # B H/2 W/2 C
-        x = paddle.reshape(x, paddle.shape(x))
+        x = paddle.reshape(x, x.shape)
         x = paddle.concat([x0, x1, x2, x3], -1)  # B H/2 W/2 4*C
 
         # x = x.reshape([B, H // 2, 2, W // 2, 2, C])
@@ -608,7 +555,8 @@ class BasicLayer(nn.Layer):
                  drop_path=0.,
                  norm_layer=nn.LayerNorm,
                  downsample=None,
-                 use_checkpoint=False):
+                 use_checkpoint=False,
+                 use_fused_attn=False):
 
         super().__init__()
         self.dim = dim
@@ -631,7 +579,8 @@ class BasicLayer(nn.Layer):
                 attn_drop=attn_drop,
                 drop_path=drop_path[i]
                 if isinstance(drop_path, list) else drop_path,
-                norm_layer=norm_layer) for i in range(depth)
+                norm_layer=norm_layer,
+                use_fused_attn=use_fused_attn) for i in range(depth)
         ])
 
         # patch merging layer
@@ -776,6 +725,7 @@ class SwinTransformer(TheseusLayer):
         self.patch_norm = patch_norm
         self.num_features = int(embed_dim * 2**(self.num_layers - 1))
         self.mlp_ratio = mlp_ratio
+        use_fused_attn = kwargs.get('use_fused_attn', False)
 
         # split image into non-overlapping patches
         self.patch_embed = PatchEmbed(
@@ -820,7 +770,8 @@ class SwinTransformer(TheseusLayer):
                 norm_layer=norm_layer,
                 downsample=PatchMerging
                 if (i_layer < self.num_layers - 1) else None,
-                use_checkpoint=use_checkpoint)
+                use_checkpoint=use_checkpoint,
+                use_fused_attn=use_fused_attn)
             self.layers.append(layer)
 
         self.norm = norm_layer(self.num_features)

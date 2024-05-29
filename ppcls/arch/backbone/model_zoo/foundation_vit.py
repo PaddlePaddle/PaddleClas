@@ -147,10 +147,7 @@ _CLIP_diff = {
     'add_mul_gamma_to_msa_mlp': [],
     'remove_cls_token': [],
     'remove_abs_pos_emb': [],
-    'replace_mlp_GELU': [
-        'vit_base_patch32_224', 'vit_base_patch16_224',
-        'vit_large_patch14_336', 'vit_large_patch14_224'
-    ],
+    'replace_mlp_GELU': [],
     'head': {
         'fc_norm': [],
         'return_all_tokens': [],
@@ -283,7 +280,7 @@ def drop_path(x, drop_prob=0., training=False):
     if drop_prob == 0. or not training:
         return x
     keep_prob = paddle.to_tensor(1 - drop_prob, dtype=x.dtype)
-    shape = (paddle.shape(x)[0], ) + (1, ) * (x.ndim - 1)
+    shape = (x.shape[0], ) + (1, ) * (x.ndim - 1)
     random_tensor = keep_prob + paddle.rand(shape).astype(x.dtype)
     random_tensor = paddle.floor(random_tensor)  # binarize
     output = x.divide(keep_prob) * random_tensor
@@ -321,14 +318,15 @@ class Mlp(nn.Layer):
                  hidden_features=None,
                  out_features=None,
                  act_layer=nn.GELU,
-                 drop=0.):
+                 drop=0.,
+                 Linear=nn.Linear):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
-        self.fc1 = nn.Linear(in_features, hidden_features)
+        self.fc1 = Linear(in_features, hidden_features)
         self.act = act_layer() if _model_size not in _model_diff[
             'replace_mlp_GELU'] else QuickGELU()
-        self.fc2 = nn.Linear(hidden_features, out_features)
+        self.fc2 = Linear(hidden_features, out_features)
         self.drop = nn.Dropout(drop)
 
     def forward(self, x):
@@ -349,7 +347,9 @@ class Attention(nn.Layer):
                  attn_drop=0.,
                  proj_drop=0.,
                  model_name=None,
-                 window_size=None):
+                 window_size=None,
+                 use_fused_attn=False,
+                 Linear=nn.Linear):
         super().__init__()
         self._model_name = model_name
 
@@ -366,10 +366,17 @@ class Attention(nn.Layer):
         head_dim = dim // num_heads
         self.scale = qk_scale or head_dim**-0.5
 
-        self.qkv = nn.Linear(dim, dim * 3, bias_attr=qkv_bias)
+        self.qkv = Linear(dim, dim * 3, bias_attr=qkv_bias)
         self.attn_drop = nn.Dropout(attn_drop)
-        self.proj = nn.Linear(dim, dim)
+        self.proj = Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
+
+        self.use_fused_attn = use_fused_attn
+        # TODO: support mask
+        if use_fused_attn:
+            if hasattr(self, 'relative_position_bias_table') or (_model_size in _model_diff['add_shared_rel_pos_bias'] and rel_pos_bias is not None):
+                logger.warning("The fused attn don't support `relative_position` yet, so fused attn will not be used.")
+                self.use_fused_attn = False
 
     def _register_relative_position_index(
             self,
@@ -405,30 +412,37 @@ class Attention(nn.Layer):
                              relative_position_index)
 
     def forward(self, x, rel_pos_bias=None):
-        # B= paddle.shape(x)[0]
-        N, C = paddle.shape(x)[1], paddle.shape(x)[2]
-        qkv = self.qkv(x).reshape((-1, N, 3, self.num_heads, C //
-                                   self.num_heads)).transpose((2, 0, 3, 1, 4))
-        q, k, v = qkv[0], qkv[1], qkv[2]
+        # B= x.shape[0]
+        N, C = x.shape[1], x.shape[2]
+        qkv = self.qkv(x).reshape((-1, N, 3, self.num_heads, C // self.num_heads))
 
-        attn = (q.matmul(k.transpose((0, 1, 3, 2)))) * self.scale
-        if hasattr(self, 'relative_position_bias_table'):
-            relative_position_bias = \
-                self.relative_position_bias_table[self.relative_position_index.reshape([-1])].reshape([
-                    self.window_size[0] * self.window_size[1] + 1,
-                    self.window_size[0] * self.window_size[1] + 1, -1])  # Wh*Ww,Wh*Ww,nH
-            relative_position_bias = relative_position_bias.transpose(
-                [2, 0, 1])  # nH, Wh*Ww, Wh*Ww
-            attn = attn + relative_position_bias.unsqueeze(0)
+        if not self.use_fused_attn:
+            qkv = qkv.transpose((2, 0, 3, 1, 4))
+            q, k, v = qkv[0], qkv[1], qkv[2]
+            attn = (q.matmul(k.transpose((0, 1, 3, 2)))) * self.scale
+            if hasattr(self, 'relative_position_bias_table'):
+                relative_position_bias = \
+                    self.relative_position_bias_table[self.relative_position_index.reshape([-1])].reshape([
+                        self.window_size[0] * self.window_size[1] + 1,
+                        self.window_size[0] * self.window_size[1] + 1, -1])  # Wh*Ww,Wh*Ww,nH
+                relative_position_bias = relative_position_bias.transpose(
+                    [2, 0, 1])  # nH, Wh*Ww, Wh*Ww
+                attn = attn + relative_position_bias.unsqueeze(0)
 
-        if _model_size in _model_diff[
-                'add_shared_rel_pos_bias'] and rel_pos_bias is not None:
-            attn = attn + rel_pos_bias
+            if _model_size in _model_diff[
+                    'add_shared_rel_pos_bias'] and rel_pos_bias is not None:
+                attn = attn + rel_pos_bias
 
-        attn = nn.functional.softmax(attn, axis=-1)
-        attn = self.attn_drop(attn)
+            attn = nn.functional.softmax(attn, axis=-1)
+            attn = self.attn_drop(attn).matmul(v)
+            attn = attn.transpose((0, 2, 1, 3))
+        else:
+            qkv = qkv.transpose((2, 0, 1, 3, 4))
+            q, k, v = qkv[0], qkv[1], qkv[2]
+            # TODO: support mask
+            attn = paddle.nn.functional.scaled_dot_product_attention(q, k, v, dropout_p=self.attn_drop.p if self.training else 0.)
 
-        x = (attn.matmul(v)).transpose((0, 2, 1, 3)).reshape((-1, N, C))
+        x = attn.reshape((-1, N, C))
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
@@ -449,7 +463,9 @@ class Block(nn.Layer):
                  act_layer=nn.GELU,
                  norm_layer='nn.LayerNorm',
                  epsilon=1e-5,
-                 window_size=None):
+                 window_size=None,
+                 use_fused_attn=False,
+                 use_fused_linear=False):
         super().__init__()
         global _model_size
         global _model_diff
@@ -461,6 +477,7 @@ class Block(nn.Layer):
         else:
             raise TypeError(
                 "The norm_layer must be str or paddle.nn.layer.Layer class")
+        Linear = paddle.incubate.nn.FusedLinear if use_fused_linear else nn.Linear
         self.attn = Attention(
             dim,
             num_heads=num_heads,
@@ -469,7 +486,9 @@ class Block(nn.Layer):
             attn_drop=attn_drop,
             proj_drop=drop,
             model_name=self._model_name,
-            window_size=window_size)
+            window_size=window_size,
+            use_fused_attn=use_fused_attn,
+            Linear=Linear)
         # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
 
@@ -495,7 +514,8 @@ class Block(nn.Layer):
         self.mlp = Mlp(in_features=dim,
                        hidden_features=mlp_hidden_dim,
                        act_layer=act_layer,
-                       drop=drop)
+                       drop=drop,
+                       Linear=Linear)
 
     def forward(self, x, rel_pos_bias=None):
         if self.gamma_1 is not None:
@@ -591,7 +611,7 @@ class PatchEmbed(nn.Layer):
         x, _ = pading_for_not_divisible(x, H, W, patch_size=self.patch_size)
 
         x = self.proj(x)
-        _, _, H, W = paddle.shape(x)
+        _, _, H, W = x.shape
 
         x = x.flatten(2).transpose((0, 2, 1))
         return x, (H, W)
@@ -678,6 +698,8 @@ class VisionTransformer(nn.Layer):
         self.class_num = class_num
         self.return_embed = kwargs.get('return_embed', False)
         self.num_features = self.embed_dim = embed_dim
+        use_fused_attn = kwargs.get('use_fused_attn', False)
+        use_fused_linear = kwargs.get('use_fused_linear', False)
         _img_size = to_2tuple(img_size)
         _patch_size = to_2tuple(patch_size)
         self.window_size = (_img_size[0] // _patch_size[0],
@@ -754,7 +776,9 @@ class VisionTransformer(nn.Layer):
                 drop_path=dpr[i],
                 norm_layer=norm_layer,
                 epsilon=epsilon,
-                window_size=self.window_size) for i in range(depth)
+                window_size=self.window_size,
+                use_fused_attn=use_fused_attn,
+                use_fused_linear=use_fused_linear) for i in range(depth)
         ])
 
         self.norm = eval(norm_layer)(embed_dim, epsilon=epsilon)
@@ -843,7 +867,7 @@ class VisionTransformer(nn.Layer):
         x = self.forward_features(x)
 
         if self.feature_frame:
-            B, L, C = paddle.shape(x)
+            B, L, C = x.shape
             x = paddle.reshape(x,[B, -1])
             x = self.feature(x)
 
@@ -985,7 +1009,7 @@ def Unicom_vit_base_patch32_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=12,
         mlp_ratio=4,
         qkv_bias=False,
-        conv_bias=True, 
+        conv_bias=True,
         feature_frame=True,
         hugging_face_framework=False,
         image_project=False,
