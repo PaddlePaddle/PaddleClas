@@ -273,6 +273,13 @@ else
                 # run train
                 # export FLAGS_cudnn_deterministic=True
                 sleep 5
+                # 20240529 add use_fused_attn=True for CLIP_vit_base_patch16_224 and SwinTransformer_base_patch4_window7_224_ampo2_ultra from wanghuan
+                if [[ $model_name == *CLIP_vit_base_patch16_224* ]] || [[ $model_name == *SwinTransformer_base_patch4_window7_224_ampo2_ultra* ]]; then
+                    if [[ $autocast == 'amp' ]] || [[ $autocast == 'fp16' ]];then
+                        cmd="${cmd} -o Arch.use_fused_attn=True -o Arch.use_fused_linear=True"
+                    fi
+                fi
+
                 eval $cmd
                 if [[ $model_name == *GeneralRecognition* ]] || [[ $model_name == *MetaBIN_ResNet50* ]]; then
                     eval "cat ${save_log}/RecModel/train.log >> ${save_log}.log"
