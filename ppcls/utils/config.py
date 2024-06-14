@@ -220,7 +220,6 @@ def represent_dictionary_order(self, dict_data):
 
 
 def setup_orderdict():
-    from collections import OrderedDict
     yaml.add_representer(OrderedDict, represent_dictionary_order)
 
 
