@@ -523,11 +523,9 @@ class Engine(object):
         else:
             paddle.jit.save(model, save_path)
         if self.config["Global"].get("export_for_fd", False):
-            # src_path = self.config["Global"]["infer_config_path"]
             dst_path = os.path.join(
                 self.config["Global"]["save_inference_dir"], 'inference.yml')
             dump_infer_config(self.config, dst_path)
-            # shutil.copy(src_path, dst_path)
         logger.info(
             f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
         )
