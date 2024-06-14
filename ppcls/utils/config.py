@@ -215,9 +215,18 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+def represent_dictionary_order(self, dict_data):
+    return self.represent_mapping('tag:yaml.org,2002:map', dict_data.items())
+
+
+def setup_orderdict():
+    from collections import OrderedDict
+    yaml.add_representer(OrderedDict, represent_dictionary_order)
+
 
 def dump_infer_config(config, path):
-    infer_cfg = {}
+    setup_orderdict()
+    infer_cfg = OrderedDict()
     infer_cfg["Global"] = {
         "infer_imgs": config["Infer"]["infer_imgs"],
         "inference_model_dir": config["Global"]["save_inference_dir"],
