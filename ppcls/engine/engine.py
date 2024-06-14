@@ -27,7 +27,7 @@ import random
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
-from ppcls.utils.config import print_config
+from ppcls.utils.config import print_config, dump_infer_config
 from ppcls.data import build_dataloader
 from ppcls.arch import build_model, RecModel, DistillationModel, TheseusLayer
 from ppcls.arch import apply_to_static
@@ -523,10 +523,11 @@ class Engine(object):
         else:
             paddle.jit.save(model, save_path)
         if self.config["Global"].get("export_for_fd", False):
-            src_path = self.config["Global"]["infer_config_path"]
+            # src_path = self.config["Global"]["infer_config_path"]
             dst_path = os.path.join(
                 self.config["Global"]["save_inference_dir"], 'inference.yml')
-            shutil.copy(src_path, dst_path)
+            dump_infer_config(self.config, dst_path)
+            # shutil.copy(src_path, dst_path)
         logger.info(
             f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
         )

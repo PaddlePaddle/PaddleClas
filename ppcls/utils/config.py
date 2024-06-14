@@ -18,6 +18,7 @@ import argparse
 import yaml
 from . import logger
 from . import check
+from collections import OrderedDict
 
 __all__ = ['get_config']
 
@@ -213,3 +214,55 @@ def parse_args():
     )
     args = parser.parse_args()
     return args
+
+
+def dump_infer_config(config, path):
+    infer_cfg = {}
+    infer_cfg["Global"] = {
+        "infer_imgs": config["Infer"]["infer_imgs"],
+        "inference_model_dir": config["Global"]["save_inference_dir"],
+        "batch_size": 1,
+        "use_gpu": True,
+        "enable_mkldnn": True,
+        "cpu_num_threads": 10,
+        "enable_benchmark": True,
+        "use_fp16": False,
+        "ir_optim": True,
+        "use_tensorrt": False,
+        "gpu_mem": 8000,
+        "enable_profile": False
+    }
+    transforms = config["Infer"]["transforms"]
+    for transform in transforms:
+        if "NormalizeImage" in transform:
+            transform["NormalizeImage"]["channel_num"] = 3
+    infer_cfg["PreProcess"] = {
+        "transform_ops": [
+            infer_preprocess for infer_preprocess in transforms
+            if "DecodeImage" not in infer_preprocess
+        ]
+    }
+
+    postprocess_dict = config["Infer"]["PostProcess"]
+    with open(postprocess_dict["class_id_map_file"], 'r') as f:
+        label_id_maps = f.readlines()
+    label_names = []
+    for line in label_id_maps:
+        line = line.strip().split(' ', 1)
+        label_names.append(line[1:][0])
+
+    infer_cfg["PostProcess"] = {
+        "main_indicator": postprocess_dict["name"],
+        "Topk": {
+            "topk": postprocess_dict["topk"],
+            "class_id_map_file": postprocess_dict["class_id_map_file"],
+            "label_list": label_names
+        },
+        "SavePreLabel": {
+            "save_dir": "pre_label"
+        }
+    }
+
+    yaml.dump(infer_cfg, open(path, 'w'))
+    logger.info("Export inference config file to {}".format(
+        os.path.join(path)))
