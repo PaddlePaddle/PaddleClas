@@ -227,20 +227,6 @@ def setup_orderdict():
 def dump_infer_config(config, path):
     setup_orderdict()
     infer_cfg = OrderedDict()
-    infer_cfg["Global"] = {
-        "infer_imgs": config["Infer"]["infer_imgs"],
-        "inference_model_dir": config["Global"]["save_inference_dir"],
-        "batch_size": 1,
-        "use_gpu": True,
-        "enable_mkldnn": True,
-        "cpu_num_threads": 10,
-        "enable_benchmark": True,
-        "use_fp16": False,
-        "ir_optim": True,
-        "use_tensorrt": False,
-        "gpu_mem": 8000,
-        "enable_profile": False
-    }
     transforms = config["Infer"]["transforms"]
     for transform in transforms:
         if "NormalizeImage" in transform:
@@ -261,15 +247,10 @@ def dump_infer_config(config, path):
         label_names.append(line[1:][0])
 
     infer_cfg["PostProcess"] = {
-        "main_indicator": postprocess_dict["name"],
-        "Topk": {
+        "Topk": OrderedDict({
             "topk": postprocess_dict["topk"],
-            "class_id_map_file": postprocess_dict["class_id_map_file"],
             "label_list": label_names
-        },
-        "SavePreLabel": {
-            "save_dir": "pre_label"
-        }
+        })
     }
 
     yaml.dump(infer_cfg, open(path, 'w'))
