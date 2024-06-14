@@ -18,6 +18,7 @@ import argparse
 import yaml
 from . import logger
 from . import check
+from collections import OrderedDict
 
 __all__ = ['get_config']
 
@@ -213,3 +214,45 @@ def parse_args():
     )
     args = parser.parse_args()
     return args
+
+
+def represent_dictionary_order(self, dict_data):
+    return self.represent_mapping('tag:yaml.org,2002:map', dict_data.items())
+
+
+def setup_orderdict():
+    yaml.add_representer(OrderedDict, represent_dictionary_order)
+
+
+def dump_infer_config(config, path):
+    setup_orderdict()
+    infer_cfg = OrderedDict()
+    transforms = config["Infer"]["transforms"]
+    for transform in transforms:
+        if "NormalizeImage" in transform:
+            transform["NormalizeImage"]["channel_num"] = 3
+    infer_cfg["PreProcess"] = {
+        "transform_ops": [
+            infer_preprocess for infer_preprocess in transforms
+            if "DecodeImage" not in infer_preprocess
+        ]
+    }
+
+    postprocess_dict = config["Infer"]["PostProcess"]
+    with open(postprocess_dict["class_id_map_file"], 'r') as f:
+        label_id_maps = f.readlines()
+    label_names = []
+    for line in label_id_maps:
+        line = line.strip().split(' ', 1)
+        label_names.append(line[1:][0])
+
+    infer_cfg["PostProcess"] = {
+        "Topk": OrderedDict({
+            "topk": postprocess_dict["topk"],
+            "label_list": label_names
+        })
+    }
+
+    yaml.dump(infer_cfg, open(path, 'w'))
+    logger.info("Export inference config file to {}".format(
+        os.path.join(path)))
