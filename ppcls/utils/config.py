@@ -252,7 +252,7 @@ def dump_infer_config(config, path):
             "label_list": label_names
         })
     }
-
-    yaml.dump(infer_cfg, open(path, 'w'))
+    with open(path, 'w') as f:
+        yaml.dump(infer_cfg, f)
     logger.info("Export inference config file to {}".format(
         os.path.join(path)))
