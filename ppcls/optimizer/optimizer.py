@@ -12,15 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import inspect
-# for python3.11
-if not hasattr(inspect, 'getargspec'):
-    inspect.getargspec = inspect.getfullargspec
-
 import paddle
 from paddle import optimizer as optim
 from ppcls.utils import logger
@@ -66,7 +58,7 @@ class SGD(object):
         # model_list is None in static graph
         parameters = sum([m.parameters() for m in model_list],
                          []) if model_list else None
-        argspec = inspect.getargspec(optim.SGD.__init__).args
+        argspec = inspect.getfullargspec(optim.SGD.__init__).args
         if 'multi_precision' in argspec:
             opt = optim.SGD(learning_rate=self.learning_rate,
                             parameters=parameters,
