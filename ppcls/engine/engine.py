@@ -226,7 +226,7 @@ class Engine(object):
         # build model
         self.model = build_model(self.config, self.mode)
         # set @to_static for benchmark, skip this by default.
-        apply_to_static(self.config, self.model)
+        apply_to_static(self.config, self.model, is_rec=self.is_rec)
 
         # load_pretrain
         if self.config["Global"]["pretrained_model"] is not None:
