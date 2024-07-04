@@ -52,13 +52,13 @@ def masked_fill(x, mask, value):
     return paddle.where(mask, y, x)
 
 
-def get_linear_op(use_fused_linear):
+def check_support_fused_op(use_fused_linear):
     if use_fused_linear:
         if paddle.device.cuda.get_device_capability()[0] >= 8:
-            return paddle.incubate.nn.FusedLinear
+            return True
         else:
             logger.warning("The current device don't support Fused OP! Using the general Linear instead.")
-    return nn.Linear
+    return False
 
 
 class Mlp(nn.Layer):
@@ -739,10 +739,10 @@ class SwinTransformer(TheseusLayer):
         self.patch_norm = patch_norm
         self.num_features = int(embed_dim * 2**(self.num_layers - 1))
         self.mlp_ratio = mlp_ratio
-        use_fused_attn = kwargs.get('use_fused_attn', False)
+        use_fused_attn = check_support_fused_op(kwargs.get('use_fused_attn', False))
         use_fused_linear = kwargs.get('use_fused_linear', False)
         global Linear
-        Linear = get_linear_op()
+        Linear = paddle.incubate.nn.FusedLinear if use_fused_linear else nn.Linear
 
         # split image into non-overlapping patches
         self.patch_embed = PatchEmbed(
