@@ -25,6 +25,7 @@ from ..model_zoo.vision_transformer import trunc_normal_, zeros_, ones_, to_2tup
 from ..base.theseus_layer import TheseusLayer
 from ....utils.save_load import load_dygraph_pretrain
 
+
 MODEL_URLS = {
     "SwinTransformer_tiny_patch4_window7_224":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/SwinTransformer_tiny_patch4_window7_224_pretrained.pdparams",
@@ -42,11 +43,22 @@ MODEL_URLS = {
 
 __all__ = list(MODEL_URLS.keys())
 
+
 Linear = nn.Linear
+
 
 def masked_fill(x, mask, value):
     y = paddle.full(x.shape, value, x.dtype)
     return paddle.where(mask, y, x)
+
+
+def get_linear_op(use_fused_linear):
+    if use_fused_linear:
+        if paddle.device.cuda.get_device_capability()[0] >= 8:
+            return paddle.incubate.nn.FusedLinear
+        else:
+            logger.warning("The current device don't support Fused OP! Using the general Linear instead.")
+    return nn.Linear
 
 
 class Mlp(nn.Layer):
@@ -730,7 +742,7 @@ class SwinTransformer(TheseusLayer):
         use_fused_attn = kwargs.get('use_fused_attn', False)
         use_fused_linear = kwargs.get('use_fused_linear', False)
         global Linear
-        Linear = paddle.incubate.nn.FusedLinear if use_fused_linear else nn.Linear
+        Linear = get_linear_op()
 
         # split image into non-overlapping patches
         self.patch_embed = PatchEmbed(
