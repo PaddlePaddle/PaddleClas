@@ -56,6 +56,15 @@ MODEL_URLS = {
 }
 
 
+def get_linear_op(use_fused_linear):
+    if use_fused_linear:
+        if paddle.device.cuda.get_device_capability()[0] >= 8:
+            return paddle.incubate.nn.FusedLinear
+        else:
+            logger.warning("The current device don't support Fused OP! Using the general Linear instead.")
+    return nn.Linear
+
+
 def resize_pos_embed(pos_embed,
                      src_shape,
                      dst_shape,
@@ -477,7 +486,7 @@ class Block(nn.Layer):
         else:
             raise TypeError(
                 "The norm_layer must be str or paddle.nn.layer.Layer class")
-        Linear = paddle.incubate.nn.FusedLinear if use_fused_linear else nn.Linear
+        Linear = get_linear_op(use_fused_linear)
         self.attn = Attention(
             dim,
             num_heads=num_heads,
