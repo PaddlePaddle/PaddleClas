@@ -24,6 +24,7 @@ from paddle.nn.initializer import TruncatedNormal, Constant
 from ..model_zoo.vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPath, Identity
 from ..base.theseus_layer import TheseusLayer
 from ....utils.save_load import load_dygraph_pretrain
+from ....utils import logger
 
 
 MODEL_URLS = {
@@ -793,7 +794,7 @@ class SwinTransformer(TheseusLayer):
 
         self.norm = norm_layer(self.num_features)
         self.avgpool = nn.AdaptiveAvgPool1D(1)
-        
+
         self.head = Linear(
             self.num_features,
             num_classes) if self.num_classes > 0 else nn.Identity()
