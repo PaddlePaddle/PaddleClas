@@ -56,13 +56,13 @@ MODEL_URLS = {
 }
 
 
-def get_linear_op(use_fused_linear):
+def check_support_fused_op(use_fused_linear):
     if use_fused_linear:
         if paddle.device.cuda.get_device_capability()[0] >= 8:
-            return paddle.incubate.nn.FusedLinear
+            return True
         else:
             logger.warning("The current device don't support Fused OP! Using the general Linear instead.")
-    return nn.Linear
+    return False
 
 
 def resize_pos_embed(pos_embed,
@@ -486,7 +486,7 @@ class Block(nn.Layer):
         else:
             raise TypeError(
                 "The norm_layer must be str or paddle.nn.layer.Layer class")
-        Linear = get_linear_op(use_fused_linear)
+        Linear = paddle.incubate.nn.FusedLinear if use_fused_linear else nn.Linear
         self.attn = Attention(
             dim,
             num_heads=num_heads,
@@ -707,8 +707,8 @@ class VisionTransformer(nn.Layer):
         self.class_num = class_num
         self.return_embed = kwargs.get('return_embed', False)
         self.num_features = self.embed_dim = embed_dim
-        use_fused_attn = kwargs.get('use_fused_attn', False)
-        use_fused_linear = kwargs.get('use_fused_linear', False)
+        use_fused_attn = check_support_fused_op(kwargs.get('use_fused_attn', False))
+        use_fused_linear = check_support_fused_op(kwargs.get('use_fused_linear', False))
         _img_size = to_2tuple(img_size)
         _patch_size = to_2tuple(patch_size)
         self.window_size = (_img_size[0] // _patch_size[0],
