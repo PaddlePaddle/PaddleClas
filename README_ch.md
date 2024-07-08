@@ -13,7 +13,12 @@
 
 ## 📣 近期更新
 
-- **💥 直播预告：11.1-11.3日每晚8点半**，PaddleClas研发团队详解PP-ShituV2优化策略与真实产业应用。微信扫描下方二维码，关注公众号并填写问卷后进入官方交流群，获取直播链接与20G重磅图像分类学习大礼包（内含20+数据集、4个垂类模型、70+前沿论文集合）
+- 2024.6.27 **💥 飞桨低代码开发工具 PaddleX 3.0 重磅更新！**
+  - 丰富的模型产线：精选 68 个优质飞桨模型，涵盖图像分类、目标检测、图像分割、OCR、文本图像版面分析、时序分析等任务场景；
+  - 低代码开发范式：支持单模型和模型产线全流程低代码开发，提供 Python API，支持用户自定义串联模型；
+  - 多硬件训推支持：支持英伟达 GPU、昆仑芯、昇腾和寒武纪等多种硬件进行模型训练与推理。
+
+- 2023.11.1-11.3日每晚8点半，PaddleClas研发团队详解PP-ShituV2优化策略与真实产业应用。微信扫描下方二维码，关注公众号并填写问卷后进入官方交流群，获取直播链接与20G重磅图像分类学习大礼包（内含20+数据集、4个垂类模型、70+前沿论文集合）
 
 <div align="center">
     <img src="https://github.com/PaddlePaddle/PaddleClas/assets/12560511/eed2d9e0-28d8-4037-9777-a2d4cf3aabbc" width = "150" height = "150"/>
@@ -21,7 +26,7 @@
 
 - 2022.9.14 发布**商超零售新革命-生鲜智能结算产业应用**范例
 
-- **🔥️ 2022.9.13 发布超轻量图像识别系统[PP-ShiTuV2](docs/zh_CN/models/PP-ShiTu/README.md)：**
+- 2022.9.13 发布超轻量图像识别系统[PP-ShiTuV2](docs/zh_CN/models/PP-ShiTu/README.md)：
   - recall1精度提升8个点，覆盖商品识别、垃圾分类、航拍场景等[20+识别场景](docs/zh_CN/deployment/PP-ShiTu/application_scenarios.md)，
   - 新增[库管理工具](./deploy/shitu_index_manager/)，[Android Demo](./docs/zh_CN/quick_start/quick_start_recognition.md)全新体验。
 
