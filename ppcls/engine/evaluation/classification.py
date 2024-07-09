@@ -56,7 +56,7 @@ def classification_eval(engine, epoch_id=0):
 
         # image input
         with engine.auto_cast(is_eval=True):
-            out = engine.model(batch[0])
+            out = engine.model(batch[0], batch[1])
 
         # just for DistributedBatchSampler issue: repeat sampling
         current_samples = batch_size * paddle.distributed.get_world_size()
