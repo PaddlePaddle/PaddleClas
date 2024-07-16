@@ -21,7 +21,7 @@ from .legendary_models.resnet import ResNet18, ResNet18_vd, ResNet34, ResNet34_v
 from .legendary_models.vgg import VGG11, VGG13, VGG16, VGG19
 from .legendary_models.inception_v3 import InceptionV3
 from .legendary_models.hrnet import HRNet_W18_C, HRNet_W30_C, HRNet_W32_C, HRNet_W40_C, HRNet_W44_C, HRNet_W48_C, HRNet_W60_C, HRNet_W64_C, SE_HRNet_W64_C
-from .legendary_models.pp_lcnet import PPLCNet_x0_25, PPLCNet_x0_35, PPLCNet_x0_5, PPLCNet_x0_75, PPLCNet_x1_0, PPLCNet_x1_5, PPLCNet_x2_0, PPLCNet_x2_5
+from .legendary_models.pp_lcnet import PPLCNet
 from .legendary_models.pp_lcnet_v2 import PPLCNetV2_small, PPLCNetV2_base, PPLCNetV2_large
 from .legendary_models.esnet import ESNet_x0_25, ESNet_x0_5, ESNet_x0_75, ESNet_x1_0
 from .legendary_models.pp_hgnet import PPHGNet_tiny, PPHGNet_small, PPHGNet_base

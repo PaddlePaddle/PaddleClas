@@ -27,9 +27,10 @@ AMP:
 
 # model architecture
 Arch:
-  name: PPLCNet_x1_0
+  name: PPLCNet
+  scale: 1.0
+  act: "hardswish"
   class_num: 1000
-  pretrained: True
  
 # loss function config for traing/eval process
 Loss:

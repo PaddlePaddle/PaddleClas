@@ -27,7 +27,9 @@ AMP:
 
 # model architecture
 Arch:
-  name: PPLCNet_x0_25
+  name: PPLCNet
+  scale: 0.25
+  act: "hardswish"
   class_num: 1000
 
 # loss function config for traing/eval process
