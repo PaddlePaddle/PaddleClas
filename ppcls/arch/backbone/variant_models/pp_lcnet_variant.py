@@ -24,6 +24,6 @@ def PPLCNet_x2_5_Tanh(pretrained=False, use_ssld=False, **kwargs):
         return new_layer
 
     pattern = "fc"
-    model = PPLCNet_x2_5(pretrained=pretrained, use_ssld=use_ssld, **kwargs)
+    model = PPLCNet(scale=2.5, pretrained=pretrained, use_ssld=use_ssld, **kwargs)
     model.upgrade_sublayer(pattern, replace_function)
     return model
