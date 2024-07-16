@@ -206,7 +206,7 @@ class SEModule(TheseusLayer):
         return x
 
 
-class PPLCNetBaseNet(TheseusLayer):
+class PPLCNet(TheseusLayer):
     def __init__(self,
                  scale=1.0,
                  class_num=1000,
@@ -370,7 +370,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
         )
 
 
-def PPLCNet(pretrained=False, use_ssld=False, **kwargs):
+def PPLCNetBaseNet(pretrained=False, use_ssld=False, **kwargs):
     """
     PPLCNet
     Args:
@@ -386,7 +386,135 @@ def PPLCNet(pretrained=False, use_ssld=False, **kwargs):
     else:
         scale = 1.0
 
-    model = PPLCNetBaseNet(scale=scale, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
+    model = PPLCNet(scale=scale, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
     model_url = _create_model_urls(scale)
     _load_pretrained(pretrained, model, model_url, use_ssld)
+    return model
+
+
+def PPLCNet_x0_25(pretrained=False, use_ssld=False, **kwargs):
+    """
+    PPLCNet_x0_25
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `PPLCNet_x0_25` model depends on args.
+    """
+    model = PPLCNet(
+        scale=0.25, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x0_25"], use_ssld)
+    return model
+
+
+def PPLCNet_x0_35(pretrained=False, use_ssld=False, **kwargs):
+    """
+    PPLCNet_x0_35
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `PPLCNet_x0_35` model depends on args.
+    """
+    model = PPLCNet(
+        scale=0.35, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x0_35"], use_ssld)
+    return model
+
+
+def PPLCNet_x0_5(pretrained=False, use_ssld=False, **kwargs):
+    """
+    PPLCNet_x0_5
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `PPLCNet_x0_5` model depends on args.
+    """
+    model = PPLCNet(
+        scale=0.5, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x0_5"], use_ssld)
+    return model
+
+
+def PPLCNet_x0_75(pretrained=False, use_ssld=False, **kwargs):
+    """
+    PPLCNet_x0_75
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `PPLCNet_x0_75` model depends on args.
+    """
+    model = PPLCNet(
+        scale=0.75, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x0_75"], use_ssld)
+    return model
+
+
+def PPLCNet_x1_0(pretrained=False, use_ssld=False, **kwargs):
+    """
+    PPLCNet_x1_0
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `PPLCNet_x1_0` model depends on args.
+    """
+    model = PPLCNet(
+        scale=1.0, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x1_0"], use_ssld)
+    return model
+
+
+def PPLCNet_x1_5(pretrained=False, use_ssld=False, **kwargs):
+    """
+    PPLCNet_x1_5
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `PPLCNet_x1_5` model depends on args.
+    """
+    model = PPLCNet(
+        scale=1.5, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x1_5"], use_ssld)
+    return model
+
+
+def PPLCNet_x2_0(pretrained=False, use_ssld=False, **kwargs):
+    """
+    PPLCNet_x2_0
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `PPLCNet_x2_0` model depends on args.
+    """
+    model = PPLCNet(
+        scale=2.0, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x2_0"], use_ssld)
+    return model
+
+
+def PPLCNet_x2_5(pretrained=False, use_ssld=False, **kwargs):
+    """
+    PPLCNet_x2_5
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer. Specific `PPLCNet_x2_5` model depends on args.
+    """
+    model = PPLCNet(
+        scale=2.5, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["PPLCNet_x2_5"], use_ssld)
     return model
