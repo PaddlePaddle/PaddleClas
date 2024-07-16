@@ -1,7 +1,7 @@
 import paddle
 from paddle.nn import Sigmoid
 from paddle.nn import Tanh
-from ..legendary_models.pp_lcnet import PPLCNet
+from ..legendary_models.pp_lcnet import PPLCNet_x2_5
 
 __all__ = ["PPLCNet_x2_5_Tanh"]
 
@@ -24,6 +24,6 @@ def PPLCNet_x2_5_Tanh(pretrained=False, use_ssld=False, **kwargs):
         return new_layer
 
     pattern = "fc"
-    model = PPLCNet(scale=2.5, pretrained=pretrained, use_ssld=use_ssld, **kwargs)
+    model = PPLCNet_x2_5(pretrained=pretrained, use_ssld=use_ssld, **kwargs)
     model.upgrade_sublayer(pattern, replace_function)
     return model
