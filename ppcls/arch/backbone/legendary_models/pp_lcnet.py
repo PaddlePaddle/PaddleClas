@@ -382,6 +382,7 @@ def PPLCNet(pretrained=False, use_ssld=False, **kwargs):
     """
     if "scale" in kwargs:
         scale = kwargs["scale"]
+        kwargs.pop("scale")
     else:
         scale = 1.0
 
