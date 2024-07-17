@@ -91,7 +91,7 @@ def _create_act(act):
 
 
 def _create_model_urls(model_scale):
-    model_scale_str = "PPLCNet_" + str(model_scale).replace('.', '_')
+    model_scale_str = "PPLCNet_x" + str(model_scale).replace('.', '_')
     if model_scale_str in MODEL_URLS:
         return MODEL_URLS[model_scale_str]
     else:
