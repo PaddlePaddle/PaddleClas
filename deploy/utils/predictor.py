@@ -43,22 +43,16 @@ class Predictor(object):
         if inference_model_dir is None:
             inference_model_dir = args.inference_model_dir
         if "inference_int8.pdiparams" in os.listdir(inference_model_dir):
-            params_file = os.path.join(inference_model_dir,
-                                       "inference_int8.pdiparams")
-            model_file = os.path.join(inference_model_dir,
-                                      "inference_int8.pdmodel")
+            model_prefix = "inference_int8"
             assert args.get(
                 "use_fp16", False
             ) is False, "fp16 mode is not supported for int8 model inference, please set use_fp16 as False during inference."
         else:
-            params_file = os.path.join(inference_model_dir,
-                                       "inference.pdiparams")
-            model_file = os.path.join(inference_model_dir, "inference.pdmodel")
+            model_prefix = "inference"
             assert args.get(
                 "use_int8", False
             ) is False, "int8 mode is not supported for fp32 model inference, please set use_int8 as False during inference."
-
-        config = Config(model_file, params_file)
+        config = Config(inference_model_dir, model_prefix)
 
         if args.get("use_gpu", False):
             config.enable_use_gpu(args.gpu_mem, 0)
