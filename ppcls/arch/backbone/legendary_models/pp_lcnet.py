@@ -372,13 +372,13 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
 
 def PPLCNetBaseNet(pretrained=False, use_ssld=False, **kwargs):
     """
-    PPLCNet
+    PPLCNetBaseNet
     Args:
         pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
                     If str, means the path of the pretrained model.
         use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
     Returns:
-        model: nn.Layer. Specific `PPLCNet_x0_25` model depends on args.
+        model: nn.Layer.
     """
     if "scale" in kwargs:
         scale = kwargs["scale"]
