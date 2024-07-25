@@ -164,11 +164,16 @@ class ScoreOutput(object):
 
 
 class Topk(object):
-    def __init__(self, topk=1, class_id_map_file=None, delimiter=None):
+    def __init__(self,
+                 topk=1,
+                 class_id_map_file=None,
+                 delimiter=None,
+                 label_list=None):
         assert isinstance(topk, (int, ))
         self.topk = topk
         delimiter = delimiter if delimiter is not None else " "
-        self.class_id_map = parse_class_id_map(class_id_map_file, delimiter)
+        self.class_id_map = parse_class_id_map(
+            class_id_map_file, delimiter) if not label_list else label_list
 
     def __call__(self, x, file_names=None):
         if file_names is not None:
