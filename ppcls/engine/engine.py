@@ -75,6 +75,8 @@ class Engine(object):
         self.output_dir = self.config['Global']['output_dir']
         log_file = os.path.join(self.output_dir, f"{mode}.log")
         log_ranks = self.config['Global'].get("log_ranks", "0")
+        if self.config["Global"]["pretrained_model"] is False:
+            self.config["Arch"]["pretrained"] = False
         init_logger(log_file=log_file, log_ranks=log_ranks)
         print_config(config)
 
@@ -229,7 +231,7 @@ class Engine(object):
         apply_to_static(self.config, self.model)
 
         # load_pretrain
-        if self.config["Global"]["pretrained_model"] is not None:
+        if self.config["Global"]["pretrained_model"]:
             load_dygraph_pretrain(
                 [self.model, getattr(self, 'train_loss_func', None)],
                 self.config["Global"]["pretrained_model"])
