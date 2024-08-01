@@ -19,6 +19,7 @@ import shutil
 import cv2
 import numpy as np
 
+import paddle
 from paddle.inference import Config
 from paddle.inference import create_predictor
 
@@ -52,9 +53,9 @@ class Predictor(object):
             assert args.get(
                 "use_int8", False
             ) is False, "int8 mode is not supported for fp32 model inference, please set use_int8 as False during inference."
-        
+
         # NOTE: paddle support to PIR mode after v2.6.0
-        pd_version = 0 
+        pd_version = 0
         for v in paddle.__version__.split(".")[:3]:
             pd_version = 10 * pd_version + eval(v)
 
