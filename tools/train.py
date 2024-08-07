@@ -20,6 +20,9 @@ import sys
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
+# XXX: avoid triggering error on DCU machines
+import tarfile
+
 from ppcls.utils import config
 from ppcls.engine.engine import Engine
 
