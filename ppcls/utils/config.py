@@ -231,6 +231,11 @@ def dump_infer_config(config, path):
     for transform in transforms:
         if "NormalizeImage" in transform:
             transform["NormalizeImage"]["channel_num"] = 3
+            scale_str = transform["NormalizeImage"]["scale"]
+            numerator, denominator = scale_str.split('/')
+            numerator, denominator = float(numerator), float(denominator)
+            transform["NormalizeImage"]["scale"] = float(numerator /
+                                                         denominator)
     infer_cfg["PreProcess"] = {
         "transform_ops": [
             infer_preprocess for infer_preprocess in transforms
