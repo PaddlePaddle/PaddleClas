@@ -215,6 +215,7 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+
 def represent_dictionary_order(self, dict_data):
     return self.represent_mapping('tag:yaml.org,2002:map', dict_data.items())
 
@@ -230,6 +231,11 @@ def dump_infer_config(config, path):
     for transform in transforms:
         if "NormalizeImage" in transform:
             transform["NormalizeImage"]["channel_num"] = 3
+            scale_str = transform["NormalizeImage"]["scale"]
+            numerator, denominator = scale_str.split('/')
+            numerator, denominator = float(numerator), float(denominator)
+            transform["NormalizeImage"]["scale"] = float(numerator /
+                                                         denominator)
     infer_cfg["PreProcess"] = {
         "transform_ops": [
             infer_preprocess for infer_preprocess in transforms
