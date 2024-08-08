@@ -17,11 +17,12 @@ from __future__ import division
 from __future__ import print_function
 import os
 import sys
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
 # XXX: avoid triggering error on DCU machines
 import tarfile
+
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
 from ppcls.utils import config
 from ppcls.engine.engine import Engine
