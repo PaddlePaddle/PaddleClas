@@ -72,6 +72,8 @@ class Predictor(object):
             config.enable_custom_device('npu')
         elif args.get("use_xpu", False):
             config.enable_xpu()
+        elif args.get("use_mlu", False):
+            config.enable_custom_device('mlu')
         else:
             config.disable_gpu()
             if args.enable_mkldnn:
