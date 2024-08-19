@@ -181,8 +181,7 @@ def get_config(fname, overrides=None, show=False):
     """
     Read config from file
     """
-    assert os.path.exists(fname), (
-        'config file({}) is not exist'.format(fname))
+    assert os.path.exists(fname), ('config file({}) is not exist'.format(fname))
     config = parse_config(fname)
     override_config(config, overrides)
     if show:
@@ -251,13 +250,19 @@ def dump_infer_config(config, path):
         line = line.strip().split(' ', 1)
         label_names.append(line[1:][0])
 
-    infer_cfg["PostProcess"] = {
-        "Topk": OrderedDict({
-            "topk": postprocess_dict["topk"],
-            "label_list": label_names
-        })
-    }
+    postprocess_name = postprocess_dict.get("name", None)
+    postprocess_dict.pop("class_id_map_file")
+    postprocess_dict.pop("name")
+    dic = OrderedDict()
+    for item in postprocess_dict.items():
+        dic[item[0]] = item[1]
+    dic['label_list'] = label_names
+
+    if postprocess_name:
+        infer_cfg["PostProcess"] = {postprocess_name: dic}
+    else:
+        raise ValueError("PostProcess name is not specified")
+
     with open(path, 'w') as f:
         yaml.dump(infer_cfg, f)
-    logger.info("Export inference config file to {}".format(
-        os.path.join(path)))
+    logger.info("Export inference config file to {}".format(os.path.join(path)))
