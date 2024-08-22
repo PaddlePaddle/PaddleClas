@@ -385,8 +385,8 @@ cd ..
 ## 5.  Windows环境源码编译
 
 - 5.1 下载安装CMake
-- 5.2 下载源码 使用VS 2019以上版本进行编译
-- 5.3 下载Widows推理库（<a link ="https://www.paddlepaddle.org.cn/inference/master/guides/install/download_lib.html#windows">下载地址</a>）
+- 5.2 下载源码 (需要使用VS 2019以上版本进行编译)
+- 5.3 下载[Widows推理库](https://www.paddlepaddle.org.cn/inference/master/guides/install/download_lib.html#windows)
   注意：推理库需要根据实际情况下载对应的版本
 - 5.4 下载或编译OpenCV
 - 5.5 下载或编译faiss
