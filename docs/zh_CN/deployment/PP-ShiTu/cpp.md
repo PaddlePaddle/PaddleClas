@@ -395,12 +395,18 @@ cd ..
 - 5.8 下载安装cuda(若启用) 配置环境变量
 - 5.9 使用CMake生成解决方案
   ```
-  打开CMake-gui，
-  源码路径选择 xx../PaddleClas/deploy/cpp_shitu,
+  打开CMake-gui
+  
+  源码路径选择 xx../PaddleClas/deploy/cpp_shitu
+  
   解决方案生成位置填写 xx../PaddleClas/deploy/cpp_shitu/build
+  
   OPENCV_DIR填写OpenCV的lib文件所在路径，如 xx../opencv/build/x64/vc15/lib
+  
   OpenCV_DIR填写OpenCV的cmake文件所在路径，如 xx../opencv/build
+  
   faiss_DIR填写faiss的cmake文件所在路径，如 xx../faiss/share/faiss
+  
   根据自己实际情况填写 CUDA_LIB,CUDNN_LIB,FAISS_WITH_MKL,WITH_GPU,WITH_MKL
   ```
 
@@ -442,7 +448,9 @@ cd ..
 
   ```
   -CMakeLists.txt 里面的文件名与实际情况不一致，或者文件位置不一致，可以参考5.10中提供的两个例子，根据实际情况调整 CMakeLists.txt
+
   -某些函数不能编译，确认使用的第三方库是否是Release模式，个别函数不能识别，确认头文件与Lib文件版本是否一致
+
   -程序无法正常启动执行，主要是因为缺少第三方的动态库文件，可以根据对应的提示，将相应的文件拷贝到Release目录下。
   ```
   
