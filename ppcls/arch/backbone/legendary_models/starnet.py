@@ -89,9 +89,9 @@ class Block(paddle.nn.Layer):
 
 class StarNet(paddle.nn.Layer):
     def __init__(self, base_dim=32, depths=[3, 3, 12, 5], mlp_ratio=4,
-        drop_path_rate=0.0, num_classes=1000, **kwargs):
+        drop_path_rate=0.0, class_num=1000, **kwargs):
         super().__init__()
-        self.num_classes = num_classes
+        self.class_num = class_num
         self.in_channel = 32
         self.stem = paddle.nn.Sequential(ConvBN(3, self.in_channel,
             kernel_size=3, stride=2, padding=1), paddle.nn.ReLU6())
@@ -110,7 +110,7 @@ class StarNet(paddle.nn.Layer):
         self.norm = paddle.nn.BatchNorm2D(num_features=self.in_channel)
         self.avgpool = paddle.nn.AdaptiveAvgPool2D(output_size=1)
         self.head = paddle.nn.Linear(in_features=self.in_channel,
-            out_features=num_classes)
+            out_features=class_num)
         self.apply(self._init_weights)
 
     def _init_weights(self, m):
