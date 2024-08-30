@@ -17,11 +17,14 @@ import inspect
 
 from .legendary_models.mobilenet_v1 import MobileNetV1_x0_25, MobileNetV1_x0_5, MobileNetV1_x0_75, MobileNetV1
 from .legendary_models.mobilenet_v3 import MobileNetV3_small_x0_35, MobileNetV3_small_x0_5, MobileNetV3_small_x0_75, MobileNetV3_small_x1_0, MobileNetV3_small_x1_25, MobileNetV3_large_x0_35, MobileNetV3_large_x0_5, MobileNetV3_large_x0_75, MobileNetV3_large_x1_0, MobileNetV3_large_x1_25
+from .legendary_models.mobilenet_v4 import mobilenetv4_conv_small, mobilenetv4_conv_medium, mobilenetv4_conv_large, mobilenetv4_hybrid_medium, mobilenetv4_hybrid_large, mobilenetv4_conv_aa_medium, mobilenetv4_conv_blur_medium, mobilenetv4_conv_aa_large, mobilenetv4_hybrid_medium_075, mobilenetv4_hybrid_large_075
+from .legendary_models.fasternet import fasternet_t0,fasternet_t1,fasternet_t2,fasternet_s,fasternet_m,fasternet_l
+from .legendary_models.starnet import starnet_s1,starnet_s2,starnet_s3,starnet_s4
 from .legendary_models.resnet import ResNet18, ResNet18_vd, ResNet34, ResNet34_vd, ResNet50, ResNet50_vd, ResNet101, ResNet101_vd, ResNet152, ResNet152_vd, ResNet200_vd
 from .legendary_models.vgg import VGG11, VGG13, VGG16, VGG19
 from .legendary_models.inception_v3 import InceptionV3
 from .legendary_models.hrnet import HRNet_W18_C, HRNet_W30_C, HRNet_W32_C, HRNet_W40_C, HRNet_W44_C, HRNet_W48_C, HRNet_W60_C, HRNet_W64_C, SE_HRNet_W64_C
-from .legendary_models.pp_lcnet import PPLCNetBaseNet, PPLCNet_x0_25, PPLCNet_x0_35, PPLCNet_x0_5, PPLCNet_x0_75, PPLCNet_x1_0, PPLCNet_x1_5, PPLCNet_x2_0, PPLCNet_x2_5
+from .legendary_models.pp_lcnet import PPLCNet_x0_25, PPLCNet_x0_35, PPLCNet_x0_5, PPLCNet_x0_75, PPLCNet_x1_0, PPLCNet_x1_5, PPLCNet_x2_0, PPLCNet_x2_5
 from .legendary_models.pp_lcnet_v2 import PPLCNetV2_small, PPLCNetV2_base, PPLCNetV2_large
 from .legendary_models.esnet import ESNet_x0_25, ESNet_x0_5, ESNet_x0_75, ESNet_x1_0
 from .legendary_models.pp_hgnet import PPHGNet_tiny, PPHGNet_small, PPHGNet_base
