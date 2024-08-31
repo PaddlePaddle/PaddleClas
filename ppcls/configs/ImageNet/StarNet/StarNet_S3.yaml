@@ -28,10 +28,11 @@ AMP:
 
 # model architecture
 Arch:
-  name: Starnet_s1
+  name: StarNet_S3
   drop_rate: 0
-  drop_path_rate: 0
+  drop_path_rate: 0.01
   class_num: 1000
+
 
 # loss function config for traing/eval process
 Loss:
@@ -67,7 +68,7 @@ DataLoader:
     dataset:
       name: ImageNetDataset
       image_root: ./dataset/ILSVRC2012/
-      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      cls_label_path: ./dataset/ILSVRC2012/val_list_smallbatch.txt
       transform_ops:
         - DecodeImage:
             to_rgb: True
@@ -93,7 +94,7 @@ DataLoader:
             MixupOperator:
               alpha: 0.8
               prob: 0.5
-            CutmixOperator: 
+            CutmixOperator:
               alpha: 0.2
               prob: 0.5
     sampler:

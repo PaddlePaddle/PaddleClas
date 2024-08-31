@@ -18,17 +18,18 @@ import paddle
 from ....utils.save_load import load_dygraph_pretrain
 from ..model_zoo.vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPath, Identity
 
+
 NET_CONFIG = {
-    "Starnet_s1": [
+    "StarNet_S1": [
         24, [2, 2, 8, 3]
     ],
-    "Starnet_s2": [
+    "StarNet_S2": [
         32, [1, 2, 6, 2]
     ],
-    "Starnet_s3": [
+    "StarNet_S3": [
         32, [2, 2, 8, 4]
     ],
-    "Starnet_s4": [
+    "StarNet_S4": [
         32, [3, 3, 12, 5]
     ],
 }
@@ -65,7 +66,6 @@ class ConvBN(paddle.nn.Sequential):
 
 
 class Block(paddle.nn.Layer):
-
     def __init__(self, dim, mlp_ratio=3, drop_path=0.0):
         super().__init__()
         self.dwconv = ConvBN(dim, dim, 7, 1, (7 - 1) // 2, groups=dim,
@@ -77,6 +77,7 @@ class Block(paddle.nn.Layer):
             with_bn=False)
         self.act = paddle.nn.ReLU6()
         self.drop_path = DropPath(drop_path) if drop_path > 0. else paddle.nn.Identity()
+
     def forward(self, x):
         input = x
         x = self.dwconv(x)
@@ -133,25 +134,25 @@ class StarNet(paddle.nn.Layer):
         return self.head(x)
 
 
-def Starnet_s1(pretrained: bool=False, **kwargs):
-    model = StarNet(*NET_CONFIG["Starnet_s1"], **kwargs)
+def StarNet_S1(pretrained: bool=False, **kwargs):
+    model = StarNet(*NET_CONFIG["StarNet_S1"], **kwargs)
     _load_pretrained(pretrained, model, model_url=None, use_ssld=False)
     return model
 
 
-def Starnet_s2(pretrained: bool=False, **kwargs):
-    model = StarNet(*NET_CONFIG["Starnet_s2"], **kwargs)
+def StarNet_S2(pretrained: bool=False, **kwargs):
+    model = StarNet(*NET_CONFIG["StarNet_S2"], **kwargs)
     _load_pretrained(pretrained, model, model_url=None, use_ssld=False)
     return model
 
 
-def Starnet_s3(pretrained: bool=False, **kwargs):
-    model = StarNet(*NET_CONFIG["Starnet_s3"], **kwargs)
+def StarNet_S3(pretrained: bool=False, **kwargs):
+    model = StarNet(*NET_CONFIG["StarNet_S3"], **kwargs)
     _load_pretrained(pretrained, model, model_url=None, use_ssld=False)
     return model
 
 
-def Starnet_s4(pretrained: bool=False, **kwargs):
-    model = StarNet(*NET_CONFIG["Starnet_s4"], **kwargs)
+def StarNet_S4(pretrained: bool=False, **kwargs):
+    model = StarNet(*NET_CONFIG["StarNet_S4"], **kwargs)
     _load_pretrained(pretrained, model, model_url=None, use_ssld=False)
     return model
