@@ -25,6 +25,22 @@ import warnings
 from ....utils.save_load import load_dygraph_pretrain
 from ..model_zoo.vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPath, Identity
 
+MODEL_URLS = {
+    "FasterNet_T0":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/FasterNet_T0_pretrained.pdparams",
+    "FasterNet_T1":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/FasterNet_T1_pretrained.pdparams",
+    "FasterNet_T2":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/FasterNet_T2_pretrained.pdparams",
+    "FasterNet_S":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/FasterNet_S_pretrained.pdparams",
+    "FasterNet_M":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/FasterNet_M_pretrained.pdparams",
+    "FasterNet_L":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/FasterNet_L_pretrained.pdparams",
+}
+
+__all__ = MODEL_URLS.keys()
 
 NET_CONFIG = {
     "FasterNet_T0": [
@@ -334,31 +350,31 @@ def FasterNet_T0(pretrained: bool=False, **kwargs) :
     return model
 
 
-def FasterNet_T1(pretrained: bool=False, **kwargs) :    
-    model = FasterNet(*NET_CONFIG["FasterNet_T1"], **kwargs)                        
-    _load_pretrained(pretrained, model, model_url=None, use_ssld=False)
+def FasterNet_T1(pretrained: bool=False, use_ssld: bool=False, **kwargs):
+    model = FasterNet(*NET_CONFIG["FasterNet_T1"], **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["FasterNet_T1"], use_ssld)
     return model
 
 
-def FasterNet_T2(pretrained: bool=False, **kwargs) :    
+def FasterNet_T2(pretrained: bool=False, use_ssld: bool=False, **kwargs):
     model = FasterNet(*NET_CONFIG["FasterNet_T2"], **kwargs)
-    _load_pretrained(pretrained, model, model_url=None, use_ssld=False)
+    _load_pretrained(pretrained, model, MODEL_URLS["FasterNet_T2"], use_ssld)
     return model
 
 
-def FasterNet_S(pretrained: bool=False, **kwargs) :    
+def FasterNet_S(pretrained: bool=False, use_ssld: bool=False, **kwargs):
     model = FasterNet(*NET_CONFIG["FasterNet_S"], **kwargs)
-    _load_pretrained(pretrained, model, model_url=None, use_ssld=False)
+    _load_pretrained(pretrained, model, MODEL_URLS["FasterNet_S"], use_ssld)
     return model
 
 
-def FasterNet_M(pretrained: bool=False, **kwargs) :    
+def FasterNet_M(pretrained: bool=False, use_ssld: bool=False, **kwargs):
     model = FasterNet(*NET_CONFIG["FasterNet_M"], **kwargs)
-    _load_pretrained(pretrained, model, model_url=None, use_ssld=False)
+    _load_pretrained(pretrained, model, MODEL_URLS["FasterNet_M"], use_ssld)
     return model
     
 
-def FasterNet_L(pretrained: bool=False, **kwargs) :    
+def FasterNet_L(pretrained: bool=False, use_ssld: bool=False, **kwargs):
     model = FasterNet(*NET_CONFIG["FasterNet_L"], **kwargs)
-    _load_pretrained(pretrained, model, model_url=None, use_ssld=False)
+    _load_pretrained(pretrained, model, MODEL_URLS["FasterNet_L"], use_ssld)
     return model

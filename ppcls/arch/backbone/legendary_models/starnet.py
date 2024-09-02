@@ -18,6 +18,18 @@ import paddle
 from ....utils.save_load import load_dygraph_pretrain
 from ..model_zoo.vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPath, Identity
 
+MODEL_URLS = {
+    "StarNet_S1":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/StarNet_S1_pretrained.pdparams",
+    "StarNet_S2":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/StarNet_S2_pretrained.pdparams",
+    "StarNet_S3":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/StarNet_S3_pretrained.pdparams",
+    "StarNet_S4":
+    "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/StarNet_S4_pretrained.pdparams",
+}
+
+__all__ = MODEL_URLS.keys()
 
 NET_CONFIG = {
     "StarNet_S1": [
@@ -134,25 +146,25 @@ class StarNet(paddle.nn.Layer):
         return self.head(x)
 
 
-def StarNet_S1(pretrained: bool=False, **kwargs):
+def StarNet_S1(pretrained: bool=False, use_ssld: bool=False, **kwargs):
     model = StarNet(*NET_CONFIG["StarNet_S1"], **kwargs)
-    _load_pretrained(pretrained, model, model_url=None, use_ssld=False)
+    _load_pretrained(pretrained, model, MODEL_URLS["StarNet_S1"], use_ssld)
     return model
 
 
-def StarNet_S2(pretrained: bool=False, **kwargs):
+def StarNet_S2(pretrained: bool=False, use_ssld: bool=False, **kwargs):
     model = StarNet(*NET_CONFIG["StarNet_S2"], **kwargs)
-    _load_pretrained(pretrained, model, model_url=None, use_ssld=False)
+    _load_pretrained(pretrained, model, MODEL_URLS["StarNet_S2"], use_ssld)
     return model
 
 
-def StarNet_S3(pretrained: bool=False, **kwargs):
+def StarNet_S3(pretrained: bool=False, use_ssld: bool=False, **kwargs):
     model = StarNet(*NET_CONFIG["StarNet_S3"], **kwargs)
-    _load_pretrained(pretrained, model, model_url=None, use_ssld=False)
+    _load_pretrained(pretrained, model, MODEL_URLS["StarNet_S3"], use_ssld)
     return model
 
 
-def StarNet_S4(pretrained: bool=False, **kwargs):
+def StarNet_S4(pretrained: bool=False, use_ssld: bool=False, **kwargs):
     model = StarNet(*NET_CONFIG["StarNet_S4"], **kwargs)
-    _load_pretrained(pretrained, model, model_url=None, use_ssld=False)
+    _load_pretrained(pretrained, model, MODEL_URLS["StarNet_S4"], use_ssld)
     return model
