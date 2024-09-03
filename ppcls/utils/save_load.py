@@ -133,8 +133,15 @@ def init_model(config,
             "Given dir {}.pdopt not exist.".format(checkpoints)
         # load state dict
         opti_dict = paddle.load(checkpoints + ".pdopt")
-        para_dict = paddle.load(checkpoints + ".pdparams")
         metric_dict = paddle.load(checkpoints + ".pdstates")
+        if ema is not None:
+            assert os.path.exists(checkpoints + ".pdema"), \
+                "Given dir {}.pdema not exist.".format(checkpoints)
+            para_dict = paddle.load(checkpoints + ".pdema")
+            para_ema_dict = paddle.load(checkpoints + ".pdparams")
+            ema.set_state_dict(para_ema_dict)
+        else:
+            para_dict = paddle.load(checkpoints + ".pdparams")
         metric_dict["metric"] = 0.0
         # set state dict
         net.set_state_dict(para_dict)
@@ -142,11 +149,6 @@ def init_model(config,
         for i in range(len(optimizer)):
             optimizer[i].set_state_dict(opti_dict[i] if isinstance(
                 opti_dict, list) else opti_dict)
-        if ema is not None:
-            assert os.path.exists(checkpoints + ".ema.pdparams"), \
-                "Given dir {}.ema.pdparams not exist.".format(checkpoints)
-            para_ema_dict = paddle.load(checkpoints + ".ema.pdparams")
-            ema.set_state_dict(para_ema_dict)
         logger.info("Finish load checkpoints from {}".format(checkpoints))
         return metric_dict
 
@@ -196,15 +198,15 @@ def save_model(net,
         s_params = _extract_student_weights(params_state_dict)
         if len(s_params) > 0:
             paddle.save(s_params, model_path + "_student.pdparams")
-
-    paddle.save(params_state_dict, model_path + ".pdparams")
+    if ema is not None:
+        paddle.save(params_state_dict, model_path + ".pdema")
+        paddle.save(ema.state_dict(), model_path + ".pdparams")
+    else:
+        paddle.save(params_state_dict, model_path + ".pdparams")
 
     if prefix == 'best_model':
         best_model_path = os.path.join(best_model_path, 'model')
         paddle.save(params_state_dict, best_model_path + ".pdparams")
-
-    if ema is not None:
-        paddle.save(ema.state_dict(), model_path + ".ema.pdparams")
     paddle.save([opt.state_dict() for opt in optimizer], model_path + ".pdopt")
     paddle.save(metric_info, model_path + ".pdstates")
     logger.info("Already save model in {}".format(model_path))

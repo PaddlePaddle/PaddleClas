@@ -297,9 +297,10 @@ class Engine(object):
             "metric": -1.0,
             "epoch": 0,
         }
+        acc_ema = -1.0
+        best_metric_ema = -1.0
         ema_module = None
         if self.ema:
-            best_metric_ema = 0.0
             ema_module = self.model_ema.module
         # key:
         # val: metrics list word
@@ -351,19 +352,10 @@ class Engine(object):
                             type_name(self.lr_sch[i]) == "ReduceOnPlateau":
                         self.lr_sch[i].step(acc)
 
+                # update best_metric
                 if acc >= best_metric["metric"]:
                     best_metric["metric"] = acc
                     best_metric["epoch"] = epoch_id
-                    save_load.save_model(
-                        self.model,
-                        self.optimizer,
-                        best_metric,
-                        self.output_dir,
-                        ema=ema_module,
-                        model_name=self.config["Arch"]["name"],
-                        prefix="best_model",
-                        loss=self.train_loss_func,
-                        save_student_model=True)
                 logger.info("[Eval][Epoch {}][best metric: {}]".format(
                     epoch_id, best_metric["metric"]))
                 logger.scaler(
@@ -372,26 +364,15 @@ class Engine(object):
                     step=epoch_id,
                     writer=self.vdl_writer)
 
-                self.model.train()
-
                 if self.ema:
                     ori_model, self.model = self.model, ema_module
                     acc_ema = self.eval(epoch_id)
                     self.model = ori_model
                     ema_module.eval()
 
+                    # update best_ema
                     if acc_ema > best_metric_ema:
                         best_metric_ema = acc_ema
-                        save_load.save_model(
-                            self.model,
-                            self.optimizer,
-                            {"metric": acc_ema,
-                             "epoch": epoch_id},
-                            self.output_dir,
-                            ema=ema_module,
-                            model_name=self.config["Arch"]["name"],
-                            prefix="best_model_ema",
-                            loss=self.train_loss_func)
                     logger.info("[Eval][Epoch {}][best metric ema: {}]".format(
                         epoch_id, best_metric_ema))
                     logger.scaler(
@@ -399,6 +380,23 @@ class Engine(object):
                         value=acc_ema,
                         step=epoch_id,
                         writer=self.vdl_writer)
+
+                # save best model from best_acc or best_ema_acc
+                if max(acc, acc_ema) >= max(best_metric["metric"],
+                                            best_metric_ema):
+                    save_load.save_model(
+                        self.model,
+                        self.optimizer,
+                        {"metric": max(acc, acc_ema),
+                         "epoch": epoch_id},
+                        self.output_dir,
+                        ema=ema_module,
+                        model_name=self.config["Arch"]["name"],
+                        prefix="best_model",
+                        loss=self.train_loss_func,
+                        save_student_model=True)
+
+                self.model.train()
 
             # save model
             if save_interval > 0 and epoch_id % save_interval == 0:
