@@ -71,11 +71,17 @@ MLDecoder:
 
 开发者可以自行尝试使用不同的主干模型来结合ML-Decoder。
 
-目前使用ResNet结合ML-Decoder在COCO2017的多标签分类任务上的性能指标如下：
+目前使用多类Backbone结合ML-Decoder在COCO2017的多标签分类任务上的性能指标如下：
 
 |        Model         | Backbone  | Resolution | mAP |                   Links                   |
 |:--------------------:|:---------:|:----------:|:---:|:-----------------------------------------:|
-| ResNet101_ml_decoder | ResNet101 |  448x448   |     | [config](./ResNet101_ml_decoder_448.yaml) |
+| PP-LCNet_x1_0_ml_decoder_448 | PP-LCNet_x1_0 |  448x448   |  77.96%  | [config](./PP-LCNet_x1_0_ml_decoder_448.yaml) |
+| PP-HGNetV2-B0_ml_decoder_448 | PP-HGNetV2-B0 |  448x448   |  80.98%  | [config](./PP-HGNetV2-B0_ml_decoder_448.yaml) |
+| PP-HGNetV2-B4_ml_decoder_448 | PP-HGNetV2-B4 |  448x448   |  87.96%   | [config](./PP-HGNetV2-B4_ml_decoder_448.yaml) |
+| PP-HGNetV2-B6_ml_decoder_448 | PP-HGNetV2-B6 |  448x448   |  91.25%  | [config](./PP-HGNetV2-B6_ml_decoder_448.yaml) |
+| ResNet50_ml_decoder_448 | ResNet50 |  448x448   |  83.50%  | [config](./ResNet50_ml_decoder_448.yaml) |
+| ResNet101_ml_decoder | ResNet101 |  448x448   |  91.40%   | [config](./ResNet101_ml_decoder_448.yaml) |
+| CLIP_vit_base_patch16_448_ml_decoder_448 | CLIP_vit_base_patch16_448 |  448x448   |  89.15%   | [config](./CLIP_vit_base_patch16_448_ml_decoder_448.yaml) |
 
 基于 [COCO2017](https://cocodataset.org/) 数据集，如下将介绍添加ml-decoder进行多标签分类的训练、评估、预测的过程。请首先安装 PaddlePaddle 和 PaddleClas，具体安装步骤可详看 [环境准备](../installation.md)。
 
