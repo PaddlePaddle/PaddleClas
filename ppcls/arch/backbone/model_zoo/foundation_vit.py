@@ -25,6 +25,7 @@ from paddle.nn.initializer import TruncatedNormal, Constant, Normal, Assign
 
 from ....utils import logger
 from ....utils.save_load import load_dygraph_pretrain
+from ..base.theseus_layer import TheseusLayer
 
 MODEL_URLS = {
     "CLIP_vit_base_patch32_224":
@@ -296,7 +297,7 @@ def drop_path(x, drop_prob=0., training=False):
     return output
 
 
-class DropPath(nn.Layer):
+class DropPath(TheseusLayer):
     """Drop paths (Stochastic Depth) per sample  (when applied in main path of residual blocks).
     """
 
@@ -316,12 +317,12 @@ class Identity(nn.Layer):
         return input
 
 
-class QuickGELU(nn.Layer):
+class QuickGELU(TheseusLayer):
     def forward(self, x):
         return x * nn.functional.sigmoid(1.702 * x)
 
 
-class Mlp(nn.Layer):
+class Mlp(TheseusLayer):
     def __init__(self,
                  in_features,
                  hidden_features=None,
@@ -347,7 +348,7 @@ class Mlp(nn.Layer):
         return x
 
 
-class Attention(nn.Layer):
+class Attention(TheseusLayer):
     def __init__(self,
                  dim,
                  num_heads=8,
@@ -457,7 +458,7 @@ class Attention(nn.Layer):
         return x
 
 
-class Block(nn.Layer):
+class Block(TheseusLayer):
     def __init__(self,
                  dim,
                  num_heads,
@@ -540,7 +541,7 @@ class Block(nn.Layer):
         return x
 
 
-class RelativePositionBias(nn.Layer):
+class RelativePositionBias(TheseusLayer):
     def __init__(self, window_size, num_heads):
         super().__init__()
         self.window_size = window_size
@@ -586,7 +587,7 @@ class RelativePositionBias(nn.Layer):
         return relative_position_bias.transpose([2, 0, 1])  # nH, Wh*Ww, Wh*Ww
 
 
-class PatchEmbed(nn.Layer):
+class PatchEmbed(TheseusLayer):
     """ Image to Patch Embedding
     """
 
@@ -626,7 +627,7 @@ class PatchEmbed(nn.Layer):
         return x, (H, W)
 
 
-class Head(nn.Layer):
+class Head(TheseusLayer):
     def __init__(self, embed_dim, class_num, norm_layer, model_size, setting):
         super().__init__()
         self.model_size = model_size
@@ -666,7 +667,7 @@ class Head(nn.Layer):
         return self.fc_head(x)
 
 
-class VisionTransformer(nn.Layer):
+class VisionTransformer(TheseusLayer):
     """ Vision Transformer with support for patch input
     """
 
@@ -706,6 +707,7 @@ class VisionTransformer(nn.Layer):
 
         self.class_num = class_num
         self.return_embed = kwargs.get('return_embed', False)
+        self.return_mean_embed = kwargs.get('return_mean_embed', False) and self.return_embed
         self.num_features = self.embed_dim = embed_dim
         use_fused_attn = check_support_fused_op(kwargs.get('use_fused_attn', False))
         use_fused_linear = check_support_fused_op(kwargs.get('use_fused_linear', False))
@@ -815,9 +817,6 @@ class VisionTransformer(nn.Layer):
             self.proj = None
             self.ln_pre = Identity()
 
-
-
-
         if head_init_scale != 1:
             if not self.return_embed and class_num > 0:
                 self.head.fc_head.weight.set_value(
@@ -883,8 +882,9 @@ class VisionTransformer(nn.Layer):
         x = self.head(x)
 
         if self.proj is not None and isinstance(self.head,Identity):
-            x = x @self.proj
-
+           x = x @self.proj
+        if self.return_mean_embed:
+            x = x.mean(1)
         return x
 
 
