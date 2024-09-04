@@ -14,6 +14,7 @@
 - [2.代码编译](#2)
 - [3.运行demo](#3)
 - [4.使用自己模型](#4)
+- [5.Windows环境源码编译](#5)
 
 <a name="1"></a>
 
@@ -378,3 +379,80 @@ cd ..
 使用自己训练的模型，可以参考[模型导出](../export_model.md)，导出`inference model`，用于模型预测。
 
 同时注意修改`yaml`文件中具体参数。
+
+<a name="5"></a>
+
+## 5.  Windows环境源码编译
+
+- 5.1 下载安装CMake
+- 5.2 下载源码 (需要使用VS 2019以上版本进行编译)
+- 5.3 下载[Widows推理库](https://www.paddlepaddle.org.cn/inference/master/guides/install/download_lib.html#windows)
+  注意：推理库需要根据实际情况下载对应的版本
+- 5.4 下载或编译OpenCV
+- 5.5 下载或编译faiss
+- 5.6 下载或编译OpenBLAS(若启用)
+- 5.7 下载安装MKL(若启用) 配置环境变量
+- 5.8 下载安装cuda(若启用) 配置环境变量
+- 5.9 使用CMake生成解决方案
+  ```
+  打开CMake-gui
+  
+  源码路径选择 xx../PaddleClas/deploy/cpp_shitu
+  
+  解决方案生成位置填写 xx../PaddleClas/deploy/cpp_shitu/build
+  
+  OPENCV_DIR填写OpenCV的lib文件所在路径，如 xx../opencv/build/x64/vc15/lib
+  
+  OpenCV_DIR填写OpenCV的cmake文件所在路径，如 xx../opencv/build
+  
+  faiss_DIR填写faiss的cmake文件所在路径，如 xx../faiss/share/faiss
+  
+  根据自己实际情况填写 CUDA_LIB,CUDNN_LIB,FAISS_WITH_MKL,WITH_GPU,WITH_MKL
+  ```
+
+  点击-Configure，没有错误之后， 点击Generate， 点击Open Project。
+
+  经过上述步骤，源码已经在VS中打开，解决方案文件均已生成，在 xx../PaddleClas/deploy/cpp_shitu/build 路径。
+  如果生成异常，可以清空该路径重新执行上述步骤。
+
+- 5.10 编译源码
+
+  在VS中，打开pp_shitu项目，编辑CMakeLists.txt文件。
+
+```
+  option(WITH_MKL        "Compile demo with MKL/OpenBlas support, default use MKL."       ON)#根据实际情况调整
+  option(WITH_GPU        "Compile demo with GPU/CPU, default use CPU."                    OFF)#根据实际情况调整
+  option(WITH_STATIC_LIB "Compile demo with static/shared library, default use static."   ON)#根据实际情况调整
+  option(WITH_TENSORRT "Compile demo with TensorRT."   OFF)#根据实际情况调整
+  option(FAISS_WITH_MKL "Faiss Compile demo with MKL."   OFF)#根据实际情况调整
+  
+  SET(PADDLE_LIB "填写推理库所在的路径，5.3解压路径")
+  SET(OPENCV_DIR "" CACHE PATH "Location of libraries")
+  SET(CUDA_LIB "" CACHE PATH "Location of libraries") #填写CUDA_LIB所在的路径（若需要）
+  SET(CUDNN_LIB "" CACHE PATH "Location of libraries") #填写CUDNN_LIB所在的路径（若需要）
+  SET(TENSORRT_DIR "" CACHE PATH "Compile demo with TensorRT")#根据实际情况调整
+  SET(FAISS_DIR "xx../faiss")#填写faiss的lib所在路径(编译后或下载的预编译解压路径)
+  ...
+```
+
+  如果使用了OpenBLAS
+```
+  22行 SET(BLAS_NAME "openblas") 修改成libopenblas.lib的实际位置，如 SET(BLAS_NAME "${PADDLE_LIB}/third_party/install/openblas/lib/libopenblas.lib")
+  ...
+  239行 target_link_libraries(${DEMO_NAME} ${BLAS_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}) 去掉文件后缀 target_link_libraries(${DEMO_NAME} ${BLAS_NAME})
+```
+  
+  将项目设置成Release模式， 右键pp_shitu->生成项目，即可。
+
+  如果在编译过程中遇到报错，主要是几种情况：
+
+  ```
+  -CMakeLists.txt 里面的文件名与实际情况不一致，或者文件位置不一致，可以参考5.10中提供的两个例子，根据实际情况调整 CMakeLists.txt
+
+  -某些函数不能编译，确认使用的第三方库是否是Release模式，个别函数不能识别，确认头文件与Lib文件版本是否一致
+
+  -程序无法正常启动执行，主要是因为缺少第三方的动态库文件，可以根据对应的提示，将相应的文件拷贝到Release目录下。
+  ```
+  
+  
+
