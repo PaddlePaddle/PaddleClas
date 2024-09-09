@@ -226,7 +226,12 @@ def setup_orderdict():
 def dump_infer_config(config, path):
     setup_orderdict()
     infer_cfg = OrderedDict()
-    transforms = config["Infer"]["transforms"]
+    if config.get("Infer"):
+        transforms = config["Infer"]["transforms"]
+    elif config["DataLoader"]["Eval"].get("Query"):
+        transforms = config["DataLoader"]["Eval"]["Query"]["dataset"]["transform_ops"]
+    else:
+        logger.error("This config does not support dump transform config!")
     for transform in transforms:
         if "NormalizeImage" in transform:
             transform["NormalizeImage"]["channel_num"] = 3
@@ -241,28 +246,30 @@ def dump_infer_config(config, path):
             if "DecodeImage" not in infer_preprocess
         ]
     }
+    if config.get("Infer"):
+        postprocess_dict = config["Infer"]["PostProcess"]
 
-    postprocess_dict = config["Infer"]["PostProcess"]
-    with open(postprocess_dict["class_id_map_file"], 'r') as f:
-        label_id_maps = f.readlines()
-    label_names = []
-    for line in label_id_maps:
-        line = line.strip().split(' ', 1)
-        label_names.append(line[1:][0])
+        with open(postprocess_dict["class_id_map_file"], 'r') as f:
+            label_id_maps = f.readlines()
+        label_names = []
+        for line in label_id_maps:
+            line = line.strip().split(' ', 1)
+            label_names.append(line[1:][0])
 
-    postprocess_name = postprocess_dict.get("name", None)
-    postprocess_dict.pop("class_id_map_file")
-    postprocess_dict.pop("name")
-    dic = OrderedDict()
-    for item in postprocess_dict.items():
-        dic[item[0]] = item[1]
-    dic['label_list'] = label_names
+        postprocess_name = postprocess_dict.get("name", None)
+        postprocess_dict.pop("class_id_map_file")
+        postprocess_dict.pop("name")
+        dic = OrderedDict()
+        for item in postprocess_dict.items():
+           dic[item[0]] = item[1]
+        dic['label_list'] = label_names
 
-    if postprocess_name:
-        infer_cfg["PostProcess"] = {postprocess_name: dic}
+        if postprocess_name:
+            infer_cfg["PostProcess"] = {postprocess_name: dic}
+        else:
+            raise ValueError("PostProcess name is not specified")
     else:
-        raise ValueError("PostProcess name is not specified")
-
+        infer_cfg["PostProcess"] = None
     with open(path, 'w') as f:
         yaml.dump(infer_cfg, f)
     logger.info("Export inference config file to {}".format(os.path.join(path)))
