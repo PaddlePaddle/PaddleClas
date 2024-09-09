@@ -18,6 +18,7 @@ from __future__ import print_function
 
 import errno
 import os
+import json
 
 import paddle
 from . import logger
@@ -108,8 +109,7 @@ def load_distillation_model(model, pretrained_model):
     student = model.student if hasattr(model,
                                        "student") else model._layers.student
     load_dygraph_pretrain(teacher, path=pretrained_model[0])
-    logger.info("Finish initing teacher model from {}".format(
-        pretrained_model))
+    logger.info("Finish initing teacher model from {}".format(pretrained_model))
     # load student model
     if len(pretrained_model) >= 2:
         load_dygraph_pretrain(student, path=pretrained_model[1])
@@ -188,8 +188,7 @@ def save_model(net,
     params_state_dict = net.state_dict()
     if loss is not None:
         loss_state_dict = loss.state_dict()
-        keys_inter = set(params_state_dict.keys()) & set(loss_state_dict.keys(
-        ))
+        keys_inter = set(params_state_dict.keys()) & set(loss_state_dict.keys())
         assert len(keys_inter) == 0, \
             f"keys in model and loss state_dict must be unique, but got intersection {keys_inter}"
         params_state_dict.update(loss_state_dict)
@@ -210,3 +209,15 @@ def save_model(net,
     paddle.save([opt.state_dict() for opt in optimizer], model_path + ".pdopt")
     paddle.save(metric_info, model_path + ".pdstates")
     logger.info("Already save model in {}".format(model_path))
+
+
+def save_model_info(model_info, save_path, prefix):
+    """
+    save model info to the target path
+    """
+    save_path = os.path.join(save_path, prefix)
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    with open(os.path.join(save_path, f'{prefix}.info.json'), 'w') as f:
+        json.dump(model_info, f)
+    logger.info("Already save model info in {}".format(save_path))
