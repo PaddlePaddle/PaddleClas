@@ -17,7 +17,7 @@ from . import metrics
 from . import misc
 from . import model_zoo
 
-from .config import get_config
+from .config import get_config, convert_to_dict
 from .dist_utils import all_gather
 from .metrics import accuracy_score
 from .metrics import hamming_distance
