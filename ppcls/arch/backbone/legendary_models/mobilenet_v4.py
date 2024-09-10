@@ -14,7 +14,6 @@
 
 # reference: https://arxiv.org/abs/2404.10518
 
-import dataclasses
 import math
 import re
 import types
@@ -43,54 +42,32 @@ MODEL_URLS = {
 __all__ = list(MODEL_URLS.keys())
 
 
-class AvgPool2dSame(nn.AvgPool2D):
-    def __init__(self, kernel_size, stride=None, padding=0,
-                 ceil_mode=False, count_include_pad=True):
-        kernel_size = to_2tuple(kernel_size)
-        stride = to_2tuple(stride)
-        super(AvgPool2dSame, self).__init__(kernel_size, stride, (0, 0),
-                                            ceil_mode, count_include_pad)
-
-    def forward(self, x):
-        return nn.functional.avg_pool2d(
-            kernel_size=self.kernel_size,
-            stride=self.stride, padding=self.padding,
-            ceil_mode=self.ceil_mode, x=x,
-            exclusive=not self.count_include_pad)
-
-
-def create_pool2d(pool_type, kernel_size, stride=None, **kwargs):
+def create_pool2D(pool_type, kernel_size, stride=None, **kwargs):
     stride = stride or kernel_size
     padding = kwargs.pop('padding', '')
     padding, is_dynamic = get_padding_value(padding, kernel_size,
                                             stride=stride, **kwargs)
     if is_dynamic:
         if pool_type == 'avg':
-            return AvgPool2dSame(kernel_size, stride=stride, **kwargs)
+            return nn.AdaptiveAvgPool2D(kernel_size, stride=stride, **kwargs)
         else:
             assert False, f'Unsupported pool type {pool_type}'
     elif pool_type == 'avg':
-        return nn.AvgPool2d(kernel_size, stride=stride, padding=padding, **
+        return nn.AvgPool2D(kernel_size, stride=stride, padding=padding, **
                             kwargs)
     elif pool_type == 'max':
-        return nn.MaxPool2d(kernel_size, stride=stride, padding=padding, **
+        return nn.MaxPool2D(kernel_size, stride=stride, padding=padding, **
                             kwargs)
     else:
         assert False, f'Unsupported pool type {pool_type}'
 
 
-def use_fused_attn(experimental=False):
-    if experimental:
-        return 1.5
-    return 0.5
-
-
-class MultiQueryAttention2d(nn.Layer):
+class MultiQueryAttention2D(nn.Layer):
     def __init__(self, dim, dim_out=None, num_heads=8,
                  key_dim=None, value_dim=None, query_strides=1,
                  kv_stride=1, dw_kernel_size=3, dilation=1,
                  padding='', attn_drop=0.0, proj_drop=0.0,
-                 norm_layer=paddle.nn.BatchNorm2D, use_bias=False):
+                 norm_layer=nn.BatchNorm2D, use_bias=False):
         super().__init__()
         dim_out = dim_out or dim
         self.num_heads = num_heads
@@ -100,34 +77,34 @@ class MultiQueryAttention2d(nn.Layer):
         self.kv_stride = kv_stride
         self.has_query_strides = False
         self.scale = self.key_dim ** -0.5
-        self.fused_attn = use_fused_attn()
+        self.fused_attn = 0.5
         self.drop = attn_drop
         self.query = nn.Sequential()
         if self.has_query_strides:
             if padding == 'same':
                 self.query.add_sublayer(
                     name='down_pool',
-                    sublayer=create_pool2d(
+                    sublayer=create_pool2D(
                         'avg', kernel_size=self.query_strides,
                         padding='same')
                 )
             else:
                 self.query.add_sublayer(
                     name='down_pool',
-                    sublayer=paddle.nn.AvgPool2D(kernel_size=query_strides,
-                                                 exclusive=False)
+                    sublayer=nn.AvgPool2D(kernel_size=query_strides,
+                                          exclusive=False)
                 )
             self.query.add_sublayer(name='norm', sublayer=norm_layer(dim))
         self.query.add_sublayer(
             name='proj',
-            sublayer=create_conv2d(dim, self.num_heads * self.key_dim,
+            sublayer=create_conv2D(dim, self.num_heads * self.key_dim,
                                    kernel_size=1, bias=use_bias)
         )
         self.key = nn.Sequential()
         if kv_stride > 1:
             self.key.add_sublayer(
                 name='down_conv',
-                sublayer=create_conv2d(
+                sublayer=create_conv2D(
                     dim, dim, kernel_size=dw_kernel_size, stride=kv_stride,
                     dilation=dilation, padding=padding, depthwise=True
                 )
@@ -136,7 +113,7 @@ class MultiQueryAttention2d(nn.Layer):
 
         self.key.add_sublayer(
             name='proj',
-            sublayer=create_conv2d(dim, self.key_dim, kernel_size=1,
+            sublayer=create_conv2D(dim, self.key_dim, kernel_size=1,
                                    padding=padding, bias=use_bias)
         )
 
@@ -145,13 +122,13 @@ class MultiQueryAttention2d(nn.Layer):
         if kv_stride > 1:
             self.value.add_sublayer(
                 name='down_conv',
-                sublayer=create_conv2d(
+                sublayer=create_conv2D(
                     dim, dim, kernel_size=dw_kernel_size, stride=kv_stride,
                     dilation=dilation, padding=padding, depthwise=True
                 )
             )
             self.value.add_sublayer(name='norm', sublayer=norm_layer(dim))
-        self.value.add_sublayer(name='proj', sublayer=create_conv2d(dim,
+        self.value.add_sublayer(name='proj', sublayer=create_conv2D(dim,
                                 self.value_dim, kernel_size=1, bias=use_bias))
         self.attn_drop = nn.Dropout(p=attn_drop)
         self.output = nn.Sequential()
@@ -161,7 +138,7 @@ class MultiQueryAttention2d(nn.Layer):
                     scale_factor=self.query_strides, mode='bilinear',
                     align_corners=False))
         self.output.add_sublayer(
-            name='proj', sublayer=create_conv2d(
+            name='proj', sublayer=create_conv2D(
                 self.value_dim * self.num_heads,
                 dim_out, kernel_size=1, bias=use_bias))
         self.output.add_sublayer(name='drop', sublayer=nn.Dropout(p=proj_drop))
@@ -261,7 +238,7 @@ class MultiQueryAttention2d(nn.Layer):
         return x
 
 
-class Attention2d(nn.Layer):
+class Attention2D(nn.Layer):
     def __init__(self, dim, dim_out=None, num_heads=32,
                  bias=True, expand_first=False,
                  head_first=False, attn_drop=0.0, proj_drop=0.0):
@@ -272,7 +249,7 @@ class Attention2d(nn.Layer):
         self.dim_head = dim_attn // num_heads
         self.head_first = head_first
         self.scale = num_heads ** -0.5
-        self.fused_attn = use_fused_attn()
+        self.fused_attn = 0.5
         self.qkv = nn.Conv2D(in_channels=dim, out_channels=dim_attn *
                              3, kernel_size=1, bias_attr=bias)
         self.attn_drop = nn.Dropout(p=attn_drop)
@@ -288,48 +265,21 @@ class Attention2d(nn.Layer):
         else:
             q, k, v = self.qkv(x).reshape(B, 3, self.num_heads, self.
                                           dim_head, -1).unbind(axis=1)
-        if self.fused_attn:
-            x = q
-            perm_4 = list(range(x.ndim))
-            perm_4[-1] = -2
-            perm_4[-2] = -1
-            x = k
-            perm_5 = list(range(x.ndim))
-            perm_5[-1] = -2
-            perm_5[-2] = -1
-            x = v
-            perm_6 = list(range(x.ndim))
-            perm_6[-1] = -2
-            perm_6[-2] = -1
-            x = nn.functional.scaled_dot_product_attention(
-                query=x.transpose(perm=perm_4).contiguous(),
-                key=x.transpose(perm=perm_5).contiguous(),
-                value=x.transpose(perm=perm_6).contiguous(),
-                attn_mask=attn_mask,
-                dropout_p=self.attn_drop.p if self.training else 0.0
-            )
-            perm_7 = list(range(x.ndim))
-            perm_7[-1] = -2
-            perm_7[-2] = -1
-            x = x.transpose(perm=perm_7).reshape(B, -1, H, W)
-        else:
-            q = q * self.scale
-            x = q
-            perm_8 = list(range(x.ndim))
-            perm_8[-2] = -1
-            perm_8[-1] = -2
-            attn = x.transpose(perm=perm_8) @ k
-            if attn_mask is not None:
-                attn = attn + attn_mask
-            attn = nn.functional.softmax(attn, axis=-1)
-            attn = self.attn_drop(attn)
-            x = attn
-            perm_9 = list(range(x.ndim))
-            perm_9[-2] = -1
-            perm_9[-1] = -2
-            x = (v @ x.transpose(perm=perm_9)).view(B, -1, H, W)
-        x = self.proj(x)
-        x = self.proj_drop(x)
+        perm_4 = list(range(q.ndim - 2)) + [-2, -1]
+        perm_5 = list(range(k.ndim - 2)) + [-2, -1]
+        perm_6 = list(range(v.ndim - 2)) + [-2, -1]
+        x = nn.functional.scaled_dot_product_attention(
+            query=x.transpose(perm=perm_4).contiguous(),
+            key=x.transpose(perm=perm_5).contiguous(),
+            value=x.transpose(perm=perm_6).contiguous(),
+            attn_mask=attn_mask,
+            dropout_p=self.attn_drop.p if self.training else 0.0
+        )
+        perm_7 = list(range(x.ndim))
+        perm_7[-1] = -2
+        perm_7[-2] = -1
+        x = x.transpose(perm=perm_7).reshape(B, -1, H, W)
+
         return x
 
 
@@ -352,7 +302,7 @@ class MobileAttention(nn.Layer):
         self.kv_stride = kv_stride
         self.has_query_stride = False
         if use_cpe:
-            self.conv_cpe_dw = create_conv2d(
+            self.conv_cpe_dw = create_conv2D(
                 in_chs, in_chs, kernel_size=cpe_dw_kernel_size,
                 dilation=dilation, depthwise=True, bias=True
             )
@@ -363,7 +313,7 @@ class MobileAttention(nn.Layer):
             assert in_chs % key_dim == 0
             num_heads = in_chs // key_dim
         if use_multi_query:
-            self.attn = MultiQueryAttention2d(
+            self.attn = MultiQueryAttention2D(
                 in_chs, dim_out=out_chs, num_heads=num_heads,
                 key_dim=key_dim, value_dim=value_dim,
                 query_strides=query_strides, kv_stride=kv_stride,
@@ -372,13 +322,13 @@ class MobileAttention(nn.Layer):
                 attn_drop=attn_drop, proj_drop=proj_drop
             )
         else:
-            self.attn = Attention2d(
+            self.attn = Attention2D(
                 in_chs, dim_out=out_chs, num_heads=num_heads,
                 attn_drop=attn_drop, proj_drop=proj_drop,
                 bias=use_bias
             )
         if layer_scale_init_value is not None:
-            self.layer_scale = LayerScale2d(out_chs, layer_scale_init_value)
+            self.layer_scale = LayerScale2D(out_chs, layer_scale_init_value)
         else:
             self.layer_scale = nn.Identity()
         self.drop_path = (
@@ -414,93 +364,7 @@ def _create_act(act_layer, act_kwargs=None, inplace=False, apply_act=True):
     return nn.Identity() if act is None else act
 
 
-class FilterResponseNormAct2d(nn.Layer):
-    def __init__(self, num_features, apply_act=True, act_layer=nn.
-                 ReLU, inplace=None, rms=True, eps=1e-05, **_):
-        super(FilterResponseNormAct2d, self).__init__()
-        if act_layer is not None and apply_act:
-            self.act = create_act_layer(act_layer, inplace=inplace)
-        else:
-            self.act = nn.Identity()
-        self.rms = rms
-        self.eps = eps
-        self.weight = paddle.base.framework.EagerParamBase.from_tensor(
-            tensor=paddle.ones(shape=num_features))
-        self.bias = paddle.base.framework.EagerParamBase.from_tensor(
-            tensor=paddle.zeros(shape=num_features))
-
-    def forward(self, x):
-        x_dtype = x.dtype
-        v_shape = 1, -1, 1, 1
-        x = x * self.weight.view(v_shape).to(dtype=x_dtype) + self.bias.view(
-            v_shape).to(dtype=x_dtype)
-        return self.act(x)
-
-
-class LayerNormAct(nn.LayerNorm):
-    def __init__(self, normalization_shape,
-                 eps=1e-05, affine=True, apply_act=True,
-                 act_layer=nn.ReLU, act_kwargs=None,
-                 inplace=True, drop_layer=None):
-        super(LayerNormAct, self).__init__(normalization_shape, eps=eps,
-                                           elementwise_affine=affine)
-        self.drop = drop_layer(
-            ) if drop_layer is not None else nn.Identity()
-        self.act = _create_act(
-             act_layer, act_kwargs=act_kwargs,
-             inplace=inplace, apply_act=apply_act)
-
-    def forward(self, x):
-        x = nn.functional.layer_norm(
-            x=x, normalized_shape=self.normalized_shape,
-            weight=self.weight, bias=self.bias, epsilon=self.eps)
-        x = self.drop(x)
-        x = self.act(x)
-        return x
-
-
-class LayerNormAct2d(nn.LayerNorm):
-    def __init__(self, num_channels, eps=1e-05, affine=True, apply_act=True,
-                 act_layer=nn.ReLU, act_kwargs=None, inplace=True,
-                 drop_layer=None):
-        super(LayerNormAct2d, self).__init__(num_channels, eps=eps,
-                                             elementwise_affine=affine)
-        self.drop = drop_layer(
-            ) if drop_layer is not None else nn.Identity()
-        self.act = _create_act(act_layer, act_kwargs=act_kwargs,
-                               inplace=inplace, apply_act=apply_act)
-
-    def forward(self, x):
-        x = x.transpose(perm=[0, 2, 3, 1])
-        x = nn.functional.layer_norm(
-            x=x, normalized_shape=self.normalized_shape,
-            weight=self.weight, bias=self.bias,
-            epsilon=self.eps)
-        x = x.transpose(perm=[0, 3, 1, 2])
-        x = self.drop(x)
-        x = self.act(x)
-        return x
-
-
-class GroupNormAct(nn.GroupNorm):
-    def __init__(self, num_channels, num_groups=32, eps=1e-05, affine=True,
-                 group_size=None, apply_act=True, act_layer=nn.ReLU,
-                 act_kwargs=None, inplace=True, drop_layer=None):
-        self.drop = drop_layer() if drop_layer is not None else nn.Identity()
-        self.act = _create_act(act_layer, act_kwargs=act_kwargs,
-                               inplace=inplace, apply_act=apply_act)
-
-    def forward(self, x):
-        x = nn.functional.group_norm(
-            x=x, num_groups=self.num_groups, weight=self.weight,
-            bias=self.bias,
-            epsilon=self.eps)
-        x = self.drop(x)
-        x = self.act(x)
-        return x
-
-
-class BatchNormAct2d(nn.BatchNorm2D):
+class BatchNormAct2D(nn.BatchNorm2D):
     def __init__(
             self, num_features, eps=1e-05, momentum=0.1, affine=True,
             track_running_stats=True, apply_act=True, act_layer=nn.ReLU,
@@ -509,11 +373,11 @@ class BatchNormAct2d(nn.BatchNorm2D):
     ):
         try:
             factory_kwargs = {'device', 'dtype'}
-            super(BatchNormAct2d, self).__init__(
+            super(BatchNormAct2D, self).__init__(
                 num_features, momentum=momentum,
                 track_running_stats=track_running_stats, **factory_kwargs)
         except TypeError:
-            super(BatchNormAct2d, self).__init__(num_features,
+            super(BatchNormAct2D, self).__init__(num_features,
                                                  momentum=momentum)
         self.drop = drop_layer(
             ) if drop_layer is not None else nn.Identity()
@@ -551,10 +415,6 @@ class BatchNormAct2d(nn.BatchNorm2D):
         return x
 
 
-_NORM_ACT_REQUIRES_ARG = {BatchNormAct2d, GroupNormAct, LayerNormAct,
-                          LayerNormAct2d, FilterResponseNormAct2d}
-
-
 def get_norm_act_layer(norm_layer, act_layer=None):
     if norm_layer is None:
         return None
@@ -570,31 +430,15 @@ def get_norm_act_layer(norm_layer, act_layer=None):
     else:
         type_name = norm_layer.__name__.lower()
         if type_name.startswith('batchnorm'):
-            norm_act_layer = BatchNormAct2d
-        elif type_name.startswith('groupnorm'):
-            norm_act_layer = GroupNormAct
-        elif type_name.startswith('groupnorm1'):
-            norm_act_layer = partial(GroupNormAct, num_groups=1)
-        elif type_name.startswith('layernorm2d'):
-            norm_act_layer = LayerNormAct2d
-        elif type_name.startswith('layernorm'):
-            norm_act_layer = LayerNormAct
+            norm_act_layer = BatchNormAct2D
         else:
             assert False, f'No equivalent norm_act layer for {type_name}'
+    _NORM_ACT_REQUIRES_ARG = {BatchNormAct2D}
     if norm_act_layer in _NORM_ACT_REQUIRES_ARG:
         norm_act_kwargs.setdefault('act_layer', act_layer)
     if norm_act_kwargs:
         norm_act_layer = partial(norm_act_layer, **norm_act_kwargs)
     return norm_act_layer
-
-
-_ACT_LAYER_ME = dict(
-             silu=nn.Silu,
-             swish=nn.Silu,
-             mish=nn.Mish,
-             hard_sigmoid=nn.Hardsigmoid,
-             hard_swish=nn.Hardswish,
-            )
 
 
 def adaptive_pool_feat_mult(pool_type='avg'):
@@ -604,10 +448,10 @@ def adaptive_pool_feat_mult(pool_type='avg'):
         return 1
 
 
-class SelectAdaptivePool2d(nn.Layer):
+class SelectAdaptivePool2D(nn.Layer):
     def __init__(self, output_size=1, pool_type='fast',
                  flatten=False, input_fmt='NCHW'):
-        super(SelectAdaptivePool2d, self).__init__()
+        super(SelectAdaptivePool2D, self).__init__()
         assert input_fmt in ('NCHW', 'NHWC')
         self.pool_type = pool_type or ''
         pool_type = pool_type.lower()
@@ -646,39 +490,6 @@ class SelectAdaptivePool2d(nn.Layer):
                 pool_type + ', flatten=' + str(self.flatten) + ')')
 
 
-class Linear(nn.Linear):
-    def forward(self, input):
-        return nn.functional.linear(x=input, weight=self.weight,
-                                    bias=self.bias)
-
-
-def checkpoint_seq(functions, x, every=1, flatten=False, skip_last=False,
-                   preserve_rng_state=True):
-    def run_function(start, end, functions):
-
-        def forward(_x):
-            for j in range(start, end + 1):
-                _x = functions[j](_x)
-            return _x
-        return forward
-    if isinstance(functions, nn.Sequential):
-        functions = functions.children()
-    if not isinstance(functions, (tuple, list)):
-        functions = tuple(functions)
-    num_checkpointed = len(functions)
-    if skip_last:
-        num_checkpointed -= 1
-    end = -1
-    for start in range(0, num_checkpointed, every):
-        end = min(start + every - 1, num_checkpointed - 1)
-        x = paddle.distributed.fleet.utils.recompute(
-            run_function(start, end, functions),
-            x, preserve_rng_state=preserve_rng_state)
-    if skip_last:
-        return run_function(end + 1, len(functions) - 1, functions)(x)
-    return x
-
-
 def get_padding(kernel_size, stride=1, dilation=1, **_):
     if any([isinstance(v, (tuple, list)) for v in [kernel_size, stride,
                                                    dilation]]):
@@ -703,194 +514,26 @@ def get_padding_value(padding, kernel_size, **kwargs):
     return padding, dynamic
 
 
-def create_conv2d_pad(in_chs, out_chs, kernel_size, **kwargs):
+def create_conv2D_pad(in_chs, out_chs, kernel_size, **kwargs):
     padding = kwargs.pop('padding', '')
     kwargs.pop('bias', '')
     kwargs.setdefault('bias_attr', False)
     padding, is_dynamic = get_padding_value(padding, kernel_size, **kwargs)
-    if is_dynamic:
-        if is_exportable():
-            assert not is_scriptable()
-    else:
-        return nn.Conv2D(in_channels=in_chs, out_channels=out_chs,
-                         kernel_size=kernel_size, padding=padding, **kwargs)
+    return nn.Conv2D(in_channels=in_chs, out_channels=out_chs,
+                     kernel_size=kernel_size, padding=padding, **kwargs)
 
 
-class CondConv2d(nn.Layer):
-    __constants__ = ['in_channels', 'out_channels', 'dynamic_padding']
-
-    def __init__(self, in_channels, out_channels, kernel_size=3, stride=1,
-                 padding='', dilation=1, groups=1, bias=False, num_experts=4):
-        super(CondConv2d, self).__init__()
-        self.in_channels = in_channels
-        self.out_channels = out_channels
-        self.kernel_size = to_2tuple(kernel_size)
-        self.stride = to_2tuple(stride)
-        padding_val, is_padding_dynamic = get_padding_value(
-            padding, kernel_size, stride=stride, dilation=dilation)
-        self.dynamic_padding = is_padding_dynamic
-        self.padding = to_2tuple(padding_val)
-        self.dilation = to_2tuple(dilation)
-        self.groups = groups
-        self.num_experts = num_experts
-        self.weight_shape = (
-            self.out_channels,
-            self.in_channels // self.groups
-        ) + self.kernel_size
-        weight_num_param = 1
-        for wd in self.weight_shape:
-            weight_num_param *= wd
-        self.weight = paddle.base.framework.EagerParamBase.from_tensor(
-            tensor=paddle.empty(shape=[
-                self.num_experts,
-                weight_num_param
-            ])
-        )
-        if bias:
-            self.bias_shape = (
-                self.out_channels,
-            )
-            self.bias = paddle.base.framework.EagerParamBase.from_tensor(
-                tensor=paddle.empty(shape=[
-                    self.num_experts,
-                    self.out_channels
-                ])
-            )
-        else:
-            self.add_parameter(name='bias', parameter=None)
-
-    def forward(self, x, routing_weights):
-        B, C, H, W = tuple(x.shape)
-        weight = paddle.matmul(x=routing_weights, y=self.weight)
-        new_weight_shape = (
-            B * self.out_channels,
-            self.in_channels // self.groups
-        ) + self.kernel_size
-
-        weight = weight.view(new_weight_shape)
-        bias = None
-        if self.bias is not None:
-            bias = paddle.matmul(x=routing_weights, y=self.bias)
-            bias = bias.view(B * self.out_channels)
-        x = x.reshape(1, B * C, H, W)
-        out = nn.functional.conv2d(
-            x=x, weight=weight, bias=bias,
-            stride=self.stride, padding=self.padding,
-            dilation=self.dilation, groups=self.groups * B)
-        out = out.transpose(perm=[1, 0, 2, 3]).view(
-            B,
-            self.out_channels,
-            tuple(out.shape)[-2],
-            tuple(out.shape)[-1]
-        )
-        return out
-
-
-def _split_channels(num_chan, num_groups):
-    split = [(num_chan // num_groups) for _ in range(num_groups)]
-    split[0] += num_chan - sum(split)
-    return split
-
-
-class MixedConv2d(nn.LayerDict):
-    def __init__(self, in_channels, out_channels, kernel_size=3, stride=1,
-                 padding='', dilation=1, depthwise=False, **kwargs):
-        super(MixedConv2d, self).__init__()
-        kernel_size = kernel_size if isinstance(kernel_size, list) else [
-            kernel_size]
-        num_groups = len(kernel_size)
-        in_splits = _split_channels(in_channels, num_groups)
-        out_splits = _split_channels(out_channels, num_groups)
-        self.in_channels = sum(in_splits)
-        self.out_channels = sum(out_splits)
-        for idx, (k, in_ch, out_ch) in enumerate(zip(kernel_size, in_splits,
-                                                 out_splits)):
-            conv_groups = in_ch if depthwise else 1
-            self.add_sublayer(name=str(idx), sublayer=create_conv2d_pad(
-                in_ch, out_ch, k, stride=stride, padding=padding,
-                dilation=dilation, groups=conv_groups, **kwargs))
-        self.splits = in_splits
-
-    def forward(self, x):
-        x_split = paddle.split(x=x, num_or_sections=self.splits, axis=1)
-        x_out = [c(x_split[i]) for i, c in enumerate(self.values())]
-        x = paddle.concat(x=x_out, axis=1)
-        return x
-
-
-def create_conv2d(in_channels, out_channels, kernel_size, **kwargs):
-    if isinstance(kernel_size, list):
-        assert 'num_experts' not in kwargs
-        if 'groups' in kwargs:
-            groups = kwargs.pop('groups')
-            if groups == in_channels:
-                kwargs['depthwise'] = True
-            else:
-                assert groups == 1
-        m = MixedConv2d(in_channels, out_channels, kernel_size, **kwargs)
-    else:
-        depthwise = kwargs.pop('depthwise', False)
-        groups = in_channels if depthwise else kwargs.pop('groups', 1)
-        if 'num_experts' in kwargs and kwargs['num_experts'] > 0:
-            m = CondConv2d(in_channels, out_channels, kernel_size,
-                           groups=groups, **kwargs)
-        else:
-            m = create_conv2d_pad(in_channels, out_channels, kernel_size,
-                                  groups=groups, **kwargs)
+def create_conv2D(in_channels, out_channels, kernel_size, **kwargs):
+    depthwise = kwargs.pop('depthwise', False)
+    groups = in_channels if depthwise else kwargs.pop('groups', 1)
+    m = create_conv2D_pad(in_channels, out_channels, kernel_size,
+                          groups=groups, **kwargs)
     return m
 
 
-class PReLU(nn.PReLU):
-    def __init__(self, num_parameters=1, init=0.25, inplace=False):
-        super(PReLU, self).__init__(num_parameters=num_parameters, init=init)
-
-    def forward(self, input):
-        return nn.functional.prelu(x=input, weight=self.weight)
-
-
-class GELUTanh(nn.Layer):
-    def __init__(self, inplace=False):
-        super(GELUTanh, self).__init__()
-
-    def forward(self, input):
-        return nn.functional.gelu(x=input, approximate=True)
-
-
-class Sigmoid(nn.Layer):
-    def __init__(self, inplace=False):
-        super(Sigmoid, self).__init__()
-        self.inplace = inplace
-
-    def forward(self, x):
-        return x.sigmoid_() if self.inplace else x.sigmoid()
-
-
-class Tanh(nn.Layer):
-    def __init__(self, inplace=False):
-        super(Tanh, self).__init__()
-        self.inplace = inplace
-
-    def forward(self, x):
-        return x.tanh_() if self.inplace else x.tanh()
-
-
 _ACT_LAYER_DEFAULT = dict(
-    silu=nn.Silu,
-    swish=nn.Silu,
-    mish=nn.Mish,
     relu=nn.ReLU,
-    relu6=nn.ReLU6,
-    leaky_relu=nn.LeakyReLU,
-    elu=nn.ELU,
-    prelu=PReLU,
-    celu=nn.CELU,
-    selu=nn.SELU,
     gelu=nn.GELU,
-    gelu_tanh=GELUTanh,
-    sigmoid=Sigmoid,
-    tanh=Tanh,
-    hard_sigmoid=nn.Hardsigmoid,
-    hard_swish=nn.Hardswish,
     identity=nn.Identity
 )
 
@@ -902,9 +545,6 @@ def get_act_layer(name='relu'):
         return name
     if not name:
         return None
-    if not (is_exportable() or is_scriptable()):
-        if name in _ACT_LAYER_ME:
-            return _ACT_LAYER_ME[name]
     return _ACT_LAYER_DEFAULT[name]
 
 
@@ -958,167 +598,19 @@ class SqueezeExcite(nn.Layer):
         return x * self.gate(x_se)
 
 
-class FeatureDictNet(nn.LayerDict):
-    def __init__(self,
-                 model,
-                 out_indices=None,
-                 output_fmt: str = 'NCHW',
-                 feature_concat=False,
-                 flatten_sequential=False):
-        super(FeatureDictNet, self).__init__()
-        self.concat = feature_concat
-        self.grad_checkpointing = False
-        self.return_layers = {}
-
-    def set_grad_checkpointing(self, enable=True):
-        self.grad_checkpointing = enable
-
-
-class FeatureListNet(FeatureDictNet):
-    def __init__(self,
-                 model,
-                 out_indices=(0, 1, 2, 3, 4),
-                 output_fmt='NCHW',
-                 feature_concat=False,
-                 flatten_sequential=False):
-        super().__init__(
-            model,
-            out_indices=out_indices,
-            output_fmt=output_fmt,
-            feature_concat=feature_concat,
-            flatten_sequential=flatten_sequential
-        )
-
-    def forward(self, x):
-        return list(self._collect(x).values())
-
-
-class FeatureHookNet(nn.LayerDict):
-    def __init__(self,
-                 model,
-                 out_indices=(0, 1, 2, 3, 4),
-                 out_map=None,
-                 return_dict=False,
-                 output_fmt='NCHW',
-                 no_rewrite=None,
-                 flatten_sequential=False,
-                 default_hook_type='forward'):
-        super().__init__()
-        self.return_dict = return_dict
-        self.grad_checkpointing = False
-        if no_rewrite is None:
-            no_rewrite = not flatten_sequential
-        hooks = []
-        if no_rewrite:
-            assert not flatten_sequential
-            if hasattr(model, 'reset_classifier'):
-                model.reset_classifier(0)
-            hooks.extend(self.feature_info.get_dicts())
-        else:
-            remaining = {
-                f['module']: (
-                    f['hook_type'] if 'hook_type' in f else default_hook_type
-                ) for f in self.feature_info.get_dicts()
-            }
-            assert not remaining, f'Return layers ({remaining}) is not present'
-
-    def set_grad_checkpointing(self, enable=True):
-        self.grad_checkpointing = enable
-
-
-class FeatureGetterNet(nn.LayerDict):
-    def __init__(self, model, out_indices=4,
-                 out_map=None, return_dict=False,
-                 output_fmt='NCHW', norm=False, prune=True):
-        super().__init__()
-        if prune and hasattr(model, 'prune_intermediate_layers'):
-            out_indices = model.prune_intermediate_layers(
-                out_indices, prune_norm=not norm)
-        self.model = model
-        self.out_indices = out_indices
-        self.out_map = out_map
-        self.return_dict = return_dict
-        self.norm = norm
-
-    def forward(self, x):
-        features = self.model.forward_intermediates(
-            x, indices=self.out_indices,
-            norm=self.norm, output_fmt=self.output_fmt,
-            intermediates_only=True)
-        return features
-
-
-def resolve_pretrained_cfg(variant, pretrained_cfg=None,
-                           pretrained_cfg_overlay=None):
-    model_with_tag = variant
-    pretrained_tag = None
-    if pretrained_cfg:
-        if isinstance(pretrained_cfg, str):
-            pretrained_tag = pretrained_cfg
-            pretrained_cfg = None
-    if not pretrained_cfg:
-        if pretrained_tag:
-            model_with_tag = '.'.join([variant, pretrained_tag])
-    if not pretrained_cfg:
-        print(f'No pretrained configuration specified for {model_with_tag}.')
-    pretrained_cfg_overlay = pretrained_cfg_overlay or {}
-    if not pretrained_cfg.architecture:
-        pretrained_cfg_overlay.setdefault('architecture', variant)
-    pretrained_cfg = dataclasses.replace(pretrained_cfg, **
-                                         pretrained_cfg_overlay)
-    return pretrained_cfg
-
-
-def _update_default_model_kwargs(pretrained_cfg, kwargs, kwargs_filter):
-    default_kwarg_names = 'class_num', 'global_pool', 'in_chans'
-    if pretrained_cfg.get('fixed_input_size', False):
-        default_kwarg_names += 'img_size',
-    for n in default_kwarg_names:
-        if n == 'img_size':
-            input_size = pretrained_cfg.get('input_size', None)
-            if input_size is not None:
-                assert len(input_size) == 3
-                kwargs.setdefault(n, input_size[-2:])
-        elif n == 'in_chans':
-            input_size = pretrained_cfg.get('input_size', None)
-            if input_size is not None:
-                assert len(input_size) == 3
-                kwargs.setdefault(n, input_size[0])
-        elif n == 'class_num':
-            default_val = pretrained_cfg.get(n, None)
-            if default_val is not None and default_val >= 0:
-                kwargs.setdefault(n, pretrained_cfg[n])
-        else:
-            default_val = pretrained_cfg.get(n, None)
-            if default_val is not None:
-                kwargs.setdefault(n, pretrained_cfg[n])
-    _filter_kwargs(kwargs, names=kwargs_filter)
-
-
-def _filter_kwargs(kwargs, names):
-    if not kwargs or not names:
-        return
-    for n in names:
-        kwargs.pop(n, None)
-
-
 def build_model_with_cfg(
     model_cls,
     variant,
     pretrained,
     pretrained_cfg=None,
-    pretrained_cfg_overlay=None,
     model_cfg=None,
     feature_cfg=None,
     pretrained_strict=True,
-    pretrained_filter_fn=None,
     kwargs_filter=None,
     **kwargs
 ):
-    features = False
     feature_cfg = feature_cfg or {}
     if kwargs.pop('features_only', False):
-        features = True
         feature_cfg.setdefault('out_indices', (0, 1, 2, 3, 4))
         if 'out_indices' in kwargs:
             feature_cfg['out_indices'] = kwargs.pop('out_indices')
@@ -1130,41 +622,7 @@ def build_model_with_cfg(
         model = model_cls(cfg=model_cfg, **kwargs)
     model.pretrained_cfg = pretrained_cfg
     model.default_cfg = model.pretrained_cfg
-    if features:
-        use_getter = False
-        if 'feature_cls' in feature_cfg:
-            feature_cls = feature_cfg.pop('feature_cls')
-            if isinstance(feature_cls, str):
-                feature_cls = feature_cls.lower()
-                if feature_cls not in ('dict', 'list', 'hook'):
-                    feature_cfg.pop('flatten_sequential', None)
-                if 'hook' in feature_cls:
-                    feature_cls = FeatureHookNet
-                elif feature_cls == 'list':
-                    feature_cls = FeatureListNet
-                elif feature_cls == 'dict':
-                    feature_cls = FeatureDictNet
-                elif feature_cls == 'getter':
-                    use_getter = True
-                    feature_cls = FeatureGetterNet
-                else:
-                    assert False, f'Unknown feature class {feature_cls}'
-        else:
-            feature_cls = FeatureListNet
-        output_fmt = getattr(model, 'output_fmt', None)
-        if output_fmt is not None and not use_getter:
-            feature_cfg.setdefault('output_fmt', output_fmt)
-        model = feature_cls(model, **feature_cfg)
-        model.default_cfg = model.pretrained_cfg
     return model
-
-
-def is_scriptable():
-    return False
-
-
-def is_exportable():
-    return False
 
 
 def resolve_act_layer(kwargs, default='relu'):
@@ -1204,16 +662,7 @@ def named_modules(module, name='',
 
 
 def _init_weight_goog(m, n='', fix_group_fanout=True):
-    if isinstance(m, CondConv2d):
-        fan_out = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-        if fix_group_fanout:
-            fan_out //= m.groups
-        init_Normal = nn.initializer.Normal(mean=0, std=math.sqrt(
-            2.0 / fan_out))
-        if m.bias is not None:
-            init_Constant = nn.initializer.Constant(value=0.0)
-            init_Constant(m.bias)
-    elif isinstance(m, nn.Conv2D):
+    if isinstance(m, nn.Conv2D):
         fan_out = m._kernel_size[0] * m._kernel_size[1] * m._out_channels
         if fix_group_fanout:
             fan_out //= m._groups
@@ -1271,20 +720,6 @@ def _decode_block_str(block_str):
             skip = True
         elif op.startswith('n'):
             key = op[0]
-            v = op[1:]
-            if v == 're':
-                value = get_act_layer('relu')
-            elif v == 'r6':
-                value = get_act_layer('relu6')
-            elif v == 'hs':
-                value = get_act_layer('hard_swish')
-            elif v == 'sw':
-                value = get_act_layer('swish')
-            elif v == 'mi':
-                value = get_act_layer('mish')
-            else:
-                continue
-            options[key] = value
         else:
             splits = re.split('(\\d.*)', op)
             if len(splits) >= 2:
@@ -1305,7 +740,7 @@ def _decode_block_str(block_str):
             exp_ratio=float(options['e']),
             se_ratio=float(options.get('se', 0.0)),
             noskip=skip is False,
-            s2d=int(options.get('d', 0)) > 0
+            s2D=int(options.get('d', 0)) > 0
         ))
         if 'cc' in options:
             block_args['num_experts'] = int(options['cc'])
@@ -1316,7 +751,7 @@ def _decode_block_str(block_str):
             se_ratio=float(options.get('se', 0.0)),
             pw_act=block_type == 'dsa',
             noskip=block_type == 'dsa' or skip is False,
-            s2d=int(options.get('d', 0)) > 0
+            s2D=int(options.get('d', 0)) > 0
         ))
     elif block_type == 'er':
         block_args.update(dict(
@@ -1389,7 +824,6 @@ def _scale_stage_depth(stack_args, repeats, depth_multiplier=1.0,
         num_repeat_scaled -= rs
     repeats_scaled = repeats_scaled[::-1]
     sa_scaled = []
-    import pdb;pdb.set_trace()
     for ba, rep in zip(stack_args, repeats_scaled):
         sa_scaled.extend([deepcopy(ba) for _ in range(rep)])
     return sa_scaled
@@ -1513,7 +947,7 @@ class EdgeResidual(nn.Layer):
         groups = num_groups(group_size, mid_chs)
         self.has_skip = (in_chs == out_chs and stride == 1) and not noskip
         use_aa = aa_layer is not None and stride > 1
-        self.conv_exp = create_conv2d(
+        self.conv_exp = create_conv2D(
             in_chs,
             mid_chs,
             exp_kernel_size,
@@ -1531,7 +965,7 @@ class EdgeResidual(nn.Layer):
         )
         self.se = (se_layer(mid_chs, act_layer=act_layer)
                    if se_layer else nn.Identity())
-        self.conv_pwl = create_conv2d(
+        self.conv_pwl = create_conv2D(
             mid_chs,
             out_chs,
             pw_kernel_size,
@@ -1594,7 +1028,7 @@ class ConvNormAct(nn.Layer):
 
         use_aa = aa_layer is not None and stride > 1
 
-        self.conv = create_conv2d(
+        self.conv = create_conv2D(
             in_channels,
             out_channels,
             kernel_size,
@@ -1665,7 +1099,7 @@ class ConvBnAct(nn.Layer):
         self.has_skip = skip and stride == 1 and in_chs == out_chs
         use_aa = aa_layer is not None and stride > 1
 
-        self.conv = create_conv2d(
+        self.conv = create_conv2D(
             in_chs,
             out_chs,
             kernel_size,
@@ -1706,7 +1140,7 @@ class ConvBnAct(nn.Layer):
         return x
 
 
-class LayerScale2d(nn.Layer):
+class LayerScale2D(nn.Layer):
     def __init__(self, dim, init_values=1e-05, inplace=False):
         super().__init__()
         self.inplace = inplace
@@ -1834,7 +1268,7 @@ class UniversalInvertedResidual(nn.Layer):
         else:
             self.dw_end = nn.Identity()
         if layer_scale_init_value is not None:
-            self.layer_scale = LayerScale2d(out_chs, layer_scale_init_value)
+            self.layer_scale = LayerScale2D(out_chs, layer_scale_init_value)
         else:
             self.layer_scale = nn.Identity()
         self.drop_path = DropPath(drop_path_rate
@@ -1862,6 +1296,12 @@ class UniversalInvertedResidual(nn.Layer):
 
 
 class EfficientNetBuilder:
+    """ Build Trunk Blocks
+    This ended up being somewhat of a cross between
+    https://github.com/tensorflow/tpu/blob/master/models/official/mnasnet/mnasnet_models.py
+    and
+    https://github.com/facebookresearch/maskrcnn-benchmark/blob/master/maskrcnn_benchmark/modeling/backbone/fbnet_builder.py
+    """
     def __init__(self,
                  output_stride=32,
                  pad_type='',
@@ -1902,8 +1342,8 @@ class EfficientNetBuilder:
         bt = ba.pop('block_type')
         ba['in_chs'] = self.in_chs
         ba['out_chs'] = self.round_chs_fn(ba['out_chs'])
-        s2d = ba.get('s2d', 0)
-        if s2d > 0:
+        s2D = ba.get('s2D', 0)
+        if s2D > 0:
             ba['out_chs'] *= 4
         if 'force_in_chs' in ba and ba['force_in_chs']:
             ba['force_in_chs'] = self.round_chs_fn(ba['force_in_chs'])
@@ -1920,7 +1360,7 @@ class EfficientNetBuilder:
         if se_ratio and self.se_layer is not None:
             if not self.se_from_exp:
                 se_ratio /= ba.get('exp_ratio', 1.0)
-            if s2d == 1:
+            if s2D == 1:
                 se_ratio /= 4
             if self.se_has_ratio:
                 ba['se_layer'] = partial(self.se_layer, rd_ratio=se_ratio)
@@ -1975,7 +1415,7 @@ class EfficientNetBuilder:
             feature_info = dict(module='bn1', num_chs=in_chs, stage=0,
                                 reduction=current_stride)
             self.features.append(feature_info)
-        space2depth = 0
+        space2Depth = 0
         for stack_idx, stack_args in enumerate(model_block_args):
             _log_info_if('Stack: {}'.format(stack_idx), self.verbose)
             assert isinstance(stack_args, list)
@@ -1986,16 +1426,16 @@ class EfficientNetBuilder:
                 assert block_args['stride'] in (1, 2)
                 if block_idx >= 1:
                     block_args['stride'] = 1
-                if not space2depth and block_args.pop('s2d', False):
+                if not space2Depth and block_args.pop('s2D', False):
                     assert block_args['stride'] == 1
-                    space2depth = 1
-                if space2depth > 0:
-                    if space2depth == 2 and block_args['stride'] == 2:
+                    space2Depth = 1
+                if space2Depth > 0:
+                    if space2Depth == 2 and block_args['stride'] == 2:
                         block_args['stride'] = 1
                         block_args['exp_ratio'] /= 4
-                        space2depth = 0
+                        space2Depth = 0
                     else:
-                        block_args['s2d'] = space2depth
+                        block_args['s2D'] = space2Depth
                 extract_features = False
                 if last_block:
                     next_stack_idx = stack_idx + 1
@@ -2020,8 +1460,8 @@ class EfficientNetBuilder:
                 block = self._make_block(block_args, total_block_idx,
                                          total_block_count)
                 blocks.append(block)
-                if space2depth == 1:
-                    space2depth = 2
+                if space2Depth == 1:
+                    space2Depth = 2
                 if extract_features:
                     feature_info = dict(
                         stage=stack_idx + 1,
@@ -2041,7 +1481,7 @@ class EfficientNetBuilder:
         return stages
 
 
-class MobileNetV3(nn.Layer):
+class MobileNetV4(nn.Layer):
     def __init__(self, block_args, class_num=1000, in_chans=3,
                  stem_size=16, fix_stem=False, num_features=1280,
                  head_bias=True, head_norm=False, pad_type='',
@@ -2050,7 +1490,7 @@ class MobileNetV3(nn.Layer):
                  round_chs_fn=round_channels, drop_rate=0.0,
                  drop_path_rate=0.0, layer_scale_init_value=None,
                  global_pool='avg'):
-        super(MobileNetV3, self).__init__()
+        super(MobileNetV4, self).__init__()
 
         act_layer = act_layer or nn.ReLU
         norm_layer = norm_layer or nn.BatchNorm2D
@@ -2064,7 +1504,7 @@ class MobileNetV3(nn.Layer):
         if not fix_stem:
             stem_size = round_chs_fn(stem_size)
 
-        self.conv_stem = create_conv2d(
+        self.conv_stem = create_conv2D(
             in_chans,
             stem_size,
             kernel_size=3,
@@ -2087,11 +1527,11 @@ class MobileNetV3(nn.Layer):
         self.num_features = builder.in_chs
         self.head_hidden_size = num_features
 
-        self.global_pool = SelectAdaptivePool2d(pool_type=global_pool)
+        self.global_pool = SelectAdaptivePool2D(pool_type=global_pool)
         num_pooled_chs = self.num_features * self.global_pool.feat_mult()
 
         if head_norm:
-            self.conv_head = create_conv2d(
+            self.conv_head = create_conv2D(
                 num_pooled_chs,
                 self.head_hidden_size,
                 kernel_size=1,
@@ -2100,7 +1540,7 @@ class MobileNetV3(nn.Layer):
             self.norm_head = norm_act_layer(self.head_hidden_size)
             self.act2 = nn.Identity()
         else:
-            self.conv_head = create_conv2d(
+            self.conv_head = create_conv2D(
                 num_pooled_chs,
                 self.head_hidden_size,
                 kernel_size=1,
@@ -2115,7 +1555,7 @@ class MobileNetV3(nn.Layer):
         )
 
         self.classifier = (
-            Linear(self.head_hidden_size, class_num)
+            nn.Linear(self.head_hidden_size, class_num)
             if class_num > 0 else nn.Identity()
         )
         efficientnet_init_weights(self)
@@ -2149,9 +1589,9 @@ class MobileNetV3(nn.Layer):
         return x
 
 
-def _create_mnv3(variant, pretrained=False, **kwargs):
+def _create_mnv4(variant, pretrained=False, **kwargs):
     features_mode = ''
-    model_cls = MobileNetV3
+    model_cls = MobileNetV4
     kwargs_filter = None
     model = build_model_with_cfg(
         model_cls, variant, pretrained,
@@ -2165,6 +1605,14 @@ def _create_mnv3(variant, pretrained=False, **kwargs):
 
 def _gen_mobilenet_v4(variant, channel_multiplier=1.0,
                       pretrained=False, **kwargs):
+    """Creates a MobileNet-V4 model.
+
+    Ref impl: ?
+    Paper: https://arxiv.org/abs/1905.02244
+
+    Args:
+      channel_multiplier: multiplier to number of channels per layer.
+    """
     num_features = 1280
     if 'hybrid' in variant:
         layer_scale_init_value = 1e-05
@@ -2275,7 +1723,7 @@ def _gen_mobilenet_v4(variant, channel_multiplier=1.0,
         **kwargs
     )
 
-    model = _create_mnv3(variant, pretrained, **model_kwargs)
+    model = _create_mnv4(variant, pretrained, **model_kwargs)
     return model
 
 
