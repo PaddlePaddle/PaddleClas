@@ -230,6 +230,7 @@ def dump_infer_config(config, path):
         transforms = config["Infer"]["transforms"]
     elif config["DataLoader"]["Eval"].get("Query"):
         transforms = config["DataLoader"]["Eval"]["Query"]["dataset"]["transform_ops"]
+        transforms.append({"ToCHWImage": None})
     else:
         logger.error("This config does not support dump transform config!")
     for transform in transforms:
@@ -269,7 +270,7 @@ def dump_infer_config(config, path):
         else:
             raise ValueError("PostProcess name is not specified")
     else:
-        infer_cfg["PostProcess"] = None
+        infer_cfg["PostProcess"] = {"NormalizeFeatures": None}
     with open(path, 'w') as f:
         yaml.dump(infer_cfg, f)
     logger.info("Export inference config file to {}".format(os.path.join(path)))
