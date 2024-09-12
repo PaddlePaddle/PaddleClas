@@ -193,5 +193,5 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
 
 # for PaddleX
 ClsDataset = ImageNetDataset
-ShiTuDataset = ImageNetDataset
+ShiTuRecDataset = ImageNetDataset
 MLClsDataset = MultiLabelDataset
