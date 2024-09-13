@@ -212,7 +212,8 @@ class BatchNormAct2D(nn.BatchNorm2D):
         self.act = self._create_act(act_layer, act_kwargs=act_kwargs,
                                     inplace=inplace, apply_act=apply_act)
 
-    def _create_act(self, act_layer, act_kwargs=None, inplace=False, apply_act=True):
+    def _create_act(self, act_layer, act_kwargs=None, inplace=False,
+                    apply_act=True):
         act_kwargs = act_kwargs or {}
         act_kwargs.setdefault('inplace', inplace)
         act = None
@@ -568,11 +569,6 @@ def decode_arch_def(
     return arch_args
 
 
-def _log_info_if(msg, condition):
-    if condition:
-        print(msg)
-
-
 def get_attn(attn_type):
     if isinstance(attn_type, nn.Layer):
         return attn_type
@@ -600,8 +596,8 @@ def make_divisible(v, divisor=8, min_value=None, round_limit=0.9):
     return new_v
 
 
-def create_aa(aa_layer, channels=None, stride=2,
-              enable=True, noop=nn.Identity):
+def create_adaptive_activation(aa_layer, channels=None, stride=2,
+                               enable=True, noop=nn.Identity):
     if not aa_layer or not enable:
         return noop() if noop is not None else None
     if isinstance(aa_layer, str):
@@ -632,8 +628,8 @@ class EdgeResidual(nn.Layer):
             dilation=dilation, groups=groups, padding=pad_type
         )
         self.bn1 = norm_act_layer(mid_chs, inplace=True)
-        self.aa = create_aa(aa_layer, channels=mid_chs, stride=stride,
-                            enable=use_aa)
+        self.aa = create_adaptive_activation(aa_layer, channels=mid_chs,
+                                             stride=stride, enable=use_aa)
         self.se = (se_layer(mid_chs, act_layer=act_layer)
                    if se_layer else nn.Identity())
         self.conv_pwl = create_conv2D(
@@ -687,7 +683,7 @@ class ConvNormAct(nn.Layer):
             out_channels, apply_act=apply_act,
             act_kwargs=act_kwargs, **norm_kwargs
         )
-        self.aa = create_aa(
+        self.aa = create_adaptive_activation(
             aa_layer, out_channels, stride=stride,
             enable=use_aa, noop=None
         )
@@ -716,7 +712,7 @@ class ConvBnAct(nn.Layer):
             groups=groups, padding=pad_type
         )
         self.bn1 = norm_act_layer(out_chs, inplace=True)
-        self.aa = create_aa(
+        self.aa = create_adaptive_activation(
             aa_layer, channels=out_chs,
             stride=stride, enable=use_aa
         )
@@ -894,23 +890,15 @@ class EfficientNetBuilder:
             else:
                 ba['se_layer'] = self.se_layer
         elif bt == 'er':
-            _log_info_if('  EdgeResidual {}, Args: {}'.format(block_idx,
-                         str(ba)), self.verbose)
             block = EdgeResidual(**ba)
         elif bt == 'cn':
-            _log_info_if('  ConvBnAct {}, Args: {}'.format(block_idx, str(
-                ba)), self.verbose)
             block = ConvBnAct(**ba)
         elif bt == 'uir':
-            _log_info_if('  UniversalInvertedResidual {}, Args: {}'.format(
-                block_idx, str(ba)), self.verbose)
             block = UniversalInvertedResidual(
                 **ba,
                 layer_scale_init_value=self.layer_scale_init_value
             )
         elif bt == 'mqa':
-            _log_info_if('  MobileMultiQueryAttention {}, Args: {}'.format(
-                block_idx, str(ba)), self.verbose)
             block = MobileAttention(
                 **ba,
                 use_multi_query=True,
@@ -920,8 +908,6 @@ class EfficientNetBuilder:
         return block
 
     def __call__(self, in_chs, model_block_args):
-        _log_info_if('Building model trunk with %d stages...' % len(
-            model_block_args), self.verbose)
         self.in_chs = in_chs
         total_block_count = sum([len(x) for x in model_block_args])
         total_block_idx = 0
@@ -934,11 +920,9 @@ class EfficientNetBuilder:
             self.features.append(feature_info)
         space2Depth = 0
         for stack_idx, stack_args in enumerate(model_block_args):
-            _log_info_if('Stack: {}'.format(stack_idx), self.verbose)
             blocks = []
             for block_idx, block_args in enumerate(stack_args):
                 last_block = block_idx + 1 == len(stack_args)
-                _log_info_if(' Block: {}'.format(block_idx), self.verbose)
                 if block_idx >= 1:
                     block_args['stride'] = 1
                 if not space2Depth and block_args.pop('s2D', False):
@@ -963,9 +947,6 @@ class EfficientNetBuilder:
                     if next_output_stride > self.output_stride:
                         next_dilation = current_dilation * block_args['stride']
                         block_args['stride'] = 1
-                        _log_info_if(
-                            '  Converting stride to maintain output_stride=={}'
-                            .format(self.output_stride), self.verbose)
                     else:
                         current_stride = next_output_stride
                 block_args['dilation'] = current_dilation
