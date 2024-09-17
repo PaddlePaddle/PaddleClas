@@ -24,9 +24,9 @@
 
 ### 1.1 模型简介
 
-[MobileNet-V4](https://arxiv.org/abs/2404.10518) 是专为移动设备设计了普遍高效的架构。其核心在于引入了 UIB（Universal Inverted Bottleneck）搜索块，这是一种统一且灵活的结构，融合了 IB（Inverted Bottleneck）、ConvNext、FFN（Feed Forward Network）以及一种新颖的 ExtraDW（Extra Depthwise）模块。与 UIB 同时推出的还有 Mobile MQA，这是一种专为移动加速器定制的注意力块，可实现高达 39% 的显著加速。此外，我们还引入了一种优化的神经架构搜索（Neural Architecture Search，NAS）方案，以提升搜索的有效性。
+[MobileNet-V4](https://arxiv.org/abs/2404.10518) 是专为移动设备设计的普遍高效的架构。其核心在于引入了 UIB（Universal Inverted Bottleneck）搜索块，这是一种统一且灵活的结构，融合了 IB（Inverted Bottleneck）、ConvNext、FFN（Feed Forward Network）以及新颖的 ExtraDW（Extra Depthwise）模块。与 UIB 同时推出的还有 Mobile MQA，这是一种专为移动加速器定制的注意力块，可实现高达 39% 的显著加速。此外，还引入了一种优化的神经架构搜索（Neural Architecture Search，NAS）方案，以提升搜索的有效性。
 
-通过整合UIB、Mobile MQA 以及优化的 NAS 方案，MNv4 系列模型在移动 CPU、DSP、GPU 以及苹果神经网络引擎和谷歌 Pixel EdgeTPU 等专用加速器上均表现出色，大多数情况下均达到了帕累托最优，这是在其他测试模型中未曾发现的特点。
+通过整合 UIB、Mobile MQA 以及优化的 NAS 方案，MNv4 系列模型在移动 CPU、DSP、GPU 以及苹果神经网络引擎和谷歌 Pixel EdgeTPU 等专用加速器上均表现出色，大多数情况下均达到了帕累托最优，这是在其他测试模型中未曾发现的特点。
 
 <a name='1.2'></a>
 
