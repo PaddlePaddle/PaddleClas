@@ -24,9 +24,7 @@
 
 ### 1.1 模型简介
 
-MobileNet-V4(https://arxiv.org/abs/2404.10518)，目标是想出一套新的NAS搜索模型，这些模型在当今的移动/边缘硬件上运行时最佳，从小型DSP/CPU设备到适度的边缘加速器（例如EdgeTPU）在当前手机中。
-目前推出最新一代的MobileNets，称为MobileNetV4（MNv4），具有通用高效的移动设备架构设计。在其核心，引入了通用倒瓶颈（UIB）搜索块，这是一个统一而灵活的结构，它融合了倒瓶颈（IB）、ConvNext、Feed Forward Network（FFN）和一种新的Extra Depthwise（ExtraDW）变体。除了UIB，还推出了移动MQA，这是一个为移动加速器量身定制的注意力块，提供了显著的39%的速度。还引入了优化的神经架构搜索（NAS）配方，以提高MNv4搜索的有效性。UIB、移动MQA和改进的NAS配方的集成产生了一套新的MNv4模型，这些模型大多是移动CPU、DSP、GPU以及苹果神经引擎和谷歌Pixel EdgeTPU等专业加速器的帕累托最佳——这是在测试的任何其他模型中都找不到的特征。最后，为了进一步提高准确性，引入了一种新的蒸馏技术。通过这项技术的增强，MNv4-Hybrid-Large模型提供了87%的ImageNet-1K精度，Pixel 8 EdgeTPU运行时间仅为3.8毫秒。
-
+MobileNet-V4（arXiv:2404.10518）旨在开发一套新的神经架构搜索（NAS）模型，这些模型在现代移动和边缘硬件上表现最佳，覆盖从小型DSP/CPU设备到中等规模的边缘加速器（如EdgeTPU）。当前推出的最新一代MobileNets称为MobileNetV4（MNv4），具有高效的通用架构设计。核心部分引入了通用倒瓶颈（UIB）搜索块，这是一种灵活统一的结构，融合了倒瓶颈（IB）、ConvNext、前馈网络（FFN）以及一种新型的Extra Depthwise（ExtraDW）变体。此外，还推出了移动MQA，这是专为移动加速器设计的注意力模块，提供了显著的39%速度提升。为了提升MNv4的搜索效果，引入了优化的NAS配方。结合UIB、移动MQA和改进的NAS配方，产生了一系列新的MNv4模型，这些模型在移动CPU、DSP、GPU，以及专用加速器（如苹果神经引擎和谷歌Pixel EdgeTPU）中表现出色，成为帕累托最优解，这是其他测试模型所无法比拟的。最后，为了进一步提升准确性，引入了一种新型蒸馏技术。经过这项技术的优化，MNv4-Hybrid-Large模型在ImageNet-1K数据集上达到了87%的准确率，且在Pixel 8 EdgeTPU上的运行时间仅为3.8毫秒。
 <a name='1.2'></a>
 
 ### 1.2 模型指标
