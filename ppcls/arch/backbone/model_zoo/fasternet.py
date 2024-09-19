@@ -316,35 +316,22 @@ class FasterNet(nn.Layer):
                         dim=int(embed_dim * 2**i_stage),
                         norm_layer=norm_layer))
         self.stages = nn.Sequential(*stages_list)
-        self.fork_feat = fork_feat
-        if self.fork_feat:
-            self.forward = self.forward_det
-            self.out_indices = [0, 2, 4, 6]
-            for i_emb, i_layer in enumerate(self.out_indices):
-                if i_emb == 0 and os.environ.get('FORK_LAST3', None):
-                    raise NotImplementedError
-                else:
-                    layer = norm_layer(int(embed_dim * 2**i_emb))
-                layer_name = f'norm{i_layer}'
-                self.add_sublayer(name=layer_name, sublayer=layer)
-        else:
-            self.forward = self.forward_cls
-            self.avgpool_pre_head = nn.Sequential(
-                nn.AdaptiveAvgPool2D(output_size=1),
-                nn.Conv2D(
-                    in_channels=self.num_features,
-                    out_channels=feature_dim,
-                    kernel_size=1,
-                    bias_attr=False),
-                act_layer())
-            self.head = (nn.Linear(
-                in_features=feature_dim, out_features=class_num)
-                         if class_num > 0 else nn.Identity())
-        self.apply(self.cls_init_weights)
-        self.init_cfg = copy.deepcopy(init_cfg)
-        if self.fork_feat and (self.init_cfg is not None or
-                               pretrained is not None):
-            self.init_weights()
+        self.avgpool_pre_head = nn.Sequential(
+            nn.AdaptiveAvgPool2D(output_size=1),
+            nn.Conv2D(
+                in_channels=self.num_features,
+                out_channels=feature_dim,
+                kernel_size=1,
+                bias_attr=False),
+            act_layer())
+        self.head = (nn.Linear(
+            in_features=feature_dim, out_features=class_num)
+                        if class_num > 0 else nn.Identity())
+    self.apply(self.cls_init_weights)
+    self.init_cfg = copy.deepcopy(init_cfg)
+    if fork_feat and (self.init_cfg is not None or
+                            pretrained is not None):
+        self.init_weights()
 
     def cls_init_weights(self, m):
         if isinstance(m, nn.Linear):
@@ -359,24 +346,13 @@ class FasterNet(nn.Layer):
             zeros_(m.bias)
             ones_(m.weight)
 
-    def forward_cls(self, x):
+    def forward(self, x):
         x = self.patch_embed(x)
         x = self.stages(x)
         x = self.avgpool_pre_head(x)
         x = paddle.flatten(x=x, start_axis=1)
         x = self.head(x)
         return x
-
-    def forward_det(self, x):
-        x = self.patch_embed(x)
-        outs = []
-        for idx, stage in enumerate(self.stages):
-            x = stage(x)
-            if self.fork_feat and idx in self.out_indices:
-                norm_layer = getattr(self, f'norm{idx}')
-                x_out = norm_layer(x)
-                outs.append(x_out)
-        return outs
 
 
 def _load_pretrained(pretrained, model, model_url, use_ssld):
