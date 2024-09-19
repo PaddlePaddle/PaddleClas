@@ -558,6 +558,21 @@ class MobileAttention(nn.Layer):
 
 
 class MobileNetV4(TheseusLayer):
+    """
+    MobileNetV4
+    Args:
+        config: list. MobileNetV4 depthwise blocks config.
+        stages_pattern: list. The pattern of each stage blocks.
+        scale: float=1.0. The coefficient that controls the size of network parameters. 
+        class_num: int=1000. The number of classes.
+        inplanes: int=32. The output channel number of first convolution layer.
+        act: str="relu". The activation function.
+        class_expand: int=960. The output channel number of last convolution layer. 
+        drop_path_rate: float=0.0. Probability of dropping path.
+        drop_rate: float=0.0.  Probability of setting units to zero.
+    Returns:
+        model: nn.Layer. Specific MobileNetV4 model depends on args.
+    """
     def __init__(self,
                  config,
                  stages_pattern,

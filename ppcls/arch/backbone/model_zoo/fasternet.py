@@ -22,6 +22,7 @@ import warnings
 import paddle
 import paddle.nn as nn
 
+from .vision_transformer import trunc_normal_, zeros_, ones_
 from ....utils.save_load import load_dygraph_pretrain
 from ..model_zoo.vision_transformer import DropPath
 
@@ -66,43 +67,6 @@ NET_CONFIG = {
         'RELU'
     ],
 }
-
-
-def _load_pretrained(pretrained, model, model_url, use_ssld):
-    if pretrained is False:
-        pass
-    elif pretrained is True:
-        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
-    elif isinstance(pretrained, str):
-        load_dygraph_pretrain(model, pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type."
-        )
-
-
-def _no_grad_trunc_normal_(tensor, mean, std, a, b):
-    def norm_cdf(x):
-        return (1.0 + math.erf(x / math.sqrt(2.0))) / 2.0
-
-    if mean < a - 2 * std or mean > b + 2 * std:
-        warnings.warn(
-            'mean is more than 2 std from [a, b] in nn.init.trunc_normal_. '
-            'The distribution of values may be incorrect.',
-            stacklevel=2)
-    with paddle.no_grad():
-        lower_bound = norm_cdf((a - mean) / std)
-        upper_bound = norm_cdf((b - mean) / std)
-        tensor.uniform_(min=2 * lower_bound - 1, max=2 * upper_bound - 1)
-        tensor.erfinv_()
-        tensor.multiply_(y=paddle.to_tensor(std * math.sqrt(2.0)))
-        tensor.add_(y=paddle.to_tensor(mean))
-        tensor.clip_(min=a, max=b)
-        return tensor
-
-
-def trunc_normal_(tensor, mean=0.0, std=1.0, a=-2.0, b=2.0):
-    return _no_grad_trunc_normal_(tensor, mean, std, a, b)
 
 
 class PartialConv(nn.Layer):
@@ -251,6 +215,33 @@ class PatchMerging(nn.Layer):
 
 
 class FasterNet(nn.Layer):
+    """
+    FasterNet
+    Args:
+        in_chans: int=3. Number of input channels. Default value is 3.
+        embed_dim: int=96. The dimension of embedding. Default value is 96.
+        depths: tuple=(1, 2, 8, 2). The depth of each stage. Default value is (1, 2, 8, 2).
+        mlp_ratio: float=2.0. The ratio of hidden dimension to embedding dimension. Default value is 2.0.
+        n_div: int=4. The number of divisions in the spatial dimension. Default value is 4.
+        patch_size: int=4. The size of patch. Default value is 4.
+        patch_stride: int=4. The stride of patch. Default value is 4.
+        patch_size_t: int=2. The size of patch for merging. Default value is 2.
+        patch_stride_t: int=2. The stride of patch for merging. Default value is 2.
+        patch_norm: bool=True. Whether to use patch normalization. Default value is True.
+        feature_dim: int=1280. The dimension of feature. Default value is 1280.
+        drop_path_rate: float=0.1. The drop path rate. Default value is 0.1.
+        layer_scale_init_value: float=0.0. The initial value of layer scale. Default value is 0.0.
+        norm_layer: str='BN'. The type of normalization layer. Default value is 'BN'.
+        act_layer: str='RELU'. The type of activation layer. Default value is 'RELU'.
+        class_num: int=1000. The number of classes. Default value is 1000.
+        fork_feat: bool=False. Whether to return feature maps. Default value is False.
+        init_cfg: dict=None. The initialization config. Default value is None.
+        pretrained: str=None. The path of pretrained model. Default value is None.
+        pconv_fw_type: str='split_cat'. The type of partial convolution forward. Default value is 'split_cat'.
+        scale: float=1.0. The coefficient that controls the size of network parameters. 
+    Returns:
+        model: nn.Layer. Specific FasterNet model depends on args.
+    """
     def __init__(self,
                  in_chans=3,
                  embed_dim=96,
@@ -357,20 +348,16 @@ class FasterNet(nn.Layer):
 
     def cls_init_weights(self, m):
         if isinstance(m, nn.Linear):
-            trunc_normal_(m.weight, std=0.02)
+            trunc_normal_(m.weight)
             if isinstance(m, nn.Linear) and m.bias is not None:
-                init_Constant = nn.initializer.Constant(value=0)
-                init_Constant(m.bias)
+                zeros_(m.bias)
         elif isinstance(m, (nn.Conv1D, nn.Conv2D)):
-            trunc_normal_(m.weight, std=0.02)
+            trunc_normal_(m.weight)
             if m.bias is not None:
-                init_Constant = nn.initializer.Constant(value=0)
-                init_Constant(m.bias)
+                zeros_(m.bias)
         elif isinstance(m, (nn.LayerNorm, nn.GroupNorm)):
-            init_Constant = nn.initializer.Constant(value=0)
-            init_Constant(m.bias)
-            init_Constant = nn.initializer.Constant(value=1.0)
-            init_Constant(m.weight)
+            zeros_(m.bias)
+            ones_(m.weight)
 
     def forward_cls(self, x):
         x = self.patch_embed(x)
@@ -390,6 +377,19 @@ class FasterNet(nn.Layer):
                 x_out = norm_layer(x)
                 outs.append(x_out)
         return outs
+
+
+def _load_pretrained(pretrained, model, model_url, use_ssld):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
 
 
 def FasterNet_T0(pretrained=False, use_ssld=False, **kwargs):

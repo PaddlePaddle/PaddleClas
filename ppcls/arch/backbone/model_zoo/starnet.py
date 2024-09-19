@@ -41,17 +41,6 @@ NET_CONFIG = {
 }
 
 
-def _load_pretrained(pretrained, model, model_url, use_ssld):
-    if pretrained is False:
-        pass
-    elif pretrained is True:
-        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
-    elif isinstance(pretrained, str):
-        load_dygraph_pretrain(model, pretrained)
-    else:
-        raise RuntimeError("pretrained type is not available. ")
-
-
 class ConvBN(nn.Sequential):
     def __init__(self,
                  in_planes,
@@ -106,7 +95,27 @@ class Block(nn.Layer):
         return x
 
 
+def _load_pretrained(pretrained, model, model_url, use_ssld):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError("pretrained type is not available. ")
+
+
 class StarNet(nn.Layer):
+    """
+    StarNet: StarNet for Image Classification
+    Args:
+        base_dim: int, base dimension of the model, default 32.
+        depths: list, number of blocks in each stage, default [3, 3, 12, 5].
+        mlp_ratio: int, ratio of hidden dim to mlp_dim, default 4.
+        drop_path_rate: float, default 0.0, stochastic depth rate.
+        class_num: int, default 1000, number of classes.
+    """
     def __init__(self,
                  base_dim=32,
                  depths=[3, 3, 12, 5],
