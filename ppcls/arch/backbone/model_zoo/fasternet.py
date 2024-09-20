@@ -327,11 +327,8 @@ class FasterNet(nn.Layer):
         self.head = (nn.Linear(
             in_features=feature_dim, out_features=class_num)
                         if class_num > 0 else nn.Identity())
-    self.apply(self.cls_init_weights)
-    self.init_cfg = copy.deepcopy(init_cfg)
-    if fork_feat and (self.init_cfg is not None or
-                            pretrained is not None):
-        self.init_weights()
+        self.apply(self.cls_init_weights)
+        self.init_cfg = copy.deepcopy(init_cfg)
 
     def cls_init_weights(self, m):
         if isinstance(m, nn.Linear):
