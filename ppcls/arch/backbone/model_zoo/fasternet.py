@@ -235,7 +235,6 @@ class FasterNet(nn.Layer):
         act_layer: str='RELU'. The type of activation layer. Default value is 'RELU'.
         class_num: int=1000. The number of classes. Default value is 1000.
         fork_feat: bool=False. Whether to return feature maps. Default value is False.
-        init_cfg: dict=None. The initialization config. Default value is None.
         pretrained: str=None. The path of pretrained model. Default value is None.
         pconv_fw_type: str='split_cat'. The type of partial convolution forward. Default value is 'split_cat'.
         scale: float=1.0. The coefficient that controls the size of network parameters. 
@@ -260,7 +259,6 @@ class FasterNet(nn.Layer):
                  act_layer='RELU',
                  class_num=1000,
                  fork_feat=False,
-                 init_cfg=None,
                  pretrained=None,
                  pconv_fw_type='split_cat',
                  **kwargs):
@@ -328,7 +326,7 @@ class FasterNet(nn.Layer):
             in_features=feature_dim, out_features=class_num)
                         if class_num > 0 else nn.Identity())
         self.apply(self.cls_init_weights)
-        self.init_cfg = copy.deepcopy(init_cfg)
+        
 
     def cls_init_weights(self, m):
         if isinstance(m, nn.Linear):
