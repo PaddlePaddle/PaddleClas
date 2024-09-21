@@ -17,7 +17,7 @@ Global:
 
 # mixed precision
 AMP:
-  use_amp: False
+  use_amp: True
   use_fp16_test: False
   scale_loss: 128.0
   use_dynamic_loss_scaling: True
@@ -70,7 +70,6 @@ DataLoader:
       transform_ops:
         - DecodeImage:
             backend: pil
-            to_np: False
             channel_first: False
         - RandCropImage:
             size: 224
