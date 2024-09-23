@@ -557,10 +557,10 @@ class MobileAttention(nn.Layer):
         else:
             q = q.transpose([0, 2, 1, 3]) * self.scale
             v = v.transpose([0, 2, 1, 3])
-            attn = paddle.mm(q, k.transpose([0, 2, 3, 1]))
+            attn = q @ k.transpose([0, 2, 3, 1])
             attn = self.softmax(attn)
             attn = self.attn_drop(attn)
-            attn = paddle.mm(attn, v)
+            attn = attn @ v
             attn = attn.transpose([0, 2, 1, 3])
 
         attn = attn.reshape([B, H, W, self.query_dim])
