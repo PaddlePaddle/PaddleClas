@@ -30,6 +30,7 @@ Arch:
   name: MobileNetV4_hybrid_medium
   drop_rate: 0.2
   drop_path_rate: 0.1
+  use_fused_attn: False
   class_num: 1000
  
  
@@ -108,7 +109,7 @@ DataLoader:
               prob: 0.5
     sampler:
       name: DistributedBatchSampler
-      batch_size: 512
+      batch_size: 64
       drop_last: False
       shuffle: True
     loader:
@@ -154,7 +155,7 @@ Infer:
     - ResizeImage:
         resize_short: 256
     - CropImage:
-        size: 224
+        size: 256
     - NormalizeImage:
         scale: 1.0/255.0
         mean: [0.485, 0.456, 0.406]
