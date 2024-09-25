@@ -63,8 +63,11 @@ def update_train_results(config,
         train_results = {}
         train_results["model_name"] = config["Global"].get("pdx_model_name",
                                                            None)
-        train_results["label_dict"] = config["Infer"]["PostProcess"][
-            "class_id_map_file"]
+        if config.get("infer", None):
+            train_results["label_dict"] = config["Infer"]["PostProcess"].get(
+                "class_id_map_file", "")
+        else:
+            train_results["label_dict"] = ""
         train_results["train_log"] = "train.log"
         train_results["visualdl_log"] = ""
         train_results["config"] = "config.yaml"

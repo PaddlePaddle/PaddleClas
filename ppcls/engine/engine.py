@@ -548,7 +548,7 @@ class Engine(object):
             "use_multilabel",
             False) or "ATTRMetric" in self.config["Metric"]["Eval"][0]
         model = self.model_ema.module if self.ema else self.model
-        if isinstance(self.model, paddle.DataParallel):
+        if hasattr(model, '_layers'):
             model = copy.deepcopy(model._layers)
         else:
             model = copy.deepcopy(model)
