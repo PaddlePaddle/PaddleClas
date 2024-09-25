@@ -215,6 +215,8 @@ def save_model_info(model_info, save_path, prefix):
     """
     save model info to the target path
     """
+    if paddle.distributed.get_rank() != 0:
+        return
     save_path = os.path.join(save_path, prefix)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
