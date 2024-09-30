@@ -41,7 +41,7 @@ PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级�
 
 ## ⚡ 快速开始
 
-- [一键调用92个PaddleClas核心模型](docs/zh_CN/paddlex/quick_start.md)
+- [🔥 一键调用98个PaddleClas核心模型](docs/zh_CN/paddlex/quick_start.md)
 - PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/quick_start/PULC.md)
 - PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 - PP-ShiTuV2 Android Demo APP，可扫描如下二维码，下载体验
