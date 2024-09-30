@@ -1,9 +1,9 @@
 
 ## 目录
 - [一站式全流程开发简介](#1)
-- [图像分类和检索相关模型产线列表和教程](#2)
-- [图像分类和检索相关单功能模块列表和教程](#3)
-- [图像分类和检索相关能力支持](#4)
+- [图像分类和检索相关能力支持](#2)
+- [图像分类和检索相关模型产线列表和教程](#3)
+- [图像分类和检索相关单功能模块列表和教程](#4)
 
 <a name="1"></a>
 
@@ -19,32 +19,7 @@
 
 <a name="2"></a>
 
-## 2. 图像分类和检索相关模型产线列表和教程
-
-- **通用图像分类产线**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/pipeline_usage/tutorials/cv_pipelines/image_classification.md)
-- **图像多标签分类产线**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/pipeline_usage/tutorials/cv_pipelines/image_multi_label_classification.md)
-- **通用图像识别产线** (coming soon)
-- **人脸识别产线** (coming soon)
-- **行人属性识别产线** (coming soon)
-- **车辆属性识别产线** (coming soon)
-
-<a name="3"></a>
-
-## 3. 图像分类和检索相关单功能模块列表和教程
-
-- **图像分类模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/image_classification.md)
-- **图像多标签分类模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/ml_classification.md)
-- **图像特征模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/image_feature.md)
-- **主体检测模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/mainbody_detection.md)
-- **人脸检测模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/face_detection.md)
-- **行人检测模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/human_detection.md)
-- **行人属性识别模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/pedestrian_attribute_recognition.md)
-- **车辆检测模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/vehicle_detection.md)
-- **车辆属性识别模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/vehicle_attribute_recognition.md)
-
-<a name="4"></a>
-
-## 4. 图像分类和检索相关能力支持
+## 2. 图像分类和检索相关能力支持
 
 PaddleX中图像分类和图像检索的6条产线均支持本地**快速推理**，部分产线支持**在线体验**，您可以快速体验各个产线的预训练模型效果，如果您对产线的预训练模型效果满意，可以直接对产线进行[高性能部署](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/pipeline_deploy/high_performance_deploy.md)/[服务化部署](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/pipeline_deploy/service_deploy.md)/[端侧部署](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/pipeline_deploy/lite_deploy.md)，如果不满意，您也可以使用产线的**二次开发**能力，提升效果。完整的产线开发流程请参考[PaddleX产线使用概览](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/pipeline_usage/pipeline_develop_guide.md)或各产线使用教程。
 
@@ -147,3 +122,28 @@ PaddleX中图像分类和图像检索的6条产线均支持本地**快速推理*
     <td>✅</td>
   </tr>
 </table>
+
+<a name="3"></a>
+
+## 3. 图像分类和检索相关模型产线列表和教程
+
+- **通用图像分类产线**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/pipeline_usage/tutorials/cv_pipelines/image_classification.md)
+- **图像多标签分类产线**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/pipeline_usage/tutorials/cv_pipelines/image_multi_label_classification.md)
+- **通用图像识别产线** (coming soon)
+- **人脸识别产线** (coming soon)
+- **行人属性识别产线** (coming soon)
+- **车辆属性识别产线** (coming soon)
+
+<a name="4"></a>
+
+## 4. 图像分类和检索相关单功能模块列表和教程
+
+- **图像分类模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/image_classification.md)
+- **图像多标签分类模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/ml_classification.md)
+- **图像特征模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/image_feature.md)
+- **主体检测模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/mainbody_detection.md)
+- **人脸检测模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/face_detection.md)
+- **行人检测模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/human_detection.md)
+- **行人属性识别模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/pedestrian_attribute_recognition.md)
+- **车辆检测模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/vehicle_detection.md)
+- **车辆属性识别模块**: [使用教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/module_usage/tutorials/cv_modules/vehicle_attribute_recognition.md)
