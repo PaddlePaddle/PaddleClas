@@ -113,8 +113,8 @@ Loss 部分选用 [Cross entropy loss](../../../../ppcls/loss/celoss.py) 和 [Tr
 
 同时，我们也提供了服务端侧精度更高的识别模型，详细指标如下，使用方法可以参考 [PaddleX](https://github.com/PaddlePaddle/PaddleX)。
 
-| 模型                             | recall@1 (%) | 模型存储大小 (M) |训练config|模型|
-|---------------------------------|--------------|------------------|------------------｜------------------|| 
+| 模型                             | recall@1 (%) | 模型存储大小 (M) |训练config|模型权重|
+|---------------------------------|--------------|------------------|------------------|------------------|
 | PP-ShiTuV2_rec_CLIP_vit_base    | 88.69        | 306.6 M          |[config](../../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_CLIP_vit_base.yaml)|[动态图](https://paddleclas.bj.bcebos.com/models/PP-ShiTu/PP-ShiTuV2_rec_CLIP_vit_base_pretrained.pdparams)/[静态图](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0b1_v2/PP-ShiTuV2_rec_CLIP_vit_base_infer.tar)|
 | PP-ShiTuV2_rec_CLIP_vit_large   | 91.03        | 1.05 G           |[config](../../../../ppcls/configs/GeneralRecognitionV2/GeneralRecognitionV2_CLIP_vit_large.yaml)|[静态图](https://paddleclas.bj.bcebos.com/models/PP-ShiTu/PP-ShiTuV2_rec_CLIP_vit_large_pretrained.pdparams)/[静态图](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0b1_v2/PP-ShiTuV2_rec_CLIP_vit_large_infer.tar)|
 
