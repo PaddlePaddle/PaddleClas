@@ -452,7 +452,8 @@ class MobileAttention(nn.Layer):
                  dropout_prob=0.0,
                  layer_scale_init_value=0.0,
                  if_act=True,
-                 act=None):
+                 act=None,
+                 use_fused_attn=False):
         super(MobileAttention, self).__init__()
 
         self.if_shortcut = stride == 1 and in_c == out_c
@@ -461,6 +462,7 @@ class MobileAttention(nn.Layer):
         self.num_head = num_head
         self.query_dim = query_dim
         self.attn_drop_rate = attn_drop_rate
+        self.use_fused_attn = use_fused_attn
         self.norm = BatchNorm(
             num_channels=in_c,
             act=None,
@@ -515,6 +517,10 @@ class MobileAttention(nn.Layer):
             padding=0,
             groups=1,
             bias_attr=False)
+        if not self.use_fused_attn:
+            self.scale = query_dim**-0.5
+            self.softmax = nn.Softmax(-1)
+            self.attn_drop = Dropout(self.attn_drop_rate)
         self.drop = Dropout(dropout_prob)
         self.layer_scale_init_value = layer_scale_init_value
         if layer_scale_init_value > 0.0:
@@ -541,12 +547,22 @@ class MobileAttention(nn.Layer):
         v = v.reshape(
             [B, self.kv_dim, 1, H // self.kv_stride * W // self.kv_stride])
         v = v.transpose([0, 3, 2, 1])
-        attn = F.scaled_dot_product_attention(
-            query=q,
-            key=k,
-            value=v,
-            attn_mask=attn_mask,
-            dropout_p=self.attn_drop_rate if self.training else 0.0)
+        if self.use_fused_attn:
+            attn = F.scaled_dot_product_attention(
+                query=q,
+                key=k,
+                value=v,
+                attn_mask=attn_mask,
+                dropout_p=self.attn_drop_rate if self.training else 0.0)
+        else:
+            q = q.transpose([0, 2, 1, 3]) * self.scale
+            v = v.transpose([0, 2, 1, 3])
+            attn = q @ k.transpose([0, 2, 3, 1])
+            attn = self.softmax(attn)
+            attn = self.attn_drop(attn)
+            attn = attn @ v
+            attn = attn.transpose([0, 2, 1, 3])
+
         attn = attn.reshape([B, H, W, self.query_dim])
         x = self.proj(attn.transpose([0, 3, 1, 2]))
         x = self.drop(x)
@@ -586,6 +602,7 @@ class MobileNetV4(TheseusLayer):
                  layer_scale_init_value=0.0,
                  return_patterns=None,
                  return_stages=None,
+                 use_fused_attn=False,
                  **kwargs):
         super(MobileNetV4, self).__init__()
         self.cfg = config
@@ -662,7 +679,8 @@ class MobileNetV4(TheseusLayer):
                     drop_path_rate=self.drop_path_rate * i / block_count,
                     layer_scale_init_value=layer_scale_init_value,
                     if_act=True,
-                    act=act)
+                    act=act,
+                    use_fused_attn=use_fused_attn)
             blocks.append(block)
         self.blocks = nn.Sequential(*blocks)
         self.global_pool = AdaptiveAvgPool2D(1)

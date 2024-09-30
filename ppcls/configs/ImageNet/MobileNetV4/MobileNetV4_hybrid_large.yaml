@@ -31,6 +31,7 @@ Arch:
   name: MobileNetV4_hybrid_large
   drop_rate: 0.2
   drop_path_rate: 0.1
+  use_fused_attn: False
   class_num: 1000
  
 
@@ -57,7 +58,7 @@ Optimizer:
   lr:
     # for 8 cards
     name: Cosine
-    learning_rate: 0.002
+    learning_rate: 0.001
     eta_min: 1.0e-06
     warmup_epoch: 20
     warmup_start_lr: 0
@@ -111,7 +112,7 @@ DataLoader:
               prob: 0.5
     sampler:
       name: DistributedBatchSampler
-      batch_size: 192
+      batch_size: 64
       drop_last: False
       shuffle: True
     loader:
@@ -157,9 +158,9 @@ Infer:
         to_rgb: True
         channel_first: False
     - ResizeImage:
-        resize_short: 256
+        resize_short: 448
     - CropImage:
-        size: 224
+        size: 448
     - NormalizeImage:
         scale: 1.0/255.0
         mean: [0.485, 0.456, 0.406]
