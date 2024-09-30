@@ -24,7 +24,7 @@ python -m pip install paddlepaddle-gpu==3.0.0b1 -i https://www.paddlepaddle.org.
 * **安装PaddleX**
 
 ```bash
-pip install https://paddle-model-ecology.bj.bcebos.com/paddlex/whl/paddlex-3.0.0.beta1-py3-none-any.whl
+pip install https://paddle-model-ecology.bj.bcebos.com/paddlex/whl/paddlex-3.0.0b1-py3-none-any.whl
 ```
 
 > ❗ 更多安装方式参考[PaddleX安装教程](https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/installation/installation.md)
@@ -69,11 +69,11 @@ paddlex --pipeline image_classification --input https://paddle-model-ecology.bj.
 
 ### 📝 Python脚本使用
 
-几行代码即可完成产线的快速推理，以图像多标签分类产线为例：
+几行代码即可完成产线的快速推理，以通用图像分类产线为例：
 ```python
 from paddlex import create_pipeline
 
-pipeline = create_pipeline(pipeline="multi_label_image_classification")
+pipeline = create_pipeline(pipeline="image_classification")
 
 output = pipeline.predict("general_image_classification_001.jpg")
 for res in output:
@@ -87,11 +87,8 @@ for res in output:
 * 传入图片并调用产线对象的`predict` 方法进行推理预测
 * 对预测结果进行处理
 
-运行后，得到的结果为：
+得到的结果与命令行方式相同。
 
-```bash
-{'img_path': '/root/.paddlex/predict_input/general_image_classification_001.jpg', 'class_ids': [21, 0, 30, 24], 'scores': [0.99257, 0.70596, 0.63001, 0.57852], 'label_names': ['bear', 'person', 'skis', 'backpack']}
-```
 
 下面列出了其他产线对应的参数名称及详细的使用解释：
 
