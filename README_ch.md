@@ -13,17 +13,13 @@
 
 ## 📣 近期更新
 
-- 2024.6.27 **💥 飞桨低代码开发工具 [PaddleX 3.0](https://github.com/paddlepaddle/paddlex) 重磅更新！**
-  - 低代码开发范式：支持图像分类模型全流程低代码开发，提供 Python API，支持用户自定义串联模型；
-  - 多硬件训推支持：支持英伟达 GPU、昆仑芯、昇腾和寒武纪等多种硬件进行模型训练与推理。PaddleClas支持的模型见 [模型列表](docs/zh_CN/hardware/supported_models.md)
-
-- 2023.11.1-11.3日每晚8点半，PaddleClas研发团队详解PP-ShituV2优化策略与真实产业应用。微信扫描下方二维码，关注公众号并填写问卷后进入官方交流群，获取直播链接与20G重磅图像分类学习大礼包（内含20+数据集、4个垂类模型、70+前沿论文集合）
-
-<div align="center">
-    <img src="https://github.com/PaddlePaddle/PaddleClas/assets/12560511/eed2d9e0-28d8-4037-9777-a2d4cf3aabbc" width = "150" height = "150"/>
-</div>
-
-- 2022.9.14 发布**商超零售新革命-生鲜智能结算产业应用**范例
+- **🔥2024.9.30 发布PaddleCls release/2.6**:
+  
+  
+  *  增加图像分类算法MobileNetV4、StarNet、FasterNet（链接到图像分类模块）
+  *  发布PaddleOCR[低代码全流程开发范式](/docs/paddlex/quick_start.md)：
+     * 🎨 模型丰富一键调用：将通用图像分类、图像多标签分类、通用图像识别、人脸识别涉及的**98个模型**整合为4条模型产线，通过极简的**Python API一键调用**，快速体验模型效果。此外，同一套API，也支持目标检测、图像分割、文本图像智能分析、通用OCR、时序预测等共计**200+模型**，形成20+单功能模块，方便开发者进行**模型组合使用**。
+     * 🚀提高效率降低门槛：提供基于**统一命令**和**图形界面**两种方式，实现模型简洁高效的使用、组合与定制。支持**高性能部署、服务化部署和端侧部署**等多种部署方式。此外，对于各种主流硬件如**英伟达GPU、昆仑芯、昇腾、寒武纪和海光**等，进行模型开发时，都可以**无缝切换**。
 
 - 2022.9.13 发布超轻量图像识别系统[PP-ShiTuV2](docs/zh_CN/models/PP-ShiTu/README.md)：
   - recall1精度提升8个点，覆盖商品识别、垃圾分类、航拍场景等[20+识别场景](docs/zh_CN/deployment/PP-ShiTu/application_scenarios.md)，
@@ -49,6 +45,7 @@ PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级�
 
 ## ⚡ 快速开始
 
+- [一键调用92个PaddleClas核心模型](./docs/paddlex/quick_start.md)
 - PULC超轻量图像分类方案快速体验：[点击这里](docs/zh_CN/quick_start/PULC.md)
 - PP-ShiTu图像识别快速体验：[点击这里](./docs/zh_CN/quick_start/quick_start_recognition.md)
 - PP-ShiTuV2 Android Demo APP，可扫描如下二维码，下载体验
@@ -57,17 +54,7 @@ PaddleClas支持多种前沿图像分类、识别相关算法，发布产业级�
 <img src="./docs/images/quick_start/android_demo/PPShiTu_qrcode.png"  width = "170" height = "170" />
 </div>
 
-## 👫 开源社区
-
-* **📑项目合作：** 如果您是企业开发者且有明确的图像分类应用需求，填写[问卷](https://paddle.wjx.cn/vm/hnGOjfn.aspx# )后可免费与官方团队展开不同层次的合作。
-* **👫加入社区：** 微信扫描二维码并填写问卷之后，加入交流群领取**20G重磅图像分类学习大礼包**，内含
-  * **20+场景数据库**，包括各类商品、动植物、航拍图像等数据集
-  * 场景应用**模型集合**：包括人员出入管理、生鲜品识别、商品识别等
-  * **70+前沿图像分类与识别论文**、历次发版课程视频、PPT与优质社区项目等
-
-<div align="center">
-  <img src="https://user-images.githubusercontent.com/50011306/215993395-b2601ca3-5b6e-42f6-9e3e-b2149c4a791e.png" width = "150" height = "150"/>
-</div>
+## 🔥 [低代码全流程开发]()
 
 
 ## 🛠️ PP系列模型列表
