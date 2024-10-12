@@ -58,9 +58,8 @@ __all__ = list(MODEL_URLS.keys())
 # use_se: whether to use SE block
 
 NET_CONFIG = {
-    "blocks2":
-    #k, in_c, out_c, s, use_se
-    [[3, 16, 32, 1, False]],
+    # [k, in_c, out_c, s, use_se]
+    "blocks2": [[3, 16, 32, 1, False]],
     "blocks3": [[3, 32, 64, 2, False], [3, 64, 64, 1, False]],
     "blocks4": [[3, 64, 128, 2, False], [3, 128, 128, 1, False]],
     "blocks5": [[3, 128, 256, 2, False], [5, 256, 256, 1, False],
@@ -79,6 +78,26 @@ def make_divisible(v, divisor=8, min_value=None):
     return new_v
 
 
+def _create_act(act):
+    if act == "hardswish":
+        return nn.Hardswish()
+    elif act == "relu":
+        return nn.ReLU()
+    elif act == "relu6":
+        return nn.ReLU6()
+    else:
+        raise RuntimeError(
+            "The activation function is not supported: {}".format(act))
+
+
+def _create_model_urls(model_scale):
+    model_scale_str = "PPLCNet_x" + str(model_scale).replace('.', '_')
+    if model_scale_str in MODEL_URLS:
+        return MODEL_URLS[model_scale_str]
+    else:
+        return None
+
+
 class ConvBNLayer(TheseusLayer):
     def __init__(self,
                  num_channels,
@@ -86,7 +105,8 @@ class ConvBNLayer(TheseusLayer):
                  num_filters,
                  stride,
                  num_groups=1,
-                 lr_mult=1.0):
+                 lr_mult=1.0,
+                 act="hardswish"):
         super().__init__()
 
         self.conv = Conv2D(
@@ -106,12 +126,12 @@ class ConvBNLayer(TheseusLayer):
                 regularizer=L2Decay(0.0), learning_rate=lr_mult),
             bias_attr=ParamAttr(
                 regularizer=L2Decay(0.0), learning_rate=lr_mult))
-        self.hardswish = nn.Hardswish()
+        self.act = _create_act(act)
 
     def forward(self, x):
         x = self.conv(x)
         x = self.bn(x)
-        x = self.hardswish(x)
+        x = self.act(x)
         return x
 
 
@@ -122,7 +142,8 @@ class DepthwiseSeparable(TheseusLayer):
                  stride,
                  dw_size=3,
                  use_se=False,
-                 lr_mult=1.0):
+                 lr_mult=1.0,
+                 act="hardswish"):
         super().__init__()
         self.use_se = use_se
         self.dw_conv = ConvBNLayer(
@@ -131,7 +152,8 @@ class DepthwiseSeparable(TheseusLayer):
             filter_size=dw_size,
             stride=stride,
             num_groups=num_channels,
-            lr_mult=lr_mult)
+            lr_mult=lr_mult,
+            act=act)
         if use_se:
             self.se = SEModule(num_channels, lr_mult=lr_mult)
         self.pw_conv = ConvBNLayer(
@@ -139,7 +161,8 @@ class DepthwiseSeparable(TheseusLayer):
             filter_size=1,
             num_filters=num_filters,
             stride=1,
-            lr_mult=lr_mult)
+            lr_mult=lr_mult,
+            act=act)
 
     def forward(self, x):
         x = self.dw_conv(x)
@@ -192,6 +215,7 @@ class PPLCNet(TheseusLayer):
                  lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                  stride_list=[2, 2, 2, 2, 2],
                  use_last_conv=True,
+                 act="hardswish",
                  **kwargs):
         super().__init__(**kwargs)
         self.scale = scale
@@ -226,7 +250,8 @@ class PPLCNet(TheseusLayer):
             filter_size=3,
             num_filters=make_divisible(16 * scale),
             stride=stride_list[0],
-            lr_mult=self.lr_mult_list[0])
+            lr_mult=self.lr_mult_list[0],
+            act=act)
 
         self.blocks2 = nn.Sequential(*[
             DepthwiseSeparable(
@@ -235,7 +260,8 @@ class PPLCNet(TheseusLayer):
                 dw_size=k,
                 stride=s,
                 use_se=se,
-                lr_mult=self.lr_mult_list[1])
+                lr_mult=self.lr_mult_list[1],
+                act=act)
             for i, (k, in_c, out_c, s, se
                     ) in enumerate(self.net_config["blocks2"])
         ])
@@ -247,7 +273,8 @@ class PPLCNet(TheseusLayer):
                 dw_size=k,
                 stride=s,
                 use_se=se,
-                lr_mult=self.lr_mult_list[2])
+                lr_mult=self.lr_mult_list[2],
+                act=act)
             for i, (k, in_c, out_c, s, se
                     ) in enumerate(self.net_config["blocks3"])
         ])
@@ -259,7 +286,8 @@ class PPLCNet(TheseusLayer):
                 dw_size=k,
                 stride=s,
                 use_se=se,
-                lr_mult=self.lr_mult_list[3])
+                lr_mult=self.lr_mult_list[3],
+                act=act)
             for i, (k, in_c, out_c, s, se
                     ) in enumerate(self.net_config["blocks4"])
         ])
@@ -271,7 +299,8 @@ class PPLCNet(TheseusLayer):
                 dw_size=k,
                 stride=s,
                 use_se=se,
-                lr_mult=self.lr_mult_list[4])
+                lr_mult=self.lr_mult_list[4],
+                act=act)
             for i, (k, in_c, out_c, s, se
                     ) in enumerate(self.net_config["blocks5"])
         ])
@@ -283,7 +312,8 @@ class PPLCNet(TheseusLayer):
                 dw_size=k,
                 stride=s,
                 use_se=se,
-                lr_mult=self.lr_mult_list[5])
+                lr_mult=self.lr_mult_list[5],
+                act=act)
             for i, (k, in_c, out_c, s, se
                     ) in enumerate(self.net_config["blocks6"])
         ])
@@ -298,7 +328,7 @@ class PPLCNet(TheseusLayer):
                 stride=1,
                 padding=0,
                 bias_attr=False)
-            self.hardswish = nn.Hardswish()
+            self.act = _create_act(act)
             self.dropout = Dropout(p=dropout_prob, mode="downscale_in_infer")
         else:
             self.last_conv = None
@@ -320,7 +350,7 @@ class PPLCNet(TheseusLayer):
         x = self.avg_pool(x)
         if self.last_conv is not None:
             x = self.last_conv(x)
-            x = self.hardswish(x)
+            x = self.act(x)
             x = self.dropout(x)
         x = self.flatten(x)
         x = self.fc(x)
@@ -338,6 +368,28 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
         raise RuntimeError(
             "pretrained type is not available. Please use `string` or `boolean` type."
         )
+
+
+def PPLCNetBaseNet(pretrained=False, use_ssld=False, **kwargs):
+    """
+    PPLCNetBaseNet
+    Args:
+        pretrained: bool=False or str. If `True` load pretrained parameters, `False` otherwise.
+                    If str, means the path of the pretrained model.
+        use_ssld: bool=False. Whether using distillation pretrained model when pretrained=True.
+    Returns:
+        model: nn.Layer.
+    """
+    if "scale" in kwargs:
+        scale = kwargs["scale"]
+        kwargs.pop("scale")
+    else:
+        scale = 1.0
+
+    model = PPLCNet(scale=scale, stages_pattern=MODEL_STAGES_PATTERN["PPLCNet"], **kwargs)
+    model_url = _create_model_urls(scale)
+    _load_pretrained(pretrained, model, model_url, use_ssld)
+    return model
 
 
 def PPLCNet_x0_25(pretrained=False, use_ssld=False, **kwargs):

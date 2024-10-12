@@ -17,16 +17,37 @@ from __future__ import division
 from __future__ import print_function
 import os
 import sys
+import yaml
+
+# XXX: avoid triggering error on DCU machines
+import tarfile
+
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
-from ppcls.utils import config
+from ppcls.utils import config, convert_to_dict
 from ppcls.engine.engine import Engine
 
 if __name__ == "__main__":
     args = config.parse_args()
-    config = config.get_config(
-        args.config, overrides=args.override, show=False)
+    config = config.get_config(args.config, overrides=args.override, show=False)
     config.profiler_options = args.profiler_options
+    uniform_output_enabled = config["Global"].get("uniform_output_enabled",
+                                                  False)
+    if uniform_output_enabled:
+        if os.path.exists(
+                os.path.join(config["Global"]["output_dir"],
+                             "train_results.json")):
+            try:
+                os.remove(
+                    os.path.join(config["Global"]["output_dir"],
+                                 "train_results.json"))
+            except:
+                pass
+        config_dict = convert_to_dict(config)
+        with open(
+                os.path.join(config["Global"]["output_dir"], "config.yaml"),
+                "w") as f:
+            yaml.dump(config_dict, f)
     engine = Engine(config, mode="train")
     engine.train()

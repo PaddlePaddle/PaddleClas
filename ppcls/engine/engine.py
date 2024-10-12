@@ -16,6 +16,7 @@ from __future__ import print_function
 
 import os
 import shutil
+import copy
 import platform
 import paddle
 import paddle.distributed as dist
@@ -27,7 +28,7 @@ import random
 from ppcls.utils.misc import AverageMeter
 from ppcls.utils import logger
 from ppcls.utils.logger import init_logger
-from ppcls.utils.config import print_config
+from ppcls.utils.config import print_config, dump_infer_config
 from ppcls.data import build_dataloader
 from ppcls.arch import build_model, RecModel, DistillationModel, TheseusLayer
 from ppcls.arch import apply_to_static
@@ -38,6 +39,7 @@ from ppcls.utils.amp import AutoCast, build_scaler
 from ppcls.utils.ema import ExponentialMovingAverage
 from ppcls.utils.save_load import load_dygraph_pretrain
 from ppcls.utils.save_load import init_model
+from ppcls.utils.save_result import update_train_results
 from ppcls.utils import save_load, save_predict_result
 
 from ppcls.data.utils.get_image_list import get_image_list
@@ -169,8 +171,8 @@ class Engine(object):
                         self.config["DataLoader"]["Eval"], "Gallery",
                         self.device, self.use_dali)
                     self.query_dataloader = build_dataloader(
-                        self.config["DataLoader"]["Eval"], "Query",
-                        self.device, self.use_dali)
+                        self.config["DataLoader"]["Eval"], "Query", self.device,
+                        self.use_dali)
 
         # build loss
         if self.mode == "train":
@@ -210,8 +212,8 @@ class Engine(object):
                                    self.config["Global"]["eval_during_train"]):
             if self.eval_mode == "classification":
                 if "Metric" in self.config and "Eval" in self.config["Metric"]:
-                    self.eval_metric_func = build_metrics(self.config["Metric"]
-                                                          ["Eval"])
+                    self.eval_metric_func = build_metrics(self.config["Metric"][
+                        "Eval"])
                 else:
                     self.eval_metric_func = None
             elif self.eval_mode == "retrieval":
@@ -226,7 +228,7 @@ class Engine(object):
         # build model
         self.model = build_model(self.config, self.mode)
         # set @to_static for benchmark, skip this by default.
-        apply_to_static(self.config, self.model)
+        apply_to_static(self.config, self.model, is_rec=self.is_rec)
 
         # load_pretrain
         if self.config["Global"]["pretrained_model"] is not None:
@@ -266,8 +268,7 @@ class Engine(object):
             self.model = paddle.DataParallel(self.model)
             if self.mode == 'train' and len(self.train_loss_func.parameters(
             )) > 0:
-                self.train_loss_func = paddle.DataParallel(
-                    self.train_loss_func)
+                self.train_loss_func = paddle.DataParallel(self.train_loss_func)
 
             # set different seed in different GPU manually in distributed environment
             if seed is None:
@@ -297,9 +298,10 @@ class Engine(object):
             "metric": -1.0,
             "epoch": 0,
         }
+        acc_ema = -1.0
+        best_metric_ema = -1.0
         ema_module = None
         if self.ema:
-            best_metric_ema = 0.0
             ema_module = self.model_ema.module
         # key:
         # val: metrics list word
@@ -312,6 +314,8 @@ class Engine(object):
         }
         # global iter counter
         self.global_step = 0
+        uniform_output_enabled = self.config['Global'].get(
+            "uniform_output_enabled", False)
 
         if self.config.Global.checkpoints is not None:
             metric_info = init_model(self.config.Global, self.model,
@@ -351,19 +355,10 @@ class Engine(object):
                             type_name(self.lr_sch[i]) == "ReduceOnPlateau":
                         self.lr_sch[i].step(acc)
 
+                # update best_metric
                 if acc >= best_metric["metric"]:
                     best_metric["metric"] = acc
                     best_metric["epoch"] = epoch_id
-                    save_load.save_model(
-                        self.model,
-                        self.optimizer,
-                        best_metric,
-                        self.output_dir,
-                        ema=ema_module,
-                        model_name=self.config["Arch"]["name"],
-                        prefix="best_model",
-                        loss=self.train_loss_func,
-                        save_student_model=True)
                 logger.info("[Eval][Epoch {}][best metric: {}]".format(
                     epoch_id, best_metric["metric"]))
                 logger.scaler(
@@ -372,26 +367,15 @@ class Engine(object):
                     step=epoch_id,
                     writer=self.vdl_writer)
 
-                self.model.train()
-
                 if self.ema:
                     ori_model, self.model = self.model, ema_module
                     acc_ema = self.eval(epoch_id)
                     self.model = ori_model
                     ema_module.eval()
 
+                    # update best_ema
                     if acc_ema > best_metric_ema:
                         best_metric_ema = acc_ema
-                        save_load.save_model(
-                            self.model,
-                            self.optimizer,
-                            {"metric": acc_ema,
-                             "epoch": epoch_id},
-                            self.output_dir,
-                            ema=ema_module,
-                            model_name=self.config["Arch"]["name"],
-                            prefix="best_model_ema",
-                            loss=self.train_loss_func)
                     logger.info("[Eval][Epoch {}][best metric ema: {}]".format(
                         epoch_id, best_metric_ema))
                     logger.scaler(
@@ -400,27 +384,92 @@ class Engine(object):
                         step=epoch_id,
                         writer=self.vdl_writer)
 
+                # save best model from best_acc or best_ema_acc
+                if max(acc, acc_ema) >= max(best_metric["metric"],
+                                            best_metric_ema):
+                    metric_info = {
+                        "metric": max(acc, acc_ema),
+                        "epoch": epoch_id
+                    }
+                    prefix = "best_model"
+                    save_load.save_model(
+                        self.model,
+                        self.optimizer,
+                        metric_info,
+                        os.path.join(self.output_dir, prefix)
+                        if uniform_output_enabled else self.output_dir,
+                        ema=ema_module,
+                        model_name=self.config["Arch"]["name"],
+                        prefix=prefix,
+                        loss=self.train_loss_func,
+                        save_student_model=True)
+                    if uniform_output_enabled:
+                        save_path = os.path.join(self.output_dir, prefix,
+                                                 "inference")
+                        self.export(save_path, uniform_output_enabled)
+                        if self.ema:
+                            ema_save_path = os.path.join(
+                                self.output_dir, prefix, "inference_ema")
+                            self.export(ema_save_path, uniform_output_enabled)
+                        update_train_results(
+                            self.config, prefix, metric_info, ema=self.ema)
+                        save_load.save_model_info(metric_info, self.output_dir,
+                                                  prefix)
+
+                self.model.train()
+
             # save model
             if save_interval > 0 and epoch_id % save_interval == 0:
+                metric_info = {"metric": acc, "epoch": epoch_id}
+                prefix = "epoch_{}".format(epoch_id)
                 save_load.save_model(
                     self.model,
-                    self.optimizer, {"metric": acc,
-                                     "epoch": epoch_id},
-                    self.output_dir,
+                    self.optimizer,
+                    metric_info,
+                    os.path.join(self.output_dir, prefix)
+                    if uniform_output_enabled else self.output_dir,
                     ema=ema_module,
                     model_name=self.config["Arch"]["name"],
-                    prefix="epoch_{}".format(epoch_id),
+                    prefix=prefix,
                     loss=self.train_loss_func)
+                if uniform_output_enabled:
+                    save_path = os.path.join(self.output_dir, prefix,
+                                             "inference")
+                    self.export(save_path, uniform_output_enabled)
+                    if self.ema:
+                        ema_save_path = os.path.join(self.output_dir, prefix,
+                                                     "inference_ema")
+                        self.export(ema_save_path, uniform_output_enabled)
+                    update_train_results(
+                        self.config,
+                        prefix,
+                        metric_info,
+                        done_flag=epoch_id == self.config["Global"]["epochs"],
+                        ema=self.ema)
+                    save_load.save_model_info(metric_info, self.output_dir,
+                                              prefix)
             # save the latest model
+            metric_info = {"metric": acc, "epoch": epoch_id}
+            prefix = "latest"
             save_load.save_model(
                 self.model,
-                self.optimizer, {"metric": acc,
-                                 "epoch": epoch_id},
-                self.output_dir,
+                self.optimizer,
+                metric_info,
+                os.path.join(self.output_dir, prefix)
+                if uniform_output_enabled else self.output_dir,
                 ema=ema_module,
                 model_name=self.config["Arch"]["name"],
-                prefix="latest",
+                prefix=prefix,
                 loss=self.train_loss_func)
+            if uniform_output_enabled:
+                save_path = os.path.join(self.output_dir, prefix, "inference")
+                self.export(save_path, uniform_output_enabled)
+                if self.ema:
+                    ema_save_path = os.path.join(self.output_dir, prefix,
+                                                 "inference_ema")
+                    self.export(ema_save_path, uniform_output_enabled)
+                save_load.save_model_info(metric_info, self.output_dir, prefix)
+                self.model.train()
 
         if self.vdl_writer is not None:
             self.vdl_writer.close()
@@ -481,33 +530,45 @@ class Engine(object):
                     image_file_list.clear()
             except Exception as ex:
                 logger.error(
-                    "Exception occured when parse line: {} with msg: {}".
-                    format(image_file, ex))
+                    "Exception occured when parse line: {} with msg: {}".format(
+                        image_file, ex))
                 continue
         if save_path:
             save_predict_result(save_path, results)
         return results
 
-    def export(self):
-        assert self.mode == "export"
+    def export(self,
+               save_path=None,
+               uniform_output_enabled=False,
+               ema_module=None):
+        assert self.mode == "export" or uniform_output_enabled
+        if paddle.distributed.get_rank() != 0:
+            return
         use_multilabel = self.config["Global"].get(
             "use_multilabel",
             False) or "ATTRMetric" in self.config["Metric"]["Eval"][0]
-        model = ExportModel(self.config["Arch"], self.model, use_multilabel)
-        if self.config["Global"]["pretrained_model"] is not None:
+        model = self.model_ema.module if self.ema else self.model
+        if hasattr(model, '_layers'):
+            model = copy.deepcopy(model._layers)
+        else:
+            model = copy.deepcopy(model)
+        model = ExportModel(self.config["Arch"], model
+                            if not ema_module else ema_module, use_multilabel)
+        if self.config["Global"][
+                "pretrained_model"] is not None and not uniform_output_enabled:
             load_dygraph_pretrain(model.base_model,
                                   self.config["Global"]["pretrained_model"])
-
         model.eval()
-
         # for re-parameterization nets
-        for layer in self.model.sublayers():
+        for layer in model.sublayers():
             if hasattr(layer, "re_parameterize") and not getattr(layer,
                                                                  "is_repped"):
                 layer.re_parameterize()
-
-        save_path = os.path.join(self.config["Global"]["save_inference_dir"],
-                                 "inference")
+        if not save_path:
+            save_path = os.path.join(
+                self.config["Global"]["save_inference_dir"], "inference")
+        else:
+            save_path = os.path.join(save_path, "inference")
 
         model = paddle.jit.to_static(
             model,
@@ -522,13 +583,12 @@ class Engine(object):
                                                           save_path + "_int8")
         else:
             paddle.jit.save(model, save_path)
-        if self.config["Global"].get("export_for_fd", False):
-            src_path = self.config["Global"]["infer_config_path"]
-            dst_path = os.path.join(
-                self.config["Global"]["save_inference_dir"], 'inference.yml')
-            shutil.copy(src_path, dst_path)
+        if self.config["Global"].get("export_for_fd",
+                                     False) or uniform_output_enabled:
+            dst_path = os.path.join(os.path.dirname(save_path), 'inference.yml')
+            dump_infer_config(self.config, dst_path)
         logger.info(
-            f"Export succeeded! The inference model exported has been saved in \"{self.config['Global']['save_inference_dir']}\"."
+            f"Export succeeded! The inference model exported has been saved in \"{save_path}\"."
         )
 
     def _init_amp(self):

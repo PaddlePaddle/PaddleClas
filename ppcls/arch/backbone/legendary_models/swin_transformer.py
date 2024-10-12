@@ -24,6 +24,8 @@ from paddle.nn.initializer import TruncatedNormal, Constant
 from ..model_zoo.vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPath, Identity
 from ..base.theseus_layer import TheseusLayer
 from ....utils.save_load import load_dygraph_pretrain
+from ....utils import logger
+
 
 MODEL_URLS = {
     "SwinTransformer_tiny_patch4_window7_224":
@@ -42,9 +44,22 @@ MODEL_URLS = {
 
 __all__ = list(MODEL_URLS.keys())
 
+
+Linear = nn.Linear
+
+
 def masked_fill(x, mask, value):
     y = paddle.full(x.shape, value, x.dtype)
     return paddle.where(mask, y, x)
+
+
+def check_support_fused_op(use_fused_linear):
+    if use_fused_linear:
+        if paddle.device.cuda.get_device_capability()[0] >= 8:
+            return True
+        else:
+            logger.warning("The current device don't support Fused OP! Using the general Linear instead.")
+    return False
 
 
 class Mlp(nn.Layer):
@@ -57,9 +72,9 @@ class Mlp(nn.Layer):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
-        self.fc1 = nn.Linear(in_features, hidden_features)
+        self.fc1 = Linear(in_features, hidden_features)
         self.act = act_layer()
-        self.fc2 = nn.Linear(hidden_features, out_features)
+        self.fc2 = Linear(hidden_features, out_features)
         self.drop = nn.Dropout(drop)
 
     def forward(self, x):
@@ -192,9 +207,9 @@ class WindowAttention(nn.Layer):
         self.register_buffer("relative_position_index",
                              relative_position_index)
 
-        self.qkv = nn.Linear(dim, dim * 3, bias_attr=qkv_bias)
+        self.qkv = Linear(dim, dim * 3, bias_attr=qkv_bias)
         self.attn_drop = nn.Dropout(attn_drop)
-        self.proj = nn.Linear(dim, dim)
+        self.proj = Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
 
         trunc_normal_(self.relative_position_bias_table)
@@ -725,7 +740,10 @@ class SwinTransformer(TheseusLayer):
         self.patch_norm = patch_norm
         self.num_features = int(embed_dim * 2**(self.num_layers - 1))
         self.mlp_ratio = mlp_ratio
-        use_fused_attn = kwargs.get('use_fused_attn', False)
+        use_fused_attn = check_support_fused_op(kwargs.get('use_fused_attn', False))
+        use_fused_linear = kwargs.get('use_fused_linear', False)
+        global Linear
+        Linear = paddle.incubate.nn.FusedLinear if use_fused_linear else nn.Linear
 
         # split image into non-overlapping patches
         self.patch_embed = PatchEmbed(
@@ -776,16 +794,17 @@ class SwinTransformer(TheseusLayer):
 
         self.norm = norm_layer(self.num_features)
         self.avgpool = nn.AdaptiveAvgPool1D(1)
-        self.head = nn.Linear(
+
+        self.head = Linear(
             self.num_features,
             num_classes) if self.num_classes > 0 else nn.Identity()
 
         self.apply(self._init_weights)
 
     def _init_weights(self, m):
-        if isinstance(m, nn.Linear):
+        if isinstance(m, (nn.Linear, paddle.incubate.nn.FusedLinear)):
             trunc_normal_(m.weight)
-            if isinstance(m, nn.Linear) and m.bias is not None:
+            if m.bias is not None:
                 zeros_(m.bias)
         elif isinstance(m, nn.LayerNorm):
             zeros_(m.bias)

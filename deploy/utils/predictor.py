@@ -19,6 +19,7 @@ import shutil
 import cv2
 import numpy as np
 
+import paddle
 from paddle.inference import Config
 from paddle.inference import create_predictor
 
@@ -43,22 +44,27 @@ class Predictor(object):
         if inference_model_dir is None:
             inference_model_dir = args.inference_model_dir
         if "inference_int8.pdiparams" in os.listdir(inference_model_dir):
-            params_file = os.path.join(inference_model_dir,
-                                       "inference_int8.pdiparams")
-            model_file = os.path.join(inference_model_dir,
-                                      "inference_int8.pdmodel")
+            model_prefix = "inference_int8"
             assert args.get(
                 "use_fp16", False
             ) is False, "fp16 mode is not supported for int8 model inference, please set use_fp16 as False during inference."
         else:
-            params_file = os.path.join(inference_model_dir,
-                                       "inference.pdiparams")
-            model_file = os.path.join(inference_model_dir, "inference.pdmodel")
+            model_prefix = "inference"
             assert args.get(
                 "use_int8", False
             ) is False, "int8 mode is not supported for fp32 model inference, please set use_int8 as False during inference."
 
-        config = Config(model_file, params_file)
+        # NOTE: paddle support to PIR mode after v2.6.0
+        pd_version = 0
+        for v in paddle.__version__.split(".")[:3]:
+            pd_version = 10 * pd_version + eval(v)
+
+        if pd_version == 0 or pd_version >= 260:
+            config = Config(inference_model_dir, model_prefix)
+        else:
+            model_file = os.path.join(inference_model_dir, f"{model_prefix}.pdmodel")
+            params_file = os.path.join(inference_model_dir, f"{model_prefix}.pdiparams")
+            config = Config(model_file, params_file)
 
         if args.get("use_gpu", False):
             config.enable_use_gpu(args.gpu_mem, 0)
@@ -66,6 +72,8 @@ class Predictor(object):
             config.enable_custom_device('npu')
         elif args.get("use_xpu", False):
             config.enable_xpu()
+        elif args.get("use_mlu", False):
+            config.enable_custom_device('mlu')
         else:
             config.disable_gpu()
             if args.enable_mkldnn:

@@ -50,6 +50,6 @@ class Cutout(object):
                                   random.randint(0, 255),
                                   random.randint(0, 255)]
 
-                img = cv2.rectangle(img, (x1, y1), (x2, y2), fill_value, -1)
+                img = cv2.rectangle(np.array(img), (x1, y1), (x2, y2), fill_value, -1)
 
         return img

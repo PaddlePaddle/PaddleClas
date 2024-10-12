@@ -137,7 +137,10 @@ def compute_feature(engine, name="gallery"):
             has_camera = True
             batch[2] = batch[2].reshape([-1, 1]).astype("int64")
         with engine.auto_cast(is_eval=True):
-            out = engine.model(batch[0])
+            if engine.is_rec:
+                out = engine.model(batch[0], batch[1])
+            else:
+                out = engine.model(batch[0])
         if "Student" in out:
             out = out["Student"]
 

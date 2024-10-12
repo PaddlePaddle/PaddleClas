@@ -35,7 +35,8 @@ Arch:
   pretrained: True
   # fused op can be used in AMP O2 mode only
   use_fused_attn: False
-
+  use_fused_linear: False
+  
 # loss function config for traing/eval process
 Loss:
   Train:
