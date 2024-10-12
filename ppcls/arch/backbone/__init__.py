@@ -97,6 +97,7 @@ from .variant_models.efficientnet_variant import EfficientNetB3_watermark
 from .variant_models.foundation_vit_variant import CLIP_large_patch14_224_aesthetic
 from .variant_models.swin_transformer_variant import SwinTransformer_tiny_patch4_window7_224_SOLIDER, SwinTransformer_small_patch4_window7_224_SOLIDER, SwinTransformer_base_patch4_window7_224_SOLIDER
 from .model_zoo.adaface_ir_net import AdaFace_IR_18, AdaFace_IR_34, AdaFace_IR_50, AdaFace_IR_101, AdaFace_IR_152, AdaFace_IR_SE_50, AdaFace_IR_SE_101, AdaFace_IR_SE_152, AdaFace_IR_SE_200
+from .model_zoo.arcface_irresnet import FresResNet50, FresResNet100
 from .model_zoo.wideresnet import WideResNet
 from .model_zoo.uniformer import UniFormer_small, UniFormer_small_plus, UniFormer_small_plus_dim64, UniFormer_base, UniFormer_base_ls
 
