@@ -549,9 +549,7 @@ class Engine(object):
             False) or "ATTRMetric" in self.config["Metric"]["Eval"][0]
         model = self.model_ema.module if self.ema else self.model
         if hasattr(model, '_layers'):
-            model = copy.deepcopy(model._layers)
-        else:
-            model = copy.deepcopy(model)
+            model = model._layers
         model = ExportModel(self.config["Arch"], model
                             if not ema_module else ema_module, use_multilabel)
         if self.config["Global"][
@@ -583,6 +581,7 @@ class Engine(object):
                                                           save_path + "_int8")
         else:
             paddle.jit.save(model, save_path)
+        model.forward.rollback()
         if self.config["Global"].get("export_for_fd",
                                      False) or uniform_output_enabled:
             dst_path = os.path.join(os.path.dirname(save_path), 'inference.yml')
