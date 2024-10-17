@@ -15,6 +15,7 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+import gc
 import shutil
 import copy
 import platform
@@ -316,6 +317,8 @@ class Engine(object):
         self.global_step = 0
         uniform_output_enabled = self.config['Global'].get(
             "uniform_output_enabled", False)
+        export_during_train = self.config['Global'].get("export_during_train",
+                                                        False)
 
         if self.config.Global.checkpoints is not None:
             metric_info = init_model(self.config.Global, self.model,
@@ -403,14 +406,17 @@ class Engine(object):
                         prefix=prefix,
                         loss=self.train_loss_func,
                         save_student_model=True)
-                    if uniform_output_enabled:
+                    if export_during_train:
                         save_path = os.path.join(self.output_dir, prefix,
                                                  "inference")
-                        self.export(save_path, uniform_output_enabled)
+                        self.export(save_path, export_during_train)
+                        gc.collect()
                         if self.ema:
                             ema_save_path = os.path.join(
                                 self.output_dir, prefix, "inference_ema")
-                            self.export(ema_save_path, uniform_output_enabled)
+                            self.export(ema_save_path, export_during_train)
+                            gc.collect()
+                    if uniform_output_enabled:
                         update_train_results(
                             self.config, prefix, metric_info, ema=self.ema)
                         save_load.save_model_info(metric_info, self.output_dir,
@@ -432,14 +438,17 @@ class Engine(object):
                     model_name=self.config["Arch"]["name"],
                     prefix=prefix,
                     loss=self.train_loss_func)
-                if uniform_output_enabled:
+                if export_during_train:
                     save_path = os.path.join(self.output_dir, prefix,
                                              "inference")
-                    self.export(save_path, uniform_output_enabled)
+                    self.export(save_path, export_during_train)
+                    gc.collect()
                     if self.ema:
                         ema_save_path = os.path.join(self.output_dir, prefix,
                                                      "inference_ema")
-                        self.export(ema_save_path, uniform_output_enabled)
+                        self.export(ema_save_path, export_during_train)
+                        gc.collect()
+                if uniform_output_enabled:
                     update_train_results(
                         self.config,
                         prefix,
@@ -461,15 +470,18 @@ class Engine(object):
                 model_name=self.config["Arch"]["name"],
                 prefix=prefix,
                 loss=self.train_loss_func)
-            if uniform_output_enabled:
+            if export_during_train:
                 save_path = os.path.join(self.output_dir, prefix, "inference")
-                self.export(save_path, uniform_output_enabled)
+                self.export(save_path, export_during_train)
+                gc.collect()
                 if self.ema:
                     ema_save_path = os.path.join(self.output_dir, prefix,
                                                  "inference_ema")
-                    self.export(ema_save_path, uniform_output_enabled)
-                save_load.save_model_info(metric_info, self.output_dir, prefix)
+                    self.export(ema_save_path, export_during_train)
+                    gc.collect()
                 self.model.train()
+            if uniform_output_enabled:
+                save_load.save_model_info(metric_info, self.output_dir, prefix)
 
         if self.vdl_writer is not None:
             self.vdl_writer.close()
@@ -537,11 +549,9 @@ class Engine(object):
             save_predict_result(save_path, results)
         return results
 
-    def export(self,
-               save_path=None,
-               uniform_output_enabled=False,
+    def export(self, save_path=None, export_during_train=False,
                ema_module=None):
-        assert self.mode == "export" or uniform_output_enabled
+        assert self.mode == "export" or export_during_train
         if paddle.distributed.get_rank() != 0:
             return
         use_multilabel = self.config["Global"].get(
@@ -555,7 +565,7 @@ class Engine(object):
         model = ExportModel(self.config["Arch"], model
                             if not ema_module else ema_module, use_multilabel)
         if self.config["Global"][
-                "pretrained_model"] is not None and not uniform_output_enabled:
+                "pretrained_model"] is not None and not export_during_train:
             load_dygraph_pretrain(model.base_model,
                                   self.config["Global"]["pretrained_model"])
         model.eval()
@@ -584,7 +594,7 @@ class Engine(object):
         else:
             paddle.jit.save(model, save_path)
         if self.config["Global"].get("export_for_fd",
-                                     False) or uniform_output_enabled:
+                                     False) or export_during_train:
             dst_path = os.path.join(os.path.dirname(save_path), 'inference.yml')
             dump_infer_config(self.config, dst_path)
         logger.info(
