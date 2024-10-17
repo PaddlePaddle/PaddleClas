@@ -21,7 +21,6 @@ from .legendary_models.mobilenet_v4 import MobileNetV4_conv_small, MobileNetV4_c
 from .model_zoo.fasternet import FasterNet_T0, FasterNet_T1, FasterNet_T2, FasterNet_S, FasterNet_M, FasterNet_L
 from .model_zoo.starnet import StarNet_S1, StarNet_S2, StarNet_S3, StarNet_S4
 from .legendary_models.resnet import ResNet18, ResNet18_vd, ResNet34, ResNet34_vd, ResNet50, ResNet50_vd, ResNet101, ResNet101_vd, ResNet152, ResNet152_vd, ResNet200_vd
-from .legendary_models.my_resnet import my_ResNet50
 from .legendary_models.vgg import VGG11, VGG13, VGG16, VGG19
 from .legendary_models.inception_v3 import InceptionV3
 from .legendary_models.hrnet import HRNet_W18_C, HRNet_W30_C, HRNet_W32_C, HRNet_W40_C, HRNet_W44_C, HRNet_W48_C, HRNet_W60_C, HRNet_W64_C, SE_HRNet_W64_C
@@ -47,7 +46,7 @@ from .model_zoo.efficientnet_v2 import EfficientNetV2_S
 from .model_zoo.resnest import ResNeSt50_fast_1s1x64d, ResNeSt50, ResNeSt101, ResNeSt200, ResNeSt269
 from .model_zoo.googlenet import GoogLeNet
 from .model_zoo.mobilenet_v2 import MobileNetV2_x0_25, MobileNetV2_x0_5, MobileNetV2_x0_75, MobileNetV2, MobileNetV2_x1_5, MobileNetV2_x2_0
-from .model_zoo.mobilefacenet import MobileFaceNet_128
+from .model_zoo.mobilefacenet import MobileFaceNet
 from .model_zoo.shufflenet_v2 import ShuffleNetV2_x0_25, ShuffleNetV2_x0_33, ShuffleNetV2_x0_5, ShuffleNetV2_x1_0, ShuffleNetV2_x1_5, ShuffleNetV2_x2_0, ShuffleNetV2_swish
 from .model_zoo.ghostnet import GhostNet_x0_5, GhostNet_x1_0, GhostNet_x1_3
 from .model_zoo.alexnet import AlexNet
