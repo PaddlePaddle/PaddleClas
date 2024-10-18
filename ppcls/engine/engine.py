@@ -83,7 +83,7 @@ class Engine(object):
 
         # init train_func and eval_func
         assert self.eval_mode in [
-            "classification", "retrieval", "adaface"
+            "classification", "retrieval", "adaface", "face_recognition"
         ], logger.error("Invalid eval mode: {}".format(self.eval_mode))
         if self.train_mode is None:
             self.train_epoch_func = train_method.train_epoch
@@ -156,7 +156,7 @@ class Engine(object):
 
         if self.mode == "eval" or (self.mode == "train" and
                                    self.config["Global"]["eval_during_train"]):
-            if self.eval_mode in ["classification", "adaface"]:
+            if self.eval_mode in ["classification", "adaface", "face_recognition"]:
                 self.eval_dataloader = build_dataloader(
                     self.config["DataLoader"], "Eval", self.device,
                     self.use_dali)
@@ -223,6 +223,10 @@ class Engine(object):
                 else:
                     metric_config = [{"name": "Recallk", "topk": (1, 5)}]
                 self.eval_metric_func = build_metrics(metric_config)
+            elif self.eval_mode == "face_recognition":
+                if "Metric" in self.config and "Eval" in self.config["Metric"]:
+                    self.eval_metric_func = build_metrics(self.config["Metric"]
+                                                          ["Eval"])
         else:
             self.eval_metric_func = None
 

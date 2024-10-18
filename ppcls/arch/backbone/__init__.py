@@ -46,6 +46,7 @@ from .model_zoo.efficientnet_v2 import EfficientNetV2_S
 from .model_zoo.resnest import ResNeSt50_fast_1s1x64d, ResNeSt50, ResNeSt101, ResNeSt200, ResNeSt269
 from .model_zoo.googlenet import GoogLeNet
 from .model_zoo.mobilenet_v2 import MobileNetV2_x0_25, MobileNetV2_x0_5, MobileNetV2_x0_75, MobileNetV2, MobileNetV2_x1_5, MobileNetV2_x2_0
+from .model_zoo.mobilefacenet import MobileFaceNet
 from .model_zoo.shufflenet_v2 import ShuffleNetV2_x0_25, ShuffleNetV2_x0_33, ShuffleNetV2_x0_5, ShuffleNetV2_x1_0, ShuffleNetV2_x1_5, ShuffleNetV2_x2_0, ShuffleNetV2_swish
 from .model_zoo.ghostnet import GhostNet_x0_5, GhostNet_x1_0, GhostNet_x1_3
 from .model_zoo.alexnet import AlexNet
@@ -97,6 +98,7 @@ from .variant_models.efficientnet_variant import EfficientNetB3_watermark
 from .variant_models.foundation_vit_variant import CLIP_large_patch14_224_aesthetic
 from .variant_models.swin_transformer_variant import SwinTransformer_tiny_patch4_window7_224_SOLIDER, SwinTransformer_small_patch4_window7_224_SOLIDER, SwinTransformer_base_patch4_window7_224_SOLIDER
 from .model_zoo.adaface_ir_net import AdaFace_IR_18, AdaFace_IR_34, AdaFace_IR_50, AdaFace_IR_101, AdaFace_IR_152, AdaFace_IR_SE_50, AdaFace_IR_SE_101, AdaFace_IR_SE_152, AdaFace_IR_SE_200
+from .model_zoo.arcface_iresnet import FresResNet50, FresResNet100
 from .model_zoo.wideresnet import WideResNet
 from .model_zoo.uniformer import UniFormer_small, UniFormer_small_plus, UniFormer_small_plus_dim64, UniFormer_base, UniFormer_base_ls
 
