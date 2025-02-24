@@ -128,8 +128,9 @@ def classification_eval(engine, epoch_id=0):
                 for key in time_info
             ])
 
-            ips_msg = "ips: {:.5f} images/sec".format(
-                batch_size / time_info["batch_cost"].avg)
+            avg = time_info["batch_cost"].avg
+            ips = batch_size / avg if avg != 0 else float("inf")
+            ips_msg = "ips: {:.5f} images/sec".format(ips)
 
             if "ATTRMetric" in engine.config["Metric"]["Eval"][0]:
                 metric_msg = ""
