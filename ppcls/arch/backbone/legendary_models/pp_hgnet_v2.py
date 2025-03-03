@@ -237,8 +237,12 @@ class StemBlock(TheseusLayer):
             stride=1,
             use_lab=use_lab,
             lr_mult=lr_mult)
-        self.pool = nn.MaxPool2D(
-            kernel_size=2, stride=1, ceil_mode=True, padding="SAME")
+        if paddle.device.get_device().startswith("xpu"):
+            self.pool = nn.MaxPool2D(
+                kernel_size=2, stride=1, padding="SAME")
+        else:
+            self.pool = nn.MaxPool2D(
+                kernel_size=2, stride=1, ceil_mode=True, padding="SAME")
 
     def forward(self, x):
         x = self.stem1(x)
