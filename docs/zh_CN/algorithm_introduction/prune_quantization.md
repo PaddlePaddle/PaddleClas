@@ -5,7 +5,7 @@
 - 量化方法：PACT 量化
 - 裁剪：FPGM 裁剪
 
-其中具体算法参数请参考 [PaddeSlim](https://github.com/PaddlePaddle/PaddleSlim/)。
+其中具体算法参数请参考 [PaddleSlim](https://github.com/PaddlePaddle/PaddleSlim/)。
 
 ## 目录
 

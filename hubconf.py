@@ -21,7 +21,7 @@ import sys
 
 class _SysPathG(object):
     """
-    _SysPathG used to add/clean path for sys.path. Making sure minimal pkgs dependents by skiping parent dirs.
+    _SysPathG used to add/clean path for sys.path. Making sure minimal pkgs dependents by skipping parent dirs.
 
     __enter__
         add path into sys.path

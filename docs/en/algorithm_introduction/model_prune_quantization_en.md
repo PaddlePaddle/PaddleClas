@@ -5,7 +5,7 @@ Deep learning limits the deployment of corresponding models in some scenarios an
 - Quantization: PACT
 - Pruning: FPGM
 
-See [PaddeSlim](https://github.com/PaddlePaddle/PaddleSlim/) for detailed parameters.
+See [PaddleSlim](https://github.com/PaddlePaddle/PaddleSlim/) for detailed parameters.
 
 ## Catlogue
 

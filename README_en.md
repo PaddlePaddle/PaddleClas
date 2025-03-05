@@ -93,7 +93,7 @@ Quick experience of **P**ractical **U**ltra **L**ight-weight image **C**lassific
     - [Vector Search](./deploy/vector_search/README.md)
 - Inference Model Prediction
     - [Python Inference](./docs/en/inference_deployment/python_deploy_en.md)
-    - [C++ Classfication Inference](./deploy/cpp/readme_en.md)
+    - [C++ Classification Inference](./deploy/cpp/readme_en.md)
 - Model Deploy (only support classification for now, recognition coming soon)
     - [Hub Serving Deployment](./deploy/hubserving/readme_en.md)
     - [Mobile Deployment](./deploy/lite/readme_en.md)
