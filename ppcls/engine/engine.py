@@ -65,6 +65,10 @@ class Engine(object):
             self.is_rec = True
         else:
             self.is_rec = False
+        if self.config["Arch"].get("use_fused_attn", False):
+            if not self.config.get("AMP", {}).get("use_amp", False):
+                self.config["Arch"]["use_fused_attn"] = False
+                self.config["Arch"]["use_fused_linear"] = False
 
         # set seed
         seed = self.config["Global"].get("seed", False)
@@ -105,7 +109,8 @@ class Engine(object):
 
         # set device
         assert self.config["Global"]["device"] in [
-            "cpu", "gpu", "xpu", "npu", "mlu", "ascend", "intel_gpu", "mps", "gcu"
+            "cpu", "gpu", "xpu", "npu", "mlu", "dcu", "ascend", "intel_gpu",
+            "mps", "gcu"
         ]
         self.device = paddle.set_device(self.config["Global"]["device"])
         logger.info('train with paddle {} and device {}'.format(
