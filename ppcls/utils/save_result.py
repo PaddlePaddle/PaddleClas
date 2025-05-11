@@ -15,6 +15,7 @@ import os
 import json
 import yaml
 import paddle
+from packaging import version
 
 from . import logger
 
@@ -22,7 +23,9 @@ from . import logger
 # just to determine the inference model file format
 def get_FLAGS_json_format_model():
     # json format by default
-    return os.environ.get("FLAGS_json_format_model", "1").lower() in ("1", "true", "t")
+    return os.environ.get("FLAGS_json_format_model", "1").lower() in (
+        "1", "true", "t")
+
 
 FLAGS_json_format_model = get_FLAGS_json_format_model()
 
@@ -59,7 +62,8 @@ def update_train_results(config,
     train_results_path = os.path.join(config["Global"]["output_dir"],
                                       "train_result.json")
     save_model_tag = ["pdparams", "pdopt", "pdstates"]
-    if FLAGS_json_format_model:
+    paddle_version = version.parse(paddle.__version__)
+    if FLAGS_json_format_model or paddle_version >= version.parse("3.0.0"):
         save_inference_files = {
             "inference_config": "inference.yml",
             "pdmodel": "inference.json",
