@@ -57,6 +57,7 @@ class Predictor(object):
         # NOTE: paddle support to PIR mode after v2.6.0
         pd_version = 0
         for v in paddle.__version__.split(".")[:3]:
+            v = v.split('-')[0]
             pd_version = 10 * pd_version + eval(v)
 
         if pd_version == 0 or pd_version >= 260:
