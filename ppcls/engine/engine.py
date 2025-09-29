@@ -111,7 +111,7 @@ class Engine(object):
         # set device
         assert self.config["Global"]["device"] in [
             "cpu", "gpu", "xpu", "npu", "mlu", "dcu", "ascend", "intel_gpu",
-            "mps", "gcu"
+            "mps", "gcu", "iluvatar_gpu"
         ]
         self.device = paddle.set_device(self.config["Global"]["device"])
         logger.info('train with paddle {} and device {}'.format(
