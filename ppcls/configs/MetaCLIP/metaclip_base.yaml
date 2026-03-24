@@ -1,0 +1,10 @@
+Arch:
+  name: MetaCLIP
+  img_size: 224
+  patch_size: 16
+  embed_dim: 768
+  depth: 12
+  num_heads: 12
+  mlp_ratio: 4.0
+  qkv_bias: True
+  pre_norm: True
