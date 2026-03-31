@@ -18,6 +18,7 @@ import inspect
 from .legendary_models.mobilenet_v1 import MobileNetV1_x0_25, MobileNetV1_x0_5, MobileNetV1_x0_75, MobileNetV1
 from .legendary_models.mobilenet_v3 import MobileNetV3_small_x0_35, MobileNetV3_small_x0_5, MobileNetV3_small_x0_75, MobileNetV3_small_x1_0, MobileNetV3_small_x1_25, MobileNetV3_large_x0_35, MobileNetV3_large_x0_5, MobileNetV3_large_x0_75, MobileNetV3_large_x1_0, MobileNetV3_large_x1_25
 from .legendary_models.mobilenet_v4 import MobileNetV4_conv_small, MobileNetV4_conv_medium, MobileNetV4_conv_large, MobileNetV4_hybrid_medium, MobileNetV4_hybrid_large
+from .legendary_models.mobilenet_v5 import MobileNetV5_300M, MobileNetV5_300m, MobileNetV5_300M_enc, MobileNetV5_300M_enc_cls, MobileNetV5_base
 from .model_zoo.fasternet import FasterNet_T0, FasterNet_T1, FasterNet_T2, FasterNet_S, FasterNet_M, FasterNet_L
 from .model_zoo.starnet import StarNet_S1, StarNet_S2, StarNet_S3, StarNet_S4
 from .legendary_models.resnet import ResNet18, ResNet18_vd, ResNet34, ResNet34_vd, ResNet50, ResNet50_vd, ResNet101, ResNet101_vd, ResNet152, ResNet152_vd, ResNet200_vd
