@@ -52,6 +52,7 @@
     - [NextViT 系列](#NextViT)
     - [UniFormer 系列](#UniFormer)
     - [DSNet 系列](#DSNet)
+    - [FastViT 系列](#FastViT)
   - [4.2 轻量级模型](#Transformer_lite)
     - [MobileViT 系列](#MobileViT)
 - [五、参考文献](#reference)
