@@ -35,21 +35,20 @@ if __name__ == "__main__":
 
     # TIPC expects checkpoints and train.log under:
     #   ${Global.output_dir}/${Arch.name}/
-    cfg["Global"]["output_dir"] = os.path.join(cfg["Global"]["output_dir"],
-                                               cfg["Arch"]["name"])
+    cfg["Global"]["output_dir"] = os.path.join(
+        cfg["Global"]["output_dir"], cfg["Arch"]["name"]
+    )
 
     uniform_output_enabled = cfg["Global"].get("uniform_output_enabled", False)
     if uniform_output_enabled:
-        result_path = os.path.join(cfg["Global"]["output_dir"],
-                                   "train_result.json")
+        result_path = os.path.join(cfg["Global"]["output_dir"], "train_result.json")
         if os.path.exists(result_path):
             try:
                 os.remove(result_path)
             except OSError:
                 pass
         cfg_dict = convert_to_dict(cfg)
-        with open(os.path.join(cfg["Global"]["output_dir"], "config.yaml"),
-                  "w") as f:
+        with open(os.path.join(cfg["Global"]["output_dir"], "config.yaml"), "w") as f:
             yaml.dump(cfg_dict, f)
 
     engine = Engine(cfg, mode="train")
