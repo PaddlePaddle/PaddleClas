@@ -40,7 +40,6 @@ MODEL_URLS = {
 
 __all__ = list(MODEL_URLS.keys()) + ["MobileNetV5_300m"]
 
-
 _ARCH_DEFS = {
     "mobilenetv5_300m": [
         [
@@ -206,6 +205,7 @@ def _get_padding(kernel_size, pad_type):
 
 
 class RmsNorm2D(nn.Layer):
+
     def __init__(self, num_channels, eps=1e-6):
         super().__init__()
         self.eps = eps
@@ -221,6 +221,7 @@ class RmsNorm2D(nn.Layer):
 
 
 class ConvBnActV5(nn.Layer):
+
     def __init__(self,
                  in_c,
                  out_c,
@@ -232,14 +233,13 @@ class ConvBnActV5(nn.Layer):
                  if_act=True,
                  act="gelu"):
         super().__init__()
-        self.conv = Conv2D(
-            in_channels=in_c,
-            out_channels=out_c,
-            kernel_size=filter_size,
-            stride=stride,
-            padding=padding,
-            groups=groups,
-            bias_attr=conv_bias)
+        self.conv = Conv2D(in_channels=in_c,
+                           out_channels=out_c,
+                           kernel_size=filter_size,
+                           stride=stride,
+                           padding=padding,
+                           groups=groups,
+                           bias_attr=conv_bias)
         self.bn = RmsNorm2D(out_c)
         self.if_act = if_act
         if self.if_act:
@@ -259,6 +259,7 @@ class ConvBnActV5(nn.Layer):
 
 
 class UniversalInvertedResidualV5(nn.Layer):
+
     def __init__(self,
                  in_c,
                  mid_c,
@@ -272,49 +273,47 @@ class UniversalInvertedResidualV5(nn.Layer):
         super().__init__()
         self.if_shortcut = stride == 1 and in_c == out_c
         if stem_kernel_size and stem_kernel_size > 0:
-            self.dw_start = ConvBnActV5(
-                in_c=in_c,
-                out_c=in_c,
-                filter_size=stem_kernel_size,
-                stride=1,
-                padding=_get_padding(stem_kernel_size, pad_type),
-                groups=in_c,
-                conv_bias=False,
-                if_act=False,
-                act=act)
+            self.dw_start = ConvBnActV5(in_c=in_c,
+                                        out_c=in_c,
+                                        filter_size=stem_kernel_size,
+                                        stride=1,
+                                        padding=_get_padding(
+                                            stem_kernel_size, pad_type),
+                                        groups=in_c,
+                                        conv_bias=False,
+                                        if_act=False,
+                                        act=act)
         else:
             self.dw_start = Identity()
-        self.pw_exp = ConvBnActV5(
-            in_c=in_c,
-            out_c=mid_c,
-            filter_size=1,
-            stride=1,
-            padding=0,
-            conv_bias=False,
-            if_act=True,
-            act=act)
+        self.pw_exp = ConvBnActV5(in_c=in_c,
+                                  out_c=mid_c,
+                                  filter_size=1,
+                                  stride=1,
+                                  padding=0,
+                                  conv_bias=False,
+                                  if_act=True,
+                                  act=act)
         if filter_size and filter_size > 0:
-            self.dw_mid = ConvBnActV5(
-                in_c=mid_c,
-                out_c=mid_c,
-                filter_size=filter_size,
-                stride=stride,
-                padding=_get_padding(filter_size, pad_type),
-                groups=mid_c,
-                conv_bias=False,
-                if_act=True,
-                act=act)
+            self.dw_mid = ConvBnActV5(in_c=mid_c,
+                                      out_c=mid_c,
+                                      filter_size=filter_size,
+                                      stride=stride,
+                                      padding=_get_padding(
+                                          filter_size, pad_type),
+                                      groups=mid_c,
+                                      conv_bias=False,
+                                      if_act=True,
+                                      act=act)
         else:
             self.dw_mid = Identity()
-        self.pw_proj = ConvBnActV5(
-            in_c=mid_c,
-            out_c=out_c,
-            filter_size=1,
-            stride=1,
-            padding=0,
-            conv_bias=False,
-            if_act=False,
-            act=act)
+        self.pw_proj = ConvBnActV5(in_c=mid_c,
+                                   out_c=out_c,
+                                   filter_size=1,
+                                   stride=1,
+                                   padding=0,
+                                   conv_bias=False,
+                                   if_act=False,
+                                   act=act)
         self.layer_scale = (LayerScale2D(out_c, layer_scale_init_value)
                             if layer_scale_init_value is not None else None)
 
@@ -332,6 +331,7 @@ class UniversalInvertedResidualV5(nn.Layer):
 
 
 class EdgeResidualV5(nn.Layer):
+
     def __init__(self,
                  in_c,
                  mid_c,
@@ -342,24 +342,23 @@ class EdgeResidualV5(nn.Layer):
                  act="gelu"):
         super().__init__()
         self.if_shortcut = stride == 1 and in_c == out_c
-        self.conv_exp = ConvBnActV5(
-            in_c=in_c,
-            out_c=mid_c,
-            filter_size=filter_size,
-            stride=stride,
-            padding=_get_padding(filter_size, pad_type),
-            conv_bias=False,
-            if_act=True,
-            act=act)
-        self.conv_pwl = ConvBnActV5(
-            in_c=mid_c,
-            out_c=out_c,
-            filter_size=1,
-            stride=1,
-            padding=0,
-            conv_bias=False,
-            if_act=False,
-            act=act)
+        self.conv_exp = ConvBnActV5(in_c=in_c,
+                                    out_c=mid_c,
+                                    filter_size=filter_size,
+                                    stride=stride,
+                                    padding=_get_padding(
+                                        filter_size, pad_type),
+                                    conv_bias=False,
+                                    if_act=True,
+                                    act=act)
+        self.conv_pwl = ConvBnActV5(in_c=mid_c,
+                                    out_c=out_c,
+                                    filter_size=1,
+                                    stride=1,
+                                    padding=0,
+                                    conv_bias=False,
+                                    if_act=False,
+                                    act=act)
 
     def forward(self, x):
         identity = x
@@ -371,6 +370,7 @@ class EdgeResidualV5(nn.Layer):
 
 
 class MobileAttentionV5(nn.Layer):
+
     def __init__(self,
                  in_c,
                  out_c,
@@ -392,59 +392,55 @@ class MobileAttentionV5(nn.Layer):
         self.query_dim = query_dim
 
         self.norm = RmsNorm2D(in_c)
-        self.query_proj = Conv2D(
-            in_channels=in_c,
-            out_channels=query_dim,
-            kernel_size=1,
-            stride=1,
-            padding=0,
-            groups=1,
-            bias_attr=False)
+        self.query_proj = Conv2D(in_channels=in_c,
+                                 out_channels=query_dim,
+                                 kernel_size=1,
+                                 stride=1,
+                                 padding=0,
+                                 groups=1,
+                                 bias_attr=False)
         if kv_stride > 1:
-            self.key_down_proj = ConvBnActV5(
-                in_c=in_c,
-                out_c=in_c,
-                filter_size=filter_size,
-                stride=kv_stride,
-                padding=_get_padding(filter_size, pad_type),
-                groups=in_c,
-                conv_bias=False,
-                if_act=False,
-                act="gelu")
-            self.value_down_proj = ConvBnActV5(
-                in_c=in_c,
-                out_c=in_c,
-                filter_size=filter_size,
-                stride=kv_stride,
-                padding=_get_padding(filter_size, pad_type),
-                groups=in_c,
-                conv_bias=False,
-                if_act=False,
-                act="gelu")
-        self.key_proj = Conv2D(
-            in_channels=in_c,
-            out_channels=kv_dim,
-            kernel_size=1,
-            stride=1,
-            padding=0,
-            groups=1,
-            bias_attr=False)
-        self.value_proj = Conv2D(
-            in_channels=in_c,
-            out_channels=kv_dim,
-            kernel_size=1,
-            stride=1,
-            padding=0,
-            groups=1,
-            bias_attr=False)
-        self.proj = Conv2D(
-            in_channels=query_dim,
-            out_channels=out_c,
-            kernel_size=1,
-            stride=1,
-            padding=0,
-            groups=1,
-            bias_attr=False)
+            self.key_down_proj = ConvBnActV5(in_c=in_c,
+                                             out_c=in_c,
+                                             filter_size=filter_size,
+                                             stride=kv_stride,
+                                             padding=_get_padding(
+                                                 filter_size, pad_type),
+                                             groups=in_c,
+                                             conv_bias=False,
+                                             if_act=False,
+                                             act="gelu")
+            self.value_down_proj = ConvBnActV5(in_c=in_c,
+                                               out_c=in_c,
+                                               filter_size=filter_size,
+                                               stride=kv_stride,
+                                               padding=_get_padding(
+                                                   filter_size, pad_type),
+                                               groups=in_c,
+                                               conv_bias=False,
+                                               if_act=False,
+                                               act="gelu")
+        self.key_proj = Conv2D(in_channels=in_c,
+                               out_channels=kv_dim,
+                               kernel_size=1,
+                               stride=1,
+                               padding=0,
+                               groups=1,
+                               bias_attr=False)
+        self.value_proj = Conv2D(in_channels=in_c,
+                                 out_channels=kv_dim,
+                                 kernel_size=1,
+                                 stride=1,
+                                 padding=0,
+                                 groups=1,
+                                 bias_attr=False)
+        self.proj = Conv2D(in_channels=query_dim,
+                           out_channels=out_c,
+                           kernel_size=1,
+                           stride=1,
+                           padding=0,
+                           groups=1,
+                           bias_attr=False)
 
         # timm MultiQueryAttention2d uses key_dim**-0.5
         self.scale = (query_dim // num_head)**-0.5
@@ -484,6 +480,7 @@ class MobileAttentionV5(nn.Layer):
 
 
 class MobileNetV5MultiScaleFusionAdapter(nn.Layer):
+
     def __init__(self,
                  in_chs,
                  out_chs,
@@ -510,7 +507,9 @@ class MobileNetV5MultiScaleFusionAdapter(nn.Layer):
         resized = []
         for feat in inputs:
             if tuple(feat.shape[-2:]) != (high_h, high_w):
-                feat = F.interpolate(feat, size=[high_h, high_w], mode="nearest")
+                feat = F.interpolate(feat,
+                                     size=[high_h, high_w],
+                                     mode="nearest")
             resized.append(feat)
         x = paddle.concat(resized, axis=1)
         x = self.ffn(x)
@@ -519,10 +518,9 @@ class MobileNetV5MultiScaleFusionAdapter(nn.Layer):
             if high_h % self.output_resolution == 0 and high_w % self.output_resolution == 0:
                 stride_h = high_h // self.output_resolution
                 stride_w = high_w // self.output_resolution
-                x = F.avg_pool2d(
-                    x,
-                    kernel_size=[stride_h, stride_w],
-                    stride=[stride_h, stride_w])
+                x = F.avg_pool2d(x,
+                                 kernel_size=[stride_h, stride_w],
+                                 stride=[stride_h, stride_w])
             else:
                 x = F.interpolate(
                     x,
@@ -533,6 +531,7 @@ class MobileNetV5MultiScaleFusionAdapter(nn.Layer):
 
 
 class MobileNetV5(TheseusLayer):
+
     def __init__(self,
                  arch_def,
                  class_num=1000,
@@ -555,14 +554,13 @@ class MobileNetV5(TheseusLayer):
         self.drop_rate = drop_rate
         self.msfa_output_resolution = msfa_output_resolution
 
-        self.conv_stem = ConvBnActV5(
-            in_c=3,
-            out_c=inplanes,
-            filter_size=3,
-            stride=2,
-            padding=_get_padding(3, pad_type),
-            conv_bias=True,
-            act=act)
+        self.conv_stem = ConvBnActV5(in_c=3,
+                                     out_c=inplanes,
+                                     filter_size=3,
+                                     stride=2,
+                                     padding=_get_padding(3, pad_type),
+                                     conv_bias=True,
+                                     act=act)
 
         blocks = []
         stage_ends = []
@@ -585,14 +583,13 @@ class MobileNetV5(TheseusLayer):
                 if block_type == "er":
                     exp_ratio = p.get("e", 4)
                     mid_c = _make_divisible(in_c * exp_ratio)
-                    block = EdgeResidualV5(
-                        in_c=in_c,
-                        mid_c=mid_c,
-                        out_c=out_c,
-                        filter_size=p.get("k", 3),
-                        stride=stride,
-                        pad_type=pad_type,
-                        act=act)
+                    block = EdgeResidualV5(in_c=in_c,
+                                           mid_c=mid_c,
+                                           out_c=out_c,
+                                           filter_size=p.get("k", 3),
+                                           stride=stride,
+                                           pad_type=pad_type,
+                                           act=act)
                 elif block_type == "uir":
                     exp_ratio = p.get("e", 4)
                     mid_c = _make_divisible(in_c * exp_ratio)
@@ -623,7 +620,8 @@ class MobileNetV5(TheseusLayer):
                         drop_path_rate=dp,
                         layer_scale_init_value=layer_scale_init_value)
                 else:
-                    raise ValueError("Unsupported block type: {}".format(block_type))
+                    raise ValueError(
+                        "Unsupported block type: {}".format(block_type))
 
                 blocks.append(block)
                 in_c = out_c
@@ -638,7 +636,8 @@ class MobileNetV5(TheseusLayer):
 
         feature_count = len(self.stage_out_channels)
         self.msfa_indices = [i % feature_count for i in msfa_indices]
-        msfa_in_chs = sum([self.stage_out_channels[i] for i in self.msfa_indices])
+        msfa_in_chs = sum(
+            [self.stage_out_channels[i] for i in self.msfa_indices])
 
         self.msfa = MobileNetV5MultiScaleFusionAdapter(
             in_chs=msfa_in_chs,
@@ -654,10 +653,9 @@ class MobileNetV5(TheseusLayer):
                                  class_num) if class_num > 0 else Identity()
 
         stages_pattern = ["blocks[{}]".format(idx) for idx in self.stage_ends]
-        super().init_res(
-            stages_pattern,
-            return_patterns=return_patterns,
-            return_stages=return_stages)
+        super().init_res(stages_pattern,
+                         return_patterns=return_patterns,
+                         return_stages=return_stages)
 
     def forward_features(self, x):
         x = self.conv_stem(x)
@@ -692,7 +690,8 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
     if pretrained is True:
         if not model_url:
             raise RuntimeError(
-                "No pretrained url is configured for this MobileNetV5 variant.")
+                "No pretrained url is configured for this MobileNetV5 variant."
+            )
         load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
     elif isinstance(pretrained, str):
         load_dygraph_pretrain(model, pretrained)
@@ -702,7 +701,8 @@ def _load_pretrained(pretrained, model, model_url, use_ssld):
 
 def MobileNetV5_300M(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNetV5(arch_def=_ARCH_DEFS["mobilenetv5_300m"], **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV5_300M"], use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV5_300M"],
+                     use_ssld)
     return model
 
 
@@ -711,20 +711,20 @@ def MobileNetV5_300m(pretrained=False, use_ssld=False, **kwargs):
 
 
 def MobileNetV5_300M_enc(pretrained=False, use_ssld=False, **kwargs):
-    model = MobileNetV5(
-        arch_def=_ARCH_DEFS["mobilenetv5_300m"],
-        class_num=0,
-        pad_type="same",
-        encoder=True,
-        **kwargs)
+    model = MobileNetV5(arch_def=_ARCH_DEFS["mobilenetv5_300m"],
+                        class_num=0,
+                        pad_type="same",
+                        encoder=True,
+                        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV5_300M_enc"],
                      use_ssld)
     return model
 
 
 def MobileNetV5_300M_enc_cls(pretrained=False, use_ssld=False, **kwargs):
-    model = MobileNetV5(
-        arch_def=_ARCH_DEFS["mobilenetv5_300m"], pad_type="same", **kwargs)
+    model = MobileNetV5(arch_def=_ARCH_DEFS["mobilenetv5_300m"],
+                        pad_type="same",
+                        **kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV5_300M_enc_cls"],
                      use_ssld)
     return model
@@ -732,5 +732,6 @@ def MobileNetV5_300M_enc_cls(pretrained=False, use_ssld=False, **kwargs):
 
 def MobileNetV5_base(pretrained=False, use_ssld=False, **kwargs):
     model = MobileNetV5(arch_def=_ARCH_DEFS["mobilenetv5_base"], **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV5_base"], use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS["MobileNetV5_base"],
+                     use_ssld)
     return model
