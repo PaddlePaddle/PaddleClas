@@ -332,11 +332,6 @@ from .model_zoo.foundation_vit import (
     MAE_vit_large_patch16,
     MAE_vit_base_patch16,
 )
-from .model_zoo.naflexvit import (
-    naflexvit_base_patch16_gap,
-    naflexvit_base_patch16_par_gap,
-    naflexvit_base_patch16_parfac_gap,
-)
 from .model_zoo.convnext import (
     ConvNeXt_tiny,
     ConvNeXt_small,
