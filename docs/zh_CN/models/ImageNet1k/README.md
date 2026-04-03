@@ -47,6 +47,7 @@
     - [Twins 系列](#Twins)
     - [CSwinTransformer 系列](#CSwinTransformer)
     - [PVTV2 系列](#PVTV2)
+    - [NaFlexViT 系列](#NaFlexViT)
     - [LeViT 系列](#LeViT)
     - [TNT 系列](#TNT)
     - [NextViT 系列](#NextViT)
@@ -740,6 +741,14 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 | LeViT_384 | 0.8191   | 0.9551    |                  |                  |                  | 2234    | 38.45    | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/LeViT_384_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/LeViT_384_infer.tar) |
 
 **注**：与 Reference 的精度差异源于数据预处理不同及未使用蒸馏的 head 作为输出。
+
+<a name="NaFlexViT"></a>
+
+## NaFlexViT 系列
+
+NaFlexViT 系列当前在 PaddleClas 中已补充基础分类主干、ImageNet1k 训练配置以及与本地 `timm` 的前向对齐验证。更多介绍可参考：[NaFlexViT 系列模型文档](NaFlexViT.md)。
+
+当前阶段尚未提供预训练权重与最终精度指标，因此模型总览表中暂不列出下载链接与 benchmark 数据。
 
 <a name="TNT"></a>
 
