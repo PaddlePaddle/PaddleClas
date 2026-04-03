@@ -1,0 +1,4 @@
+torch>=1.8.1
+timm>=0.4.12
+tqdm
+packaging
