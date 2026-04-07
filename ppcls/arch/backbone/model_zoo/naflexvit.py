@@ -22,6 +22,7 @@ import math
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
+from paddle.base.dygraph.base import in_to_static_mode
 from paddle.nn.initializer import Constant, Normal, TruncatedNormal
 
 from ....utils.save_load import load_dygraph_pretrain
@@ -47,7 +48,9 @@ def to_2tuple(x):
 
 
 def gelu_erf(x):
-    return 0.5 * x * (1.0 + paddle.erf(x / math.sqrt(2.0)))
+    x_fp64 = x.astype("float64")
+    y = 0.5 * x_fp64 * (1.0 + paddle.erf(x_fp64 / math.sqrt(2.0)))
+    return y.astype(x.dtype)
 
 
 def batch_patchify(x, patch_size, pad=False):
@@ -95,6 +98,20 @@ class Mlp(TheseusLayer):
         self.drop = nn.Dropout(drop)
 
     def forward(self, x):
+        if not in_to_static_mode():
+            x_fp64 = x.astype("float64")
+            fc1_w = self.fc1.weight.astype("float64")
+            x_fp64 = paddle.matmul(x_fp64, fc1_w)
+            if self.fc1.bias is not None:
+                x_fp64 = x_fp64 + self.fc1.bias.astype("float64")
+            x_fp64 = gelu_erf(x_fp64)
+            x_fp64 = self.drop(x_fp64.astype(x.dtype)).astype("float64")
+            fc2_w = self.fc2.weight.astype("float64")
+            x_fp64 = paddle.matmul(x_fp64, fc2_w)
+            if self.fc2.bias is not None:
+                x_fp64 = x_fp64 + self.fc2.bias.astype("float64")
+            x = self.drop(x_fp64.astype(x.dtype))
+            return x
         x = self.fc1(x)
         x = gelu_erf(x)
         x = self.drop(x)
@@ -250,7 +267,7 @@ class NaFlexEmbeds(TheseusLayer):
                 interp_size = list(grid_size)
             use_antialias = paddle.get_device().startswith("gpu")
             pos = F.interpolate(
-                self.pos_embed.transpose([0, 3, 1, 2]).astype("float32"),
+                self.pos_embed.transpose([0, 3, 1, 2]).astype("float64"),
                 size=interp_size,
                 mode=self.pos_embed_interp_mode,
                 align_corners=False,
@@ -262,17 +279,13 @@ class NaFlexEmbeds(TheseusLayer):
 
     def _interp_1d(self, table, new_length):
         if table.shape[1] == new_length:
-            return table
-        return (
-            F.interpolate(
-                table.transpose([0, 2, 1]).astype("float32"),
-                size=[new_length],
-                mode="linear",
-                align_corners=False,
-            )
-            .transpose([0, 2, 1])
-            .astype(table.dtype)
-        )
+            return table.astype("float64")
+        return F.interpolate(
+            table.transpose([0, 2, 1]).astype("float64"),
+            size=[new_length],
+            mode="linear",
+            align_corners=False,
+        ).transpose([0, 2, 1])
 
     def _apply_factorized_pos_embed(self, x, grid_size):
         target_h, target_w = grid_size

@@ -28,6 +28,7 @@ NaFlexViT 是 `timm` 中面向灵活输入场景实现的一类 Vision Transform
 当前 PaddleClas 中提供的实现以本地 `timm` 的 `naflexvit.py` 为参考，优先覆盖分类主干与前向对齐所需的最小能力集合。当前已完成以下核验工作：
 
 - 与本地 `timm` 参考实现的同权重前向对齐
+- 与本地 `timm` 官方预训练权重的前向对齐
 - 随机初始化权重转换与加载验证
 - ImageNet1k 分类训练配置补充
 - 静态图导出验证
@@ -47,7 +48,12 @@ NaFlexViT 是 `timm` 中面向灵活输入场景实现的一类 Vision Transform
 
 - 对齐脚本默认使用 `torch=cpu`、`paddle=gpu` 的环境组合
 - `par_gap` 变体依赖 Paddle GPU 上的 `bicubic + antialias` 插值核进行高精度对齐
-- 当前阶段不提供全量 ImageNet 训练精度与预训练权重下载链接
+- 当前阶段不提供全量 ImageNet 训练精度与 Paddle 预训练权重下载链接
+- 本地 `timm` 官方预训练权重对齐结果：
+  - `naflexvit_base_patch16_gap`, `256 x 256`: `forward_features max abs diff = 8.30e-05`
+  - `naflexvit_base_patch16_par_gap`, `224 x 320`: `forward_features max abs diff = 8.20e-05`
+  - `naflexvit_base_patch16_parfac_gap`, `256 x 256`: `forward_features max abs diff = 6.41e-05`
+  - `naflexvit_base_patch16_parfac_gap`, `224 x 320`: `forward_features max abs diff = 9.35e-05`
 
 <a name='1.2'></a>
 
@@ -85,6 +91,7 @@ NaFlexViT 是 `timm` 中面向灵活输入场景实现的一类 Vision Transform
 python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_gap --height 256 --width 256 --batch-size 2
 python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_par_gap --height 224 --width 320 --batch-size 2
 python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_parfac_gap --height 224 --width 320 --batch-size 2
+python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_gap --height 256 --width 256 --batch-size 2 --pretrained
 ```
 
 <a name="3"></a>
@@ -108,6 +115,7 @@ python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_parf
 当前已经完成的实验：
 
 - 3 个基础变体的同权重前向对齐
+- 3 个基础变体的 `timm` 官方预训练权重前向对齐
 - 随机初始化权重转换与加载验证
 - 配置文件补充与可实例化验证
 - 3 个基础变体的静态图导出验证
