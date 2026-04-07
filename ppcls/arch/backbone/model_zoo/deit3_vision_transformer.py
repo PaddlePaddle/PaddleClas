@@ -317,6 +317,7 @@ def DeiT3_base_patch16_384(pretrained=False, use_ssld=False, **kwargs):
         num_heads=12,
         no_embed_class=True,
         init_values=1e-6,
+        qkv_bias=True,
         **kwargs,
     )
 
@@ -333,6 +334,7 @@ def DeiT3_small_patch16_384(pretrained=False, use_ssld=False, **kwargs):
         num_heads=6,
         no_embed_class=True,
         init_values=1e-6,
+        qkv_bias=True,
         **kwargs,
     )
 
@@ -349,6 +351,7 @@ def DeiT3_large_patch16_384(pretrained=False, use_ssld=False, **kwargs):
         num_heads=16,
         no_embed_class=True,
         init_values=1e-6,
+        qkv_bias=True,
         **kwargs,
     )
 
@@ -364,6 +367,7 @@ def DeiT3_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=12,
         no_embed_class=True,
         init_values=1e-6,
+        qkv_bias=True,
         **kwargs,
     )
 
@@ -379,6 +383,7 @@ def DeiT3_huge_patch14_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=16,
         no_embed_class=True,
         init_values=1e-6,
+        qkv_bias=True,
         **kwargs,
     )
 
@@ -394,6 +399,7 @@ def DeiT3_medium_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=8,
         no_embed_class=True,
         init_values=1e-6,
+        qkv_bias=True,
         **kwargs,
     )
 
@@ -409,5 +415,6 @@ def DeiT3_large_patch16_224(pretrained=False, use_ssld=False, **kwargs):
         num_heads=16,
         no_embed_class=True,
         init_values=1e-6,
+        qkv_bias=True,
         **kwargs,
     )
