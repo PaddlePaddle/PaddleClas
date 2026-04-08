@@ -27,33 +27,29 @@ NaFlexViT 是 `timm` 中面向灵活输入场景实现的一类 Vision Transform
 
 当前 PaddleClas 中提供的实现以本地 `timm` 的 `naflexvit.py` 为参考，优先覆盖分类主干与前向对齐所需的最小能力集合。当前已完成以下核验工作：
 
-- 与本地 `timm` 参考实现的同权重前向对齐
 - 与本地 `timm` 官方预训练权重的前向对齐
+- 与本地 `timm` 参考实现的随机初始化前向对齐
 - 随机初始化权重转换与加载验证
 - ImageNet1k 分类训练配置补充
 - 静态图导出验证
 
-前向对齐阶段使用固定输入、同源随机初始化权重和本地 `timm` 参考实现进行比对。当前已经完成 3 个基础变体的对齐验证，`forward_features` 与最终 `out` 的绝对误差均稳定低于 `1e-4`：
+前向对齐阶段使用固定输入和本地 `timm` 参考实现进行比对。当前以官方预训练权重场景为主，`forward_features` 与最终 `out` 的绝对误差均稳定低于 `1e-4`：
 
-| Models | 输入尺寸 | 对齐节点 | max abs diff | mean abs diff |
-|:--:|:--:|:--:|:--:|:--:|
-| `naflexvit_base_patch16_gap` | `256 x 256` | `forward_features` | `2.03e-06` | `1.71e-07` |
-| `naflexvit_base_patch16_gap` | `256 x 256` | `out` | `1.19e-06` | `2.47e-07` |
-| `naflexvit_base_patch16_par_gap` | `224 x 320` | `forward_features` | `2.38e-06` | `1.71e-07` |
-| `naflexvit_base_patch16_par_gap` | `224 x 320` | `out` | `9.54e-07` | `2.40e-07` |
-| `naflexvit_base_patch16_parfac_gap` | `224 x 320` | `forward_features` | `2.38e-06` | `1.71e-07` |
-| `naflexvit_base_patch16_parfac_gap` | `224 x 320` | `out` | `1.13e-06` | `2.34e-07` |
+| Models | 权重来源 | 输入尺寸 | 对齐节点 | max abs diff | mean abs diff |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| `naflexvit_base_patch16_gap` | `timm` 官方预训练 | `256 x 256` | `forward_features` | `6.48e-05` | `1.40e-06` |
+| `naflexvit_base_patch16_gap` | `timm` 官方预训练 | `256 x 256` | `out` | `4.29e-06` | `5.60e-07` |
+| `naflexvit_base_patch16_par_gap` | `timm` 官方预训练 | `224 x 320` | `forward_features` | `7.82e-05` | `1.61e-06` |
+| `naflexvit_base_patch16_par_gap` | `timm` 官方预训练 | `224 x 320` | `out` | `6.91e-06` | `7.98e-07` |
+| `naflexvit_base_patch16_parfac_gap` | `timm` 官方预训练 | `224 x 320` | `forward_features` | `8.77e-05` | `1.33e-06` |
+| `naflexvit_base_patch16_parfac_gap` | `timm` 官方预训练 | `224 x 320` | `out` | `8.58e-06` | `6.37e-07` |
 
 说明：
 
-- 对齐脚本默认使用 `torch=cpu`、`paddle=gpu` 的环境组合
+- 上表结果在 `torch=cuda`、`paddle=gpu` 的双端 GPU 环境下获得
 - `par_gap` 变体依赖 Paddle GPU 上的 `bicubic + antialias` 插值核进行高精度对齐
 - 当前阶段不提供全量 ImageNet 训练精度与 Paddle 预训练权重下载链接
-- 本地 `timm` 官方预训练权重对齐结果：
-  - `naflexvit_base_patch16_gap`, `256 x 256`: `forward_features max abs diff = 8.30e-05`
-  - `naflexvit_base_patch16_par_gap`, `224 x 320`: `forward_features max abs diff = 8.20e-05`
-  - `naflexvit_base_patch16_parfac_gap`, `256 x 256`: `forward_features max abs diff = 6.41e-05`
-  - `naflexvit_base_patch16_parfac_gap`, `224 x 320`: `forward_features max abs diff = 9.35e-05`
+- 随机初始化权重场景也已验证，当前 3 个基础变体的 `forward_features max abs diff` 均在 `1e-6` 量级
 
 <a name='1.2'></a>
 
@@ -70,6 +66,7 @@ NaFlexViT 是 `timm` 中面向灵活输入场景实现的一类 Vision Transform
 - `ppcls/configs/ImageNet/NaFlexViT/naflexvit_base_patch16_gap.yaml`
 - `ppcls/configs/ImageNet/NaFlexViT/naflexvit_base_patch16_par_gap.yaml`
 - `ppcls/configs/ImageNet/NaFlexViT/naflexvit_base_patch16_parfac_gap.yaml`
+- `ppcls/configs/ImageNet/NaFlexViT/naflexvit_base_patch16_gap_lite_imagenet.yaml`
 
 前向对齐脚本位于：
 
@@ -88,10 +85,9 @@ NaFlexViT 是 `timm` 中面向灵活输入场景实现的一类 Vision Transform
 若需要复现实验中的前向对齐，可直接运行：
 
 ```bash
-python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_gap --height 256 --width 256 --batch-size 2
-python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_par_gap --height 224 --width 320 --batch-size 2
-python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_parfac_gap --height 224 --width 320 --batch-size 2
-python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_gap --height 256 --width 256 --batch-size 2 --pretrained
+python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_gap --height 256 --width 256 --batch-size 2 --pretrained --torch-python /root/timm_env_cu126/bin/python --paddle-python /root/paddleclas_env/bin/python --torch-device cuda --paddle-device gpu
+python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_par_gap --height 224 --width 320 --batch-size 2 --pretrained --torch-python /root/timm_env_cu126/bin/python --paddle-python /root/paddleclas_env/bin/python --torch-device cuda --paddle-device gpu
+python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_parfac_gap --height 224 --width 320 --batch-size 2 --pretrained --torch-python /root/timm_env_cu126/bin/python --paddle-python /root/paddleclas_env/bin/python --torch-device cuda --paddle-device gpu
 ```
 
 <a name="3"></a>
@@ -105,8 +101,30 @@ python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_gap 
 - `naflexvit_base_patch16_gap.yaml`
 - `naflexvit_base_patch16_par_gap.yaml`
 - `naflexvit_base_patch16_parfac_gap.yaml`
+- `naflexvit_base_patch16_gap_lite_imagenet.yaml`
 
-由于当前仓库环境下未提供 ImageNet 或 lite ImageNet 数据，本次提交阶段未补充训练收敛性日志表。若后续补齐数据，可直接基于上述配置继续完成训练链路验证。
+若只需要做小数据快速收敛验证，可直接复用 TIPC 的 `lite_train_lite_infer` 数据准备流程：
+
+```bash
+bash test_tipc/prepare.sh test_tipc/configs/NaFlexViT/naflexvit_base_patch16_gap_train_infer_python.txt lite_train_lite_infer
+```
+
+该命令会自动下载并准备 `dataset/whole_chain_little_train`，同时建立 `dataset/ILSVRC2012` 软链接和对应的 `train_list.txt`、`val_list.txt`，无需额外准备全量 ImageNet。
+
+在此基础上，可直接用 GPU 跑一个短周期收敛实验，例如：
+
+```bash
+python tools/train.py -c ppcls/configs/ImageNet/NaFlexViT/naflexvit_base_patch16_gap_lite_imagenet.yaml -o Global.device=gpu
+```
+
+本地已完成 1 次 5 epoch 的 GPU 收敛性验证，环境为 `PaddlePaddle 3.3.0 + A100`，结果如下：
+
+| 配置 | 数据 | 设备 | Epoch | Train CELoss | Train Top1 | Train Top5 |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| `naflexvit_base_patch16_gap_lite_imagenet.yaml` | TIPC `lite_train_lite_infer` | `gpu:0` | 1 | `7.20865` | `0.00000` | `0.00000` |
+| `naflexvit_base_patch16_gap_lite_imagenet.yaml` | TIPC `lite_train_lite_infer` | `gpu:0` | 5 | `3.46303` | `0.20690` | `0.58621` |
+
+从训练集指标看，loss 明显下降，Top-1 / Top-5 持续上升，可作为训练链路能够正常收敛的快速验证。本次实验仅用于证明收敛，不作为全量 ImageNet 精度结论。
 
 <a name="4"></a>
 
@@ -114,8 +132,9 @@ python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_gap 
 
 当前已经完成的实验：
 
-- 3 个基础变体的同权重前向对齐
 - 3 个基础变体的 `timm` 官方预训练权重前向对齐
+- 3 个基础变体的随机初始化前向对齐
+- `naflexvit_base_patch16_gap` 在 TIPC 小数据集上的 5 epoch GPU 收敛性验证
 - 随机初始化权重转换与加载验证
 - 配置文件补充与可实例化验证
 - 3 个基础变体的静态图导出验证
@@ -123,7 +142,7 @@ python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_gap 
 当前尚未纳入本次提交结论的内容：
 
 - 全量 ImageNet 精度指标
-- lite ImageNet 快速收敛性实验
+- Paddle 预训练权重下载链接
 
 静态图导出验证命令示例：
 

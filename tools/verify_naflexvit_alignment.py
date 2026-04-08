@@ -118,6 +118,28 @@ def run_helper(python_bin, helper_code, args):
     return info
 
 
+def detect_torch_cuda(python_bin):
+    code = (
+        "import json, torch; "
+        "print(json.dumps({'cuda': bool(torch.cuda.is_available())}))"
+    )
+    result = subprocess.run([python_bin, "-c", code], capture_output=True, text=True)
+    if result.returncode != 0:
+        return False
+    stdout = result.stdout.strip().splitlines()
+    if not stdout:
+        return False
+    return bool(json.loads(stdout[-1]).get("cuda", False))
+
+
+def normalize_torch_device(device, python_bin):
+    if device == "auto":
+        return "cuda" if detect_torch_cuda(python_bin) else "cpu"
+    if device == "gpu":
+        return "cuda"
+    return device
+
+
 def diff_metrics(a, b):
     diff = np.abs(a - b)
     return {
@@ -158,7 +180,7 @@ def parse_args():
             (Path(__file__).resolve().parents[2] / "paddleclas_env" / "bin" / "python")
         ),
     )
-    parser.add_argument("--torch-device", default="cpu")
+    parser.add_argument("--torch-device", default="auto")
     parser.add_argument(
         "--paddle-device", default="gpu" if os.path.exists("/dev/nvidia0") else "cpu"
     )
@@ -169,6 +191,7 @@ def parse_args():
 def main():
     args = parse_args()
     repo_root = Path(__file__).resolve().parents[1]
+    torch_device = normalize_torch_device(args.torch_device, args.torch_python)
 
     x = (
         np.random.RandomState(2026)
@@ -193,7 +216,7 @@ def main():
                 input_path,
                 state_path,
                 torch_output_path,
-                args.torch_device,
+                torch_device,
                 int(args.pretrained),
             ],
         )
@@ -223,7 +246,7 @@ def main():
         "torch": torch_info,
         "paddle": paddle_info,
         "devices": {
-            "torch": args.torch_device,
+            "torch": torch_device,
             "paddle": args.paddle_device,
         },
         "pretrained": args.pretrained,
