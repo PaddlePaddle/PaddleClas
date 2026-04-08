@@ -80,14 +80,6 @@ NaFlexViT 是 `timm` 中面向灵活输入场景实现的一类 Vision Transform
 - `naflexvit_base_patch16_par_gap`
 - `naflexvit_base_patch16_parfac_gap`
 
-若需要复现实验中的前向对齐，可直接运行：
-
-```bash
-python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_gap --height 256 --width 256 --batch-size 2 --pretrained --torch-python /root/timm_env_cu126/bin/python --paddle-python /root/paddleclas_env/bin/python --torch-device cuda --paddle-device gpu
-python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_par_gap --height 224 --width 320 --batch-size 2 --pretrained --torch-python /root/timm_env_cu126/bin/python --paddle-python /root/paddleclas_env/bin/python --torch-device cuda --paddle-device gpu
-python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_parfac_gap --height 224 --width 320 --batch-size 2 --pretrained --torch-python /root/timm_env_cu126/bin/python --paddle-python /root/paddleclas_env/bin/python --torch-device cuda --paddle-device gpu
-```
-
 <a name="3"></a>
 
 ## 3. 模型训练、评估和预测
@@ -109,6 +101,3 @@ python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_parf
 | `naflexvit_base_patch16_gap_lite_imagenet.yaml` | TIPC `lite_train_lite_infer` | `gpu:0` | 5 | `3.46303` | `0.20690` | `0.58621` |
 
 从训练集指标看，loss 明显下降，Top-1 / Top-5 持续上升，可作为训练链路能够正常收敛的快速验证。本次实验仅用于证明收敛，不作为全量 ImageNet 精度结论。
-
-<a name="4"></a>
-
