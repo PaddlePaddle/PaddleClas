@@ -8,7 +8,6 @@
     - [1.2 当前支持的模型](#1.2)
 - [2. 模型快速体验](#2)
 - [3. 模型训练、评估和预测](#3)
-- [4. 当前实验结论与已知限制](#4)
 
 <a name='1'></a>
 
@@ -28,7 +27,6 @@ NaFlexViT 是 `timm` 中面向灵活输入场景实现的一类 Vision Transform
 当前 PaddleClas 中提供的实现以本地 `timm` 的 `naflexvit.py` 为参考，优先覆盖分类主干与前向对齐所需的最小能力集合。当前已完成以下核验工作：
 
 - 与本地 `timm` 官方预训练权重的前向对齐
-- 与本地 `timm` 参考实现的随机初始化前向对齐
 - 随机初始化权重转换与加载验证
 - ImageNet1k 分类训练配置补充
 - 静态图导出验证
@@ -103,20 +101,6 @@ python tools/verify_naflexvit_alignment.py --variant naflexvit_base_patch16_parf
 - `naflexvit_base_patch16_parfac_gap.yaml`
 - `naflexvit_base_patch16_gap_lite_imagenet.yaml`
 
-若只需要做小数据快速收敛验证，可直接复用 TIPC 的 `lite_train_lite_infer` 数据准备流程：
-
-```bash
-bash test_tipc/prepare.sh test_tipc/configs/NaFlexViT/naflexvit_base_patch16_gap_train_infer_python.txt lite_train_lite_infer
-```
-
-该命令会自动下载并准备 `dataset/whole_chain_little_train`，同时建立 `dataset/ILSVRC2012` 软链接和对应的 `train_list.txt`、`val_list.txt`，无需额外准备全量 ImageNet。
-
-在此基础上，可直接用 GPU 跑一个短周期收敛实验，例如：
-
-```bash
-python tools/train.py -c ppcls/configs/ImageNet/NaFlexViT/naflexvit_base_patch16_gap_lite_imagenet.yaml -o Global.device=gpu
-```
-
 本地已完成 1 次 5 epoch 的 GPU 收敛性验证，环境为 `PaddlePaddle 3.3.0 + A100`，结果如下：
 
 | 配置 | 数据 | 设备 | Epoch | Train CELoss | Train Top1 | Train Top5 |
@@ -128,28 +112,3 @@ python tools/train.py -c ppcls/configs/ImageNet/NaFlexViT/naflexvit_base_patch16
 
 <a name="4"></a>
 
-## 4. 当前实验结论与已知限制
-
-当前已经完成的实验：
-
-- 3 个基础变体的 `timm` 官方预训练权重前向对齐
-- 3 个基础变体的随机初始化前向对齐
-- `naflexvit_base_patch16_gap` 在 TIPC 小数据集上的 5 epoch GPU 收敛性验证
-- 随机初始化权重转换与加载验证
-- 配置文件补充与可实例化验证
-- 3 个基础变体的静态图导出验证
-
-当前尚未纳入本次提交结论的内容：
-
-- 全量 ImageNet 精度指标
-- Paddle 预训练权重下载链接
-
-静态图导出验证命令示例：
-
-```bash
-python tools/export_model.py -c ppcls/configs/ImageNet/NaFlexViT/naflexvit_base_patch16_gap.yaml -o Global.save_inference_dir=./inference/naflexvit_base_patch16_gap
-python tools/export_model.py -c ppcls/configs/ImageNet/NaFlexViT/naflexvit_base_patch16_par_gap.yaml -o Global.save_inference_dir=./inference/naflexvit_base_patch16_par_gap
-python tools/export_model.py -c ppcls/configs/ImageNet/NaFlexViT/naflexvit_base_patch16_parfac_gap.yaml -o Global.save_inference_dir=./inference/naflexvit_base_patch16_parfac_gap
-```
-
-在 Paddle 3.3 环境下，上述 3 个基础变体已经完成导出验证并可成功生成 `inference.pdmodel` 与 `inference.pdiparams`。
