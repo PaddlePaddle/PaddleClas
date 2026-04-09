@@ -39,6 +39,7 @@
     - [其他模型](#Others)
   - [3.2 轻量级模型](#CNN_lite)
     - [移动端系列](#Mobile)
+    - [MobileOne 系列](#MobileOne)
     - [PP-LCNet & PP-LCNetV2 系列](#PPLCNet)
 - [四、Transformer 系列模型](#Transformer_based)
   - [4.1 服务器端模型](#Transformer_server)
@@ -594,6 +595,20 @@ YOLO26 系列模型的精度指标如下表所示，更多介绍可以参考：[
 | ESNet_x0_75 | 0.7224 | 0.9045 |9.59|6.28|4.52| 123.74 | 3.87 | 15 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x0_75_pretrained.pdparams)               |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ESNet_x0_75_infer.tar)               |
 | ESNet_x1_0 | 0.7392 | 0.9140 |13.67|8.71|5.97| 197.33 | 4.64 | 18 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x1_0_pretrained.pdparams)               |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ESNet_x1_0_infer.tar)               |
 
+<a name="MobileOne"></a>
+
+## MobileOne 系列 <sup>[[53](#ref53)]</sup>
+
+MobileOne 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[MobileOne 系列模型文档](MobileOne.md)。
+
+| 模型          | Top-1 Acc | Top-5 Acc | FLOPs(M) | Params(M) | <span style="white-space:nowrap;">模型大小(M)</span> | 预训练模型下载地址 | inference模型下载地址 |
+|----------------|-----------|-----------|----------|-----------|-----------------------------------|-----------------------------------|-----------------------------------|
+| MobileOne_S0   | 0.7140    | -         | 279      | 2.08      | 8.3                               | -                                 | -                                 |
+| MobileOne_S1   | 0.7590    | -         | 831      | 4.76      | 19.1                              | -                                 | -                                 |
+| MobileOne_S2   | 0.7740    | -         | 1306     | 7.81      | 31.2                              | -                                 | -                                 |
+| MobileOne_S3   | 0.7810    | -         | 1905     | 10.08     | 40.3                              | -                                 | -                                 |
+| MobileOne_S4   | 0.7940    | -         | 2991     | 14.84     | 59.4                              | -                                 | -                                 |
+
 <a name="PPLCNet"></a>
 
 ## PP-LCNet & PP-LCNetV2 系列 <sup>[[28](#ref28)]</sup>
@@ -953,3 +968,5 @@ TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
 <a name="ref51">[51]</a>Sachin Mehta and Mohammad Rastegari. Separable Self-attention for Mobile Vision Transformers
 
 <a name="ref52">[52]</a>Wadekar, Shakti N. and Chaurasia, Abhishek. MobileViTv3: Mobile-Friendly Vision Transformer with Simple and Effective Fusion of Local, Global and Input Features
+
+<a name="ref53">[53]</a>MobileOne: An Improved One millisecond Mobile Backbone. arXiv:2206.04040.

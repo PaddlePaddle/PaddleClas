@@ -83,13 +83,19 @@ SwiftFormer 于2023年提出，聚焦于解决视觉 Transformer 在移动端部
 
 ```bash
 # 训练
-python3 -m paddle.distributed.launch     --gpus="0"     tools/train.py -c /home/housaijie/code/PaddleClas/ppcls/configs/ImageNet/SwiftFormer/SwiftFormer_L1.yaml
+python3 -m paddle.distributed.launch     --gpus="0"     tools/train.py -c PaddleClas/ppcls/configs/ImageNet/SwiftFormer/SwiftFormer_L1.yaml
 
 
 
 # 评估（以本地权重为例）
-python tools/eval.py -c ppcls/configs/ImageNet/SwiftFormer/SwiftFormer_L1.yaml \
+python3 tools/eval.py -c ppcls/configs/ImageNet/SwiftFormer/SwiftFormer_L1.yaml \
   -o Global.pretrained_model=/path/to/SwiftFormer_L1.pdparams
+
+# 模型预测
+python3 tools/infer.py \
+-c PaddleClas/ppcls/configs/ImageNet/SwiftFormer/SwiftFormer_L1.yaml \
+-o Global.pretrained_model=/path/to/SwiftFormer_L1.pdparams
+
 ```
 
 其他训练、评估、预测通用流程可参考：[ResNet50 模型训练、评估和预测](./ResNet.md#3-模型训练评估和预测)。

@@ -56,6 +56,7 @@ from .model_zoo.fasternet import (
     FasterNet_L,
 )
 from .model_zoo.starnet import StarNet_S1, StarNet_S2, StarNet_S3, StarNet_S4
+from .model_zoo.mobileone import MobileOne_S0, MobileOne_S1, MobileOne_S2, MobileOne_S3, MobileOne_S4
 from .legendary_models.resnet import (
     ResNet18,
     ResNet18_vd,
