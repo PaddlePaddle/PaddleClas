@@ -49,6 +49,12 @@ from .model_zoo.mobilenet_v2 import MobileNetV2_x0_25, MobileNetV2_x0_5, MobileN
 from .model_zoo.mobilefacenet import MobileFaceNet
 from .model_zoo.shufflenet_v2 import ShuffleNetV2_x0_25, ShuffleNetV2_x0_33, ShuffleNetV2_x0_5, ShuffleNetV2_x1_0, ShuffleNetV2_x1_5, ShuffleNetV2_x2_0, ShuffleNetV2_swish
 from .model_zoo.ghostnet import GhostNet_x0_5, GhostNet_x1_0, GhostNet_x1_3
+from .model_zoo.ghostnet_v3 import (
+    GhostNetV3_x0_5,
+    GhostNetV3_x1_0,
+    GhostNetV3_x1_3,
+    GhostNetV3_x1_6,
+)
 from .model_zoo.alexnet import AlexNet
 from .model_zoo.inception_v4 import InceptionV4
 from .model_zoo.xception import Xception41, Xception65, Xception71
