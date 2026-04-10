@@ -30,7 +30,7 @@
 
 YOLO11 是 Ultralytics 发布的 YOLO11 系列模型，其中 `YOLO11-cls` 为 ImageNet 1K 图像分类模型，输入分辨率为 `224x224`。该系列分类模型沿用了 YOLO11 的基础卷积设计，并在分类任务中使用 `C3k2`、`C2PSA` 和 `Classify` Head 等模块，在精度和推理效率之间取得了较好的平衡。
 
-PaddleClas 当前提供 `YOLO11_cls_n/s/m/l/x` 五个分类规格，均由 Ultralytics 官方 `yolo11*-cls.pt` 权重转换得到。迁移过程中未复用 PyTorch 网络实现，而是按 PaddleClas 风格重新实现了 Paddle 版本，并完成了官方权重映射、逐层前向对齐和 ImageNet 验证集精度复现。
+PaddleClas 当前提供 `YOLO11_cls_n/s/m/l/x` 五个分类规格，均由 Ultralytics 官方 `yolo11*-cls.pt` 权重转换得到。
 
 <a name='1.2'></a>
 
@@ -100,55 +100,6 @@ python tools/infer.py \
   -o Global.pretrained_model=/path/to/YOLO11_cls_s_pretrained.pdparams \
   -o Infer.infer_imgs=docs/images/inference_deployment/whl_demo.jpg
 ```
-
-<a name="3.4"></a>
-
-### 3.4 官方权重转换与前向对齐
-
-YOLO11 分类模型的迁移辅助脚本位于 `tools/model_conversion/yolo11_cls/`，包括：
-
-- Ultralytics 权重导出
-- Paddle 权重转换
-- 输入导出
-- 源模型与 Paddle 模型前向结果导出
-- 数值对比
-- Ultralytics 侧 ImageNet 验证脚本
-
-以 `YOLO11_cls_s` 为例，完整流程如下：
-
-```bash
-# 1. 导出 Ultralytics 官方 pt 权重到 npz
-/root/timm_env_cu126/bin/python tools/model_conversion/yolo11_cls/export_ultralytics_state_npz.py \
-  --variant yolo11_cls_s \
-  --weights /root/ultralytics/yolo11s-cls.pt \
-  --output ./dist/yolo11_cls_runs/s_torch_state_pretrained.npz
-
-# 2. 转换为 Paddle 权重
-/root/paddleclas_env/bin/python tools/model_conversion/yolo11_cls/convert_ultralytics_npz_to_paddle.py \
-  --variant yolo11_cls_s \
-  --state_npz ./dist/yolo11_cls_runs/s_torch_state_pretrained.npz \
-  --output ./dist/yolo11_cls_runs/s_paddle_state_pretrained.pdparams
-
-# 3. 导出源模型与 Paddle 模型前向结果
-/root/timm_env_cu126/bin/python tools/model_conversion/yolo11_cls/export_ultralytics_forward_npz.py \
-  --variant yolo11_cls_s \
-  --input_npz ./dist/yolo11_cls_debug/input.npz \
-  --weights /root/ultralytics/yolo11s-cls.pt \
-  --output ./dist/yolo11_cls_runs/s_torch_forward_pretrained.npz
-
-/root/paddleclas_env/bin/python tools/model_conversion/yolo11_cls/export_paddle_forward_npz.py \
-  --variant yolo11_cls_s \
-  --input_npz ./dist/yolo11_cls_debug/input.npz \
-  --weights ./dist/yolo11_cls_runs/s_paddle_state_pretrained.pdparams \
-  --output ./dist/yolo11_cls_runs/s_paddle_forward_pretrained.npz
-
-# 4. 对比前向结果
-python tools/model_conversion/yolo11_cls/compare_outputs.py \
-  --torch_npz ./dist/yolo11_cls_runs/s_torch_forward_pretrained.npz \
-  --paddle_npz ./dist/yolo11_cls_runs/s_paddle_forward_pretrained.npz
-```
-
-目前 `n/s/m/l/x` 五个规格均已完成官方权重转换、前向对齐和 ImageNet 精度验证。
 
 <a name="4"></a>
 
