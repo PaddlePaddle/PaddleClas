@@ -13,6 +13,7 @@
     - [3.3 预测](#3.3)
     - [3.4 官方权重转换与前向对齐](#3.4)
     - [3.5 前向对齐结果](#3.5)
+    - [3.6 训练烟测结果](#3.6)
 - [4. 模型推理部署](#4)
   - [4.1 推理模型准备](#4.1)
   - [4.2 基于 Python 预测引擎推理](#4.2)
@@ -59,6 +60,16 @@ PaddleClas 当前提供 `YOLO11_cls_n/s/m/l/x` 五个分类规格，均由 Ultra
 | YOLO11_cls_l | 0.7834 | 0.9422 | 0.783 | 0.943 | 6.2 | 12.94 |
 | YOLO11_cls_x | 0.7943 | 0.9488 | 0.795 | 0.949 | 13.7 | 28.46 |
 
+在ImageNet小数据集上的训练结果如下：
+| Models | Epoch1<br>Avg loss | Epoch2<br>Avg loss | Epoch3<br>Avg loss |
+|:--:|:--:|:--:|:--:|
+| YOLO11_cls_n | 2.95626 | 1.41258 | 0.33085 |
+| YOLO11_cls_s | 3.04500 | 1.08102 | 0.13762 |
+| YOLO11_cls_m | 2.45981 | 0.99367 | 0.14679 |
+| YOLO11_cls_l | 2.74979 | 0.92564 | 0.10278 |
+| YOLO11_cls_x | 2.46337 | 0.86293 | 0.25371 |
+
+Loss可以正常下降
 **说明：**
 
 - `Reference top1/top5` 来自 Ultralytics 官方 YOLO11 文档与官方 `pt` 权重实测结果。
@@ -115,6 +126,18 @@ python tools/infer.py \
   -o Global.pretrained_model=/path/to/YOLO11_cls_s_pretrained.pdparams \
   -o Infer.infer_imgs=docs/images/inference_deployment/whl_demo.jpg
 ```
+
+
+
+| Models | Epoch1<br>Avg loss | Epoch2<br>Avg loss | Epoch3<br>Avg loss |
+|:--:|:--:|:--:|:--:|
+| YOLO11_cls_n | 2.95626 | 1.41258 | 0.33085 |
+| YOLO11_cls_s | 3.04500 | 1.08102 | 0.13762 |
+| YOLO11_cls_m | 2.45981 | 0.99367 | 0.14679 |
+| YOLO11_cls_l | 2.74979 | 0.92564 | 0.10278 |
+| YOLO11_cls_x | 2.46337 | 0.86293 | 0.25371 |
+
+从结果可以看出，五个规格在小样本短训中均出现了明显的 loss 下降，说明训练链路、反向传播和参数更新过程均正常。
 
 <a name="4"></a>
 
