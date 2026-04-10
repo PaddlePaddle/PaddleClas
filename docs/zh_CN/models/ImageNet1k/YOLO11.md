@@ -12,6 +12,7 @@
     - [3.2 评估](#3.2)
     - [3.3 预测](#3.3)
     - [3.4 官方权重转换与前向对齐](#3.4)
+    - [3.5 前向对齐结果](#3.5)
 - [4. 模型推理部署](#4)
   - [4.1 推理模型准备](#4.1)
   - [4.2 基于 Python 预测引擎推理](#4.2)
@@ -35,6 +36,20 @@ PaddleClas 当前提供 `YOLO11_cls_n/s/m/l/x` 五个分类规格，均由 Ultra
 <a name='1.2'></a>
 
 ### 1.2 模型指标
+
+使用 Ultralytics 官方 `yolo11*-cls.pt` 权重和相同输入进行前向对齐，比较 Paddle 模型与源模型的末级特征 `feat` 和分类输出 `out`，结果如下：
+
+| Models | feat<br>max_abs_diff | out<br>max_abs_diff |
+|:--:|:--:|:--:|
+| YOLO11_cls_n | 4.23e-6 | 3.81e-6 |
+| YOLO11_cls_s | 9.48e-6 | 9.66e-6 |
+| YOLO11_cls_m | 3.24e-6 | 5.96e-6 |
+| YOLO11_cls_l | 6.14e-6 | 3.34e-6 |
+| YOLO11_cls_x | 3.70e-6 | 3.10e-6 |
+
+最大绝对误差稳定在 `1e-5` 以内。
+
+在ImageNet数据集下的精度测试结果如下：
 
 | Models | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
