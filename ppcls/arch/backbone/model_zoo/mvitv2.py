@@ -25,6 +25,17 @@ from paddle.nn.initializer import TruncatedNormal
 from .vision_transformer import zeros_, ones_, DropPath, Identity, Mlp
 from ....utils.save_load import load_dygraph_pretrain
 
+MODEL_URLS = {
+    "MViTv2_tiny":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mvitv2_tiny.pdparams",
+    "MViTv2_small":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mvitv2_small.pdparams",
+    "MViTv2_base":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mvitv2_base.pdparams",
+    "MViTv2_large":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mvitv2_large.pdparams",
+}
+
 __all__ = [
     'MViTv2_tiny', 'MViTv2_small', 'MViTv2_base', 'MViTv2_large',
     'MViTv2_small_cls', 'MViTv2_base_cls', 'MViTv2_large_cls', 'MViTv2_huge_cls'
@@ -893,44 +904,63 @@ model_cfgs = dict(
 )
 
 
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+
 def _create_mvitv2(variant, cfg_variant=None, pretrained=False, **kwargs):
     cfg = model_cfgs[variant] if not cfg_variant else model_cfgs[cfg_variant]
     model = MultiScaleVit(
         cfg=cfg,
         **kwargs,
     )
-    if pretrained:
-        load_dygraph_pretrain(model, pretrained)
     return model
 
 
-def MViTv2_tiny(pretrained=False, **kwargs):
-    return _create_mvitv2('mvitv2_tiny', pretrained=pretrained, **kwargs)
+def MViTv2_tiny(pretrained=False, use_ssld=False, **kwargs):
+    model = _create_mvitv2('mvitv2_tiny', **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MViTv2_tiny"], use_ssld=use_ssld)
+    return model
 
 
-def MViTv2_small(pretrained=False, **kwargs):
-    return _create_mvitv2('mvitv2_small', pretrained=pretrained, **kwargs)
+def MViTv2_small(pretrained=False, use_ssld=False, **kwargs):
+    model = _create_mvitv2('mvitv2_small', **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MViTv2_small"], use_ssld=use_ssld)
+    return model
 
 
-def MViTv2_base(pretrained=False, **kwargs):
-    return _create_mvitv2('mvitv2_base', pretrained=pretrained, **kwargs)
+def MViTv2_base(pretrained=False, use_ssld=False, **kwargs):
+    model = _create_mvitv2('mvitv2_base', **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MViTv2_base"], use_ssld=use_ssld)
+    return model
 
 
-def MViTv2_large(pretrained=False, **kwargs):
-    return _create_mvitv2('mvitv2_large', pretrained=pretrained, **kwargs)
+def MViTv2_large(pretrained=False, use_ssld=False, **kwargs):
+    model = _create_mvitv2('mvitv2_large', **kwargs)
+    _load_pretrained(pretrained, model, MODEL_URLS["MViTv2_large"], use_ssld=use_ssld)
+    return model
 
 
 def MViTv2_small_cls(pretrained=False, **kwargs):
-    return _create_mvitv2('mvitv2_small_cls', pretrained=pretrained, **kwargs)
+    return _create_mvitv2('mvitv2_small_cls', **kwargs)
 
 
 def MViTv2_base_cls(pretrained=False, **kwargs):
-    return _create_mvitv2('mvitv2_base_cls', pretrained=pretrained, **kwargs)
+    return _create_mvitv2('mvitv2_base_cls', **kwargs)
 
 
 def MViTv2_large_cls(pretrained=False, **kwargs):
-    return _create_mvitv2('mvitv2_large_cls', pretrained=pretrained, **kwargs)
+    return _create_mvitv2('mvitv2_large_cls', **kwargs)
 
 
 def MViTv2_huge_cls(pretrained=False, **kwargs):
-    return _create_mvitv2('mvitv2_huge_cls', pretrained=pretrained, **kwargs)
+    return _create_mvitv2('mvitv2_huge_cls', **kwargs)
