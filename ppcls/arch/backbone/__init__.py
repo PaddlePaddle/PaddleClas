@@ -87,6 +87,7 @@ from .model_zoo.mobilevit_v2 import MobileViTV2_x0_5, MobileViTV2_x0_75, MobileV
 from .model_zoo.tinynet import TinyNet_A, TinyNet_B, TinyNet_C, TinyNet_D, TinyNet_E
 from .model_zoo.mobilevit_v3 import MobileViTV3_XXS, MobileViTV3_XS, MobileViTV3_S, MobileViTV3_XXS_L2, MobileViTV3_XS_L2, MobileViTV3_S_L2, MobileViTV3_x0_5, MobileViTV3_x0_75, MobileViTV3_x1_0
 from .model_zoo.svtrnet import SVTR_tiny, SVTR_base, SVTR_large
+from .model_zoo.mvitv2 import  MViTv2_tiny, MViTv2_small, MViTv2_base, MViTv2_large, MViTv2_small_cls, MViTv2_base_cls, MViTv2_large_cls, MViTv2_huge_cls
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1
 from .variant_models.resnet_variant import ResNet50_adaptive_max_pool2d
