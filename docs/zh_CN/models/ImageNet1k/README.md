@@ -35,6 +35,7 @@
     - [VAN](#VAN)
     - [PeleeNet](#PeleeNet)
     - [CSPNet](#CSPNet)
+    - [YOLO26 系列](#YOLO26)
     - [其他模型](#Others)
   - [3.2 轻量级模型](#CNN_lite)
     - [移动端系列](#Mobile)
@@ -60,7 +61,7 @@
 
 ## 一、模型库概览图
 
-基于 ImageNet1k 分类数据集，PaddleClas 支持 37 个系列分类网络结构以及对应的 217 个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
+基于 ImageNet1k 分类数据集，PaddleClas 支持 38 个系列分类网络结构以及对应的 222 个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
 * Arm CPU 的评估环境基于骁龙 855(SD855)。
 * Intel CPU 的评估环境基于 Intel(R) Xeon(R) Gold 6148。
 * GPU 评估环境基于 V100 机器，在 FP32+TensorRT 配置下运行 2100 次测得（去除前 100 次的 warmup 时间）。
@@ -507,6 +508,20 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 | 模型       | Top-1 Acc | Top-5 Acc | time(ms)<br>bs=1 | time(ms)<br>bs=4 | time(ms)<br/>bs=8 | FLOPs(G) | Params(M) | 预训练模型下载地址 | inference模型下载地址 |
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | CSPDarkNet53 | 0.7725 | 0.9355  | 2.80 | 5.43 | 9.48 | 5.041 | 27.678 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSPDarkNet53_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CSPDarkNet53_infer.tar) |
+
+<a name="YOLO26"></a>
+
+## YOLO26 系列
+
+YOLO26 系列模型的精度指标如下表所示，更多介绍可以参考：[YOLO26 系列模型文档](YOLO26.md)。当前 PaddleClas 已复现 `YOLO26n-cls`，其它 scale 可按同一转换流程生成 Paddle 权重后评估。
+
+| 模型 | Top-1 Acc | Top-5 Acc | Reference<br>Top-1 Acc | Reference<br>Top-5 Acc | FLOPs(G) | Params(M) | 预训练模型 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| YOLO26n-cls | 0.7146 | 0.9011 | 0.714 | 0.901 | 0.5 | 2.8 | [本地转换](YOLO26.md#4-预处理与权重转换说明) |
+| YOLO26s-cls | - | - | 0.760 | 0.929 | 1.6 | 6.7 | [本地转换](YOLO26.md#4-预处理与权重转换说明) |
+| YOLO26m-cls | - | - | 0.781 | 0.942 | 4.9 | 11.6 | [本地转换](YOLO26.md#4-预处理与权重转换说明) |
+| YOLO26l-cls | - | - | 0.790 | 0.946 | 6.2 | 14.1 | [本地转换](YOLO26.md#4-预处理与权重转换说明) |
+| YOLO26x-cls | - | - | 0.799 | 0.950 | 13.6 | 29.6 | [本地转换](YOLO26.md#4-预处理与权重转换说明) |
 
 <a name="Others"></a>
 
