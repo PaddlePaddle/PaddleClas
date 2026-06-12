@@ -742,7 +742,7 @@ class EfficientFormerV2(nn.Layer):
         norm_layer: str = "batchnorm2d",
         norm_eps: float = 1e-5,
         act_layer: str = "gelu",
-        num_classes: int = 1000,
+        class_num: int = 1000,
         drop_rate: float = 0.0,
         proj_drop_rate: float = 0.0,
         drop_path_rate: float = 0.0,
@@ -752,7 +752,7 @@ class EfficientFormerV2(nn.Layer):
     ):
         super().__init__()
         assert global_pool in ("avg", "")
-        self.num_classes = num_classes
+        self.class_num = class_num
         self.global_pool = global_pool
         self.feature_info = []
         img_size = to_2tuple(img_size)
@@ -829,13 +829,13 @@ class EfficientFormerV2(nn.Layer):
             self.norm = norm_layer_fn(embed_dims[-1], epsilon=norm_eps)
         self.head_drop = nn.Dropout(drop_rate)
         self.head = (
-            nn.Linear(embed_dims[-1], num_classes) if num_classes > 0 else nn.Identity()
+            nn.Linear(embed_dims[-1], class_num) if class_num > 0 else nn.Identity()
         )
         self.dist = distillation
         if self.dist:
             self.head_dist = (
-                nn.Linear(embed_dims[-1], num_classes)
-                if num_classes > 0
+                nn.Linear(embed_dims[-1], class_num)
+                if class_num > 0
                 else nn.Identity()
             )
         else:
@@ -855,18 +855,18 @@ class EfficientFormerV2(nn.Layer):
     def get_classifier(self):
         return self.head, self.head_dist
 
-    def reset_classifier(self, num_classes: int, global_pool: Optional[str] = None):
-        self.num_classes = num_classes
+    def reset_classifier(self, class_num: int, global_pool: Optional[str] = None):
+        self.class_num = class_num
         if global_pool is not None:
             self.global_pool = global_pool
         self.head = (
-            nn.Linear(self.num_features, num_classes)
-            if num_classes > 0
+            nn.Linear(self.num_features, class_num)
+            if class_num > 0
             else nn.Identity()
         )
         self.head_dist = (
-            nn.Linear(self.num_features, num_classes)
-            if num_classes > 0
+            nn.Linear(self.num_features, class_num)
+            if class_num > 0
             else nn.Identity()
         )
 
