@@ -95,31 +95,6 @@ def _calc_drop_path_rates(drop_path_rate, depths):
     return per_stage
 
 
-def _pad_same(x, kernel_size, stride):
-    """SAME padding for Conv2d (NCHW) -- TF-style asymmetric.
-
-    timm: pad_same / get_same_padding
-    """
-    ih, iw = x.shape[-2:]
-    oh = math.ceil(ih / stride)
-    ow = math.ceil(iw / stride)
-    ph = max((oh - 1) * stride + kernel_size - ih, 0)
-    pw = max((ow - 1) * stride + kernel_size - iw, 0)
-    pt, pb = ph // 2, ph - ph // 2
-    pl, pr = pw // 2, pw - pw // 2
-    if ph > 0 or pw > 0:
-        return paddle.nn.functional.pad(x, [pl, pr, pt, pb])
-    return x
-
-
-def gelu_tanh(x):
-    return paddle.nn.functional.gelu(x, approximate=True)
-
-
-def silu_fn(x):
-    return paddle.nn.functional.silu(x)
-
-
 # ---------------------------------------------------------------------------
 # Basic layers
 # ---------------------------------------------------------------------------
@@ -137,15 +112,6 @@ class DropPath(nn.Layer):
         shape = (x.shape[0],) + (1,) * (x.ndim - 1)
         random_tensor = paddle.bernoulli(paddle.full(shape, keep_prob, dtype=x.dtype))
         return x * random_tensor / keep_prob
-
-
-class GELUTanh(nn.Layer):
-    """GELU with tanh approximation.
-
-    timm: GELU(approximate='tanh') / gelu_tanh layer
-    """
-    def forward(self, x):
-        return paddle.nn.functional.gelu(x, approximate=True)
 
 
 class Mlp(nn.Layer):
@@ -264,19 +230,19 @@ class BatchNormAct2d(nn.BatchNorm2D):
     """BatchNorm2d + activation.
 
     timm: BatchNormAct2d.
-    act_fn: callable activation function. If None, defaults to gelu_tanh (MaxViT TF).
-    For CoAtNet, pass silu_fn.
+    act_layer: nn.Layer class for activation (e.g. nn.Silu). If None, defaults to
+    nn.GELU(approximate='tanh') for MaxViT TF; pass nn.Silu for CoAtNet.
     """
-    def __init__(self, num_features, eps=1e-5, apply_act=True, act_fn=None):
+    def __init__(self, num_features, eps=1e-5, apply_act=True, act_layer=None):
         super().__init__(num_features, epsilon=eps)
-        self.apply_act = apply_act
-        self.act_fn = act_fn
+        if apply_act:
+            # paddle native: nn.GELU(approximate='tanh') == timm gelu_tanh
+            self.act = act_layer() if act_layer is not None else nn.GELU(approximate='tanh')
+        else:
+            self.act = nn.Identity()
 
     def forward(self, x):
-        x = super().forward(x)
-        if self.apply_act:
-            x = self.act_fn(x) if self.act_fn is not None else gelu_tanh(x)
-        return x
+        return self.act(super().forward(x))
 
 
 # ---------------------------------------------------------------------------
@@ -288,37 +254,18 @@ def create_conv2d(in_chs, out_chs, kernel_size, stride=1, padding=0,
     """Create a Conv2D layer with timm-compatible padding semantics.
 
     timm: create_conv2d / get_padding_value
-
     padding values:
-      - "same": TF-style SAME padding (asymmetric, dynamic via _SamePadConv2d)
+      - "same": paddle native TF-style SAME padding (equivalent to timm's _SamePadConv2d)
       - "" or None: symmetric PyTorch-style padding (default in timm MaxxVitConvCfg)
       - int / tuple: explicit padding passed to nn.Conv2D
     """
-    if padding == "same":
-        return _SamePadConv2d(in_chs, out_chs, kernel_size, stride, groups, bias)
     if padding == "" or padding is None:
-        # Symmetric padding = ((stride-1) + dilation*(k-1)) // 2, dilation=1
-        # timm: get_padding(kernel_size, stride)
+        # timm: get_padding(kernel_size, stride) -- symmetric padding
         k = kernel_size if isinstance(kernel_size, int) else kernel_size[0]
         s = stride if isinstance(stride, int) else stride[0]
         padding = ((s - 1) + (k - 1)) // 2
     return nn.Conv2D(in_chs, out_chs, kernel_size, stride=stride,
                      padding=padding, groups=groups, bias_attr=bias)
-
-
-class _SamePadConv2d(nn.Conv2D):
-    """Conv2D with SAME padding (TF-style, asymmetric).
-
-    timm: Conv2dSame / _SamePadConv2d. Inherits from Conv2D so weight key matches.
-    """
-    def __init__(self, in_chs, out_chs, kernel_size, stride, groups, bias):
-        super().__init__(in_chs, out_chs, kernel_size, stride=stride,
-                         padding=0, groups=groups, bias_attr=bias)
-        self._kernel_size = kernel_size if isinstance(kernel_size, tuple) else (kernel_size, kernel_size)
-
-    def forward(self, x):
-        x = _pad_same(x, self._kernel_size[0], self._stride[0])
-        return super().forward(x)
 
 
 def create_pool2d(pool_type, kernel_size, stride=None, padding=0, **kwargs):
@@ -344,17 +291,16 @@ def create_pool2d(pool_type, kernel_size, stride=None, padding=0, **kwargs):
 def _generate_lookup_tensor(length):
     """One-hot lookup tensor for TF-compatible relative position bias (MaxViT).
 
-    timm: _generate_lookup_tensor (in RelPosBiasTf)
+    timm: _generate_lookup_tensor (in RelPosBiasTf).
+    Returns [L, L, 2L-1] one-hot tensor where entry [i, j, j-i+L-1] = 1.
+    Vectorized: replaces original Python double for-loop.
     """
     max_rel = length - 1
     vocab = 2 * max_rel + 1
-    ret = paddle.zeros((length, length, vocab))
-    for i in range(length):
-        for j in range(length):
-            v = j - i + max_rel
-            if abs(j - i) <= max_rel:
-                ret[i, j, v] = 1.0
-    return ret
+    idx = paddle.arange(length).reshape([length, 1])  # i: [L, 1]
+    jdx = paddle.arange(length).reshape([1, length])  # j: [1, L]
+    rel = jdx - idx + max_rel  # [L, L], values in [0, 2*max_rel]
+    return nn.functional.one_hot(rel, num_classes=vocab).astype("float32")
 
 
 def gen_relative_position_index(q_size):
@@ -556,7 +502,8 @@ class AttentionCl(nn.Layer):
         # timm: head_first -> (B, num_heads, dim_head*3, -1) chunk(3, dim=2)
         #       else       -> (B, -1, 3, num_heads, dim_head) transpose(1,3) unbind(2)
         B = x.shape[0]
-        restore_shape = x.shape[:-1]
+        # paddle: x.shape 返回 list, 需显式 list 化后再拼接; timm 原版 restore_shape = x.shape[:-1] (tuple)
+        restore_shape = list(x.shape[:-1])
 
         if self.head_first:
             qkv = self.qkv(x).reshape(
@@ -581,7 +528,7 @@ class AttentionCl(nn.Layer):
         attn = self.attn_drop(attn)
 
         x = attn.matmul(v)
-        x = x.transpose([0, 2, 1, 3]).reshape(restore_shape + (-1,))
+        x = x.transpose([0, 2, 1, 3]).reshape(restore_shape + [-1])
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
@@ -725,7 +672,7 @@ class MbConvBlock(nn.Layer):
                  drop_path=0.0,
                  stride_mode="dw", expand_output=True,
                  pre_norm_act=False, attn_early=False,
-                 attn_act_layer=None, norm_act_fn=None):
+                 attn_act_layer=None, norm_act_layer=None):
         super().__init__()
         # timm: downsample_pool_type defaults to 'avg2' (independent of pool_type);
         # __post_init__ sets it to pool_type only when explicitly None.
@@ -749,7 +696,7 @@ class MbConvBlock(nn.Layer):
             stride_2 = stride
 
         self.pre_norm = BatchNormAct2d(
-            in_chs, eps=norm_eps, apply_act=pre_norm_act, act_fn=norm_act_fn)
+            in_chs, eps=norm_eps, apply_act=pre_norm_act, act_layer=norm_act_layer)
         if stride_pool > 1:
             # timm: down uses downsample_pool_type (NOT pool_type)
             self.down = Downsample2d(in_chs, in_chs, pool_type=downsample_pool_type)
@@ -757,7 +704,7 @@ class MbConvBlock(nn.Layer):
             self.down = nn.Identity()
 
         self.conv1_1x1 = create_conv2d(in_chs, mid_chs, 1, stride=stride_1, bias=False)
-        self.norm1 = BatchNormAct2d(mid_chs, eps=norm_eps, apply_act=True, act_fn=norm_act_fn)
+        self.norm1 = BatchNormAct2d(mid_chs, eps=norm_eps, apply_act=True, act_layer=norm_act_layer)
 
         self.conv2_kxk = create_conv2d(mid_chs, mid_chs, kernel_size,
                                         stride=stride_2, groups=groups, padding=padding,
@@ -768,11 +715,11 @@ class MbConvBlock(nn.Layer):
         rd_channels = int(attn_ratio * (out_chs if expand_output else mid_chs))
         if attn_early:
             self.se_early = SqueezeExcitation(mid_chs, rd_channels, act_layer=se_act)
-            self.norm2 = BatchNormAct2d(mid_chs, eps=norm_eps, apply_act=True, act_fn=norm_act_fn)
+            self.norm2 = BatchNormAct2d(mid_chs, eps=norm_eps, apply_act=True, act_layer=norm_act_layer)
             self.se = None
         else:
             self.se_early = None
-            self.norm2 = BatchNormAct2d(mid_chs, eps=norm_eps, apply_act=True, act_fn=norm_act_fn)
+            self.norm2 = BatchNormAct2d(mid_chs, eps=norm_eps, apply_act=True, act_layer=norm_act_layer)
             self.se = SqueezeExcitation(mid_chs, rd_channels, act_layer=se_act)
 
         self.conv3_1x1 = create_conv2d(mid_chs, out_chs, 1, bias=output_bias)
@@ -965,7 +912,7 @@ class MaxxVitBlock(nn.Layer):
                  conv_pool_type="avg2", conv_stride_mode="dw",
                  conv_expand_output=True, conv_pre_norm_act=False,
                  conv_attn_early=False, conv_attn_act_layer=None,
-                 conv_norm_act_fn=None,
+                 conv_norm_act_layer=None,
                  mlp_ratio=4.0, drop_path=0.0, init_values=None):
         super().__init__()
         self.conv = MbConvBlock(
@@ -979,7 +926,7 @@ class MaxxVitBlock(nn.Layer):
             pre_norm_act=conv_pre_norm_act,
             attn_early=conv_attn_early,
             attn_act_layer=conv_attn_act_layer,
-            norm_act_fn=conv_norm_act_fn)
+            norm_act_layer=conv_norm_act_layer)
 
         attn_kwargs = dict(
             dim=dim_out, window_size=window_size, grid_size=grid_size,
@@ -1039,7 +986,7 @@ class MaxxVitStage(nn.Layer):
                     pre_norm_act=kwargs.get("conv_pre_norm_act", False),
                     attn_early=kwargs.get("conv_attn_early", False),
                     attn_act_layer=kwargs.get("conv_attn_act_layer"),
-                    norm_act_fn=kwargs.get("conv_norm_act_fn")))
+                    norm_act_layer=kwargs.get("conv_norm_act_layer")))
             elif block_type == 'T':
                 rel_pos_cls = kwargs.get("rel_pos_cls")
                 blocks.append(TransformerBlock2d(
@@ -1082,7 +1029,7 @@ class MaxxVitStage(nn.Layer):
                     conv_pre_norm_act=kwargs.get("conv_pre_norm_act", False),
                     conv_attn_early=kwargs.get("conv_attn_early", False),
                     conv_attn_act_layer=kwargs.get("conv_attn_act_layer"),
-                    conv_norm_act_fn=kwargs.get("conv_norm_act_fn"),
+                    conv_norm_act_layer=kwargs.get("conv_norm_act_layer"),
                     mlp_ratio=kwargs.get("mlp_ratio", 4.0),
                     init_values=kwargs.get("init_values"),
                     drop_path=drop_path))
@@ -1104,13 +1051,13 @@ class Stem(nn.Layer):
     timm: Stem
     """
     def __init__(self, in_chs, out_chs, bias=True,
-                 norm_eps=1e-3, padding="same", act_fn=None):
+                 norm_eps=1e-3, padding="same", act_layer=None):
         super().__init__()
         if not isinstance(out_chs, (list, tuple)):
             out_chs = to_2tuple(out_chs)
         self.conv1 = create_conv2d(in_chs, out_chs[0], 3, stride=2,
                                     padding=padding, bias=bias)
-        self.norm1 = BatchNormAct2d(out_chs[0], eps=norm_eps, apply_act=True, act_fn=act_fn)
+        self.norm1 = BatchNormAct2d(out_chs[0], eps=norm_eps, apply_act=True, act_layer=act_layer)
         self.conv2 = create_conv2d(out_chs[0], out_chs[1], 3, stride=1,
                                     padding=padding, bias=bias)
         self.out_chs = out_chs[-1]
@@ -1211,13 +1158,12 @@ class MaxxVit(nn.Layer):
         img_size = to_2tuple(img_size)
         self.num_features = cfg_embed_dim[-1]
 
-        # Resolve conv activation function
-        if conv_act == 'gelu_tanh':
-            conv_act_fn = gelu_tanh
-        elif conv_act == 'silu':
-            conv_act_fn = silu_fn
-        else:
-            conv_act_fn = gelu_tanh
+        # Resolve conv activation layer class (paddle native)
+        # paddle nn.GELU(approximate='tanh') == timm gelu_tanh
+        if conv_act == 'silu':
+            conv_act_layer = nn.Silu
+        else:  # 'gelu_tanh' or default
+            conv_act_layer = partial(nn.GELU, approximate='tanh')
 
         # SE activation layer class
         if conv_attn_act == 'relu':
@@ -1225,10 +1171,10 @@ class MaxxVit(nn.Layer):
         else:
             se_act_layer = nn.Silu
 
-        # Transformer activation layer class
+        # Transformer activation layer class (paddle native)
         if transformer_act == 'gelu_tanh':
-            tf_act_layer = GELUTanh
-        else:
+            tf_act_layer = partial(nn.GELU, approximate='tanh')
+        else:  # 'gelu'
             tf_act_layer = nn.GELU
 
         # Relative position class for transformer blocks
@@ -1250,7 +1196,7 @@ class MaxxVit(nn.Layer):
         # Stem
         self.stem = Stem(in_chans, cfg_stem_width, bias=cfg_stem_bias,
                           norm_eps=conv_norm_eps, padding=conv_padding,
-                          act_fn=conv_act_fn)
+                          act_layer=conv_act_layer)
         feat_size = (img_size[0] // 2, img_size[1] // 2)
         in_chs = self.stem.out_chs
 
@@ -1283,7 +1229,7 @@ class MaxxVit(nn.Layer):
                 conv_attn_ratio=conv_attn_ratio, conv_pool_type=conv_pool_type,
                 conv_stride_mode=conv_stride_mode, conv_expand_output=conv_expand_output,
                 conv_pre_norm_act=conv_pre_norm_act, conv_attn_early=conv_attn_early,
-                conv_attn_act_layer=se_act_layer, conv_norm_act_fn=conv_act_fn,
+                conv_attn_act_layer=se_act_layer, conv_norm_act_layer=conv_act_layer,
                 # transformer params
                 dim_head=transformer_dim_head, head_first=transformer_head_first,
                 act_layer=tf_act_layer, norm_eps=transformer_norm_eps,
