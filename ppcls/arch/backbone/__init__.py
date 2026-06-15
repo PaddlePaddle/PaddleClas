@@ -100,6 +100,7 @@ from .variant_models.swin_transformer_variant import SwinTransformer_tiny_patch4
 from .model_zoo.adaface_ir_net import AdaFace_IR_18, AdaFace_IR_34, AdaFace_IR_50, AdaFace_IR_101, AdaFace_IR_152, AdaFace_IR_SE_50, AdaFace_IR_SE_101, AdaFace_IR_SE_152, AdaFace_IR_SE_200
 from .model_zoo.wideresnet import WideResNet
 from .model_zoo.uniformer import UniFormer_small, UniFormer_small_plus, UniFormer_small_plus_dim64, UniFormer_base, UniFormer_base_ls
+from .model_zoo.eva02 import EVA02_tiny_patch14_336, EVA02_small_patch14_336, EVA02_base_patch14_448, EVA02_large_patch14_448
 
 
 # help whl get all the models' api (class type) and components' api (func type)
