@@ -380,6 +380,7 @@ from .model_zoo.mobilevit_v3 import (
     MobileViTV3_x1_0,
 )
 from .model_zoo.svtrnet import SVTR_tiny, SVTR_base, SVTR_large
+from .model_zoo.siglip import vit_base_patch32_siglip_256,vit_base_patch16_siglip_224, vit_base_patch16_siglip_256,vit_base_patch16_siglip_384
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1
 from .variant_models.resnet_variant import ResNet50_adaptive_max_pool2d
