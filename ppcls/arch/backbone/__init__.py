@@ -380,6 +380,7 @@ from .model_zoo.mobilevit_v3 import (
     MobileViTV3_x1_0,
 )
 from .model_zoo.svtrnet import SVTR_tiny, SVTR_base, SVTR_large
+from .model_zoo.mvitv2 import  MViTv2_tiny, MViTv2_small, MViTv2_base, MViTv2_large, MViTv2_small_cls, MViTv2_base_cls, MViTv2_large_cls, MViTv2_huge_cls
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1
 from .variant_models.resnet_variant import ResNet50_adaptive_max_pool2d
