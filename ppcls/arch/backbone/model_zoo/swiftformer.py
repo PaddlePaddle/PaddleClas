@@ -7,7 +7,6 @@ import os
 import copy
 import paddle
 import paddle.nn as nn
-import einops
 from itertools import repeat
 
 SwiftFormer_width = {
@@ -233,7 +232,7 @@ class EfficientAdditiveAttnetion(nn.Layer):
         A = query_weight * self.scale_factor
         A = nn.functional.normalize(A, axis=1)
         G = paddle.sum(A * query, axis=1)
-        G = einops.repeat(G, "b d -> b repeat d", repeat=key.shape[1])
+        G = G.unsqueeze(1).expand([G.shape[0], key.shape[1], G.shape[1]])
         out = self.Proj(G * key) + query
         out = self.final(out)
         return out
