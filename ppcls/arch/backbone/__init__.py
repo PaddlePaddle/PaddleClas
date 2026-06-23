@@ -407,13 +407,8 @@ from .model_zoo.adaface_ir_net import (
     AdaFace_IR_SE_200,
 )
 from .model_zoo.wideresnet import WideResNet
-from .model_zoo.uniformer import (
-    UniFormer_small,
-    UniFormer_small_plus,
-    UniFormer_small_plus_dim64,
-    UniFormer_base,
-    UniFormer_base_ls,
-)
+from .model_zoo.uniformer import UniFormer_small, UniFormer_small_plus, UniFormer_small_plus_dim64, UniFormer_base, UniFormer_base_ls
+from .model_zoo.edgenext import EdgeNeXt_XX_Small, EdgeNeXt_X_Small, EdgeNeXt_Small, EdgeNeXt_Base
 
 
 # help whl get all the models' api (class type) and components' api (func type)
