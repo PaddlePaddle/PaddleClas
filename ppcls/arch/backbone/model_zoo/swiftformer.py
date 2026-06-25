@@ -15,6 +15,7 @@ MODEL_URLS = {
     "SwiftFormer_XS": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_XS_paddle.pdparams",
     "SwiftFormer_S": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_S_paddle.pdparams",
     "SwiftFormer_L1": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_L1_paddle.pdparams",
+    "SwiftFormer_L3": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_L3_paddle.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -632,5 +633,5 @@ def SwiftFormer_L3(pretrained=False, use_ssld=False, **kwargs):
         **kwargs,
     )
     model.default_cfg = _cfg(crop_pct=0.9)
-    _load_pretrained(pretrained, model, MODEL_URLS.get("SwiftFormer_L3", ""), use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS["SwiftFormer_L3"], use_ssld=use_ssld)
     return model
