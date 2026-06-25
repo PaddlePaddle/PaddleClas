@@ -9,6 +9,16 @@ import paddle
 import paddle.nn as nn
 from itertools import repeat
 
+from ....utils.save_load import load_dygraph_pretrain
+
+MODEL_URLS = {
+    "SwiftFormer_XS": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_XS_paddle.pdparams",
+    "SwiftFormer_S": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_S_paddle.pdparams",
+    "SwiftFormer_L1": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_L1_paddle.pdparams",
+}
+
+__all__ = list(MODEL_URLS.keys())
+
 SwiftFormer_width = {
     "XS": [48, 56, 112, 220],
     "S": [48, 64, 168, 224],
@@ -222,8 +232,6 @@ class EfficientAdditiveAttnetion(nn.Layer):
         self.final = nn.Linear(token_dim * num_heads, token_dim)
 
     def forward(self, x):
-        #print(f"[DEBUG] attn input: shape={x.shape}, dtype={x.dtype}, min={x.min().item()}, max={x.max().item()}")
-        #print(f"[DEBUG] to_query weight: shape={self.to_query.weight.shape}, dtype={self.to_query.weight.dtype}")
         query = self.to_query(x)
         key = self.to_key(x)
         query = nn.functional.normalize(query, axis=-1)
@@ -561,7 +569,22 @@ def _cfg(url="", **kwargs):
     }
 
 
-def SwiftFormer_XS(pretrained=False, **kwargs):
+def _load_pretrained(pretrained, model, model_url="", use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True and model_url:
+        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
+    elif pretrained is True:
+        model.init_weights()
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+
+def SwiftFormer_XS(pretrained=False, use_ssld=False, **kwargs):
     model = SwiftFormer(
         layers=SwiftFormer_depth["XS"],
         embed_dims=SwiftFormer_width["XS"],
@@ -570,12 +593,11 @@ def SwiftFormer_XS(pretrained=False, **kwargs):
         **kwargs,
     )
     model.default_cfg = _cfg(crop_pct=0.9)
-    if pretrained:
-        model.init_weights()
+    _load_pretrained(pretrained, model, MODEL_URLS["SwiftFormer_XS"], use_ssld=use_ssld)
     return model
 
 
-def SwiftFormer_S(pretrained=False, **kwargs):
+def SwiftFormer_S(pretrained=False, use_ssld=False, **kwargs):
     model = SwiftFormer(
         layers=SwiftFormer_depth["S"],
         embed_dims=SwiftFormer_width["S"],
@@ -584,12 +606,11 @@ def SwiftFormer_S(pretrained=False, **kwargs):
         **kwargs,
     )
     model.default_cfg = _cfg(crop_pct=0.9)
-    if pretrained:
-        model.init_weights()
+    _load_pretrained(pretrained, model, MODEL_URLS["SwiftFormer_S"], use_ssld=use_ssld)
     return model
 
 
-def SwiftFormer_L1(pretrained=False, **kwargs):
+def SwiftFormer_L1(pretrained=False, use_ssld=False, **kwargs):
     model = SwiftFormer(
         layers=SwiftFormer_depth["l1"],
         embed_dims=SwiftFormer_width["l1"],
@@ -598,12 +619,11 @@ def SwiftFormer_L1(pretrained=False, **kwargs):
         **kwargs,
     )
     model.default_cfg = _cfg(crop_pct=0.9)
-    if pretrained:
-        model.init_weights()
+    _load_pretrained(pretrained, model, MODEL_URLS["SwiftFormer_L1"], use_ssld=use_ssld)
     return model
 
 
-def SwiftFormer_L3(pretrained=False, **kwargs):
+def SwiftFormer_L3(pretrained=False, use_ssld=False, **kwargs):
     model = SwiftFormer(
         layers=SwiftFormer_depth["l3"],
         embed_dims=SwiftFormer_width["l3"],
@@ -612,6 +632,5 @@ def SwiftFormer_L3(pretrained=False, **kwargs):
         **kwargs,
     )
     model.default_cfg = _cfg(crop_pct=0.9)
-    if pretrained:
-        model.init_weights()
+    _load_pretrained(pretrained, model, MODEL_URLS.get("SwiftFormer_L3", ""), use_ssld=use_ssld)
     return model

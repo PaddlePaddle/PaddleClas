@@ -24,14 +24,22 @@ import paddle.nn.functional as F
 from ....utils.save_load import load_dygraph_pretrain
 
 MODEL_URLS = {
-    "MobileOne_S0": "",
-    "MobileOne_S1": "",
-    "MobileOne_S2": "",
-    "MobileOne_S3": "",
-    "MobileOne_S4": "",
+    "MobileOne_S0": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s0_paddle.pdparams",
+    "MobileOne_S1": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s1_paddle.pdparams",
+    "MobileOne_S2": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s2_paddle.pdparams",
+    "MobileOne_S3": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s3_paddle.pdparams",
+    "MobileOne_S4": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s4_paddle.pdparams",
 }
 
-__all__ = list(MODEL_URLS.keys())
+MODEL_URLS_UNFUSED = {
+    "MobileOne_S0_unfused": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s0_unfused_paddle.pdparams",
+    "MobileOne_S1_unfused": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s1_unfused_paddle.pdparams",
+    "MobileOne_S2_unfused": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s2_unfused_paddle.pdparams",
+    "MobileOne_S3_unfused": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s3_unfused_paddle.pdparams",
+    "MobileOne_S4_unfused": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s4_unfused_paddle.pdparams",
+}
+
+__all__ = list(MODEL_URLS.keys()) + list(MODEL_URLS_UNFUSED.keys())
 
 
 class SEBlock(nn.Layer):
@@ -372,31 +380,57 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
+def _get_model_url(variant, inference_mode=False):
+    if inference_mode:
+        return MODEL_URLS[variant]
+    return MODEL_URLS_UNFUSED[f"{variant}_unfused"]
+
+
 def MobileOne_S0(pretrained=False, use_ssld=False, **kwargs):
     model = MobileOne(
         width_multipliers=(0.75, 1.0, 1.0, 2.0),
         num_conv_branches=4,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["MobileOne_S0"], use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        _get_model_url("MobileOne_S0", model.inference_mode),
+        use_ssld,
+    )
     return model
 
 
 def MobileOne_S1(pretrained=False, use_ssld=False, **kwargs):
     model = MobileOne(width_multipliers=(1.5, 1.5, 2.0, 2.5), **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["MobileOne_S1"], use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        _get_model_url("MobileOne_S1", model.inference_mode),
+        use_ssld,
+    )
     return model
 
 
 def MobileOne_S2(pretrained=False, use_ssld=False, **kwargs):
     model = MobileOne(width_multipliers=(1.5, 2.0, 2.5, 4.0), **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["MobileOne_S2"], use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        _get_model_url("MobileOne_S2", model.inference_mode),
+        use_ssld,
+    )
     return model
 
 
 def MobileOne_S3(pretrained=False, use_ssld=False, **kwargs):
     model = MobileOne(width_multipliers=(2.0, 2.5, 3.0, 4.0), **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["MobileOne_S3"], use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        _get_model_url("MobileOne_S3", model.inference_mode),
+        use_ssld,
+    )
     return model
 
 
@@ -406,8 +440,38 @@ def MobileOne_S4(pretrained=False, use_ssld=False, **kwargs):
         use_se=True,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["MobileOne_S4"], use_ssld)
+    _load_pretrained(
+        pretrained,
+        model,
+        _get_model_url("MobileOne_S4", model.inference_mode),
+        use_ssld,
+    )
     return model
+
+
+def MobileOne_S0_unfused(pretrained=False, use_ssld=False, **kwargs):
+    kwargs["inference_mode"] = False
+    return MobileOne_S0(pretrained=pretrained, use_ssld=use_ssld, **kwargs)
+
+
+def MobileOne_S1_unfused(pretrained=False, use_ssld=False, **kwargs):
+    kwargs["inference_mode"] = False
+    return MobileOne_S1(pretrained=pretrained, use_ssld=use_ssld, **kwargs)
+
+
+def MobileOne_S2_unfused(pretrained=False, use_ssld=False, **kwargs):
+    kwargs["inference_mode"] = False
+    return MobileOne_S2(pretrained=pretrained, use_ssld=use_ssld, **kwargs)
+
+
+def MobileOne_S3_unfused(pretrained=False, use_ssld=False, **kwargs):
+    kwargs["inference_mode"] = False
+    return MobileOne_S3(pretrained=pretrained, use_ssld=use_ssld, **kwargs)
+
+
+def MobileOne_S4_unfused(pretrained=False, use_ssld=False, **kwargs):
+    kwargs["inference_mode"] = False
+    return MobileOne_S4(pretrained=pretrained, use_ssld=use_ssld, **kwargs)
 
 
 def mobileone(class_num=1000, inference_mode=False, variant="s0", **kwargs):
