@@ -21,16 +21,15 @@ import paddle.nn as nn
 
 from ....utils.save_load import load_dygraph_pretrain
 
-MODEL_URLS = {}
+MODEL_URLS = {
+    "YOLO26n": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26n-cls.pdparams",
+    "YOLO26s": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26s-cls.pdparams",
+    "YOLO26m": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26m-cls.pdparams",
+    "YOLO26l": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26l-cls.pdparams",
+    "YOLO26x": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26x-cls.pdparams",
+}
 
-__all__ = [
-    "YOLO26n",
-    "YOLO26s",
-    "YOLO26m",
-    "YOLO26l",
-    "YOLO26x",
-]
-
+__all__ = list(MODEL_URLS.keys())
 
 YOLO26_CLS_CFG = {
     "n": {"depth": 0.50, "width": 0.25, "max_channels": 1024},
