@@ -26,7 +26,7 @@
 
 [MobileOne](https://arxiv.org/abs/2206.04040) 是面向移动端低时延场景设计的卷积骨干网络。其核心思想是将训练阶段的多分支结构（卷积分支、尺度分支、恒等分支）在部署阶段重参数化为单分支卷积，从而兼顾训练表达能力和推理效率。
 
-PaddleClas 当前已支持 `MobileOne_S0`、`MobileOne_S0_unfused`、`MobileOne_S1`、、`MobileOne_S1_unfused`、`MobileOne_S2`、、`MobileOne_S2_unfused`、`MobileOne_S3`、、`MobileOne_S3_unfused`、`MobileOne_S4`、`MobileOne_S4_unfused` 十个变体，支持unfused(多分支)和fused（单分支）两种结构，分别对应不同的参数权重并提供对应的 ImageNet 训练配置。
+PaddleClas 当前已支持 `MobileOne_S0`、`MobileOne_S0_unfused`、`MobileOne_S1`、`MobileOne_S1_unfused`、`MobileOne_S2`、`MobileOne_S2_unfused`、`MobileOne_S3`、`MobileOne_S3_unfused`、`MobileOne_S4`、`MobileOne_S4_unfused` 十个变体，支持 unfused（多分支）和 fused（单分支）两种结构，分别对应不同的参数权重并提供对应的 ImageNet 训练配置。
 
 <a name='1.2'></a>
 
@@ -86,14 +86,12 @@ python3 -m paddle.distributed.launch  tools/train.py \
 #fused
 python tools/eval.py -c PaddleClas/ppcls/configs/ImageNet/MobileOne/MobileOne_S0.yaml \
 -o Arch.inference_mode=True \
--o Global.pretrained_model=/path/to/mobileone_s0_paddle.pdparams \
+-o Global.pretrained_model=/path/to/mobileone_s0_paddle.pdparams
 
 #unfused
 python tools/eval.py -c PaddleClas/ppcls/configs/ImageNet/MobileOne/MobileOne_S0.yaml \
 -o Arch.inference_mode=False \
--o Global.pretrained_model=/path/to/mobileone_s0_unfused_paddle.pdparams \
-
-# 模型预测
+-o Global.pretrained_model=/path/to/mobileone_s0_unfused_paddle.pdparams
 
 
 # 模型预测
@@ -108,6 +106,7 @@ python3 tools/infer.py \
 -c PaddleClas/ppcls/configs/ImageNet/MobileOne/MobileOne_S0.yaml \
 -o Arch.inference_mode=False \
 -o Global.pretrained_model=/path/to/mobileone_s0_unfused_paddle.pdparams
+```
 
 <a name="4"></a>
 

@@ -54,13 +54,14 @@
     - [TNT 系列](#TNT)
   - [4.2 轻量级模型](#Transformer_lite)
     - [MobileViT 系列](#MobileViT)
+    - [SwiftFormer 系列](#SwiftFormer)
 - [五、参考文献](#reference)
 
 <a name="Overview"></a>
 
 ## 一、模型库概览图
 
-基于 ImageNet1k 分类数据集，PaddleClas 支持 38 个系列分类网络结构以及对应的 222 个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
+基于 ImageNet1k 分类数据集，PaddleClas 支持 40 个系列分类网络结构以及对应的 231 个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
 * Arm CPU 的评估环境基于骁龙 855(SD855)。
 * Intel CPU 的评估环境基于 Intel(R) Xeon(R) Gold 6148。
 * GPU 评估环境基于 V100 机器，在 FP32+TensorRT-8.0.3.4 配置下运行 2100 次测得（去除前 100 次的 warmup 时间）。
@@ -774,6 +775,19 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 |  MobileViT_XS    | 0.7454 | 0.9227 | - | - | - | 930.75  |  2.33   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViT_XS_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileViT_XS_infer.tar) |
 |  MobileViT_S    | 0.7814 | 0.9413 | - | - | - | 1849.35  |   5.59   | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/MobileViT_S_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/MobileViT_S_infer.tar) |
 
+<a name="SwiftFormer"></a>
+
+## SwiftFormer 系列 <sup>[[49](#ref49)]</sup>
+
+SwiftFormer 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[SwiftFormer 系列模型文档](SwiftFormer.md)。
+
+| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| SwiftFormer_XS    | 0.7561 | 0.9238 | 0.757 | - | 0.611 | 3.5 |
+| SwiftFormer_S     | 0.7841 | 0.9393 | 0.785 | - | 0.995 | 6.1 |
+| SwiftFormer_L1    | 0.8091 | 0.9528 | 0.809 | - | 1.609 | 12.1 |
+| SwiftFormer_L3    | 0.8300 | 0.9617 | 0.830 | - | 4.029 | 28.5 |
+
 <a name='reference'></a>
 
 ## 五、参考文献
@@ -874,3 +888,5 @@ TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
 <a name="ref47">[47]</a>Ze Liu, Han Hu, Yutong Lin, Zhuliang Yao, Zhenda Xie, Yixuan Wei, Jia Ning, Yue Cao, Zheng Zhang, Li Dong, Furu Wei, Baining Guo. Swin Transformer V2: Scaling Up Capacity and Resolution.
 
 <a name="ref48">[48]</a>MobileOne: An Improved One millisecond Mobile Backbone. arXiv:2206.04040.
+
+<a name="ref49">[49]</a>Abdelrahman Shaker, Muhammad Maaz, Hanoona Rasheed, Salman Khan, Ming-Hsuan Yang, Fahad Shahbaz Khan. SwiftFormer: Efficient Additive Attention for Transformer-based Real-time Mobile Vision Applications.
