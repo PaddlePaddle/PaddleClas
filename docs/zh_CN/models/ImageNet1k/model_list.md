@@ -492,15 +492,15 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 
 ## YOLO26 系列
 
-YOLO26 系列模型的精度指标如下表所示，更多介绍可以参考：[YOLO26 系列模型文档](YOLO26.md)。当前 PaddleClas 已复现 `YOLO26n-cls`，其它 scale 可按同一转换流程生成 Paddle 权重后评估。
+YOLO26 系列模型的精度指标如下表所示，更多介绍可以参考：[YOLO26 系列模型文档](YOLO26.md)。
 
-| 模型 | Top-1 Acc | Top-5 Acc | Reference<br>Top-1 Acc | Reference<br>Top-5 Acc | FLOPs(G) | Params(M) | 预训练模型 |
+| 模型 | Top-1 Acc | Top-5 Acc | Reference<br>Top-1 Acc | Reference<br>Top-5 Acc | FLOPs(G) | Params(M) | 预训练模型下载地址 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| YOLO26n-cls | 0.7146 | 0.9011 | 0.714 | 0.901 | 0.5 | 2.8 | [本地转换](YOLO26.md#4-预处理与权重转换说明) |
-| YOLO26s-cls | - | - | 0.760 | 0.929 | 1.6 | 6.7 | [本地转换](YOLO26.md#4-预处理与权重转换说明) |
-| YOLO26m-cls | - | - | 0.781 | 0.942 | 4.9 | 11.6 | [本地转换](YOLO26.md#4-预处理与权重转换说明) |
-| YOLO26l-cls | - | - | 0.790 | 0.946 | 6.2 | 14.1 | [本地转换](YOLO26.md#4-预处理与权重转换说明) |
-| YOLO26x-cls | - | - | 0.799 | 0.950 | 13.6 | 29.6 | [本地转换](YOLO26.md#4-预处理与权重转换说明) |
+| YOLO26n-cls | 0.7146 | 0.9011 | 0.714 | 0.901 | 0.5 | 2.8 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26n-cls.pdparams) |
+| YOLO26s-cls | - | - | 0.760 | 0.929 | 1.6 | 6.7 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26s-cls.pdparams) |
+| YOLO26m-cls | - | - | 0.781 | 0.942 | 4.9 | 11.6 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26m-cls.pdparams) |
+| YOLO26l-cls | - | - | 0.790 | 0.946 | 6.2 | 14.1 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26l-cls.pdparams) |
+| YOLO26x-cls | - | - | 0.799 | 0.950 | 13.6 | 29.6 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26x-cls.pdparams) |
 
 <a name="Others"></a>
 
@@ -576,11 +576,16 @@ MobileOne 系列模型的精度、速度指标如下表所示，更多关于该�
 
 | 模型          | Top-1 Acc | Top-5 Acc | FLOPs(M) | Params(M) | <span style="white-space:nowrap;">模型大小(M)</span> | 预训练模型下载地址 | inference模型下载地址 |
 |----------------|-----------|-----------|----------|-----------|-----------------------------------|-----------------------------------|-----------------------------------|
-| MobileOne_S0   | 0.7140    | -         | 279      | 2.08      | 8.3                               | -                                 | -                                 |
-| MobileOne_S1   | 0.7590    | -         | 831      | 4.76      | 19.1                              | -                                 | -                                 |
-| MobileOne_S2   | 0.7740    | -         | 1306     | 7.81      | 31.2                              | -                                 | -                                 |
-| MobileOne_S3   | 0.7810    | -         | 1905     | 10.08     | 40.3                              | -                                 | -                                 |
-| MobileOne_S4   | 0.7940    | -         | 2991     | 14.84     | 59.4                              | -                                 | -                                 |
+| MobileOne_S0   | 0.7140    | -         | 279      | 2.08      | 8.3                               | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s0_paddle.pdparams) | -                                 |
+| MobileOne_S0_unfused   | 0.7140    | -         | 1088.5   | 5.38      | 21.5                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s0_unfused_paddle.pdparams) | -                                 |
+| MobileOne_S1   | 0.7590    | -         | 831      | 4.76      | 19.1                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s1_paddle.pdparams) | -                                 |
+| MobileOne_S1_unfused   | 0.7590    | -         | 858.5    | 4.89      | 19.6                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s1_unfused_paddle.pdparams) | -                                 |
+| MobileOne_S2   | 0.7740    | -         | 1306     | 7.81      | 31.2                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s2_paddle.pdparams) | -                                 |
+| MobileOne_S2_unfused   | 0.7740    | -         | 1338.6   | 7.97      | 31.9                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s2_unfused_paddle.pdparams) | -                                 |
+| MobileOne_S3   | 0.7810    | -         | 1905     | 10.08     | 40.3                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s3_paddle.pdparams) | -                                 |
+| MobileOne_S3_unfused   | 0.7810    | -         | 1944.0   | 10.28     | 41.1                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s3_unfused_paddle.pdparams) | -                                 |
+| MobileOne_S4   | 0.7940    | -         | 2991     | 14.84     | 59.4                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s4_paddle.pdparams) | -                                 |
+| MobileOne_S4_unfused   | 0.7940    | -         | 3040.9   | 15.08     | 60.3                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s4_unfused_paddle.pdparams) | -                                 |
 
 <a name="PPLCNet"></a>
 
@@ -781,12 +786,12 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 
 SwiftFormer 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[SwiftFormer 系列模型文档](SwiftFormer.md)。
 
-| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) |
-|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| SwiftFormer_XS    | 0.7561 | 0.9238 | 0.757 | - | 0.611 | 3.5 |
-| SwiftFormer_S     | 0.7841 | 0.9393 | 0.785 | - | 0.995 | 6.1 |
-| SwiftFormer_L1    | 0.8091 | 0.9528 | 0.809 | - | 1.609 | 12.1 |
-| SwiftFormer_L3    | 0.8300 | 0.9617 | 0.830 | - | 4.029 | 28.5 |
+| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) | 预训练模型下载地址 |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| SwiftFormer_XS    | 0.7561 | 0.9238 | 0.757 | - | 0.611 | 3.5 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_XS_paddle.pdparams) |
+| SwiftFormer_S     | 0.7841 | 0.9393 | 0.785 | - | 0.995 | 6.1 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_S_paddle.pdparams) |
+| SwiftFormer_L1    | 0.8091 | 0.9528 | 0.809 | - | 1.609 | 12.1 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_L1_paddle.pdparams) |
+| SwiftFormer_L3    | 0.8300 | 0.9617 | 0.830 | - | 4.029 | 28.5 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_L3_paddle.pdparams) |
 
 <a name='reference'></a>
 
