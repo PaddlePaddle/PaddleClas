@@ -300,7 +300,7 @@ from .model_zoo.mobilevit_v3 import (
     MobileViTV3_x1_0,
 )
 from .model_zoo.svtrnet import SVTR_tiny, SVTR_base, SVTR_large
-from .model_zoo.efficientformer_v2 import EfficientFormerV2, efficientformerv2_s0, efficientformerv2_s1, efficientformerv2_s2, efficientformerv2_l
+from .model_zoo.efficientformer_v2 import EfficientFormerV2, EfficientFormerV2_S0, EfficientFormerV2_S1, EfficientFormerV2_S2, EfficientFormerV2_L
 from .model_zoo.mvitv2 import  MViTv2_tiny, MViTv2_small, MViTv2_base, MViTv2_large, MViTv2_small_cls, MViTv2_base_cls, MViTv2_large_cls, MViTv2_huge_cls
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1

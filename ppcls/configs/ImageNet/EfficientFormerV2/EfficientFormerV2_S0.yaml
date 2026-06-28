@@ -25,7 +25,7 @@ AMP:
 
 # model architecture
 Arch:
-  name: efficientformerv2_s0
+  name: EfficientFormerV2_S0
   class_num: 1000
 
 # loss function config for traing/eval process

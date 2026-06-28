@@ -911,7 +911,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def efficientformerv2_s0(pretrained=False, use_ssld=False, **kwargs) -> EfficientFormerV2:
+def EfficientFormerV2_S0(pretrained=False, use_ssld=False, **kwargs) -> EfficientFormerV2:
     model_args = dict(
         depths=EfficientFormer_depth["S0"],
         embed_dims=EfficientFormer_width["S0"],
@@ -924,7 +924,7 @@ def efficientformerv2_s0(pretrained=False, use_ssld=False, **kwargs) -> Efficien
     return model
 
 
-def efficientformerv2_s1(pretrained=False, use_ssld=False, **kwargs) -> EfficientFormerV2:
+def EfficientFormerV2_S1(pretrained=False, use_ssld=False, **kwargs) -> EfficientFormerV2:
     model_args = dict(
         depths=EfficientFormer_depth["S1"],
         embed_dims=EfficientFormer_width["S1"],
@@ -937,7 +937,7 @@ def efficientformerv2_s1(pretrained=False, use_ssld=False, **kwargs) -> Efficien
     return model
 
 
-def efficientformerv2_s2(pretrained=False, use_ssld=False, **kwargs) -> EfficientFormerV2:
+def EfficientFormerV2_S2(pretrained=False, use_ssld=False, **kwargs) -> EfficientFormerV2:
     model_args = dict(
         depths=EfficientFormer_depth["S2"],
         embed_dims=EfficientFormer_width["S2"],
@@ -950,7 +950,7 @@ def efficientformerv2_s2(pretrained=False, use_ssld=False, **kwargs) -> Efficien
     return model
 
 
-def efficientformerv2_l(pretrained=False, use_ssld=False, **kwargs) -> EfficientFormerV2:
+def EfficientFormerV2_L(pretrained=False, use_ssld=False, **kwargs) -> EfficientFormerV2:
     model_args = dict(
         depths=EfficientFormer_depth["L"],
         embed_dims=EfficientFormer_width["L"],
