@@ -496,11 +496,11 @@ YOLO26 系列模型的精度指标如下表所示，更多介绍可以参考：[
 
 | 模型 | Top-1 Acc | Top-5 Acc | Reference<br>Top-1 Acc | Reference<br>Top-5 Acc | FLOPs(G) | Params(M) | 预训练模型下载地址 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| YOLO26n-cls | 0.7146 | 0.9011 | 0.714 | 0.901 | 0.5 | 2.8 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26n-cls.pdparams) |
-| YOLO26s-cls | - | - | 0.760 | 0.929 | 1.6 | 6.7 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26s-cls.pdparams) |
-| YOLO26m-cls | - | - | 0.781 | 0.942 | 4.9 | 11.6 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26m-cls.pdparams) |
-| YOLO26l-cls | - | - | 0.790 | 0.946 | 6.2 | 14.1 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26l-cls.pdparams) |
-| YOLO26x-cls | - | - | 0.799 | 0.950 | 13.6 | 29.6 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26x-cls.pdparams) |
+| YOLO26n-cls | 0.715 | 0.901 | 0.714 | 0.901 | 0.5 | 2.8 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26n-cls.pdparams) |
+| YOLO26s-cls | 0.759 | 0.929 | 0.760 | 0.929 | 1.6 | 6.7 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26s-cls.pdparams) |
+| YOLO26m-cls | 0.780 | 0.942 | 0.781 | 0.942 | 4.9 | 11.6 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26m-cls.pdparams) |
+| YOLO26l-cls | 0.791 | 0.946 | 0.790 | 0.946 | 6.2 | 14.1 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26l-cls.pdparams) |
+| YOLO26x-cls | 0.799 | 0.950 | 0.799 | 0.950 | 13.6 | 29.6 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26x-cls.pdparams) |
 
 <a name="Others"></a>
 
