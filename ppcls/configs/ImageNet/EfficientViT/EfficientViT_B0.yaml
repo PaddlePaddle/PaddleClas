@@ -42,9 +42,7 @@ Optimizer:
     name: Cosine
     learning_rate: 0.001
     warmup_epoch: 5
-  regularizer:
-    name: 'L2'
-    coeff: 0.05
+  weight_decay: 0.05
 
 DataLoader:
   Train:
