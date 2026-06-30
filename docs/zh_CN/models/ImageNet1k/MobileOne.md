@@ -50,7 +50,7 @@ PaddleClas 当前已支持 `MobileOne_S0`、`MobileOne_S0_unfused`、`MobileOne_
 **备注：**
 1. Reference Top1 指标来自 MobileOne 原论文/官方仓库公开结果。
 2. FLOPs/Params 基于 PaddleClas 当前实现在 `inference_mode=True` 下统计，输入分辨率为 `224x224`。
-3. 当前文档暂未提供线上预训练模型与 inference 下载链接，可通过本地权重路径进行加载。
+3. PaddleClas 所提供的该系列模型的预训练模型权重，均是基于其官方提供的权重转得。
 
 <a name="2"></a>
 
