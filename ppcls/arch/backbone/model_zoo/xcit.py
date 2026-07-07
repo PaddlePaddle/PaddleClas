@@ -26,51 +26,93 @@ from ....utils.save_load import load_dygraph_pretrain
 
 MODEL_URLS = {
     # Patch size 16, 224
-    "XCiT_nano_12_p16_224": "",
-    "XCiT_nano_12_p16_224_distilled": "",
-    "XCiT_tiny_12_p16_224": "",
-    "XCiT_tiny_12_p16_224_distilled": "",
-    "XCiT_tiny_24_p16_224": "",
-    "XCiT_tiny_24_p16_224_distilled": "",
-    "XCiT_small_12_p16_224": "",
-    "XCiT_small_12_p16_224_distilled": "",
-    "XCiT_small_24_p16_224": "",
-    "XCiT_small_24_p16_224_distilled": "",
-    "XCiT_medium_24_p16_224": "",
-    "XCiT_medium_24_p16_224_distilled": "",
-    "XCiT_large_24_p16_224": "",
-    "XCiT_large_24_p16_224_distilled": "",
+    "XCiT_nano_12_p16_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_nano_12_p16_224.pdparams",
+    "XCiT_nano_12_p16_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_nano_12_p16_224_distilled.pdparams",
+    "XCiT_tiny_12_p16_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_tiny_12_p16_224.pdparams",
+    "XCiT_tiny_12_p16_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_tiny_12_p16_224_distilled.pdparams",
+    "XCiT_tiny_24_p16_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_tiny_24_p16_224.pdparams",
+    "XCiT_tiny_24_p16_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_tiny_24_p16_224_distilled.pdparams",
+    "XCiT_small_12_p16_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_small_12_p16_224.pdparams",
+    "XCiT_small_12_p16_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_small_12_p16_224_distilled.pdparams",
+    "XCiT_small_24_p16_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_small_24_p16_224.pdparams",
+    "XCiT_small_24_p16_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_small_24_p16_224_distilled.pdparams",
+    "XCiT_medium_24_p16_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_medium_24_p16_224.pdparams",
+    "XCiT_medium_24_p16_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_medium_24_p16_224_distilled.pdparams",
+    "XCiT_large_24_p16_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_large_24_p16_224.pdparams",
+    "XCiT_large_24_p16_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_large_24_p16_224_distilled.pdparams",
     # Patch size 16, 384
-    "XCiT_nano_12_p16_384_distilled": "",
-    "XCiT_tiny_12_p16_384_distilled": "",
-    "XCiT_tiny_24_p16_384_distilled": "",
-    "XCiT_small_12_p16_384_distilled": "",
-    "XCiT_small_24_p16_384_distilled": "",
-    "XCiT_medium_24_p16_384_distilled": "",
-    "XCiT_large_24_p16_384_distilled": "",
+    "XCiT_nano_12_p16_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_nano_12_p16_384_distilled.pdparams",
+    "XCiT_tiny_12_p16_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_tiny_12_p16_384_distilled.pdparams",
+    "XCiT_tiny_24_p16_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_tiny_24_p16_384_distilled.pdparams",
+    "XCiT_small_12_p16_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_small_12_p16_384_distilled.pdparams",
+    "XCiT_small_24_p16_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_small_24_p16_384_distilled.pdparams",
+    "XCiT_medium_24_p16_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_medium_24_p16_384_distilled.pdparams",
+    "XCiT_large_24_p16_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_large_24_p16_384_distilled.pdparams",
     # Patch size 8, 224
-    "XCiT_nano_12_p8_224": "",
-    "XCiT_nano_12_p8_224_distilled": "",
-    "XCiT_tiny_12_p8_224": "",
-    "XCiT_tiny_12_p8_224_distilled": "",
-    "XCiT_tiny_24_p8_224": "",
-    "XCiT_tiny_24_p8_224_distilled": "",
-    "XCiT_small_12_p8_224": "",
-    "XCiT_small_12_p8_224_distilled": "",
-    "XCiT_small_24_p8_224": "",
-    "XCiT_small_24_p8_224_distilled": "",
-    "XCiT_medium_24_p8_224": "",
-    "XCiT_medium_24_p8_224_distilled": "",
-    "XCiT_large_24_p8_224": "",
-    "XCiT_large_24_p8_224_distilled": "",
+    "XCiT_nano_12_p8_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_nano_12_p8_224.pdparams",
+    "XCiT_nano_12_p8_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_nano_12_p8_224_distilled.pdparams",
+    "XCiT_tiny_12_p8_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_tiny_12_p8_224.pdparams",
+    "XCiT_tiny_12_p8_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_tiny_12_p8_224_distilled.pdparams",
+    "XCiT_tiny_24_p8_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_tiny_24_p8_224.pdparams",
+    "XCiT_tiny_24_p8_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_tiny_24_p8_224_distilled.pdparams",
+    "XCiT_small_12_p8_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_small_12_p8_224.pdparams",
+    "XCiT_small_12_p8_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_small_12_p8_224_distilled.pdparams",
+    "XCiT_small_24_p8_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_small_24_p8_224.pdparams",
+    "XCiT_small_24_p8_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_small_24_p8_224_distilled.pdparams",
+    "XCiT_medium_24_p8_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_medium_24_p8_224.pdparams",
+    "XCiT_medium_24_p8_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_medium_24_p8_224_distilled.pdparams",
+    "XCiT_large_24_p8_224":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_large_24_p8_224.pdparams",
+    "XCiT_large_24_p8_224_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_large_24_p8_224_distilled.pdparams",
     # Patch size 8, 384
-    "XCiT_nano_12_p8_384_distilled": "",
-    "XCiT_tiny_12_p8_384_distilled": "",
-    "XCiT_tiny_24_p8_384_distilled": "",
-    "XCiT_small_12_p8_384_distilled": "",
-    "XCiT_small_24_p8_384_distilled": "",
-    "XCiT_medium_24_p8_384_distilled": "",
-    "XCiT_large_24_p8_384_distilled": "",
+    "XCiT_nano_12_p8_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_nano_12_p8_384_distilled.pdparams",
+    "XCiT_tiny_12_p8_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_tiny_12_p8_384_distilled.pdparams",
+    "XCiT_tiny_24_p8_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_tiny_24_p8_384_distilled.pdparams",
+    "XCiT_small_12_p8_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_small_12_p8_384_distilled.pdparams",
+    "XCiT_small_24_p8_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_small_24_p8_384_distilled.pdparams",
+    "XCiT_medium_24_p8_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_medium_24_p8_384_distilled.pdparams",
+    "XCiT_large_24_p8_384_distilled":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/XCiT_large_24_p8_384_distilled.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -505,10 +547,10 @@ class Xcit(nn.Layer):
             act_layer=act_layer,
         )
 
-        self.cls_token = paddle.create_parameter(
+        self.cls_token = self.create_parameter(
             shape=[1, 1, embed_dim],
-            dtype='float32',
             default_initializer=nn.initializer.Constant(0.0))
+        self.add_parameter("cls_token", self.cls_token)
         if use_pos_embed:
             self.pos_embed = PositionalEncodingFourier(dim=embed_dim)
         else:

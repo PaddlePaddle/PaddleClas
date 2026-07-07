@@ -36,7 +36,7 @@ export2:null
 inference_model_url:null
 infer_model:../inference/
 infer_export:True
-infer_quant:Fasle
+infer_quant:False
 inference:python/predict_cls.py -c configs/inference_cls.yaml
 -o Global.use_gpu:True|False
 -o Global.enable_mkldnn:True|False
