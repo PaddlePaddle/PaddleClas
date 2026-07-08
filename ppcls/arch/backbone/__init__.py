@@ -56,6 +56,7 @@ from .model_zoo.fasternet import (
     FasterNet_L,
 )
 from .model_zoo.starnet import StarNet_S1, StarNet_S2, StarNet_S3, StarNet_S4
+from .model_zoo.mobileone import MobileOne_S0, MobileOne_S1, MobileOne_S2, MobileOne_S3, MobileOne_S4
 from .legendary_models.resnet import (
     ResNet18,
     ResNet18_vd,
@@ -330,6 +331,7 @@ from .model_zoo.wideresnet import WideResNet
 from .model_zoo.uniformer import UniFormer_small, UniFormer_small_plus, UniFormer_small_plus_dim64, UniFormer_base, UniFormer_base_ls
 from .model_zoo.fastvit import FastViT_T8, FastViT_T12, FastViT_SA12, FastViT_SA24, FastViT_SA36, FastViT_MA36
 from .model_zoo.edgenext import EdgeNeXt_XX_Small, EdgeNeXt_X_Small, EdgeNeXt_Small, EdgeNeXt_Base
+from .model_zoo.swiftformer import SwiftFormer_XS, SwiftFormer_S, SwiftFormer_L1, SwiftFormer_L3
 
 
 # help whl get all the models' api (class type) and components' api (func type)
