@@ -1,0 +1,16 @@
+{
+    "image": {
+        "hiera_tiny_224": {"target_acc": 82.8},
+        "hiera_small_224": {"target_acc": 83.8},
+        "hiera_base_224": {"target_acc": 84.5},
+        "hiera_base_plus_224": {"target_acc": 85.2},
+        "hiera_large_224": {"target_acc": 86.1},
+        "hiera_huge_224": {"target_acc": 86.9}
+    },
+    "video": {
+        "hiera_base_16x224": {"target_acc": 84.0},
+        "hiera_base_plus_16x224": {"target_acc": 85.0},
+        "hiera_large_16x224": {"target_acc": 87.3},
+        "hiera_huge_16x224": {"target_acc": 87.8}
+    }
+}
