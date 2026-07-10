@@ -1,9 +1,7 @@
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-from functools import partial
 
-print("🔍 metaclip_paddle.py is being loaded...")
 
 class Mlp(nn.Layer):
     def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0.):
@@ -22,6 +20,7 @@ class Mlp(nn.Layer):
         x = self.fc2(x)
         x = self.drop(x)
         return x
+
 
 class Attention(nn.Layer):
     def __init__(self, dim, num_heads=8, qkv_bias=False, qk_norm=False, attn_drop=0., proj_drop=0., norm_layer=nn.LayerNorm):
@@ -54,6 +53,7 @@ class Attention(nn.Layer):
         x = self.proj_drop(x)
         return x
 
+
 class Block(nn.Layer):
     def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, qk_norm=False, drop=0., attn_drop=0., norm_layer=nn.LayerNorm, act_layer=nn.GELU):
         super().__init__()
@@ -67,16 +67,17 @@ class Block(nn.Layer):
         x = x + self.mlp(self.norm2(x))
         return x
 
+
 class PatchEmbed(nn.Layer):
     def __init__(self, img_size=224, patch_size=16, in_chans=3, embed_dim=768):
         super().__init__()
-        # pre_norm=True usually implies no bias in patch embedding
         self.proj = nn.Conv2D(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size, bias_attr=False)
 
     def forward(self, x):
         x = self.proj(x)
         x = x.flatten(2).transpose([0, 2, 1])
         return x
+
 
 class MetaCLIP(nn.Layer):
     def __init__(self, img_size=224, patch_size=16, in_chans=3, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4., qkv_bias=True, pre_norm=True):
@@ -86,7 +87,6 @@ class MetaCLIP(nn.Layer):
 
         self.cls_token = self.create_parameter(shape=[1, 1, embed_dim], default_initializer=nn.initializer.Constant(0.))
         self.pos_embed = self.create_parameter(shape=[1, num_patches + 1, embed_dim], default_initializer=nn.initializer.Constant(0.))
-        
         self.norm_pre = nn.LayerNorm(embed_dim, epsilon=1e-5) if pre_norm else nn.Identity()
         self.blocks = nn.LayerList([
             Block(dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias)
@@ -100,9 +100,9 @@ class MetaCLIP(nn.Layer):
         x = paddle.concat((cls_token, x), axis=1)
         x = x + self.pos_embed
         x = self.norm_pre(x)
-        
+
         for block in self.blocks:
             x = block(x)
-            
+
         x = self.norm(x)
         return x
