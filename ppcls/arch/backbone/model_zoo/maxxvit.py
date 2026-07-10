@@ -1,4 +1,4 @@
-# copyright (c) 2024 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2026 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 # Code was based on https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/maxxvit.py
-# reference: https://arxiv.org/abs/2204.01696 (MaxViT)
+# reference: https://arxiv.org/abs/2204.01697 (MaxViT)
 # reference: https://arxiv.org/abs/2106.04803 (CoAtNet)
 
 """Unified MaxxViT Paddle implementation supporting both MaxViT and CoAtNet.
@@ -26,25 +26,44 @@ Architecture differences:
 import math
 from collections import OrderedDict
 from functools import partial
-from typing import Optional, Tuple, List
 
 import paddle
 import paddle.nn as nn
+
+MODEL_URLS = {
+    "MaxViT_tiny_tf_224": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_tiny_tf_224.in1k.pdparams",
+    "MaxViT_tiny_tf_384": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_tiny_tf_384.in1k.pdparams",
+    "MaxViT_tiny_tf_512": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_tiny_tf_512.in1k.pdparams",
+    "MaxViT_small_tf_224": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_small_tf_224.in1k.pdparams",
+    "MaxViT_small_tf_384": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_small_tf_384.in1k.pdparams",
+    "MaxViT_small_tf_512": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_small_tf_512.in1k.pdparams",
+    "MaxViT_base_tf_224": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_base_tf_224.in1k.pdparams",
+    "MaxViT_base_tf_384": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_base_tf_384.in1k.pdparams",
+    "MaxViT_base_tf_512": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_base_tf_512.in1k.pdparams",
+    "MaxViT_large_tf_224": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_large_tf_224.in1k.pdparams",
+    "MaxViT_large_tf_384": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_large_tf_384.in1k.pdparams",
+    "MaxViT_large_tf_512": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_large_tf_512.in1k.pdparams",
+    "CoAtNet_0_rw_224": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/coatnet_0_rw_224.sw_in1k.pdparams",
+    "CoAtNet_1_rw_224": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/coatnet_1_rw_224.sw_in1k.pdparams",
+    "CoAtNet_bn_0_rw_224": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/coatnet_bn_0_rw_224.sw_in1k.pdparams",
+    "CoAtNet_nano_rw_224": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/coatnet_nano_rw_224.sw_in1k.pdparams",
+    "CoAtNet_rmlp_1_rw_224": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/coatnet_rmlp_1_rw_224.sw_in1k.pdparams",
+    "CoAtNet_rmlp_2_rw_224": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/coatnet_rmlp_2_rw_224.sw_in1k.pdparams",
+    "CoAtNet_rmlp_nano_rw_224": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/coatnet_rmlp_nano_rw_224.sw_in1k.pdparams",
+}
 
 __all__ = [
     "MaxxVit",
     "create_maxvit",
     "create_coatnet",
-    # MaxViT factory functions
     "MaxViT_tiny_tf_224", "MaxViT_tiny_tf_384", "MaxViT_tiny_tf_512",
     "MaxViT_small_tf_224", "MaxViT_small_tf_384", "MaxViT_small_tf_512",
     "MaxViT_base_tf_224", "MaxViT_base_tf_384", "MaxViT_base_tf_512",
     "MaxViT_large_tf_224", "MaxViT_large_tf_384", "MaxViT_large_tf_512",
-    # CoAtNet factory functions
-    "CoAtNet_0_rw_224", "CoAtNet_1_rw_224", "CoAtNet_2_rw_224",
+    "CoAtNet_0_rw_224", "CoAtNet_1_rw_224",
     "CoAtNet_bn_0_rw_224", "CoAtNet_nano_rw_224",
-    "CoAtNet_rmlp_1_rw_224", "CoAtNet_rmlp_1_rw2_224",
-    "CoAtNet_rmlp_2_rw_224", "CoAtNet_rmlp_2_rw_384",
+    "CoAtNet_rmlp_1_rw_224",
+    "CoAtNet_rmlp_2_rw_224",
     "CoAtNet_rmlp_nano_rw_224",
 ]
 
@@ -54,14 +73,12 @@ __all__ = [
 # ---------------------------------------------------------------------------
 
 def to_2tuple(x):
-    # timm: to_2tuple
     if isinstance(x, (tuple, list)):
         return tuple(x)
     return (x, x)
 
 
 def make_divisible(v, divisor=8, min_value=None):
-    # timm: make_divisible
     min_value = min_value or divisor
     new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)
     if new_v < 0.9 * v:
@@ -70,7 +87,6 @@ def make_divisible(v, divisor=8, min_value=None):
 
 
 def extend_tuple(x, n):
-    # timm: extend_tuple
     if not isinstance(x, (tuple, list)):
         return (x,) * n
     x = tuple(x)
@@ -84,7 +100,6 @@ def _assert(cond, msg=""):
 
 
 def _calc_drop_path_rates(drop_path_rate, depths):
-    # timm: _calc_drop_path_rates -- linearly increasing drop_path across all blocks
     total = sum(depths)
     rates = [float(x) for x in paddle.linspace(0, drop_path_rate, total)]
     idx = 0
@@ -100,7 +115,6 @@ def _calc_drop_path_rates(drop_path_rate, depths):
 # ---------------------------------------------------------------------------
 
 class DropPath(nn.Layer):
-    """DropPath -- timm: DropPath"""
     def __init__(self, drop_prob=0.0):
         super().__init__()
         self.drop_prob = drop_prob
@@ -115,11 +129,6 @@ class DropPath(nn.Layer):
 
 
 class Mlp(nn.Layer):
-    """MLP as used in Vision Transformer, MLP-Mixer and related networks.
-
-    Supports tuple bias/drop for compatibility with timm's RelPosMlp.
-    timm: Mlp
-    """
     def __init__(self, in_features, hidden_features=None, out_features=None,
                  act_layer=nn.GELU, drop=0.0, bias=True):
         super().__init__()
@@ -143,24 +152,18 @@ class Mlp(nn.Layer):
 
 
 class ConvMlp(nn.Layer):
-    """Conv-based MLP (1x1 conv) for NCHW tensors.
-
-    timm: ConvMlp. forward: fc1 -> norm -> act -> drop -> fc2 (single drop, before fc2).
-    """
     def __init__(self, in_features, hidden_features=None, out_features=None,
                  act_layer=nn.GELU, norm_layer=None, drop=0.0):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
         self.fc1 = nn.Conv2D(in_features, hidden_features, 1)
-        # timm: norm_layer if provided else Identity. CoAtNet passes None -> Identity.
         self.norm = norm_layer(hidden_features) if norm_layer else nn.Identity()
         self.act = act_layer()
         self.fc2 = nn.Conv2D(hidden_features, out_features, 1)
         self.drop = nn.Dropout(drop)
 
     def forward(self, x):
-        # timm: x = fc1 -> norm -> act -> drop -> fc2
         x = self.fc1(x)
         x = self.norm(x)
         x = self.act(x)
@@ -170,10 +173,6 @@ class ConvMlp(nn.Layer):
 
 
 class LayerNorm2d(nn.Layer):
-    """LayerNorm for NCHW tensors (normalizes over channel dim).
-
-    timm: LayerNorm2d
-    """
     def __init__(self, num_channels, eps=1e-5):
         super().__init__()
         self.weight = paddle.create_parameter(
@@ -194,10 +193,6 @@ class LayerNorm2d(nn.Layer):
 
 
 class LayerScale(nn.Layer):
-    """LayerScale for channels-last tensors (B, ..., C).
-
-    timm: LayerScale
-    """
     def __init__(self, dim, init_values=1e-5):
         super().__init__()
         self.gamma = paddle.create_parameter(
@@ -209,11 +204,6 @@ class LayerScale(nn.Layer):
 
 
 class LayerScale2d(nn.Layer):
-    """LayerScale for NCHW tensors (B, C, H, W).
-
-    timm: LayerScale2d. gamma stored as 1D [dim] (matches timm safetensors
-    layout); reshaped to [1, C, 1, 1] in forward for broadcasting.
-    """
     def __init__(self, dim, init_values=1e-5):
         super().__init__()
         self.gamma = paddle.create_parameter(
@@ -221,22 +211,14 @@ class LayerScale2d(nn.Layer):
             default_initializer=nn.initializer.Constant(init_values))
 
     def forward(self, x):
-        # timm: gamma.view(1, -1, 1, 1); return x * gamma
         gamma = self.gamma.reshape([1, -1, 1, 1])
         return x * gamma
 
 
 class BatchNormAct2d(nn.BatchNorm2D):
-    """BatchNorm2d + activation.
-
-    timm: BatchNormAct2d.
-    act_layer: nn.Layer class for activation (e.g. nn.Silu). If None, defaults to
-    nn.GELU(approximate='tanh') for MaxViT TF; pass nn.Silu for CoAtNet.
-    """
     def __init__(self, num_features, eps=1e-5, apply_act=True, act_layer=None):
         super().__init__(num_features, epsilon=eps)
         if apply_act:
-            # paddle native: nn.GELU(approximate='tanh') == timm gelu_tanh
             self.act = act_layer() if act_layer is not None else nn.GELU(approximate='tanh')
         else:
             self.act = nn.Identity()
@@ -251,16 +233,7 @@ class BatchNormAct2d(nn.BatchNorm2D):
 
 def create_conv2d(in_chs, out_chs, kernel_size, stride=1, padding=0,
                   groups=1, bias=False):
-    """Create a Conv2D layer with timm-compatible padding semantics.
-
-    timm: create_conv2d / get_padding_value
-    padding values:
-      - "same": paddle native TF-style SAME padding (equivalent to timm's _SamePadConv2d)
-      - "" or None: symmetric PyTorch-style padding (default in timm MaxxVitConvCfg)
-      - int / tuple: explicit padding passed to nn.Conv2D
-    """
     if padding == "" or padding is None:
-        # timm: get_padding(kernel_size, stride) -- symmetric padding
         k = kernel_size if isinstance(kernel_size, int) else kernel_size[0]
         s = stride if isinstance(stride, int) else stride[0]
         padding = ((s - 1) + (k - 1)) // 2
@@ -269,7 +242,6 @@ def create_conv2d(in_chs, out_chs, kernel_size, stride=1, padding=0,
 
 
 def create_pool2d(pool_type, kernel_size, stride=None, padding=0, **kwargs):
-    """timm: create_pool2d"""
     stride = stride or kernel_size
     if pool_type == "avg":
         return nn.AvgPool2D(kernel_size, stride=stride, padding=padding,
@@ -289,12 +261,6 @@ def create_pool2d(pool_type, kernel_size, stride=None, padding=0, **kwargs):
 # ---------------------------------------------------------------------------
 
 def _generate_lookup_tensor(length):
-    """One-hot lookup tensor for TF-compatible relative position bias (MaxViT).
-
-    timm: _generate_lookup_tensor (in RelPosBiasTf).
-    Returns [L, L, 2L-1] one-hot tensor where entry [i, j, j-i+L-1] = 1.
-    Vectorized: replaces original Python double for-loop.
-    """
     max_rel = length - 1
     vocab = 2 * max_rel + 1
     idx = paddle.arange(length).reshape([length, 1])  # i: [L, 1]
@@ -304,11 +270,6 @@ def _generate_lookup_tensor(length):
 
 
 def gen_relative_position_index(q_size):
-    """Generate relative position index for Swin-style relative position bias.
-
-    timm: gen_relative_position_index (in pos_embed_rel.py)
-    Returns: [Wh*Ww, Wh*Ww] tensor of indices into the bias table.
-    """
     coords_h = paddle.arange(q_size[0])
     coords_w = paddle.arange(q_size[1])
     grid_h, grid_w = paddle.meshgrid(coords_h, coords_w)
@@ -324,11 +285,6 @@ def gen_relative_position_index(q_size):
 
 
 def gen_relative_log_coords(win_size, mode='cr'):
-    """Generate log-coordinate table for MLP-based relative position (RelPosMlp).
-
-    timm: gen_relative_log_coords (in pos_embed_rel.py)
-    Returns: [2*Wh-1, 2*Ww-1, 2] tensor.
-    """
     rel_coords_h = paddle.arange(-(win_size[0] - 1), win_size[0]).astype('float32')
     rel_coords_w = paddle.arange(-(win_size[1] - 1), win_size[1]).astype('float32')
     grid_h, grid_w = paddle.meshgrid(rel_coords_h, rel_coords_w)
@@ -347,10 +303,6 @@ def gen_relative_log_coords(win_size, mode='cr'):
 
 
 class RelPosBiasTf(nn.Layer):
-    """TF-compatible relative position bias (for maxvit_tf models).
-
-    timm: RelPosBiasTf. Uses einsum-based lookup matching TensorFlow MaxViT.
-    """
     def __init__(self, window_size, num_heads):
         super().__init__()
         self.window_size = window_size
@@ -365,7 +317,6 @@ class RelPosBiasTf(nn.Layer):
         self.register_buffer("width_lookup", _generate_lookup_tensor(ws[1]))
 
     def get_bias(self):
-        # timm: einsum-based reindex
         t = self.relative_position_bias_table
         hl = self.height_lookup
         wl = self.width_lookup
@@ -380,10 +331,6 @@ class RelPosBiasTf(nn.Layer):
 
 
 class RelPosBias(nn.Layer):
-    """Swin-style relative position bias (for CoAtNet non-rmlp models).
-
-    timm: RelPosBias. Uses a learnable bias table indexed by relative position.
-    """
     def __init__(self, window_size, num_heads, prefix_tokens=0):
         super().__init__()
         _assert(prefix_tokens <= 1)
@@ -407,7 +354,6 @@ class RelPosBias(nn.Layer):
         self.relative_position_index.copy_(idx)
 
     def get_bias(self):
-        # timm: self.relative_position_bias_table[self.relative_position_index]
         relative_position_bias = paddle.gather(
             self.relative_position_bias_table, self.relative_position_index, axis=0)
         relative_position_bias = relative_position_bias.reshape(self.bias_shape)
@@ -419,10 +365,6 @@ class RelPosBias(nn.Layer):
 
 
 class RelPosMlp(nn.Layer):
-    """Log-coordinate MLP relative position bias (for CoAtNet rmlp models).
-
-    timm: RelPosMlp. Based on Swin-V2 ideas. Uses an MLP on log-coordinates.
-    """
     def __init__(self, window_size, num_heads=8, hidden_dim=128,
                  prefix_tokens=0, mode='cr'):
         super().__init__()
@@ -433,7 +375,6 @@ class RelPosMlp(nn.Layer):
         self.bias_shape = (self.window_area,) * 2 + (num_heads,)
         self.mode = mode
 
-        # timm: Mlp(in=2, hidden=hidden_dim, out=num_heads, act=ReLU, bias=True, drop=(0.125, 0.))
         self.mlp = Mlp(
             2,
             hidden_features=hidden_dim,
@@ -459,7 +400,6 @@ class RelPosMlp(nn.Layer):
             gen_relative_log_coords(self.window_size, mode=self.mode))
 
     def get_bias(self):
-        # timm: mlp(rel_coords_log).reshape(-1, num_heads)[rel_pos_idx]
         relative_position_bias = self.mlp(self.rel_coords_log)
         relative_position_bias = paddle.gather(
             relative_position_bias.reshape([-1, self.num_heads]),
@@ -477,10 +417,6 @@ class RelPosMlp(nn.Layer):
 # ---------------------------------------------------------------------------
 
 class AttentionCl(nn.Layer):
-    """Channels-last multi-head attention (B, ..., C).
-
-    timm: AttentionCl. Used by MaxViT's PartitionAttentionCl.
-    """
     def __init__(self, dim, dim_out=None, dim_head=32, bias=True,
                  expand_first=True, head_first=True,
                  rel_pos_cls=None, attn_drop=0.0, proj_drop=0.0):
@@ -499,10 +435,7 @@ class AttentionCl(nn.Layer):
         self.proj_drop = nn.Dropout(proj_drop)
 
     def forward(self, x):
-        # timm: head_first -> (B, num_heads, dim_head*3, -1) chunk(3, dim=2)
-        #       else       -> (B, -1, 3, num_heads, dim_head) transpose(1,3) unbind(2)
         B = x.shape[0]
-        # paddle: x.shape 返回 list, 需显式 list 化后再拼接; timm 原版 restore_shape = x.shape[:-1] (tuple)
         restore_shape = list(x.shape[:-1])
 
         if self.head_first:
@@ -535,11 +468,6 @@ class AttentionCl(nn.Layer):
 
 
 class Attention2d(nn.Layer):
-    """Multi-head attention for 2D NCHW tensors.
-
-    timm: Attention2d. Used by CoAtNet's TransformerBlock2d.
-    Q/K/V are computed via 1x1 Conv2D.
-    """
     def __init__(self, dim, dim_out=None, dim_head=32, bias=True,
                  expand_first=True, head_first=True,
                  rel_pos_cls=None, attn_drop=0.0, proj_drop=0.0):
@@ -558,25 +486,18 @@ class Attention2d(nn.Layer):
         self.proj_drop = nn.Dropout(proj_drop)
 
     def forward(self, x, shared_rel_pos=None):
-        # timm:
-        #   head_first -> qkv(x).view(B, num_heads, dim_head*3, -1).chunk(3, dim=2)
-        #   else       -> qkv(x).reshape(B, 3, num_heads, dim_head, -1).unbind(1)
         B, C, H, W = x.shape
-        qkv = self.qkv(x)  # [B, dim_attn*3, H, W]
+        qkv = self.qkv(x)
 
         if self.head_first:
-            # [B, dim_attn*3, H, W] -> [B, num_heads, dim_head*3, H*W]
             qkv = qkv.reshape([B, self.num_heads, self.dim_head * 3, H * W])
-            q, k, v = qkv.chunk(3, axis=2)  # each [B, num_heads, dim_head, H*W]
+            q, k, v = qkv.chunk(3, axis=2)
         else:
-            # [B, dim_attn*3, H, W] -> [B, 3, num_heads, dim_head, H*W]
             qkv = qkv.reshape([B, 3, self.num_heads, self.dim_head, H * W])
-            q = qkv[:, 0]  # [B, num_heads, dim_head, H*W]
+            q = qkv[:, 0]
             k = qkv[:, 1]
             v = qkv[:, 2]
 
-        # q, k, v: [B, num_heads, dim_head, H*W]
-        # timm: q * scale, attn = q.transpose(-2,-1) @ k  ->  [B, h, HW, HW]
         q = q * self.scale
         attn = q.transpose([0, 1, 3, 2]) @ k
 
@@ -588,7 +509,6 @@ class Attention2d(nn.Layer):
         attn = paddle.nn.functional.softmax(attn, axis=-1)
         attn = self.attn_drop(attn)
 
-        # timm: x = (v @ attn.transpose(-2,-1)).view(B, -1, H, W)
         x = v @ attn.transpose([0, 1, 3, 2])
         x = x.reshape([B, -1, H, W])
 
@@ -602,14 +522,6 @@ class Attention2d(nn.Layer):
 # ---------------------------------------------------------------------------
 
 class Downsample2d(nn.Layer):
-    """2D spatial downsampling via pooling + optional 1x1 channel expansion.
-
-    timm: Downsample2d. pool_type maps to:
-      'max'  -> MaxPool2d(3, stride=2, padding=1)
-      'max2' -> MaxPool2d(2, stride=2, padding=0)
-      'avg'  -> AvgPool2d(3, stride=2, padding=1, count_include_pad=False)
-      'avg2' -> AvgPool2d(2, stride=2, padding=0)
-    """
     def __init__(self, dim, dim_out, pool_type="avg2", bias=True):
         super().__init__()
         if pool_type == "max":
@@ -617,7 +529,6 @@ class Downsample2d(nn.Layer):
         elif pool_type == "max2":
             self.pool = nn.MaxPool2D(kernel_size=2, stride=2, padding=0)
         elif pool_type == "avg":
-            # Paddle exclusive=True (default) == PyTorch count_include_pad=False
             self.pool = nn.AvgPool2D(kernel_size=3, stride=2, padding=1, exclusive=True)
         else:  # 'avg2'
             self.pool = nn.AvgPool2D(kernel_size=2, stride=2, padding=0, exclusive=True)
@@ -637,10 +548,6 @@ class Downsample2d(nn.Layer):
 # ---------------------------------------------------------------------------
 
 class SqueezeExcitation(nn.Layer):
-    """SE channel attention for MbConvBlock.
-
-    timm: SqueezeExcite. act_layer: activation for the squeeze FC (default SiLU).
-    """
     def __init__(self, channels, rd_channels, act_layer=nn.Silu):
         super().__init__()
         self.fc1 = nn.Conv2D(channels, rd_channels, 1)
@@ -659,12 +566,6 @@ class SqueezeExcitation(nn.Layer):
 # ---------------------------------------------------------------------------
 
 class MbConvBlock(nn.Layer):
-    """Pre-Norm MBConv block.
-
-    timm: MbConvBlock. Supports MaxViT TF config (gelu_tanh, stride_mode='dw',
-    expand_output=True) and CoAtNet config (silu, stride_mode varies,
-    expand_output=False).
-    """
     def __init__(self, in_chs, out_chs, stride=1, expand_ratio=4.0,
                  kernel_size=3, group_size=1, output_bias=True,
                  padding="same", norm_eps=1e-3, attn_ratio=0.25,
@@ -674,8 +575,6 @@ class MbConvBlock(nn.Layer):
                  pre_norm_act=False, attn_early=False,
                  attn_act_layer=None, norm_act_layer=None):
         super().__init__()
-        # timm: downsample_pool_type defaults to 'avg2' (independent of pool_type);
-        # __post_init__ sets it to pool_type only when explicitly None.
         if downsample_pool_type is None:
             downsample_pool_type = "avg2"
         mid_chs = make_divisible(
@@ -698,7 +597,6 @@ class MbConvBlock(nn.Layer):
         self.pre_norm = BatchNormAct2d(
             in_chs, eps=norm_eps, apply_act=pre_norm_act, act_layer=norm_act_layer)
         if stride_pool > 1:
-            # timm: down uses downsample_pool_type (NOT pool_type)
             self.down = Downsample2d(in_chs, in_chs, pool_type=downsample_pool_type)
         else:
             self.down = nn.Identity()
@@ -726,7 +624,6 @@ class MbConvBlock(nn.Layer):
         self.drop_path = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
 
     def forward(self, x):
-        # timm forward order
         shortcut = self.shortcut(x)
         x = self.pre_norm(x)
         x = self.down(x)
@@ -748,11 +645,6 @@ class MbConvBlock(nn.Layer):
 # ---------------------------------------------------------------------------
 
 class TransformerBlock2d(nn.Layer):
-    """Transformer block with 2D downsampling (NCHW tensor layout).
-
-    timm: TransformerBlock2d. Used by CoAtNet for the 'T' stages.
-    Uses Attention2d + ConvMlp.
-    """
     def __init__(self, dim, dim_out, stride=1,
                  rel_pos_cls=None, dim_head=32, expand_first=True,
                  head_first=True, attn_bias=True,
@@ -794,8 +686,6 @@ class TransformerBlock2d(nn.Layer):
         self.drop_path2 = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
 
     def forward(self, x, shared_rel_pos=None):
-        # timm: x = shortcut(x) + drop_path1(ls1(attn(norm1(x))))
-        #       x = x + drop_path2(ls2(mlp(norm2(x))))
         x = self.shortcut(x) + self.drop_path1(self.ls1(
             self.attn(self.norm1(x), shared_rel_pos=shared_rel_pos)))
         x = x + self.drop_path2(self.ls2(self.mlp(self.norm2(x))))
@@ -807,7 +697,6 @@ class TransformerBlock2d(nn.Layer):
 # ---------------------------------------------------------------------------
 
 def window_partition(x, window_size):
-    # timm: window_partition
     B, H, W, C = x.shape
     x = x.reshape([B, H // window_size[0], window_size[0],
                    W // window_size[1], window_size[1], C])
@@ -816,7 +705,6 @@ def window_partition(x, window_size):
 
 
 def window_reverse(windows, window_size, img_size):
-    # timm: window_reverse
     H, W = img_size
     C = windows.shape[-1]
     x = windows.reshape([-1, H // window_size[0], W // window_size[1],
@@ -825,7 +713,6 @@ def window_reverse(windows, window_size, img_size):
 
 
 def grid_partition(x, grid_size):
-    # timm: grid_partition
     B, H, W, C = x.shape
     x = x.reshape([B, grid_size[0], H // grid_size[0],
                    grid_size[1], W // grid_size[1], C])
@@ -834,7 +721,6 @@ def grid_partition(x, grid_size):
 
 
 def grid_reverse(windows, grid_size, img_size):
-    # timm: grid_reverse
     H, W = img_size
     C = windows.shape[-1]
     x = windows.reshape([-1, H // grid_size[0], W // grid_size[1],
@@ -847,10 +733,6 @@ def grid_reverse(windows, grid_size, img_size):
 # ---------------------------------------------------------------------------
 
 class PartitionAttentionCl(nn.Layer):
-    """Grid or Block partition + Attn + FFN (channels-last layout).
-
-    timm: PartitionAttentionCl. Used by MaxViT's MaxxVitBlock.
-    """
     def __init__(self, dim, partition_type="block", window_size=None,
                  grid_size=None, dim_head=32, head_first=True,
                  act_layer=None, norm_eps=1e-5, attn_drop=0.0,
@@ -898,10 +780,6 @@ class PartitionAttentionCl(nn.Layer):
 # ---------------------------------------------------------------------------
 
 class MaxxVitBlock(nn.Layer):
-    """MaxViT block: MbConv + window partition attn + grid partition attn.
-
-    timm: MaxxVitBlock
-    """
     def __init__(self, dim, dim_out, stride=1, window_size=None,
                  grid_size=None, dim_head=32, head_first=True,
                  act_layer=None, norm_eps=1e-5, attn_drop=0.0,
@@ -940,7 +818,6 @@ class MaxxVitBlock(nn.Layer):
         self.attn_grid = PartitionAttentionCl(partition_type="grid", **attn_kwargs)
 
     def forward(self, x):
-        # timm: conv (NCHW) -> NHWC -> attn_block -> attn_grid -> NCHW
         x = self.conv(x)
         x = x.transpose([0, 2, 3, 1])  # NCHW -> NHWC
         x = self.attn_block(x)
@@ -954,11 +831,6 @@ class MaxxVitBlock(nn.Layer):
 # ---------------------------------------------------------------------------
 
 class MaxxVitStage(nn.Layer):
-    """Stage of blocks.
-
-    timm: MaxxVitStage. Supports block_type='C' (MbConv),
-    'T' (Transformer2d), 'M' (MaxxVit).
-    """
     def __init__(self, in_chs, out_chs, depth, stride=2,
                  block_type='M', feat_size=None, window_size=None, grid_size=None,
                  **kwargs):
@@ -1046,10 +918,6 @@ class MaxxVitStage(nn.Layer):
 # ---------------------------------------------------------------------------
 
 class Stem(nn.Layer):
-    """Stem: Conv-BN-Act -> Conv.
-
-    timm: Stem
-    """
     def __init__(self, in_chs, out_chs, bias=True,
                  norm_eps=1e-3, padding="same", act_layer=None):
         super().__init__()
@@ -1063,7 +931,6 @@ class Stem(nn.Layer):
         self.out_chs = out_chs[-1]
 
     def forward(self, x):
-        # timm: conv1 -> norm1 -> conv2
         x = self.conv1(x)
         x = self.norm1(x)
         x = self.conv2(x)
@@ -1071,10 +938,6 @@ class Stem(nn.Layer):
 
 
 class ClassifierHead(nn.Layer):
-    """Simple classifier head: global_pool -> flatten -> drop -> fc.
-
-    timm: ClassifierHead. Used by CoAtNet when head_hidden_size is None.
-    """
     def __init__(self, in_features, num_classes, pool_type="avg",
                  drop_rate=0.0):
         super().__init__()
@@ -1095,10 +958,6 @@ class ClassifierHead(nn.Layer):
 
 
 class NormMlpClassifierHead(nn.Layer):
-    """Classifier head: pool -> norm -> flatten -> fc -> tanh -> drop -> fc.
-
-    timm: NormMlpClassifierHead. Used by MaxViT when head_hidden_size is set.
-    """
     def __init__(self, in_features, num_classes, hidden_size,
                  pool_type="avg", drop_rate=0.0, norm_eps=1e-5):
         super().__init__()
@@ -1129,18 +988,11 @@ class NormMlpClassifierHead(nn.Layer):
 # ---------------------------------------------------------------------------
 
 class MaxxVit(nn.Layer):
-    """Unified MaxxViT model supporting both MaxViT and CoAtNet architectures.
-
-    timm: MaxxVit. block_type controls per-stage composition:
-      MaxViT:  ('M','M','M','M') -- every stage is MbConv + window/grid attention
-      CoAtNet: ('C','C','T','T') -- first two stages MbConv, last two Transformer
-    """
     def __init__(self, cfg_embed_dim, cfg_depths, cfg_stem_width,
                  cfg_head_hidden_size, cfg_stem_bias=True,
                  block_type=('M', 'M', 'M', 'M'),
                  img_size=224, in_chans=3, num_classes=1000,
                  drop_path_rate=0.0,
-                 # conv config
                  conv_norm_eps=1e-3, conv_act='gelu_tanh', conv_padding='same',
                  conv_expand_ratio=4.0, conv_kernel_size=3, conv_group_size=1,
                  conv_output_bias=True, conv_attn_ratio=0.25, conv_pool_type='avg2',
@@ -1158,26 +1010,21 @@ class MaxxVit(nn.Layer):
         img_size = to_2tuple(img_size)
         self.num_features = cfg_embed_dim[-1]
 
-        # Resolve conv activation layer class (paddle native)
-        # paddle nn.GELU(approximate='tanh') == timm gelu_tanh
         if conv_act == 'silu':
             conv_act_layer = nn.Silu
         else:  # 'gelu_tanh' or default
             conv_act_layer = partial(nn.GELU, approximate='tanh')
 
-        # SE activation layer class
         if conv_attn_act == 'relu':
             se_act_layer = nn.ReLU
         else:
             se_act_layer = nn.Silu
 
-        # Transformer activation layer class (paddle native)
         if transformer_act == 'gelu_tanh':
             tf_act_layer = partial(nn.GELU, approximate='tanh')
         else:  # 'gelu'
             tf_act_layer = nn.GELU
 
-        # Relative position class for transformer blocks
         def make_rel_pos_cls(feat_size_ws):
             if transformer_rel_pos_type == 'mlp':
                 return partial(RelPosMlp, window_size=feat_size_ws,
@@ -1188,19 +1035,20 @@ class MaxxVit(nn.Layer):
                 return partial(RelPosBiasTf, window_size=feat_size_ws)
             return None
 
-        # Window/grid size for MaxViT partition attention
+        # Window/grid size for MaxViT partition attention.
+        # matches timm's MaxViT_tf architecture exactly (224->(7,7), 384->(12,12),
+        # 512->(16,16)). Pretrained weights at a different resolution are adapted
+        # via resize_rel_pos_bias_table in load_pretrained (see _load_pretrained).
+        # NOTE: CoAtNet 'T' blocks do not use this; they derive rel-pos from feat_size.
         partition_ratio = 32
         window_size = (img_size[0] // partition_ratio, img_size[1] // partition_ratio)
         grid_size = window_size
 
-        # Stem
         self.stem = Stem(in_chans, cfg_stem_width, bias=cfg_stem_bias,
                           norm_eps=conv_norm_eps, padding=conv_padding,
                           act_layer=conv_act_layer)
         feat_size = (img_size[0] // 2, img_size[1] // 2)
         in_chs = self.stem.out_chs
-
-        # Stages
         num_stages = len(cfg_embed_dim)
         dpr = _calc_drop_path_rates(drop_path_rate, cfg_depths)
         stages = []
@@ -1211,8 +1059,6 @@ class MaxxVit(nn.Layer):
                          (feat_size[1] - 1) // stage_stride + 1)
 
             bt = block_type[i] if isinstance(block_type, (tuple, list)) else block_type
-
-            # rel_pos_cls is needed for 'T' blocks
             rel_pos_cls = None
             if bt == 'T':
                 rel_pos_cls = make_rel_pos_cls(feat_size)
@@ -1222,7 +1068,6 @@ class MaxxVit(nn.Layer):
                 block_type=bt,
                 feat_size=feat_size,
                 window_size=window_size, grid_size=grid_size,
-                # conv params
                 conv_norm_eps=conv_norm_eps, conv_padding=conv_padding,
                 conv_expand_ratio=conv_expand_ratio, conv_kernel_size=conv_kernel_size,
                 conv_group_size=conv_group_size, conv_output_bias=conv_output_bias,
@@ -1230,7 +1075,6 @@ class MaxxVit(nn.Layer):
                 conv_stride_mode=conv_stride_mode, conv_expand_output=conv_expand_output,
                 conv_pre_norm_act=conv_pre_norm_act, conv_attn_early=conv_attn_early,
                 conv_attn_act_layer=se_act_layer, conv_norm_act_layer=conv_act_layer,
-                # transformer params
                 dim_head=transformer_dim_head, head_first=transformer_head_first,
                 act_layer=tf_act_layer, norm_eps=transformer_norm_eps,
                 attn_drop=0.0, proj_drop=0.0,
@@ -1239,17 +1083,11 @@ class MaxxVit(nn.Layer):
                 transformer_norm_layer=transformer_norm_layer,
                 transformer_attn_bias=transformer_attn_bias,
                 mlp_ratio=mlp_ratio, init_values=init_values,
-                # for 'T' blocks
                 rel_pos_cls=rel_pos_cls,
                 drop_path_rates=dpr[i]))
             in_chs = out_chs
         self.stages = nn.Sequential(*stages)
 
-        # Head
-        # timm logic:
-        #   if head_hidden_size: NormMlpClassifierHead (norm=Identity inside head)
-        #   else: self.norm = LayerNorm2d/BatchNorm2d + ClassifierHead (no pre_logits MLP)
-        # The final self.norm follows transformer_norm_layer (e.g. 'batchnorm2d' for coatnet_bn_0_rw).
         if cfg_head_hidden_size:
             self.norm = nn.Identity()
             self.head = NormMlpClassifierHead(
@@ -1263,7 +1101,6 @@ class MaxxVit(nn.Layer):
             self.head = ClassifierHead(self.num_features, num_classes)
 
     def forward_features(self, x):
-        # timm: stem -> stages -> norm
         x = self.stem(x)
         x = self.stages(x)
         x = self.norm(x)
@@ -1278,6 +1115,78 @@ class MaxxVit(nn.Layer):
 # ---------------------------------------------------------------------------
 # MaxViT TF model constructors
 # ---------------------------------------------------------------------------
+
+def _resize_rel_pos_bias_table(rel_pos_bias, dst_shape):
+    if list(rel_pos_bias.shape) == list(dst_shape):
+        return rel_pos_bias
+
+    if rel_pos_bias.ndim == 3:
+        num_heads, _, _ = dst_shape
+        src = rel_pos_bias.unsqueeze(1)  # [H, 1, src_h, src_w]
+        dst = paddle.nn.functional.interpolate(
+            src, size=dst_shape[1:], mode='bilinear', align_corners=False)
+        return dst.squeeze(1)
+
+    dst_num_pos, num_heads = dst_shape
+    src_num_pos, _ = rel_pos_bias.shape
+    src_size = int(round((src_num_pos) ** 0.5))
+    dst_size = int(round((dst_num_pos) ** 0.5))
+    if src_size * src_size != src_num_pos or dst_size * dst_size != dst_num_pos:
+        return rel_pos_bias
+    src = rel_pos_bias.transpose([1, 0]).reshape([num_heads, 1, src_size, src_size])
+    dst = paddle.nn.functional.interpolate(
+        src, size=(dst_size, dst_size), mode='bilinear', align_corners=False)
+    return dst.reshape([num_heads, dst_size * dst_size]).transpose([1, 0])
+
+
+def _checkpoint_filter_fn(state_dict, model):
+    model_sd = model.state_dict()
+    out = {}
+    for k, v in state_dict.items():
+        if k.endswith('relative_position_index') or k.endswith('rel_coords_log') \
+                or k.endswith('height_lookup') or k.endswith('width_lookup'):
+            continue
+        if k.endswith('relative_position_bias_table') and k in model_sd \
+                and list(v.shape) != list(model_sd[k].shape):
+            try:
+                v = _resize_rel_pos_bias_table(v, model_sd[k].shape)
+            except Exception:
+                pass
+        out[k] = v
+    return out
+
+
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        _load_filtered(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        _load_filtered(model, pretrained, use_ssld=use_ssld)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+
+def _load_filtered(model, pretrained_path, use_ssld=False):
+    from ....utils import logger
+    from ....utils.save_load import _set_ssld_pretrained
+    from ....utils.download import get_weights_path_from_url
+    import os
+    path = pretrained_path
+    if path.startswith(("http://", "https://")):
+        path = _set_ssld_pretrained(path, use_ssld=use_ssld)
+        path = get_weights_path_from_url(path)
+    if not path.endswith('.pdparams'):
+        path = path + '.pdparams'
+    if not os.path.exists(path):
+        raise ValueError("Model pretrain path {} does not exists.".format(path))
+    state_dict = paddle.load(path)
+    state_dict = _checkpoint_filter_fn(state_dict, model)
+    missing, unexpected = model.set_state_dict(state_dict)
+    logger.info("Finish load pretrained model from {}".format(path))
+
 
 MAXVIT_TF_CONFIGS = {
     "maxvit_tiny_tf": dict(
@@ -1296,15 +1205,10 @@ MAXVIT_TF_CONFIGS = {
         embed_dim=(128, 256, 512, 1024), depths=(2, 6, 14, 2),
         stem_width=128, head_hidden_size=1024, stem_bias=True,
         dim_head=32, drop_path_rate=0.2),
-    "maxvit_xlarge_tf": dict(
-        embed_dim=(192, 384, 768, 1536), depths=(2, 6, 14, 2),
-        stem_width=192, head_hidden_size=1536, stem_bias=True,
-        dim_head=32, drop_path_rate=0.2),
 }
 
 
 def _get_size_from_model_name(name):
-    """Extract image size from model name like 'maxvit_tiny_tf_224'."""
     parts = name.split("_")
     for p in reversed(parts):
         if p.isdigit() and int(p) >= 32:
@@ -1312,14 +1216,10 @@ def _get_size_from_model_name(name):
     return 224
 
 
-def create_maxvit(model_name):
-    """Create a MaxxVit model matching timm's maxvit_tf architecture.
-
-    Uses _tf_cfg defaults: conv gelu_tanh/eps=1e-3/padding=same,
-    transformer gelu_tanh/eps=1e-5/head_first=False/bias_tf.
-    """
-    base = model_name
-    for suffix in (".in1k", ".in21k"):
+def create_maxvit(model_name, pretrained=False, use_ssld=False,
+                  **override_kwargs):
+    base = model_name.lower()
+    for suffix in (".sw_in1k", ".in1k", ".in21k"):
         base = base.replace(suffix, "")
     size = _get_size_from_model_name(base)
     config_key = base.rsplit("_", 1)[0]
@@ -1327,8 +1227,10 @@ def create_maxvit(model_name):
         raise ValueError(f"Unknown maxvit config: {config_key}")
 
     cfg = MAXVIT_TF_CONFIGS[config_key]
+    num_classes = override_kwargs.pop("class_num", 1000)
+    drop_path_rate = override_kwargs.pop("drop_path_rate", cfg["drop_path_rate"])
 
-    return MaxxVit(
+    model = MaxxVit(
         cfg_embed_dim=cfg["embed_dim"],
         cfg_depths=cfg["depths"],
         cfg_stem_width=cfg["stem_width"],
@@ -1336,17 +1238,17 @@ def create_maxvit(model_name):
         cfg_stem_bias=cfg["stem_bias"],
         block_type=('M', 'M', 'M', 'M'),
         img_size=size,
-        num_classes=1000,
-        drop_path_rate=cfg["drop_path_rate"],
-        # TF-specific config (_tf_cfg)
+        num_classes=num_classes,
+        drop_path_rate=drop_path_rate,
         conv_norm_eps=1e-3, conv_act='gelu_tanh', conv_padding='same',
         conv_stride_mode='dw', conv_expand_output=True,
         conv_pre_norm_act=False, conv_attn_early=False,
-        # transformer _tf_cfg: gelu_tanh, eps=1e-5, head_first=False, bias_tf
         transformer_norm_eps=1e-5, transformer_act='gelu_tanh',
         transformer_head_first=False, transformer_rel_pos_type='bias_tf',
         transformer_dim_head=cfg["dim_head"],
     )
+    _load_pretrained(pretrained, model, MODEL_URLS.get(model_name), use_ssld=use_ssld)
+    return model
 
 
 # ---------------------------------------------------------------------------
@@ -1360,12 +1262,6 @@ def _rw_coat_cfg(
         transformer_shortcut_bias=True,
         transformer_norm_layer='layernorm2d',
         init_values=None, rel_pos_type='bias', rel_pos_dim=512):
-    """RW CoAtNet configuration builder.
-
-    Matches timm.models.maxxvit._rw_coat_cfg defaults:
-      conv: pre_norm_act=True, expand_output=False, act='silu', stride_mode='pool'
-      transformer: expand_first=False, shortcut_bias=True, rel_pos_type='bias'
-    """
     return dict(
         conv_stride_mode=stride_mode,
         conv_pool_type=pool_type,
@@ -1392,12 +1288,6 @@ def _rw_max_cfg(
         transformer_shortcut_bias=True,
         transformer_norm_layer='layernorm2d',
         init_values=None, rel_pos_type='bias', rel_pos_dim=512):
-    """RW MaxViT-style configuration builder (used by some CoAtNet models).
-
-    Matches timm.models.maxxvit._rw_max_cfg defaults:
-      conv: expand_output=False, act='silu', pre_norm_act=False, attn_act='silu'
-      transformer: expand_first=False
-    """
     return dict(
         conv_stride_mode=stride_mode,
         conv_pool_type=pool_type,
@@ -1432,12 +1322,6 @@ COATNET_CONFIGS = {
         **_rw_coat_cfg(
             stride_mode='dw', conv_attn_early=True,
             transformer_shortcut_bias=False)),
-    "coatnet_2_rw": dict(
-        embed_dim=(128, 256, 512, 1024), depths=(2, 6, 14, 2),
-        stem_width=(64, 128), head_hidden_size=None, stem_bias=False,
-        dim_head=32, drop_path_rate=0.0,
-        **_rw_coat_cfg(
-            stride_mode='dw', conv_attn_act_layer='silu')),
     "coatnet_bn_0_rw": dict(
         embed_dim=(96, 192, 384, 768), depths=(2, 3, 7, 2),
         stem_width=(32, 64), head_hidden_size=None, stem_bias=False,
@@ -1460,12 +1344,6 @@ COATNET_CONFIGS = {
             pool_type='max', conv_attn_early=True,
             transformer_shortcut_bias=False,
             rel_pos_type='mlp', rel_pos_dim=384)),
-    "coatnet_rmlp_1_rw2": dict(
-        embed_dim=(96, 192, 384, 768), depths=(2, 6, 14, 2),
-        stem_width=(32, 64), head_hidden_size=None, stem_bias=False,
-        dim_head=32, drop_path_rate=0.0,
-        **_rw_coat_cfg(
-            stride_mode='dw', rel_pos_type='mlp', rel_pos_dim=512)),
     "coatnet_rmlp_2_rw": dict(
         embed_dim=(128, 256, 512, 1024), depths=(2, 6, 14, 2),
         stem_width=(64, 128), head_hidden_size=None, stem_bias=False,
@@ -1484,12 +1362,8 @@ COATNET_CONFIGS = {
 
 
 def _parse_coatnet_name(model_name):
-    """Parse coatnet model name to (config_key, img_size).
-
-    Example: 'coatnet_rmlp_2_rw_384.sw_in12k_ft_in1k' -> ('coatnet_rmlp_2_rw', 384)
-    """
-    base = model_name
-    for suffix in (".sw_in1k", ".sw_in12k_ft_in1k"):
+    base = model_name.lower()
+    for suffix in (".sw_in1k", ".in1k"):
         base = base.replace(suffix, "")
     parts = base.split("_")
     size = int(parts[-1])
@@ -1497,19 +1371,16 @@ def _parse_coatnet_name(model_name):
     return config_key, size
 
 
-def create_coatnet(model_name):
-    """Create a MaxxVit model matching timm's coatnet architecture.
-
-    Uses CoAtNet block_type=('C','C','T','T').
-    CoAtNet uses symmetric padding ('' in timm MaxxVitConvCfg), unlike MaxViT TF.
-    """
+def create_coatnet(model_name, pretrained=False, use_ssld=False,
+                   **override_kwargs):
     config_key, size = _parse_coatnet_name(model_name)
     if config_key not in COATNET_CONFIGS:
         raise ValueError(f"Unknown coatnet config: {config_key}")
 
     cfg = COATNET_CONFIGS[config_key]
+    num_classes = override_kwargs.pop("class_num", 1000)
+    drop_path_rate = override_kwargs.pop("drop_path_rate", cfg["drop_path_rate"])
 
-    # Extract CoAtNet-specific params from config
     kwargs = {}
     for k in ('conv_stride_mode', 'conv_pool_type', 'conv_pre_norm_act',
               'conv_expand_output', 'conv_output_bias', 'conv_attn_early',
@@ -1522,7 +1393,7 @@ def create_coatnet(model_name):
 
     init_values = cfg.get('transformer_init_values')
 
-    return MaxxVit(
+    model = MaxxVit(
         cfg_embed_dim=cfg["embed_dim"],
         cfg_depths=cfg["depths"],
         cfg_stem_width=cfg["stem_width"],
@@ -1530,35 +1401,27 @@ def create_coatnet(model_name):
         cfg_stem_bias=cfg["stem_bias"],
         block_type=('C', 'C', 'T', 'T'),
         img_size=size,
-        num_classes=1000,
-        drop_path_rate=cfg["drop_path_rate"],
+        num_classes=num_classes,
+        drop_path_rate=drop_path_rate,
         transformer_dim_head=cfg["dim_head"],
         init_values=init_values,
         conv_attn_ratio=cfg.get('conv_attn_ratio', 0.25),
-        # CoAtNet uses symmetric PyTorch-style padding ('' in timm MaxxVitConvCfg).
-        # MaxViT TF uses 'same' (TF-style asymmetric padding).
         conv_padding='',
-        # CoAtNet transformer uses head_first=True (timm MaxxVitTransformerCfg default).
-        # MaxViT TF uses head_first=False (_tf_cfg override).
         transformer_head_first=True,
         **kwargs,
     )
+    _load_pretrained(pretrained, model, MODEL_URLS.get(model_name), use_ssld=use_ssld)
+    return model
 
-
-# ---------------------------------------------------------------------------
-# PaddleClas-style factory functions
-# ---------------------------------------------------------------------------
 
 def _make_maxvit_factory(config_key, img_size):
-    # config_key='maxvit_tiny_tf', img_size=224 -> 'MaxViT_tiny_tf_224'
-    # PaddleClas convention: keep suffix lowercase (cf. ConvNeXt_tiny, MobileNetV2_x0_25)
     suffix = config_key[len("maxvit_"):]
     name = f"MaxViT_{suffix}_{img_size}"
+    model_name = name
 
-    def _factory(pretrained=False, **kwargs):
-        # timm: create_maxvit(f"{config_key}_{img_size}")
-        model_name = f"{config_key}_{img_size}"
-        return create_maxvit(model_name)
+    def _factory(pretrained=False, use_ssld=False, **kwargs):
+        return create_maxvit(model_name, pretrained=pretrained, use_ssld=use_ssld,
+                             **kwargs)
 
     _factory.__name__ = name
     _factory.__qualname__ = name
@@ -1566,21 +1429,19 @@ def _make_maxvit_factory(config_key, img_size):
 
 
 def _make_coatnet_factory(config_key, img_size):
-    # config_key='coatnet_0_rw', img_size=224 -> 'CoAtNet_0_rw_224'
     suffix = config_key[len("coatnet_"):]
     name = f"CoAtNet_{suffix}_{img_size}"
+    model_name = name
 
-    def _factory(pretrained=False, **kwargs):
-        # timm: create_coatnet(f"{config_key}_{img_size}")
-        model_name = f"{config_key}_{img_size}"
-        return create_coatnet(model_name)
+    def _factory(pretrained=False, use_ssld=False, **kwargs):
+        return create_coatnet(model_name, pretrained=pretrained, use_ssld=use_ssld,
+                              **kwargs)
 
     _factory.__name__ = name
     _factory.__qualname__ = name
     return _factory
 
 
-# MaxViT factory functions (matching PaddleClas naming convention)
 MaxViT_tiny_tf_224 = _make_maxvit_factory("maxvit_tiny_tf", 224)
 MaxViT_tiny_tf_384 = _make_maxvit_factory("maxvit_tiny_tf", 384)
 MaxViT_tiny_tf_512 = _make_maxvit_factory("maxvit_tiny_tf", 512)
@@ -1594,14 +1455,10 @@ MaxViT_large_tf_224 = _make_maxvit_factory("maxvit_large_tf", 224)
 MaxViT_large_tf_384 = _make_maxvit_factory("maxvit_large_tf", 384)
 MaxViT_large_tf_512 = _make_maxvit_factory("maxvit_large_tf", 512)
 
-# CoAtNet factory functions
 CoAtNet_0_rw_224 = _make_coatnet_factory("coatnet_0_rw", 224)
 CoAtNet_1_rw_224 = _make_coatnet_factory("coatnet_1_rw", 224)
-CoAtNet_2_rw_224 = _make_coatnet_factory("coatnet_2_rw", 224)
 CoAtNet_bn_0_rw_224 = _make_coatnet_factory("coatnet_bn_0_rw", 224)
 CoAtNet_nano_rw_224 = _make_coatnet_factory("coatnet_nano_rw", 224)
 CoAtNet_rmlp_1_rw_224 = _make_coatnet_factory("coatnet_rmlp_1_rw", 224)
-CoAtNet_rmlp_1_rw2_224 = _make_coatnet_factory("coatnet_rmlp_1_rw2", 224)
 CoAtNet_rmlp_2_rw_224 = _make_coatnet_factory("coatnet_rmlp_2_rw", 224)
-CoAtNet_rmlp_2_rw_384 = _make_coatnet_factory("coatnet_rmlp_2_rw", 384)
 CoAtNet_rmlp_nano_rw_224 = _make_coatnet_factory("coatnet_rmlp_nano_rw", 224)

@@ -335,10 +335,10 @@ from .model_zoo.maxxvit import MaxViT_tiny_tf_224, MaxViT_tiny_tf_384, MaxViT_ti
 from .model_zoo.maxxvit import MaxViT_small_tf_224, MaxViT_small_tf_384, MaxViT_small_tf_512
 from .model_zoo.maxxvit import MaxViT_base_tf_224, MaxViT_base_tf_384, MaxViT_base_tf_512
 from .model_zoo.maxxvit import MaxViT_large_tf_224, MaxViT_large_tf_384, MaxViT_large_tf_512
-from .model_zoo.maxxvit import CoAtNet_0_rw_224, CoAtNet_1_rw_224, CoAtNet_2_rw_224
+from .model_zoo.maxxvit import CoAtNet_0_rw_224, CoAtNet_1_rw_224
 from .model_zoo.maxxvit import CoAtNet_bn_0_rw_224, CoAtNet_nano_rw_224
-from .model_zoo.maxxvit import CoAtNet_rmlp_1_rw_224, CoAtNet_rmlp_1_rw2_224
-from .model_zoo.maxxvit import CoAtNet_rmlp_2_rw_224, CoAtNet_rmlp_2_rw_384
+from .model_zoo.maxxvit import CoAtNet_rmlp_1_rw_224
+from .model_zoo.maxxvit import CoAtNet_rmlp_2_rw_224
 from .model_zoo.maxxvit import CoAtNet_rmlp_nano_rw_224
 from .model_zoo.efficientvit import Efficientvit_B0, Efficientvit_B1, Efficientvit_B2, Efficientvit_B3, Efficientvit_L1, Efficientvit_L2, Efficientvit_L3
 from .model_zoo.fastvit import FastViT_T8, FastViT_T12, FastViT_SA12, FastViT_SA24, FastViT_SA36, FastViT_MA36
