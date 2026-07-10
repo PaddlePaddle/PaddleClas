@@ -30,6 +30,8 @@ from functools import partial
 import paddle
 import paddle.nn as nn
 
+from ..base.theseus_layer import TheseusLayer
+
 MODEL_URLS = {
     "MaxViT_tiny_tf_224": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_tiny_tf_224.in1k.pdparams",
     "MaxViT_tiny_tf_384": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/maxvit_tiny_tf_384.in1k.pdparams",
@@ -56,12 +58,22 @@ __all__ = [
     "MaxxVit",
     "create_maxvit",
     "create_coatnet",
-    "MaxViT_tiny_tf_224", "MaxViT_tiny_tf_384", "MaxViT_tiny_tf_512",
-    "MaxViT_small_tf_224", "MaxViT_small_tf_384", "MaxViT_small_tf_512",
-    "MaxViT_base_tf_224", "MaxViT_base_tf_384", "MaxViT_base_tf_512",
-    "MaxViT_large_tf_224", "MaxViT_large_tf_384", "MaxViT_large_tf_512",
-    "CoAtNet_0_rw_224", "CoAtNet_1_rw_224",
-    "CoAtNet_bn_0_rw_224", "CoAtNet_nano_rw_224",
+    "MaxViT_tiny_tf_224",
+    "MaxViT_tiny_tf_384",
+    "MaxViT_tiny_tf_512",
+    "MaxViT_small_tf_224",
+    "MaxViT_small_tf_384",
+    "MaxViT_small_tf_512",
+    "MaxViT_base_tf_224",
+    "MaxViT_base_tf_384",
+    "MaxViT_base_tf_512",
+    "MaxViT_large_tf_224",
+    "MaxViT_large_tf_384",
+    "MaxViT_large_tf_512",
+    "CoAtNet_0_rw_224",
+    "CoAtNet_1_rw_224",
+    "CoAtNet_bn_0_rw_224",
+    "CoAtNet_nano_rw_224",
     "CoAtNet_rmlp_1_rw_224",
     "CoAtNet_rmlp_2_rw_224",
     "CoAtNet_rmlp_nano_rw_224",
@@ -71,6 +83,7 @@ __all__ = [
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def to_2tuple(x):
     if isinstance(x, (tuple, list)):
@@ -105,7 +118,7 @@ def _calc_drop_path_rates(drop_path_rate, depths):
     idx = 0
     per_stage = []
     for d in depths:
-        per_stage.append(rates[idx: idx + d])
+        per_stage.append(rates[idx : idx + d])
         idx += d
     return per_stage
 
@@ -113,6 +126,7 @@ def _calc_drop_path_rates(drop_path_rate, depths):
 # ---------------------------------------------------------------------------
 # Basic layers
 # ---------------------------------------------------------------------------
+
 
 class DropPath(nn.Layer):
     def __init__(self, drop_prob=0.0):
@@ -129,8 +143,15 @@ class DropPath(nn.Layer):
 
 
 class Mlp(nn.Layer):
-    def __init__(self, in_features, hidden_features=None, out_features=None,
-                 act_layer=nn.GELU, drop=0.0, bias=True):
+    def __init__(
+        self,
+        in_features,
+        hidden_features=None,
+        out_features=None,
+        act_layer=nn.GELU,
+        drop=0.0,
+        bias=True,
+    ):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
@@ -152,8 +173,15 @@ class Mlp(nn.Layer):
 
 
 class ConvMlp(nn.Layer):
-    def __init__(self, in_features, hidden_features=None, out_features=None,
-                 act_layer=nn.GELU, norm_layer=None, drop=0.0):
+    def __init__(
+        self,
+        in_features,
+        hidden_features=None,
+        out_features=None,
+        act_layer=nn.GELU,
+        norm_layer=None,
+        drop=0.0,
+    ):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
@@ -175,12 +203,16 @@ class ConvMlp(nn.Layer):
 class LayerNorm2d(nn.Layer):
     def __init__(self, num_channels, eps=1e-5):
         super().__init__()
-        self.weight = paddle.create_parameter(
-            shape=[num_channels], dtype="float32",
-            default_initializer=nn.initializer.Constant(1.0))
-        self.bias = paddle.create_parameter(
-            shape=[num_channels], dtype="float32",
-            default_initializer=nn.initializer.Constant(0.0))
+        self.weight = self.create_parameter(
+            shape=[num_channels],
+            dtype="float32",
+            default_initializer=nn.initializer.Constant(1.0),
+        )
+        self.bias = self.create_parameter(
+            shape=[num_channels],
+            dtype="float32",
+            default_initializer=nn.initializer.Constant(0.0),
+        )
         self.eps = eps
 
     def forward(self, x):
@@ -195,9 +227,11 @@ class LayerNorm2d(nn.Layer):
 class LayerScale(nn.Layer):
     def __init__(self, dim, init_values=1e-5):
         super().__init__()
-        self.gamma = paddle.create_parameter(
-            shape=[dim], dtype="float32",
-            default_initializer=nn.initializer.Constant(init_values))
+        self.gamma = self.create_parameter(
+            shape=[dim],
+            dtype="float32",
+            default_initializer=nn.initializer.Constant(init_values),
+        )
 
     def forward(self, x):
         return x * self.gamma
@@ -206,9 +240,11 @@ class LayerScale(nn.Layer):
 class LayerScale2d(nn.Layer):
     def __init__(self, dim, init_values=1e-5):
         super().__init__()
-        self.gamma = paddle.create_parameter(
-            shape=[dim], dtype="float32",
-            default_initializer=nn.initializer.Constant(init_values))
+        self.gamma = self.create_parameter(
+            shape=[dim],
+            dtype="float32",
+            default_initializer=nn.initializer.Constant(init_values),
+        )
 
     def forward(self, x):
         gamma = self.gamma.reshape([1, -1, 1, 1])
@@ -219,7 +255,9 @@ class BatchNormAct2d(nn.BatchNorm2D):
     def __init__(self, num_features, eps=1e-5, apply_act=True, act_layer=None):
         super().__init__(num_features, epsilon=eps)
         if apply_act:
-            self.act = act_layer() if act_layer is not None else nn.GELU(approximate='tanh')
+            self.act = (
+                act_layer() if act_layer is not None else nn.GELU(approximate="tanh")
+            )
         else:
             self.act = nn.Identity()
 
@@ -231,26 +269,37 @@ class BatchNormAct2d(nn.BatchNorm2D):
 # Conv helpers
 # ---------------------------------------------------------------------------
 
-def create_conv2d(in_chs, out_chs, kernel_size, stride=1, padding=0,
-                  groups=1, bias=False):
+
+def create_conv2d(
+    in_chs, out_chs, kernel_size, stride=1, padding=0, groups=1, bias=False
+):
     if padding == "" or padding is None:
         k = kernel_size if isinstance(kernel_size, int) else kernel_size[0]
         s = stride if isinstance(stride, int) else stride[0]
         padding = ((s - 1) + (k - 1)) // 2
-    return nn.Conv2D(in_chs, out_chs, kernel_size, stride=stride,
-                     padding=padding, groups=groups, bias_attr=bias)
+    return nn.Conv2D(
+        in_chs,
+        out_chs,
+        kernel_size,
+        stride=stride,
+        padding=padding,
+        groups=groups,
+        bias_attr=bias,
+    )
 
 
 def create_pool2d(pool_type, kernel_size, stride=None, padding=0, **kwargs):
     stride = stride or kernel_size
     if pool_type == "avg":
-        return nn.AvgPool2D(kernel_size, stride=stride, padding=padding,
-                            exclusive=False)
+        return nn.AvgPool2D(
+            kernel_size, stride=stride, padding=padding, exclusive=False
+        )
     elif pool_type == "max":
         return nn.MaxPool2D(kernel_size, stride=stride, padding=padding)
     elif pool_type == "avg2":
-        return nn.AvgPool2D(kernel_size, stride=stride, padding=padding,
-                            exclusive=False)
+        return nn.AvgPool2D(
+            kernel_size, stride=stride, padding=padding, exclusive=False
+        )
     elif pool_type == "max2":
         return nn.MaxPool2D(kernel_size, stride=stride, padding=padding)
     raise ValueError(f"Unknown pool type: {pool_type}")
@@ -259,6 +308,7 @@ def create_pool2d(pool_type, kernel_size, stride=None, padding=0, **kwargs):
 # ---------------------------------------------------------------------------
 # Relative position bias
 # ---------------------------------------------------------------------------
+
 
 def _generate_lookup_tensor(length):
     max_rel = length - 1
@@ -278,22 +328,24 @@ def gen_relative_position_index(q_size):
     relative_coords = coords.unsqueeze(2) - coords.unsqueeze(1)  # [2, N, N]
     relative_coords = relative_coords.transpose([1, 2, 0])  # [N, N, 2]
     relative_coords = relative_coords + paddle.to_tensor(
-        [q_size[0] - 1, q_size[1] - 1]).reshape([1, 1, 2])
+        [q_size[0] - 1, q_size[1] - 1]
+    ).reshape([1, 1, 2])
     scale = paddle.to_tensor([2 * q_size[1] - 1, 1]).reshape([1, 1, 2])
     relative_coords = relative_coords * scale
     return relative_coords.sum(-1)  # [N, N]
 
 
-def gen_relative_log_coords(win_size, mode='cr'):
-    rel_coords_h = paddle.arange(-(win_size[0] - 1), win_size[0]).astype('float32')
-    rel_coords_w = paddle.arange(-(win_size[1] - 1), win_size[1]).astype('float32')
+def gen_relative_log_coords(win_size, mode="cr"):
+    rel_coords_h = paddle.arange(-(win_size[0] - 1), win_size[0]).astype("float32")
+    rel_coords_w = paddle.arange(-(win_size[1] - 1), win_size[1]).astype("float32")
     grid_h, grid_w = paddle.meshgrid(rel_coords_h, rel_coords_w)
     table = paddle.stack([grid_h, grid_w])  # [2, 2Wh-1, 2Ww-1]
     table = table.transpose([1, 2, 0])  # [2Wh-1, 2Ww-1, 2]
 
-    if mode == 'swin':
-        table = table / paddle.to_tensor(
-            [win_size[0] - 1, win_size[1] - 1]).reshape([1, 1, 2])
+    if mode == "swin":
+        table = table / paddle.to_tensor([win_size[0] - 1, win_size[1] - 1]).reshape(
+            [1, 1, 2]
+        )
         table = table * 8
         table = paddle.sign(table) * paddle.log2(1.0 + paddle.abs(table)) / math.log2(8)
     else:  # 'cr'
@@ -310,11 +362,17 @@ class RelPosBiasTf(nn.Layer):
         ws = window_size
         vocab_h = 2 * ws[0] - 1
         vocab_w = 2 * ws[1] - 1
-        self.relative_position_bias_table = paddle.create_parameter(
-            shape=[num_heads, vocab_h, vocab_w], dtype="float32",
-            default_initializer=nn.initializer.Normal(std=0.02))
-        self.register_buffer("height_lookup", _generate_lookup_tensor(ws[0]))
-        self.register_buffer("width_lookup", _generate_lookup_tensor(ws[1]))
+        self.relative_position_bias_table = self.create_parameter(
+            shape=[num_heads, vocab_h, vocab_w],
+            dtype="float32",
+            default_initializer=nn.initializer.Normal(std=0.02),
+        )
+        self.register_buffer(
+            "height_lookup", _generate_lookup_tensor(ws[0]), persistable=False
+        )
+        self.register_buffer(
+            "width_lookup", _generate_lookup_tensor(ws[1]), persistable=False
+        )
 
     def get_bias(self):
         t = self.relative_position_bias_table
@@ -339,14 +397,20 @@ class RelPosBias(nn.Layer):
         self.prefix_tokens = prefix_tokens
         self.bias_shape = (self.window_area + prefix_tokens,) * 2 + (num_heads,)
 
-        num_relative_distance = (2 * window_size[0] - 1) * (2 * window_size[1] - 1) + 3 * prefix_tokens
-        self.relative_position_bias_table = paddle.create_parameter(
-            shape=[num_relative_distance, num_heads], dtype="float32",
-            default_initializer=nn.initializer.Normal(std=0.02))
+        num_relative_distance = (2 * window_size[0] - 1) * (
+            2 * window_size[1] - 1
+        ) + 3 * prefix_tokens
+        self.relative_position_bias_table = self.create_parameter(
+            shape=[num_relative_distance, num_heads],
+            dtype="float32",
+            default_initializer=nn.initializer.Normal(std=0.02),
+        )
         index_size = (self.window_area + prefix_tokens) ** 2
         self.register_buffer(
             "relative_position_index",
-            paddle.zeros([index_size], dtype='int64'), persistent=False)
+            paddle.zeros([index_size], dtype="int64"),
+            persistable=False,
+        )
         self._init_index()
 
     def _init_index(self):
@@ -355,7 +419,8 @@ class RelPosBias(nn.Layer):
 
     def get_bias(self):
         relative_position_bias = paddle.gather(
-            self.relative_position_bias_table, self.relative_position_index, axis=0)
+            self.relative_position_bias_table, self.relative_position_index, axis=0
+        )
         relative_position_bias = relative_position_bias.reshape(self.bias_shape)
         relative_position_bias = relative_position_bias.transpose([2, 0, 1])
         return relative_position_bias.unsqueeze(0)
@@ -365,8 +430,9 @@ class RelPosBias(nn.Layer):
 
 
 class RelPosMlp(nn.Layer):
-    def __init__(self, window_size, num_heads=8, hidden_dim=128,
-                 prefix_tokens=0, mode='cr'):
+    def __init__(
+        self, window_size, num_heads=8, hidden_dim=128, prefix_tokens=0, mode="cr"
+    ):
         super().__init__()
         self.window_size = window_size
         self.window_area = window_size[0] * window_size[1]
@@ -381,29 +447,35 @@ class RelPosMlp(nn.Layer):
             out_features=num_heads,
             act_layer=nn.ReLU,
             bias=True,
-            drop=(0.125, 0.))
+            drop=(0.125, 0.0),
+        )
 
-        index_size = self.window_area ** 2
+        index_size = self.window_area**2
         self.register_buffer(
             "relative_position_index",
-            paddle.zeros([index_size], dtype='int64'), persistent=False)
+            paddle.zeros([index_size], dtype="int64"),
+            persistable=False,
+        )
         rel_coords_shape = (2 * window_size[0] - 1, 2 * window_size[1] - 1, 2)
         self.register_buffer(
-            "rel_coords_log",
-            paddle.zeros(rel_coords_shape), persistent=False)
+            "rel_coords_log", paddle.zeros(rel_coords_shape), persistable=False
+        )
         self._init_buffers()
 
     def _init_buffers(self):
         idx = gen_relative_position_index(self.window_size).reshape([-1])
         self.relative_position_index.copy_(idx)
         self.rel_coords_log.copy_(
-            gen_relative_log_coords(self.window_size, mode=self.mode))
+            gen_relative_log_coords(self.window_size, mode=self.mode)
+        )
 
     def get_bias(self):
         relative_position_bias = self.mlp(self.rel_coords_log)
         relative_position_bias = paddle.gather(
             relative_position_bias.reshape([-1, self.num_heads]),
-            self.relative_position_index, axis=0)
+            self.relative_position_index,
+            axis=0,
+        )
         relative_position_bias = relative_position_bias.reshape(self.bias_shape)
         relative_position_bias = relative_position_bias.transpose([2, 0, 1])
         return relative_position_bias.unsqueeze(0)
@@ -416,17 +488,27 @@ class RelPosMlp(nn.Layer):
 # Attention mechanisms
 # ---------------------------------------------------------------------------
 
+
 class AttentionCl(nn.Layer):
-    def __init__(self, dim, dim_out=None, dim_head=32, bias=True,
-                 expand_first=True, head_first=True,
-                 rel_pos_cls=None, attn_drop=0.0, proj_drop=0.0):
+    def __init__(
+        self,
+        dim,
+        dim_out=None,
+        dim_head=32,
+        bias=True,
+        expand_first=True,
+        head_first=True,
+        rel_pos_cls=None,
+        attn_drop=0.0,
+        proj_drop=0.0,
+    ):
         super().__init__()
         dim_out = dim_out or dim
         dim_attn = dim_out if expand_first else dim
         self.num_heads = dim_attn // dim_head
         self.dim_head = dim_head
         self.head_first = head_first
-        self.scale = dim_head ** -0.5
+        self.scale = dim_head**-0.5
 
         self.qkv = nn.Linear(dim, dim_attn * 3, bias_attr=bias)
         self.rel_pos = rel_pos_cls(num_heads=self.num_heads) if rel_pos_cls else None
@@ -439,14 +521,18 @@ class AttentionCl(nn.Layer):
         restore_shape = list(x.shape[:-1])
 
         if self.head_first:
-            qkv = self.qkv(x).reshape(
-                [B, -1, self.num_heads, self.dim_head * 3]
-            ).transpose([0, 2, 1, 3])
+            qkv = (
+                self.qkv(x)
+                .reshape([B, -1, self.num_heads, self.dim_head * 3])
+                .transpose([0, 2, 1, 3])
+            )
             q, k, v = qkv.chunk(3, axis=-1)
         else:
-            qkv = self.qkv(x).reshape(
-                [B, -1, 3, self.num_heads, self.dim_head]
-            ).transpose([0, 3, 2, 1, 4])
+            qkv = (
+                self.qkv(x)
+                .reshape([B, -1, 3, self.num_heads, self.dim_head])
+                .transpose([0, 3, 2, 1, 4])
+            )
             q = qkv[:, :, 0, :, :]
             k = qkv[:, :, 1, :, :]
             v = qkv[:, :, 2, :, :]
@@ -468,16 +554,25 @@ class AttentionCl(nn.Layer):
 
 
 class Attention2d(nn.Layer):
-    def __init__(self, dim, dim_out=None, dim_head=32, bias=True,
-                 expand_first=True, head_first=True,
-                 rel_pos_cls=None, attn_drop=0.0, proj_drop=0.0):
+    def __init__(
+        self,
+        dim,
+        dim_out=None,
+        dim_head=32,
+        bias=True,
+        expand_first=True,
+        head_first=True,
+        rel_pos_cls=None,
+        attn_drop=0.0,
+        proj_drop=0.0,
+    ):
         super().__init__()
         dim_out = dim_out or dim
         dim_attn = dim_out if expand_first else dim
         self.num_heads = dim_attn // dim_head
         self.dim_head = dim_head
         self.head_first = head_first
-        self.scale = dim_head ** -0.5
+        self.scale = dim_head**-0.5
 
         self.qkv = nn.Conv2D(dim, dim_attn * 3, 1, bias_attr=bias)
         self.rel_pos = rel_pos_cls(num_heads=self.num_heads) if rel_pos_cls else None
@@ -521,6 +616,7 @@ class Attention2d(nn.Layer):
 # Downsample
 # ---------------------------------------------------------------------------
 
+
 class Downsample2d(nn.Layer):
     def __init__(self, dim, dim_out, pool_type="avg2", bias=True):
         super().__init__()
@@ -547,6 +643,7 @@ class Downsample2d(nn.Layer):
 # Squeeze-and-Excitation
 # ---------------------------------------------------------------------------
 
+
 class SqueezeExcitation(nn.Layer):
     def __init__(self, channels, rd_channels, act_layer=nn.Silu):
         super().__init__()
@@ -565,25 +662,40 @@ class SqueezeExcitation(nn.Layer):
 # MbConvBlock (supports both MaxViT TF and CoAtNet configs)
 # ---------------------------------------------------------------------------
 
+
 class MbConvBlock(nn.Layer):
-    def __init__(self, in_chs, out_chs, stride=1, expand_ratio=4.0,
-                 kernel_size=3, group_size=1, output_bias=True,
-                 padding="same", norm_eps=1e-3, attn_ratio=0.25,
-                 pool_type="avg2", downsample_pool_type=None,
-                 drop_path=0.0,
-                 stride_mode="dw", expand_output=True,
-                 pre_norm_act=False, attn_early=False,
-                 attn_act_layer=None, norm_act_layer=None):
+    def __init__(
+        self,
+        in_chs,
+        out_chs,
+        stride=1,
+        expand_ratio=4.0,
+        kernel_size=3,
+        group_size=1,
+        output_bias=True,
+        padding="same",
+        norm_eps=1e-3,
+        attn_ratio=0.25,
+        pool_type="avg2",
+        downsample_pool_type=None,
+        drop_path=0.0,
+        stride_mode="dw",
+        expand_output=True,
+        pre_norm_act=False,
+        attn_early=False,
+        attn_act_layer=None,
+        norm_act_layer=None,
+    ):
         super().__init__()
         if downsample_pool_type is None:
             downsample_pool_type = "avg2"
-        mid_chs = make_divisible(
-            (out_chs if expand_output else in_chs) * expand_ratio)
+        mid_chs = make_divisible((out_chs if expand_output else in_chs) * expand_ratio)
         groups = mid_chs if group_size == 1 else mid_chs // group_size
 
         if stride == 2:
-            self.shortcut = Downsample2d(in_chs, out_chs, pool_type=pool_type,
-                                         bias=output_bias)
+            self.shortcut = Downsample2d(
+                in_chs, out_chs, pool_type=pool_type, bias=output_bias
+            )
         else:
             self.shortcut = nn.Identity()
 
@@ -595,29 +707,42 @@ class MbConvBlock(nn.Layer):
             stride_2 = stride
 
         self.pre_norm = BatchNormAct2d(
-            in_chs, eps=norm_eps, apply_act=pre_norm_act, act_layer=norm_act_layer)
+            in_chs, eps=norm_eps, apply_act=pre_norm_act, act_layer=norm_act_layer
+        )
         if stride_pool > 1:
             self.down = Downsample2d(in_chs, in_chs, pool_type=downsample_pool_type)
         else:
             self.down = nn.Identity()
 
         self.conv1_1x1 = create_conv2d(in_chs, mid_chs, 1, stride=stride_1, bias=False)
-        self.norm1 = BatchNormAct2d(mid_chs, eps=norm_eps, apply_act=True, act_layer=norm_act_layer)
+        self.norm1 = BatchNormAct2d(
+            mid_chs, eps=norm_eps, apply_act=True, act_layer=norm_act_layer
+        )
 
-        self.conv2_kxk = create_conv2d(mid_chs, mid_chs, kernel_size,
-                                        stride=stride_2, groups=groups, padding=padding,
-                                        bias=False)
+        self.conv2_kxk = create_conv2d(
+            mid_chs,
+            mid_chs,
+            kernel_size,
+            stride=stride_2,
+            groups=groups,
+            padding=padding,
+            bias=False,
+        )
 
         # SE placement: attn_early -> SE before norm2, else after
         se_act = attn_act_layer if attn_act_layer is not None else nn.Silu
         rd_channels = int(attn_ratio * (out_chs if expand_output else mid_chs))
         if attn_early:
             self.se_early = SqueezeExcitation(mid_chs, rd_channels, act_layer=se_act)
-            self.norm2 = BatchNormAct2d(mid_chs, eps=norm_eps, apply_act=True, act_layer=norm_act_layer)
+            self.norm2 = BatchNormAct2d(
+                mid_chs, eps=norm_eps, apply_act=True, act_layer=norm_act_layer
+            )
             self.se = None
         else:
             self.se_early = None
-            self.norm2 = BatchNormAct2d(mid_chs, eps=norm_eps, apply_act=True, act_layer=norm_act_layer)
+            self.norm2 = BatchNormAct2d(
+                mid_chs, eps=norm_eps, apply_act=True, act_layer=norm_act_layer
+            )
             self.se = SqueezeExcitation(mid_chs, rd_channels, act_layer=se_act)
 
         self.conv3_1x1 = create_conv2d(mid_chs, out_chs, 1, bias=output_bias)
@@ -644,36 +769,63 @@ class MbConvBlock(nn.Layer):
 # TransformerBlock2d (NCHW, for CoAtNet transformer stages)
 # ---------------------------------------------------------------------------
 
+
 class TransformerBlock2d(nn.Layer):
-    def __init__(self, dim, dim_out, stride=1,
-                 rel_pos_cls=None, dim_head=32, expand_first=True,
-                 head_first=True, attn_bias=True,
-                 norm_layer='layernorm2d', norm_eps=1e-6,
-                 attn_drop=0.0, proj_drop=0.0,
-                 shortcut_bias=True, pool_type='avg2',
-                 mlp_ratio=4.0, act_layer=None,
-                 init_values=None, drop_path=0.0):
+    def __init__(
+        self,
+        dim,
+        dim_out,
+        stride=1,
+        rel_pos_cls=None,
+        dim_head=32,
+        expand_first=True,
+        head_first=True,
+        attn_bias=True,
+        norm_layer="layernorm2d",
+        norm_eps=1e-6,
+        attn_drop=0.0,
+        proj_drop=0.0,
+        shortcut_bias=True,
+        pool_type="avg2",
+        mlp_ratio=4.0,
+        act_layer=None,
+        init_values=None,
+        drop_path=0.0,
+    ):
         super().__init__()
-        if norm_layer == 'batchnorm2d':
+        if norm_layer == "batchnorm2d":
             norm = lambda c: nn.BatchNorm2D(c, epsilon=norm_eps)
         else:  # 'layernorm2d'
             norm = lambda c: LayerNorm2d(c, eps=norm_eps)
 
         if stride == 2:
-            self.shortcut = Downsample2d(dim, dim_out, pool_type=pool_type, bias=shortcut_bias)
-            self.norm1 = nn.Sequential(OrderedDict([
-                ('norm', norm(dim)),
-                ('down', Downsample2d(dim, dim, pool_type=pool_type)),
-            ]))
+            self.shortcut = Downsample2d(
+                dim, dim_out, pool_type=pool_type, bias=shortcut_bias
+            )
+            self.norm1 = nn.Sequential(
+                OrderedDict(
+                    [
+                        ("norm", norm(dim)),
+                        ("down", Downsample2d(dim, dim, pool_type=pool_type)),
+                    ]
+                )
+            )
         else:
             _assert(dim == dim_out, "dim must equal dim_out when stride=1")
             self.shortcut = nn.Identity()
             self.norm1 = norm(dim)
 
         self.attn = Attention2d(
-            dim, dim_out, dim_head=dim_head, expand_first=expand_first,
-            bias=attn_bias, head_first=head_first,
-            rel_pos_cls=rel_pos_cls, attn_drop=attn_drop, proj_drop=proj_drop)
+            dim,
+            dim_out,
+            dim_head=dim_head,
+            expand_first=expand_first,
+            bias=attn_bias,
+            head_first=head_first,
+            rel_pos_cls=rel_pos_cls,
+            attn_drop=attn_drop,
+            proj_drop=proj_drop,
+        )
         self.ls1 = LayerScale2d(dim_out, init_values) if init_values else nn.Identity()
         self.drop_path1 = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
 
@@ -681,13 +833,16 @@ class TransformerBlock2d(nn.Layer):
         self.mlp = ConvMlp(
             in_features=dim_out,
             hidden_features=int(dim_out * mlp_ratio),
-            act_layer=act_layer, drop=proj_drop)
+            act_layer=act_layer,
+            drop=proj_drop,
+        )
         self.ls2 = LayerScale2d(dim_out, init_values) if init_values else nn.Identity()
         self.drop_path2 = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
 
     def forward(self, x, shared_rel_pos=None):
-        x = self.shortcut(x) + self.drop_path1(self.ls1(
-            self.attn(self.norm1(x), shared_rel_pos=shared_rel_pos)))
+        x = self.shortcut(x) + self.drop_path1(
+            self.ls1(self.attn(self.norm1(x), shared_rel_pos=shared_rel_pos))
+        )
         x = x + self.drop_path2(self.ls2(self.mlp(self.norm2(x))))
         return x
 
@@ -696,35 +851,47 @@ class TransformerBlock2d(nn.Layer):
 # Partition operations (channels-last: B, H, W, C) -- for MaxViT
 # ---------------------------------------------------------------------------
 
+
 def window_partition(x, window_size):
     B, H, W, C = x.shape
-    x = x.reshape([B, H // window_size[0], window_size[0],
-                   W // window_size[1], window_size[1], C])
+    x = x.reshape(
+        [B, H // window_size[0], window_size[0], W // window_size[1], window_size[1], C]
+    )
     return x.transpose([0, 1, 3, 2, 4, 5]).reshape(
-        [-1, window_size[0], window_size[1], C])
+        [-1, window_size[0], window_size[1], C]
+    )
 
 
 def window_reverse(windows, window_size, img_size):
     H, W = img_size
     C = windows.shape[-1]
-    x = windows.reshape([-1, H // window_size[0], W // window_size[1],
-                         window_size[0], window_size[1], C])
+    x = windows.reshape(
+        [
+            -1,
+            H // window_size[0],
+            W // window_size[1],
+            window_size[0],
+            window_size[1],
+            C,
+        ]
+    )
     return x.transpose([0, 1, 3, 2, 4, 5]).reshape([-1, H, W, C])
 
 
 def grid_partition(x, grid_size):
     B, H, W, C = x.shape
-    x = x.reshape([B, grid_size[0], H // grid_size[0],
-                   grid_size[1], W // grid_size[1], C])
-    return x.transpose([0, 2, 4, 1, 3, 5]).reshape(
-        [-1, grid_size[0], grid_size[1], C])
+    x = x.reshape(
+        [B, grid_size[0], H // grid_size[0], grid_size[1], W // grid_size[1], C]
+    )
+    return x.transpose([0, 2, 4, 1, 3, 5]).reshape([-1, grid_size[0], grid_size[1], C])
 
 
 def grid_reverse(windows, grid_size, img_size):
     H, W = img_size
     C = windows.shape[-1]
-    x = windows.reshape([-1, H // grid_size[0], W // grid_size[1],
-                         grid_size[0], grid_size[1], C])
+    x = windows.reshape(
+        [-1, H // grid_size[0], W // grid_size[1], grid_size[0], grid_size[1], C]
+    )
     return x.transpose([0, 3, 1, 4, 2, 5]).reshape([-1, H, W, C])
 
 
@@ -732,24 +899,43 @@ def grid_reverse(windows, grid_size, img_size):
 # PartitionAttentionCl (channels-last, for MaxViT)
 # ---------------------------------------------------------------------------
 
+
 class PartitionAttentionCl(nn.Layer):
-    def __init__(self, dim, partition_type="block", window_size=None,
-                 grid_size=None, dim_head=32, head_first=True,
-                 act_layer=None, norm_eps=1e-5, attn_drop=0.0,
-                 proj_drop=0.0, mlp_ratio=4.0, drop_path=0.0,
-                 init_values=None):
+    def __init__(
+        self,
+        dim,
+        partition_type="block",
+        window_size=None,
+        grid_size=None,
+        dim_head=32,
+        head_first=True,
+        act_layer=None,
+        norm_eps=1e-5,
+        attn_drop=0.0,
+        proj_drop=0.0,
+        mlp_ratio=4.0,
+        drop_path=0.0,
+        init_values=None,
+    ):
         super().__init__()
         self.partition_block = partition_type == "block"
         self.partition_size = to_2tuple(
-            window_size if self.partition_block else grid_size)
+            window_size if self.partition_block else grid_size
+        )
 
         rel_pos_cls = partial(RelPosBiasTf, window_size=self.partition_size)
 
         self.norm1 = nn.LayerNorm(dim, epsilon=norm_eps)
         self.attn = AttentionCl(
-            dim, dim, dim_head=dim_head, bias=True,
-            head_first=head_first, rel_pos_cls=rel_pos_cls,
-            attn_drop=attn_drop, proj_drop=proj_drop)
+            dim,
+            dim,
+            dim_head=dim_head,
+            bias=True,
+            head_first=head_first,
+            rel_pos_cls=rel_pos_cls,
+            attn_drop=attn_drop,
+            proj_drop=proj_drop,
+        )
         self.ls1 = LayerScale(dim, init_values) if init_values else nn.Identity()
         self.drop_path1 = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
 
@@ -779,40 +965,75 @@ class PartitionAttentionCl(nn.Layer):
 # MaxxVitBlock (MbConv + PartitionAttentionCl block+grid, for MaxViT)
 # ---------------------------------------------------------------------------
 
+
 class MaxxVitBlock(nn.Layer):
-    def __init__(self, dim, dim_out, stride=1, window_size=None,
-                 grid_size=None, dim_head=32, head_first=True,
-                 act_layer=None, norm_eps=1e-5, attn_drop=0.0,
-                 proj_drop=0.0, conv_norm_eps=1e-3,
-                 conv_expand_ratio=4.0, conv_kernel_size=3,
-                 conv_group_size=1, conv_output_bias=True,
-                 conv_padding="same", conv_attn_ratio=0.25,
-                 conv_pool_type="avg2", conv_stride_mode="dw",
-                 conv_expand_output=True, conv_pre_norm_act=False,
-                 conv_attn_early=False, conv_attn_act_layer=None,
-                 conv_norm_act_layer=None,
-                 mlp_ratio=4.0, drop_path=0.0, init_values=None):
+    def __init__(
+        self,
+        dim,
+        dim_out,
+        stride=1,
+        window_size=None,
+        grid_size=None,
+        dim_head=32,
+        head_first=True,
+        act_layer=None,
+        norm_eps=1e-5,
+        attn_drop=0.0,
+        proj_drop=0.0,
+        conv_norm_eps=1e-3,
+        conv_expand_ratio=4.0,
+        conv_kernel_size=3,
+        conv_group_size=1,
+        conv_output_bias=True,
+        conv_padding="same",
+        conv_attn_ratio=0.25,
+        conv_pool_type="avg2",
+        conv_stride_mode="dw",
+        conv_expand_output=True,
+        conv_pre_norm_act=False,
+        conv_attn_early=False,
+        conv_attn_act_layer=None,
+        conv_norm_act_layer=None,
+        mlp_ratio=4.0,
+        drop_path=0.0,
+        init_values=None,
+    ):
         super().__init__()
         self.conv = MbConvBlock(
-            in_chs=dim, out_chs=dim_out, stride=stride,
-            expand_ratio=conv_expand_ratio, kernel_size=conv_kernel_size,
-            group_size=conv_group_size, output_bias=conv_output_bias,
-            padding=conv_padding, norm_eps=conv_norm_eps,
-            attn_ratio=conv_attn_ratio, pool_type=conv_pool_type,
-            drop_path=drop_path, stride_mode=conv_stride_mode,
+            in_chs=dim,
+            out_chs=dim_out,
+            stride=stride,
+            expand_ratio=conv_expand_ratio,
+            kernel_size=conv_kernel_size,
+            group_size=conv_group_size,
+            output_bias=conv_output_bias,
+            padding=conv_padding,
+            norm_eps=conv_norm_eps,
+            attn_ratio=conv_attn_ratio,
+            pool_type=conv_pool_type,
+            drop_path=drop_path,
+            stride_mode=conv_stride_mode,
             expand_output=conv_expand_output,
             pre_norm_act=conv_pre_norm_act,
             attn_early=conv_attn_early,
             attn_act_layer=conv_attn_act_layer,
-            norm_act_layer=conv_norm_act_layer)
+            norm_act_layer=conv_norm_act_layer,
+        )
 
         attn_kwargs = dict(
-            dim=dim_out, window_size=window_size, grid_size=grid_size,
-            dim_head=dim_head, head_first=head_first,
-            act_layer=act_layer, norm_eps=norm_eps,
-            attn_drop=attn_drop, proj_drop=proj_drop,
-            mlp_ratio=mlp_ratio, drop_path=drop_path,
-            init_values=init_values)
+            dim=dim_out,
+            window_size=window_size,
+            grid_size=grid_size,
+            dim_head=dim_head,
+            head_first=head_first,
+            act_layer=act_layer,
+            norm_eps=norm_eps,
+            attn_drop=attn_drop,
+            proj_drop=proj_drop,
+            mlp_ratio=mlp_ratio,
+            drop_path=drop_path,
+            init_values=init_values,
+        )
 
         self.attn_block = PartitionAttentionCl(partition_type="block", **attn_kwargs)
         self.attn_grid = PartitionAttentionCl(partition_type="grid", **attn_kwargs)
@@ -830,81 +1051,120 @@ class MaxxVitBlock(nn.Layer):
 # MaxxVitStage (supports 'C', 'T', 'M' block types)
 # ---------------------------------------------------------------------------
 
+
 class MaxxVitStage(nn.Layer):
-    def __init__(self, in_chs, out_chs, depth, stride=2,
-                 block_type='M', feat_size=None, window_size=None, grid_size=None,
-                 **kwargs):
+    def __init__(
+        self,
+        in_chs,
+        out_chs,
+        depth,
+        stride=2,
+        block_type="M",
+        feat_size=None,
+        window_size=None,
+        grid_size=None,
+        **kwargs,
+    ):
         super().__init__()
+
+        conv_cfg = dict(
+            expand_ratio=kwargs.get("conv_expand_ratio", 4.0),
+            kernel_size=kwargs.get("conv_kernel_size", 3),
+            group_size=kwargs.get("conv_group_size", 1),
+            output_bias=kwargs.get("conv_output_bias", True),
+            padding=kwargs.get("conv_padding", "same"),
+            norm_eps=kwargs.get("conv_norm_eps", 1e-3),
+            attn_ratio=kwargs.get("conv_attn_ratio", 0.25),
+            pool_type=kwargs.get("conv_pool_type", "avg2"),
+            stride_mode=kwargs.get("conv_stride_mode", "dw"),
+            expand_output=kwargs.get("conv_expand_output", True),
+            pre_norm_act=kwargs.get("conv_pre_norm_act", False),
+            attn_early=kwargs.get("conv_attn_early", False),
+            attn_act_layer=kwargs.get("conv_attn_act_layer"),
+            norm_act_layer=kwargs.get("conv_norm_act_layer"),
+        )
+        transformer_cfg = dict(
+            rel_pos_cls=kwargs.get("rel_pos_cls"),
+            dim_head=kwargs.get("dim_head", 32),
+            head_first=kwargs.get("head_first", True),
+            expand_first=kwargs.get("transformer_expand_first", True),
+            attn_bias=kwargs.get("transformer_attn_bias", True),
+            norm_layer=kwargs.get("transformer_norm_layer", "layernorm2d"),
+            norm_eps=kwargs.get("norm_eps", 1e-6),
+            attn_drop=kwargs.get("attn_drop", 0.0),
+            proj_drop=kwargs.get("proj_drop", 0.0),
+            shortcut_bias=kwargs.get("transformer_shortcut_bias", True),
+            pool_type=kwargs.get("conv_pool_type", "avg2"),
+            mlp_ratio=kwargs.get("mlp_ratio", 4.0),
+            act_layer=kwargs.get("act_layer"),
+            init_values=kwargs.get("init_values"),
+        )
+
         blocks = []
         for i in range(depth):
             block_stride = stride if i == 0 else 1
             drop_path = kwargs.get("drop_path_rates", [0.0] * depth)[i]
             dim_in = in_chs if i == 0 else out_chs
 
-            if block_type == 'C':
-                blocks.append(MbConvBlock(
-                    in_chs=dim_in, out_chs=out_chs, stride=block_stride,
-                    expand_ratio=kwargs.get("conv_expand_ratio", 4.0),
-                    kernel_size=kwargs.get("conv_kernel_size", 3),
-                    group_size=kwargs.get("conv_group_size", 1),
-                    output_bias=kwargs.get("conv_output_bias", True),
-                    padding=kwargs.get("conv_padding", "same"),
-                    norm_eps=kwargs.get("conv_norm_eps", 1e-3),
-                    attn_ratio=kwargs.get("conv_attn_ratio", 0.25),
-                    pool_type=kwargs.get("conv_pool_type", "avg2"),
-                    drop_path=drop_path,
-                    stride_mode=kwargs.get("conv_stride_mode", "dw"),
-                    expand_output=kwargs.get("conv_expand_output", True),
-                    pre_norm_act=kwargs.get("conv_pre_norm_act", False),
-                    attn_early=kwargs.get("conv_attn_early", False),
-                    attn_act_layer=kwargs.get("conv_attn_act_layer"),
-                    norm_act_layer=kwargs.get("conv_norm_act_layer")))
-            elif block_type == 'T':
-                rel_pos_cls = kwargs.get("rel_pos_cls")
-                blocks.append(TransformerBlock2d(
-                    dim=dim_in, dim_out=out_chs, stride=block_stride,
-                    rel_pos_cls=rel_pos_cls,
-                    dim_head=kwargs.get("dim_head", 32),
-                    expand_first=kwargs.get("transformer_expand_first", True),
-                    head_first=kwargs.get("head_first", True),
-                    attn_bias=kwargs.get("transformer_attn_bias", True),
-                    norm_layer=kwargs.get("transformer_norm_layer", "layernorm2d"),
-                    norm_eps=kwargs.get("norm_eps", 1e-6),
-                    attn_drop=kwargs.get("attn_drop", 0.0),
-                    proj_drop=kwargs.get("proj_drop", 0.0),
-                    shortcut_bias=kwargs.get("transformer_shortcut_bias", True),
-                    pool_type=kwargs.get("conv_pool_type", "avg2"),
-                    mlp_ratio=kwargs.get("mlp_ratio", 4.0),
-                    act_layer=kwargs.get("act_layer"),
-                    init_values=kwargs.get("init_values"),
-                    drop_path=drop_path))
-            elif block_type == 'M':
-                blocks.append(MaxxVitBlock(
-                    dim=dim_in, dim_out=out_chs, stride=block_stride,
-                    window_size=window_size, grid_size=grid_size,
-                    dim_head=kwargs.get("dim_head", 32),
-                    head_first=kwargs.get("head_first", True),
-                    act_layer=kwargs.get("act_layer"),
-                    norm_eps=kwargs.get("norm_eps", 1e-5),
-                    attn_drop=kwargs.get("attn_drop", 0.0),
-                    proj_drop=kwargs.get("proj_drop", 0.0),
-                    conv_norm_eps=kwargs.get("conv_norm_eps", 1e-3),
-                    conv_expand_ratio=kwargs.get("conv_expand_ratio", 4.0),
-                    conv_kernel_size=kwargs.get("conv_kernel_size", 3),
-                    conv_group_size=kwargs.get("conv_group_size", 1),
-                    conv_output_bias=kwargs.get("conv_output_bias", True),
-                    conv_padding=kwargs.get("conv_padding", "same"),
-                    conv_attn_ratio=kwargs.get("conv_attn_ratio", 0.25),
-                    conv_pool_type=kwargs.get("conv_pool_type", "avg2"),
-                    conv_stride_mode=kwargs.get("conv_stride_mode", "dw"),
-                    conv_expand_output=kwargs.get("conv_expand_output", True),
-                    conv_pre_norm_act=kwargs.get("conv_pre_norm_act", False),
-                    conv_attn_early=kwargs.get("conv_attn_early", False),
-                    conv_attn_act_layer=kwargs.get("conv_attn_act_layer"),
-                    conv_norm_act_layer=kwargs.get("conv_norm_act_layer"),
-                    mlp_ratio=kwargs.get("mlp_ratio", 4.0),
-                    init_values=kwargs.get("init_values"),
-                    drop_path=drop_path))
+            if block_type == "C":
+                blocks.append(
+                    MbConvBlock(
+                        in_chs=dim_in,
+                        out_chs=out_chs,
+                        stride=block_stride,
+                        drop_path=drop_path,
+                        **conv_cfg,
+                    )
+                )
+            elif block_type == "T":
+                blocks.append(
+                    TransformerBlock2d(
+                        dim=dim_in,
+                        dim_out=out_chs,
+                        stride=block_stride,
+                        drop_path=drop_path,
+                        **transformer_cfg,
+                    )
+                )
+            elif block_type == "M":
+                maxvit_cfg = {
+                    k: transformer_cfg[k]
+                    for k in (
+                        "dim_head",
+                        "head_first",
+                        "act_layer",
+                        "attn_drop",
+                        "proj_drop",
+                        "mlp_ratio",
+                        "init_values",
+                    )
+                }
+                maxvit_cfg["norm_eps"] = kwargs.get("norm_eps", 1e-5)
+                blocks.append(
+                    MaxxVitBlock(
+                        dim=dim_in,
+                        dim_out=out_chs,
+                        stride=block_stride,
+                        window_size=window_size,
+                        grid_size=grid_size,
+                        drop_path=drop_path,
+                        conv_norm_eps=conv_cfg["norm_eps"],
+                        conv_expand_ratio=conv_cfg["expand_ratio"],
+                        conv_kernel_size=conv_cfg["kernel_size"],
+                        conv_group_size=conv_cfg["group_size"],
+                        conv_output_bias=conv_cfg["output_bias"],
+                        conv_padding=conv_cfg["padding"],
+                        conv_attn_ratio=conv_cfg["attn_ratio"],
+                        conv_pool_type=conv_cfg["pool_type"],
+                        conv_stride_mode=conv_cfg["stride_mode"],
+                        conv_expand_output=conv_cfg["expand_output"],
+                        conv_pre_norm_act=conv_cfg["pre_norm_act"],
+                        conv_attn_early=conv_cfg["attn_early"],
+                        conv_attn_act_layer=conv_cfg["attn_act_layer"],
+                        conv_norm_act_layer=conv_cfg["norm_act_layer"],
+                        **maxvit_cfg,
+                    )
+                )
             else:
                 raise ValueError(f"Unknown block_type: {block_type}")
         self.blocks = nn.Sequential(*blocks)
@@ -917,17 +1177,23 @@ class MaxxVitStage(nn.Layer):
 # Stem and Head
 # ---------------------------------------------------------------------------
 
+
 class Stem(nn.Layer):
-    def __init__(self, in_chs, out_chs, bias=True,
-                 norm_eps=1e-3, padding="same", act_layer=None):
+    def __init__(
+        self, in_chs, out_chs, bias=True, norm_eps=1e-3, padding="same", act_layer=None
+    ):
         super().__init__()
         if not isinstance(out_chs, (list, tuple)):
             out_chs = to_2tuple(out_chs)
-        self.conv1 = create_conv2d(in_chs, out_chs[0], 3, stride=2,
-                                    padding=padding, bias=bias)
-        self.norm1 = BatchNormAct2d(out_chs[0], eps=norm_eps, apply_act=True, act_layer=act_layer)
-        self.conv2 = create_conv2d(out_chs[0], out_chs[1], 3, stride=1,
-                                    padding=padding, bias=bias)
+        self.conv1 = create_conv2d(
+            in_chs, out_chs[0], 3, stride=2, padding=padding, bias=bias
+        )
+        self.norm1 = BatchNormAct2d(
+            out_chs[0], eps=norm_eps, apply_act=True, act_layer=act_layer
+        )
+        self.conv2 = create_conv2d(
+            out_chs[0], out_chs[1], 3, stride=1, padding=padding, bias=bias
+        )
         self.out_chs = out_chs[-1]
 
     def forward(self, x):
@@ -938,14 +1204,15 @@ class Stem(nn.Layer):
 
 
 class ClassifierHead(nn.Layer):
-    def __init__(self, in_features, num_classes, pool_type="avg",
-                 drop_rate=0.0):
+    def __init__(self, in_features, num_classes, pool_type="avg", drop_rate=0.0):
         super().__init__()
         self.in_features = in_features
         self.global_pool = nn.AdaptiveAvgPool2D(1)
         self.flatten = nn.Flatten()
         self.drop = nn.Dropout(drop_rate)
-        self.fc = nn.Linear(in_features, num_classes) if num_classes > 0 else nn.Identity()
+        self.fc = (
+            nn.Linear(in_features, num_classes) if num_classes > 0 else nn.Identity()
+        )
 
     def forward(self, x, pre_logits=False):
         x = self.global_pool(x)
@@ -958,18 +1225,31 @@ class ClassifierHead(nn.Layer):
 
 
 class NormMlpClassifierHead(nn.Layer):
-    def __init__(self, in_features, num_classes, hidden_size,
-                 pool_type="avg", drop_rate=0.0, norm_eps=1e-5):
+    def __init__(
+        self,
+        in_features,
+        num_classes,
+        hidden_size,
+        pool_type="avg",
+        drop_rate=0.0,
+        norm_eps=1e-5,
+    ):
         super().__init__()
         self.norm = LayerNorm2d(in_features, eps=norm_eps)
         self.pool = nn.AdaptiveAvgPool2D(1)
         self.flatten = nn.Flatten()
-        self.pre_logits = nn.Sequential(OrderedDict([
-            ("fc", nn.Linear(in_features, hidden_size)),
-            ("act", nn.Tanh()),
-        ]))
+        self.pre_logits = nn.Sequential(
+            OrderedDict(
+                [
+                    ("fc", nn.Linear(in_features, hidden_size)),
+                    ("act", nn.Tanh()),
+                ]
+            )
+        )
         self.dropout = nn.Dropout(drop_rate)
-        self.fc = nn.Linear(hidden_size, num_classes) if num_classes > 0 else nn.Identity()
+        self.fc = (
+            nn.Linear(hidden_size, num_classes) if num_classes > 0 else nn.Identity()
+        )
 
     def forward(self, x, pre_logits=False):
         x = self.pool(x)
@@ -987,51 +1267,77 @@ class NormMlpClassifierHead(nn.Layer):
 # Main model
 # ---------------------------------------------------------------------------
 
-class MaxxVit(nn.Layer):
-    def __init__(self, cfg_embed_dim, cfg_depths, cfg_stem_width,
-                 cfg_head_hidden_size, cfg_stem_bias=True,
-                 block_type=('M', 'M', 'M', 'M'),
-                 img_size=224, in_chans=3, num_classes=1000,
-                 drop_path_rate=0.0,
-                 conv_norm_eps=1e-3, conv_act='gelu_tanh', conv_padding='same',
-                 conv_expand_ratio=4.0, conv_kernel_size=3, conv_group_size=1,
-                 conv_output_bias=True, conv_attn_ratio=0.25, conv_pool_type='avg2',
-                 conv_stride_mode='dw', conv_expand_output=True,
-                 conv_pre_norm_act=False, conv_attn_early=False,
-                 conv_attn_act='silu',
-                 # transformer config (defaults match timm MaxxVitTransformerCfg)
-                 transformer_norm_eps=1e-6, transformer_act='gelu',
-                 transformer_head_first=True, transformer_dim_head=32,
-                 transformer_rel_pos_type='bias', transformer_rel_pos_dim=512,
-                 transformer_expand_first=True, transformer_shortcut_bias=True,
-                 transformer_norm_layer='layernorm2d', transformer_attn_bias=True,
-                 mlp_ratio=4.0, init_values=None):
+
+class MaxxVit(TheseusLayer):
+    def __init__(
+        self,
+        cfg_embed_dim,
+        cfg_depths,
+        cfg_stem_width,
+        cfg_head_hidden_size,
+        cfg_stem_bias=True,
+        block_type=("M", "M", "M", "M"),
+        img_size=224,
+        in_chans=3,
+        num_classes=1000,
+        drop_path_rate=0.0,
+        conv_norm_eps=1e-3,
+        conv_act="gelu_tanh",
+        conv_padding="same",
+        conv_expand_ratio=4.0,
+        conv_kernel_size=3,
+        conv_group_size=1,
+        conv_output_bias=True,
+        conv_attn_ratio=0.25,
+        conv_pool_type="avg2",
+        conv_stride_mode="dw",
+        conv_expand_output=True,
+        conv_pre_norm_act=False,
+        conv_attn_early=False,
+        conv_attn_act="silu",
+        # transformer config (defaults match timm MaxxVitTransformerCfg)
+        transformer_norm_eps=1e-6,
+        transformer_act="gelu",
+        transformer_head_first=True,
+        transformer_dim_head=32,
+        transformer_rel_pos_type="bias",
+        transformer_rel_pos_dim=512,
+        transformer_expand_first=True,
+        transformer_shortcut_bias=True,
+        transformer_norm_layer="layernorm2d",
+        transformer_attn_bias=True,
+        mlp_ratio=4.0,
+        init_values=None,
+    ):
         super().__init__()
         img_size = to_2tuple(img_size)
         self.num_features = cfg_embed_dim[-1]
 
-        if conv_act == 'silu':
+        if conv_act == "silu":
             conv_act_layer = nn.Silu
         else:  # 'gelu_tanh' or default
-            conv_act_layer = partial(nn.GELU, approximate='tanh')
+            conv_act_layer = partial(nn.GELU, approximate="tanh")
 
-        if conv_attn_act == 'relu':
+        if conv_attn_act == "relu":
             se_act_layer = nn.ReLU
         else:
             se_act_layer = nn.Silu
 
-        if transformer_act == 'gelu_tanh':
-            tf_act_layer = partial(nn.GELU, approximate='tanh')
+        if transformer_act == "gelu_tanh":
+            tf_act_layer = partial(nn.GELU, approximate="tanh")
         else:  # 'gelu'
             tf_act_layer = nn.GELU
 
         def make_rel_pos_cls(feat_size_ws):
-            if transformer_rel_pos_type == 'mlp':
-                return partial(RelPosMlp, window_size=feat_size_ws,
-                               hidden_dim=transformer_rel_pos_dim)
-            elif transformer_rel_pos_type == 'bias':
+            if transformer_rel_pos_type == "mlp":
+                return partial(
+                    RelPosMlp,
+                    window_size=feat_size_ws,
+                    hidden_dim=transformer_rel_pos_dim,
+                )
+            elif transformer_rel_pos_type == "bias":
                 return partial(RelPosBias, window_size=feat_size_ws)
-            elif transformer_rel_pos_type == 'bias_tf':
+            elif transformer_rel_pos_type == "bias_tf":
                 return partial(RelPosBiasTf, window_size=feat_size_ws)
             return None
 
@@ -1044,9 +1350,14 @@ class MaxxVit(nn.Layer):
         window_size = (img_size[0] // partition_ratio, img_size[1] // partition_ratio)
         grid_size = window_size
 
-        self.stem = Stem(in_chans, cfg_stem_width, bias=cfg_stem_bias,
-                          norm_eps=conv_norm_eps, padding=conv_padding,
-                          act_layer=conv_act_layer)
+        self.stem = Stem(
+            in_chans,
+            cfg_stem_width,
+            bias=cfg_stem_bias,
+            norm_eps=conv_norm_eps,
+            padding=conv_padding,
+            act_layer=conv_act_layer,
+        )
         feat_size = (img_size[0] // 2, img_size[1] // 2)
         in_chs = self.stem.out_chs
         num_stages = len(cfg_embed_dim)
@@ -1055,47 +1366,72 @@ class MaxxVit(nn.Layer):
         for i in range(num_stages):
             stage_stride = 2
             out_chs = cfg_embed_dim[i]
-            feat_size = ((feat_size[0] - 1) // stage_stride + 1,
-                         (feat_size[1] - 1) // stage_stride + 1)
+            feat_size = (
+                (feat_size[0] - 1) // stage_stride + 1,
+                (feat_size[1] - 1) // stage_stride + 1,
+            )
 
             bt = block_type[i] if isinstance(block_type, (tuple, list)) else block_type
             rel_pos_cls = None
-            if bt == 'T':
+            if bt == "T":
                 rel_pos_cls = make_rel_pos_cls(feat_size)
 
-            stages.append(MaxxVitStage(
-                in_chs, out_chs, depth=cfg_depths[i], stride=stage_stride,
-                block_type=bt,
-                feat_size=feat_size,
-                window_size=window_size, grid_size=grid_size,
-                conv_norm_eps=conv_norm_eps, conv_padding=conv_padding,
-                conv_expand_ratio=conv_expand_ratio, conv_kernel_size=conv_kernel_size,
-                conv_group_size=conv_group_size, conv_output_bias=conv_output_bias,
-                conv_attn_ratio=conv_attn_ratio, conv_pool_type=conv_pool_type,
-                conv_stride_mode=conv_stride_mode, conv_expand_output=conv_expand_output,
-                conv_pre_norm_act=conv_pre_norm_act, conv_attn_early=conv_attn_early,
-                conv_attn_act_layer=se_act_layer, conv_norm_act_layer=conv_act_layer,
-                dim_head=transformer_dim_head, head_first=transformer_head_first,
-                act_layer=tf_act_layer, norm_eps=transformer_norm_eps,
-                attn_drop=0.0, proj_drop=0.0,
-                transformer_expand_first=transformer_expand_first,
-                transformer_shortcut_bias=transformer_shortcut_bias,
-                transformer_norm_layer=transformer_norm_layer,
-                transformer_attn_bias=transformer_attn_bias,
-                mlp_ratio=mlp_ratio, init_values=init_values,
-                rel_pos_cls=rel_pos_cls,
-                drop_path_rates=dpr[i]))
+            stages.append(
+                MaxxVitStage(
+                    in_chs,
+                    out_chs,
+                    depth=cfg_depths[i],
+                    stride=stage_stride,
+                    block_type=bt,
+                    feat_size=feat_size,
+                    window_size=window_size,
+                    grid_size=grid_size,
+                    conv_norm_eps=conv_norm_eps,
+                    conv_padding=conv_padding,
+                    conv_expand_ratio=conv_expand_ratio,
+                    conv_kernel_size=conv_kernel_size,
+                    conv_group_size=conv_group_size,
+                    conv_output_bias=conv_output_bias,
+                    conv_attn_ratio=conv_attn_ratio,
+                    conv_pool_type=conv_pool_type,
+                    conv_stride_mode=conv_stride_mode,
+                    conv_expand_output=conv_expand_output,
+                    conv_pre_norm_act=conv_pre_norm_act,
+                    conv_attn_early=conv_attn_early,
+                    conv_attn_act_layer=se_act_layer,
+                    conv_norm_act_layer=conv_act_layer,
+                    dim_head=transformer_dim_head,
+                    head_first=transformer_head_first,
+                    act_layer=tf_act_layer,
+                    norm_eps=transformer_norm_eps,
+                    attn_drop=0.0,
+                    proj_drop=0.0,
+                    transformer_expand_first=transformer_expand_first,
+                    transformer_shortcut_bias=transformer_shortcut_bias,
+                    transformer_norm_layer=transformer_norm_layer,
+                    transformer_attn_bias=transformer_attn_bias,
+                    mlp_ratio=mlp_ratio,
+                    init_values=init_values,
+                    rel_pos_cls=rel_pos_cls,
+                    drop_path_rates=dpr[i],
+                )
+            )
             in_chs = out_chs
         self.stages = nn.Sequential(*stages)
 
         if cfg_head_hidden_size:
             self.norm = nn.Identity()
             self.head = NormMlpClassifierHead(
-                self.num_features, num_classes, cfg_head_hidden_size,
-                norm_eps=transformer_norm_eps)
+                self.num_features,
+                num_classes,
+                cfg_head_hidden_size,
+                norm_eps=transformer_norm_eps,
+            )
         else:
             if transformer_norm_layer == "batchnorm2d":
-                self.norm = nn.BatchNorm2D(self.num_features, epsilon=transformer_norm_eps)
+                self.norm = nn.BatchNorm2D(
+                    self.num_features, epsilon=transformer_norm_eps
+                )
             else:
                 self.norm = LayerNorm2d(self.num_features, eps=transformer_norm_eps)
             self.head = ClassifierHead(self.num_features, num_classes)
@@ -1116,6 +1452,7 @@ class MaxxVit(nn.Layer):
 # MaxViT TF model constructors
 # ---------------------------------------------------------------------------
 
+
 def _resize_rel_pos_bias_table(rel_pos_bias, dst_shape):
     if list(rel_pos_bias.shape) == list(dst_shape):
         return rel_pos_bias
@@ -1124,7 +1461,8 @@ def _resize_rel_pos_bias_table(rel_pos_bias, dst_shape):
         num_heads, _, _ = dst_shape
         src = rel_pos_bias.unsqueeze(1)  # [H, 1, src_h, src_w]
         dst = paddle.nn.functional.interpolate(
-            src, size=dst_shape[1:], mode='bilinear', align_corners=False)
+            src, size=dst_shape[1:], mode="bilinear", align_corners=False
+        )
         return dst.squeeze(1)
 
     dst_num_pos, num_heads = dst_shape
@@ -1135,7 +1473,8 @@ def _resize_rel_pos_bias_table(rel_pos_bias, dst_shape):
         return rel_pos_bias
     src = rel_pos_bias.transpose([1, 0]).reshape([num_heads, 1, src_size, src_size])
     dst = paddle.nn.functional.interpolate(
-        src, size=(dst_size, dst_size), mode='bilinear', align_corners=False)
+        src, size=(dst_size, dst_size), mode="bilinear", align_corners=False
+    )
     return dst.reshape([num_heads, dst_size * dst_size]).transpose([1, 0])
 
 
@@ -1143,11 +1482,18 @@ def _checkpoint_filter_fn(state_dict, model):
     model_sd = model.state_dict()
     out = {}
     for k, v in state_dict.items():
-        if k.endswith('relative_position_index') or k.endswith('rel_coords_log') \
-                or k.endswith('height_lookup') or k.endswith('width_lookup'):
+        if (
+            k.endswith("relative_position_index")
+            or k.endswith("rel_coords_log")
+            or k.endswith("height_lookup")
+            or k.endswith("width_lookup")
+        ):
             continue
-        if k.endswith('relative_position_bias_table') and k in model_sd \
-                and list(v.shape) != list(model_sd[k].shape):
+        if (
+            k.endswith("relative_position_bias_table")
+            and k in model_sd
+            and list(v.shape) != list(model_sd[k].shape)
+        ):
             try:
                 v = _resize_rel_pos_bias_table(v, model_sd[k].shape)
             except Exception:
@@ -1174,37 +1520,62 @@ def _load_filtered(model, pretrained_path, use_ssld=False):
     from ....utils.save_load import _set_ssld_pretrained
     from ....utils.download import get_weights_path_from_url
     import os
+
     path = pretrained_path
     if path.startswith(("http://", "https://")):
         path = _set_ssld_pretrained(path, use_ssld=use_ssld)
         path = get_weights_path_from_url(path)
-    if not path.endswith('.pdparams'):
-        path = path + '.pdparams'
+    if not path.endswith(".pdparams"):
+        path = path + ".pdparams"
     if not os.path.exists(path):
         raise ValueError("Model pretrain path {} does not exists.".format(path))
     state_dict = paddle.load(path)
     state_dict = _checkpoint_filter_fn(state_dict, model)
     missing, unexpected = model.set_state_dict(state_dict)
+    if missing:
+        logger.warning("Missing keys when loading pretrained: {}".format(missing))
+    if unexpected:
+        logger.warning("Unexpected keys when loading pretrained: {}".format(unexpected))
     logger.info("Finish load pretrained model from {}".format(path))
 
 
 MAXVIT_TF_CONFIGS = {
     "maxvit_tiny_tf": dict(
-        embed_dim=(64, 128, 256, 512), depths=(2, 2, 5, 2),
-        stem_width=64, head_hidden_size=512, stem_bias=True,
-        dim_head=32, drop_path_rate=0.2),
+        embed_dim=(64, 128, 256, 512),
+        depths=(2, 2, 5, 2),
+        stem_width=64,
+        head_hidden_size=512,
+        stem_bias=True,
+        dim_head=32,
+        drop_path_rate=0.2,
+    ),
     "maxvit_small_tf": dict(
-        embed_dim=(96, 192, 384, 768), depths=(2, 2, 5, 2),
-        stem_width=64, head_hidden_size=768, stem_bias=True,
-        dim_head=32, drop_path_rate=0.2),
+        embed_dim=(96, 192, 384, 768),
+        depths=(2, 2, 5, 2),
+        stem_width=64,
+        head_hidden_size=768,
+        stem_bias=True,
+        dim_head=32,
+        drop_path_rate=0.2,
+    ),
     "maxvit_base_tf": dict(
-        embed_dim=(96, 192, 384, 768), depths=(2, 6, 14, 2),
-        stem_width=64, head_hidden_size=768, stem_bias=True,
-        dim_head=32, drop_path_rate=0.2),
+        embed_dim=(96, 192, 384, 768),
+        depths=(2, 6, 14, 2),
+        stem_width=64,
+        head_hidden_size=768,
+        stem_bias=True,
+        dim_head=32,
+        drop_path_rate=0.2,
+    ),
     "maxvit_large_tf": dict(
-        embed_dim=(128, 256, 512, 1024), depths=(2, 6, 14, 2),
-        stem_width=128, head_hidden_size=1024, stem_bias=True,
-        dim_head=32, drop_path_rate=0.2),
+        embed_dim=(128, 256, 512, 1024),
+        depths=(2, 6, 14, 2),
+        stem_width=128,
+        head_hidden_size=1024,
+        stem_bias=True,
+        dim_head=32,
+        drop_path_rate=0.2,
+    ),
 }
 
 
@@ -1216,8 +1587,7 @@ def _get_size_from_model_name(name):
     return 224
 
 
-def create_maxvit(model_name, pretrained=False, use_ssld=False,
-                  **override_kwargs):
+def create_maxvit(model_name, pretrained=False, use_ssld=False, **override_kwargs):
     base = model_name.lower()
     for suffix in (".sw_in1k", ".in1k", ".in21k"):
         base = base.replace(suffix, "")
@@ -1236,15 +1606,21 @@ def create_maxvit(model_name, pretrained=False, use_ssld=False,
         cfg_stem_width=cfg["stem_width"],
         cfg_head_hidden_size=cfg["head_hidden_size"],
         cfg_stem_bias=cfg["stem_bias"],
-        block_type=('M', 'M', 'M', 'M'),
+        block_type=("M", "M", "M", "M"),
         img_size=size,
         num_classes=num_classes,
         drop_path_rate=drop_path_rate,
-        conv_norm_eps=1e-3, conv_act='gelu_tanh', conv_padding='same',
-        conv_stride_mode='dw', conv_expand_output=True,
-        conv_pre_norm_act=False, conv_attn_early=False,
-        transformer_norm_eps=1e-5, transformer_act='gelu_tanh',
-        transformer_head_first=False, transformer_rel_pos_type='bias_tf',
+        conv_norm_eps=1e-3,
+        conv_act="gelu_tanh",
+        conv_padding="same",
+        conv_stride_mode="dw",
+        conv_expand_output=True,
+        conv_pre_norm_act=False,
+        conv_attn_early=False,
+        transformer_norm_eps=1e-5,
+        transformer_act="gelu_tanh",
+        transformer_head_first=False,
+        transformer_rel_pos_type="bias_tf",
         transformer_dim_head=cfg["dim_head"],
     )
     _load_pretrained(pretrained, model, MODEL_URLS.get(model_name), use_ssld=use_ssld)
@@ -1255,13 +1631,20 @@ def create_maxvit(model_name, pretrained=False, use_ssld=False,
 # CoAtNet model constructors
 # ---------------------------------------------------------------------------
 
+
 def _rw_coat_cfg(
-        stride_mode='pool', pool_type='avg2',
-        conv_output_bias=False, conv_attn_early=False,
-        conv_attn_act_layer='relu', conv_norm_layer='',
-        transformer_shortcut_bias=True,
-        transformer_norm_layer='layernorm2d',
-        init_values=None, rel_pos_type='bias', rel_pos_dim=512):
+    stride_mode="pool",
+    pool_type="avg2",
+    conv_output_bias=False,
+    conv_attn_early=False,
+    conv_attn_act_layer="relu",
+    conv_norm_layer="",
+    transformer_shortcut_bias=True,
+    transformer_norm_layer="layernorm2d",
+    init_values=None,
+    rel_pos_type="bias",
+    rel_pos_dim=512,
+):
     return dict(
         conv_stride_mode=stride_mode,
         conv_pool_type=pool_type,
@@ -1270,7 +1653,7 @@ def _rw_coat_cfg(
         conv_output_bias=conv_output_bias,
         conv_attn_early=conv_attn_early,
         conv_attn_act=conv_attn_act_layer,
-        conv_act='silu',
+        conv_act="silu",
         conv_norm_eps=1e-5,
         transformer_expand_first=False,
         transformer_shortcut_bias=transformer_shortcut_bias,
@@ -1283,11 +1666,16 @@ def _rw_coat_cfg(
 
 
 def _rw_max_cfg(
-        stride_mode='dw', pool_type='avg2',
-        conv_output_bias=False, conv_attn_ratio=1 / 16,
-        transformer_shortcut_bias=True,
-        transformer_norm_layer='layernorm2d',
-        init_values=None, rel_pos_type='bias', rel_pos_dim=512):
+    stride_mode="dw",
+    pool_type="avg2",
+    conv_output_bias=False,
+    conv_attn_ratio=1 / 16,
+    transformer_shortcut_bias=True,
+    transformer_norm_layer="layernorm2d",
+    init_values=None,
+    rel_pos_type="bias",
+    rel_pos_dim=512,
+):
     return dict(
         conv_stride_mode=stride_mode,
         conv_pool_type=pool_type,
@@ -1295,8 +1683,8 @@ def _rw_max_cfg(
         conv_expand_output=False,
         conv_output_bias=conv_output_bias,
         conv_attn_ratio=conv_attn_ratio,
-        conv_attn_act='silu',
-        conv_act='silu',
+        conv_attn_act="silu",
+        conv_act="silu",
         conv_norm_eps=1e-5,
         transformer_expand_first=False,
         transformer_shortcut_bias=transformer_shortcut_bias,
@@ -1310,54 +1698,98 @@ def _rw_max_cfg(
 
 COATNET_CONFIGS = {
     "coatnet_0_rw": dict(
-        embed_dim=(96, 192, 384, 768), depths=(2, 3, 7, 2),
-        stem_width=(32, 64), head_hidden_size=None, stem_bias=False,
-        dim_head=32, drop_path_rate=0.0,
-        **_rw_coat_cfg(
-            conv_attn_early=True, transformer_shortcut_bias=False)),
+        embed_dim=(96, 192, 384, 768),
+        depths=(2, 3, 7, 2),
+        stem_width=(32, 64),
+        head_hidden_size=None,
+        stem_bias=False,
+        dim_head=32,
+        drop_path_rate=0.0,
+        **_rw_coat_cfg(conv_attn_early=True, transformer_shortcut_bias=False),
+    ),
     "coatnet_1_rw": dict(
-        embed_dim=(96, 192, 384, 768), depths=(2, 6, 14, 2),
-        stem_width=(32, 64), head_hidden_size=None, stem_bias=False,
-        dim_head=32, drop_path_rate=0.0,
+        embed_dim=(96, 192, 384, 768),
+        depths=(2, 6, 14, 2),
+        stem_width=(32, 64),
+        head_hidden_size=None,
+        stem_bias=False,
+        dim_head=32,
+        drop_path_rate=0.0,
         **_rw_coat_cfg(
-            stride_mode='dw', conv_attn_early=True,
-            transformer_shortcut_bias=False)),
+            stride_mode="dw", conv_attn_early=True, transformer_shortcut_bias=False
+        ),
+    ),
     "coatnet_bn_0_rw": dict(
-        embed_dim=(96, 192, 384, 768), depths=(2, 3, 7, 2),
-        stem_width=(32, 64), head_hidden_size=None, stem_bias=False,
-        dim_head=32, drop_path_rate=0.0,
+        embed_dim=(96, 192, 384, 768),
+        depths=(2, 3, 7, 2),
+        stem_width=(32, 64),
+        head_hidden_size=None,
+        stem_bias=False,
+        dim_head=32,
+        drop_path_rate=0.0,
         **_rw_coat_cfg(
-            stride_mode='dw', conv_attn_early=True,
+            stride_mode="dw",
+            conv_attn_early=True,
             transformer_shortcut_bias=False,
-            transformer_norm_layer='batchnorm2d')),
+            transformer_norm_layer="batchnorm2d",
+        ),
+    ),
     "coatnet_nano_rw": dict(
-        embed_dim=(64, 128, 256, 512), depths=(3, 4, 6, 3),
-        stem_width=(32, 64), head_hidden_size=None, stem_bias=False,
-        dim_head=32, drop_path_rate=0.0,
-        **_rw_max_cfg(
-            stride_mode='pool', conv_output_bias=True, conv_attn_ratio=0.25)),
+        embed_dim=(64, 128, 256, 512),
+        depths=(3, 4, 6, 3),
+        stem_width=(32, 64),
+        head_hidden_size=None,
+        stem_bias=False,
+        dim_head=32,
+        drop_path_rate=0.0,
+        **_rw_max_cfg(stride_mode="pool", conv_output_bias=True, conv_attn_ratio=0.25),
+    ),
     "coatnet_rmlp_1_rw": dict(
-        embed_dim=(96, 192, 384, 768), depths=(2, 6, 14, 2),
-        stem_width=(32, 64), head_hidden_size=None, stem_bias=False,
-        dim_head=32, drop_path_rate=0.0,
+        embed_dim=(96, 192, 384, 768),
+        depths=(2, 6, 14, 2),
+        stem_width=(32, 64),
+        head_hidden_size=None,
+        stem_bias=False,
+        dim_head=32,
+        drop_path_rate=0.0,
         **_rw_coat_cfg(
-            pool_type='max', conv_attn_early=True,
+            pool_type="max",
+            conv_attn_early=True,
             transformer_shortcut_bias=False,
-            rel_pos_type='mlp', rel_pos_dim=384)),
+            rel_pos_type="mlp",
+            rel_pos_dim=384,
+        ),
+    ),
     "coatnet_rmlp_2_rw": dict(
-        embed_dim=(128, 256, 512, 1024), depths=(2, 6, 14, 2),
-        stem_width=(64, 128), head_hidden_size=None, stem_bias=False,
-        dim_head=32, drop_path_rate=0.0,
+        embed_dim=(128, 256, 512, 1024),
+        depths=(2, 6, 14, 2),
+        stem_width=(64, 128),
+        head_hidden_size=None,
+        stem_bias=False,
+        dim_head=32,
+        drop_path_rate=0.0,
         **_rw_coat_cfg(
-            stride_mode='dw', conv_attn_act_layer='silu',
-            init_values=1e-6, rel_pos_type='mlp')),
+            stride_mode="dw",
+            conv_attn_act_layer="silu",
+            init_values=1e-6,
+            rel_pos_type="mlp",
+        ),
+    ),
     "coatnet_rmlp_nano_rw": dict(
-        embed_dim=(64, 128, 256, 512), depths=(3, 4, 6, 3),
-        stem_width=(32, 64), head_hidden_size=None, stem_bias=False,
-        dim_head=32, drop_path_rate=0.0,
+        embed_dim=(64, 128, 256, 512),
+        depths=(3, 4, 6, 3),
+        stem_width=(32, 64),
+        head_hidden_size=None,
+        stem_bias=False,
+        dim_head=32,
+        drop_path_rate=0.0,
         **_rw_max_cfg(
-            conv_output_bias=True, conv_attn_ratio=0.25,
-            rel_pos_type='mlp', rel_pos_dim=384)),
+            conv_output_bias=True,
+            conv_attn_ratio=0.25,
+            rel_pos_type="mlp",
+            rel_pos_dim=384,
+        ),
+    ),
 }
 
 
@@ -1371,8 +1803,7 @@ def _parse_coatnet_name(model_name):
     return config_key, size
 
 
-def create_coatnet(model_name, pretrained=False, use_ssld=False,
-                   **override_kwargs):
+def create_coatnet(model_name, pretrained=False, use_ssld=False, **override_kwargs):
     config_key, size = _parse_coatnet_name(model_name)
     if config_key not in COATNET_CONFIGS:
         raise ValueError(f"Unknown coatnet config: {config_key}")
@@ -1382,16 +1813,27 @@ def create_coatnet(model_name, pretrained=False, use_ssld=False,
     drop_path_rate = override_kwargs.pop("drop_path_rate", cfg["drop_path_rate"])
 
     kwargs = {}
-    for k in ('conv_stride_mode', 'conv_pool_type', 'conv_pre_norm_act',
-              'conv_expand_output', 'conv_output_bias', 'conv_attn_early',
-              'conv_attn_act', 'conv_act', 'conv_norm_eps',
-              'transformer_expand_first', 'transformer_shortcut_bias',
-              'transformer_norm_layer', 'transformer_rel_pos_type',
-              'transformer_rel_pos_dim', 'transformer_norm_eps'):
+    for k in (
+        "conv_stride_mode",
+        "conv_pool_type",
+        "conv_pre_norm_act",
+        "conv_expand_output",
+        "conv_output_bias",
+        "conv_attn_early",
+        "conv_attn_act",
+        "conv_act",
+        "conv_norm_eps",
+        "transformer_expand_first",
+        "transformer_shortcut_bias",
+        "transformer_norm_layer",
+        "transformer_rel_pos_type",
+        "transformer_rel_pos_dim",
+        "transformer_norm_eps",
+    ):
         if k in cfg:
             kwargs[k] = cfg[k]
 
-    init_values = cfg.get('transformer_init_values')
+    init_values = cfg.get("transformer_init_values")
 
     model = MaxxVit(
         cfg_embed_dim=cfg["embed_dim"],
@@ -1399,14 +1841,14 @@ def create_coatnet(model_name, pretrained=False, use_ssld=False,
         cfg_stem_width=cfg["stem_width"],
         cfg_head_hidden_size=cfg["head_hidden_size"],
         cfg_stem_bias=cfg["stem_bias"],
-        block_type=('C', 'C', 'T', 'T'),
+        block_type=("C", "C", "T", "T"),
         img_size=size,
         num_classes=num_classes,
         drop_path_rate=drop_path_rate,
         transformer_dim_head=cfg["dim_head"],
         init_values=init_values,
-        conv_attn_ratio=cfg.get('conv_attn_ratio', 0.25),
-        conv_padding='',
+        conv_attn_ratio=cfg.get("conv_attn_ratio", 0.25),
+        conv_padding="",
         transformer_head_first=True,
         **kwargs,
     )
@@ -1415,13 +1857,14 @@ def create_coatnet(model_name, pretrained=False, use_ssld=False,
 
 
 def _make_maxvit_factory(config_key, img_size):
-    suffix = config_key[len("maxvit_"):]
+    suffix = config_key[len("maxvit_") :]
     name = f"MaxViT_{suffix}_{img_size}"
     model_name = name
 
     def _factory(pretrained=False, use_ssld=False, **kwargs):
-        return create_maxvit(model_name, pretrained=pretrained, use_ssld=use_ssld,
-                             **kwargs)
+        return create_maxvit(
+            model_name, pretrained=pretrained, use_ssld=use_ssld, **kwargs
+        )
 
     _factory.__name__ = name
     _factory.__qualname__ = name
@@ -1429,13 +1872,14 @@ def _make_maxvit_factory(config_key, img_size):
 
 
 def _make_coatnet_factory(config_key, img_size):
-    suffix = config_key[len("coatnet_"):]
+    suffix = config_key[len("coatnet_") :]
     name = f"CoAtNet_{suffix}_{img_size}"
     model_name = name
 
     def _factory(pretrained=False, use_ssld=False, **kwargs):
-        return create_coatnet(model_name, pretrained=pretrained, use_ssld=use_ssld,
-                              **kwargs)
+        return create_coatnet(
+            model_name, pretrained=pretrained, use_ssld=use_ssld, **kwargs
+        )
 
     _factory.__name__ = name
     _factory.__qualname__ = name
