@@ -47,10 +47,7 @@ Optimizer:
     name: Cosine
     learning_rate: 0.001
     warmup_epoch: 5
-    warmup_start_lr: 1e-6
-  regularizer:
-    name: 'L2'
-    coeff: 0.0001
+    warmup_start_lr: 0.000001
 
 # data loader for train and eval
 DataLoader:
