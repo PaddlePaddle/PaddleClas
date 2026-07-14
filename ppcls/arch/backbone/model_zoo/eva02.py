@@ -28,7 +28,23 @@ from ..base.theseus_layer import TheseusLayer
 from ....utils.save_load import load_dygraph_pretrain
 
 logger = logging.getLogger(__name__)
-MODEL_URLS = {}
+MODEL_URLS = {
+    "EVA02_tiny_patch14_336": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/eva02_tiny_patch14_336.mim_in22k_ft_in1k.pdparams",
+    "EVA02_small_patch14_336": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/eva02_small_patch14_336.mim_in22k_ft_in1k.pdparams",
+    "EVA02_base_patch14_448": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/eva02_base_patch14_448.mim_in22k_ft_in1k.pdparams",
+    "EVA02_base_patch14_448_ft22k_in1k": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/eva02_base_patch14_448.mim_in22k_ft_in22k_in1k.pdparams",
+    "EVA02_large_patch14_448": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/eva02_large_patch14_448.mim_in22k_ft_in1k.pdparams",
+    "EVA02_large_patch14_448_ft22k_in1k": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/eva02_large_patch14_448.mim_in22k_ft_in22k_in1k.pdparams",
+    "EVA02_large_patch14_448_m38m": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/eva02_large_patch14_448.mim_m38m_ft_in1k.pdparams",
+    "EVA02_large_patch14_448_m38m_ft22k_in1k": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/eva02_large_patch14_448.mim_m38m_ft_in22k_in1k.pdparams",
+}
+
+DEFAULT_VARIANT = {
+    "EVA02_tiny_patch14_336": "EVA02_tiny_patch14_336",
+    "EVA02_small_patch14_336": "EVA02_small_patch14_336",
+    "EVA02_base_patch14_448": "EVA02_base_patch14_448",
+    "EVA02_large_patch14_448": "EVA02_large_patch14_448",
+}
 
 __all__ = [
     "EVA02_tiny_patch14_336",
@@ -1080,27 +1096,35 @@ def checkpoint_filter_fn(state_dict, model, interpolation="bicubic", antialias=T
 # ---- Factory functions ------------------------------------------------------
 
 
-def _create_eva(variant, pretrained=None, **kwargs):
+def _load_pretrained(pretrained, model, model_url, use_ssld=False):
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
+
+
+def _create_eva(variant, pretrained=False, use_ssld=False, **kwargs):
     model = Eva(**kwargs)
     if pretrained:
-        if pretrained in MODEL_URLS:
-            load_dygraph_pretrain(model, MODEL_URLS[pretrained])
+        if isinstance(pretrained, str) and pretrained in MODEL_URLS:
+            url = MODEL_URLS[pretrained]
+            _load_pretrained(True, model, url, use_ssld=use_ssld)
+        elif pretrained is True:
+            url = MODEL_URLS[DEFAULT_VARIANT[variant]]
+            _load_pretrained(True, model, url, use_ssld=use_ssld)
         else:
-            state_dict = paddle.load(pretrained)
-            state_dict = checkpoint_filter_fn(state_dict, model)
-            missing_keys, unexpected_keys = model.set_state_dict(state_dict)
-            if missing_keys:
-                logger.warning(
-                    f"Missing keys when loading {variant}: {missing_keys[:5]}..."
-                )
-            if unexpected_keys:
-                logger.warning(
-                    f"Unexpected keys when loading {variant}: {unexpected_keys[:5]}..."
-                )
+            _load_pretrained(pretrained, model, None, use_ssld=use_ssld)
     return model
 
 
-def EVA02_tiny_patch14_336(pretrained=None, **kwargs):
+def EVA02_tiny_patch14_336(pretrained=False, use_ssld=False, **kwargs):
+    """EVA02-tiny, patch14, input 336x336, mim_in22k_ft_in1k (single weight, no sub-variant)."""
     if "class_num" in kwargs:
         kwargs["num_classes"] = kwargs.pop("class_num")
     model_args = dict(
@@ -1115,10 +1139,13 @@ def EVA02_tiny_patch14_336(pretrained=None, **kwargs):
         ref_feat_shape=(16, 16),
     )
     model_args.update(kwargs)
-    return _create_eva("eva02_tiny_patch14_336", pretrained=pretrained, **model_args)
+    return _create_eva(
+        "EVA02_tiny_patch14_336", pretrained=pretrained, use_ssld=use_ssld, **model_args
+    )
 
 
-def EVA02_small_patch14_336(pretrained=None, **kwargs):
+def EVA02_small_patch14_336(pretrained=False, use_ssld=False, **kwargs):
+    """EVA02-small, patch14, input 336x336, mim_in22k_ft_in1k (single weight, no sub-variant)."""
     if "class_num" in kwargs:
         kwargs["num_classes"] = kwargs.pop("class_num")
     model_args = dict(
@@ -1133,10 +1160,22 @@ def EVA02_small_patch14_336(pretrained=None, **kwargs):
         ref_feat_shape=(16, 16),
     )
     model_args.update(kwargs)
-    return _create_eva("eva02_small_patch14_336", pretrained=pretrained, **model_args)
+    return _create_eva(
+        "EVA02_small_patch14_336",
+        pretrained=pretrained,
+        use_ssld=use_ssld,
+        **model_args,
+    )
 
 
-def EVA02_base_patch14_448(pretrained=None, **kwargs):
+def EVA02_base_patch14_448(pretrained=False, use_ssld=False, **kwargs):
+    """EVA02-base, patch14, input 448x448. Has 2 weight sub-variants.
+
+    pretrained=True (default) loads mim_in22k_ft_in1k.
+    To switch to the ft22k_in1k sub-variant, pass the MODEL_URLS key string:
+        EVA02_base_patch14_448(pretrained="EVA02_base_patch14_448_ft22k_in1k")
+    pretrained may also be a weight URL or local path.
+    """
     if "class_num" in kwargs:
         kwargs["num_classes"] = kwargs.pop("class_num")
     model_args = dict(
@@ -1153,10 +1192,21 @@ def EVA02_base_patch14_448(pretrained=None, **kwargs):
         ref_feat_shape=(16, 16),
     )
     model_args.update(kwargs)
-    return _create_eva("eva02_base_patch14_448", pretrained=pretrained, **model_args)
+    return _create_eva(
+        "EVA02_base_patch14_448", pretrained=pretrained, use_ssld=use_ssld, **model_args
+    )
 
 
-def EVA02_large_patch14_448(pretrained=None, **kwargs):
+def EVA02_large_patch14_448(pretrained=False, use_ssld=False, **kwargs):
+    """EVA02-large, patch14, input 448x448. Has 4 weight sub-variants.
+
+    pretrained=True (default) loads mim_in22k_ft_in1k.
+    To switch to a specific sub-variant, pass the MODEL_URLS key string:
+        EVA02_large_patch14_448(pretrained="EVA02_large_patch14_448_ft22k_in1k")
+        EVA02_large_patch14_448(pretrained="EVA02_large_patch14_448_m38m")
+        EVA02_large_patch14_448(pretrained="EVA02_large_patch14_448_m38m_ft22k_in1k")
+    pretrained may also be a weight URL or local path.
+    """
     if "class_num" in kwargs:
         kwargs["num_classes"] = kwargs.pop("class_num")
     model_args = dict(
@@ -1173,4 +1223,9 @@ def EVA02_large_patch14_448(pretrained=None, **kwargs):
         ref_feat_shape=(16, 16),
     )
     model_args.update(kwargs)
-    return _create_eva("eva02_large_patch14_448", pretrained=pretrained, **model_args)
+    return _create_eva(
+        "EVA02_large_patch14_448",
+        pretrained=pretrained,
+        use_ssld=use_ssld,
+        **model_args,
+    )
