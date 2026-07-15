@@ -26,54 +26,17 @@ from paddle import ParamAttr
 from paddle.nn.initializer import Constant
 
 try:
-    from safetensors import safe_open
-    HAS_SAFETENSORS = True
-except ImportError:
-    HAS_SAFETENSORS = False
-
-try:
     from ppcls.utils import load_dygraph_pretrain
     HAS_PPCLS = True
 except ImportError:
     HAS_PPCLS = False
-    load_dygraph_pretrain = None
+    load_dygraph_pretrain = None 
 
 
 MODEL_URLS = {
-    "vit_base_patch32_siglip_256": "https://huggingface.co/timm/vit_base_patch32_siglip_256.v2_webli/resolve/main/model.safetensors",
-    "vit_base_patch16_siglip_224": "https://huggingface.co/timm/vit_base_patch16_siglip_224.v2_webli/resolve/main/model.safetensors",
-    "vit_base_patch16_siglip_256": "https://huggingface.co/timm/vit_base_patch16_siglip_256.v2_webli/resolve/main/model.safetensors",
-    "vit_base_patch16_siglip_384": "https://huggingface.co/timm/vit_base_patch16_siglip_384.v2_webli/resolve/main/model.safetensors",
-    "vit_base_patch16_siglip_512": "https://huggingface.co/timm/vit_base_patch16_siglip_512.v2_webli/resolve/main/model.safetensors",
-    "vit_large_patch16_siglip_256": "https://huggingface.co/timm/vit_large_patch16_siglip_256.v2_webli/resolve/main/model.safetensors",
-    "vit_large_patch16_siglip_384": "https://huggingface.co/timm/vit_large_patch16_siglip_384.v2_webli/resolve/main/model.safetensors",
-    "vit_large_patch16_siglip_512": "https://huggingface.co/timm/vit_large_patch16_siglip_512.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch14_siglip_224": "https://huggingface.co/timm/vit_so400m_patch14_siglip_224.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch14_siglip_378": "https://huggingface.co/timm/vit_so400m_patch14_siglip_378.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch14_siglip_384": "https://huggingface.co/timm/vit_so400m_patch14_siglip_384.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch16_siglip_256": "https://huggingface.co/timm/vit_so400m_patch16_siglip_256.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch16_siglip_384": "https://huggingface.co/timm/vit_so400m_patch16_siglip_384.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch16_siglip_512": "https://huggingface.co/timm/vit_so400m_patch16_siglip_512.v2_webli/resolve/main/model.safetensors",
-    "vit_giantopt_patch16_siglip_256": "https://huggingface.co/timm/vit_giantopt_patch16_siglip_256.v2_webli/resolve/main/model.safetensors",
-    "vit_giantopt_patch16_siglip_384": "https://huggingface.co/timm/vit_giantopt_patch16_siglip_384.v2_webli/resolve/main/model.safetensors",
-    "vit_base_patch32_siglip_gap_256": "https://huggingface.co/timm/vit_base_patch32_siglip_gap_256.v2_webli/resolve/main/model.safetensors",
-    "vit_base_patch16_siglip_gap_224": "https://huggingface.co/timm/vit_base_patch16_siglip_gap_224.v2_webli/resolve/main/model.safetensors",
-    "vit_base_patch16_siglip_gap_256": "https://huggingface.co/timm/vit_base_patch16_siglip_gap_256.v2_webli/resolve/main/model.safetensors",
-    "vit_base_patch16_siglip_gap_384": "https://huggingface.co/timm/vit_base_patch16_siglip_gap_384.v2_webli/resolve/main/model.safetensors",
-    "vit_base_patch16_siglip_gap_512": "https://huggingface.co/timm/vit_base_patch16_siglip_gap_512.v2_webli/resolve/main/model.safetensors",
-    "vit_large_patch16_siglip_gap_256": "https://huggingface.co/timm/vit_large_patch16_siglip_gap_256.v2_webli/resolve/main/model.safetensors",
-    "vit_large_patch16_siglip_gap_384": "https://huggingface.co/timm/vit_large_patch16_siglip_gap_384.v2_webli/resolve/main/model.safetensors",
-    "vit_large_patch16_siglip_gap_512": "https://huggingface.co/timm/vit_large_patch16_siglip_gap_512.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch14_siglip_gap_224": "https://huggingface.co/timm/vit_so400m_patch14_siglip_gap_224.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch14_siglip_gap_378": "https://huggingface.co/timm/vit_so400m_patch14_siglip_gap_378.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch14_siglip_gap_384": "https://huggingface.co/timm/vit_so400m_patch14_siglip_gap_384.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch14_siglip_gap_448": "https://huggingface.co/timm/vit_so400m_patch14_siglip_gap_448.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch14_siglip_gap_896": "https://huggingface.co/timm/vit_so400m_patch14_siglip_gap_896.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch16_siglip_gap_256": "https://huggingface.co/timm/vit_so400m_patch16_siglip_gap_256.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch16_siglip_gap_384": "https://huggingface.co/timm/vit_so400m_patch16_siglip_gap_384.v2_webli/resolve/main/model.safetensors",
-    "vit_so400m_patch16_siglip_gap_512": "https://huggingface.co/timm/vit_so400m_patch16_siglip_gap_512.v2_webli/resolve/main/model.safetensors",
-    "vit_giantopt_patch16_siglip_gap_256": "https://huggingface.co/timm/vit_giantopt_patch16_siglip_gap_256.v2_webli/resolve/main/model.safetensors",
-    "vit_giantopt_patch16_siglip_gap_384": "https://huggingface.co/timm/vit_giantopt_patch16_siglip_gap_384.v2_webli/resolve/main/model.safetensors",
+    "vit_base_patch16_siglip_256": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/vit_base_patch16_siglip_256_pretrained.pdparams",
+    "vit_base_patch32_siglip_256": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/vit_base_patch32_siglip_256_pretrained.pdparams",
+    "vit_large_patch16_siglip_256": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/vit_large_patch16_siglip_256_pretrained.pdparams",
 }
 
 
@@ -81,9 +44,10 @@ def download_weight(url, model_name=None, max_retries=3):
     """Download weight file from URL with SSL fix and retry mechanism"""
     cache_dir = os.path.expanduser("~/.cache/paddle/siglip_weights")
     
-    url_path = url.split("huggingface.co/")[1] if "huggingface.co/" in url else url
-    url_path = url_path.replace("/resolve/main/", "/")
-    filepath = os.path.join(cache_dir, url_path)
+    filename = url.rsplit("/", 1)[-1]
+    if not filename.endswith(".pdparams"):
+        raise ValueError("线上权重地址必须指向 .pdparams 文件")
+    filepath = os.path.join(cache_dir, filename)
     
     if os.path.exists(filepath):
         print(f"  Weight file already exists: {filepath}")
@@ -147,75 +111,44 @@ def download_weight(url, model_name=None, max_retries=3):
     return filepath
 
 
-def load_safetensors_weights(model, filepath):
-    """Load weights from safetensors file"""
-    if not HAS_SAFETENSORS:
-        raise ImportError("safetensors is required. Install with: pip install safetensors")
-    
-    state_dict = {}
-    with safe_open(filepath, framework="np", device="cpu") as f:
-        for key in f.keys():
-            state_dict[key] = f.get_tensor(key)
-    
-    model_state_dict = model.state_dict()
-    
-    converted_state_dict = {}
-    for key, value in state_dict.items():
-        new_key = key
-        if key.startswith("visual."):
-            new_key = key[7:]
-        elif "encoder" in key:
-            new_key = key.replace("encoder.", "")
-        
-        if new_key in model_state_dict:
-            model_shape = model_state_dict[new_key].shape
-            if value.shape != model_shape:
-                if len(value.shape) == 2 and len(model_shape) == 2:
-                    if value.shape[0] == model_shape[1] and value.shape[1] == model_shape[0]:
-                        value = value.T
-                elif len(value.shape) == 4 and len(model_shape) == 4:
-                    if value.shape == model_shape[::-1]:
-                        value = value.transpose(3, 2, 1, 0)
-            converted_state_dict[new_key] = value
-    
-    missing_keys = []
-    for key in model_state_dict.keys():
-        if key not in converted_state_dict:
-            missing_keys.append(key)
-    
-    if missing_keys:
-        print(f"  Warning: {len(missing_keys)} keys not found in pretrained weights")
-        if len(missing_keys) <= 10:
-            for key in missing_keys[:10]:
-                print(f"    - {key}")
-    
-    model.set_state_dict(converted_state_dict)
+def load_pdparams_weights(model, filepath):
+    if not filepath.endswith(".pdparams"):
+        raise ValueError("只支持 Paddle .pdparams 权重文件")
+    state_dict = paddle.load(filepath)
+    if isinstance(state_dict, dict) and "state_dict" in state_dict:
+        state_dict = state_dict["state_dict"]
+    elif isinstance(state_dict, dict) and "model" in state_dict:
+        state_dict = state_dict["model"]
+    expected = model.state_dict()
+    missing = sorted(set(expected) - set(state_dict))
+    unexpected = sorted(set(state_dict) - set(expected))
+    mismatched = [
+        key for key in expected
+        if key in state_dict and expected[key].shape != state_dict[key].shape
+    ]
+    if missing or unexpected or mismatched:
+        raise RuntimeError(
+            f".pdparams 与模型结构不匹配：缺失={missing}，多余={unexpected}，形状不符={mismatched}"
+        )
+    incompatible = model.set_state_dict(state_dict, use_structured_name=True)
+    if incompatible[0] or incompatible[1]:
+        raise RuntimeError(f".pdparams 加载失败：{incompatible}")
     return model
 
 
 def load_pretrained_weights(model, url):
-    """Download and load pretrained weights"""
     weight_path = download_weight(url)
-    return load_safetensors_weights(model, weight_path)
+    return load_pdparams_weights(model, weight_path)
 
 
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
-    if pretrained is False:
-        pass
-    elif pretrained is True:
-        if load_dygraph_pretrain is not None:
-            load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
-        else:
-            load_pretrained_weights(model, model_url)
-    elif isinstance(pretrained, str):
-        if load_dygraph_pretrain is not None:
-            load_dygraph_pretrain(model, pretrained)
-        else:
-            load_safetensors_weights(model, pretrained)
-    else:
-        raise RuntimeError(
-            "pretrained type is not available. Please use `string` or `boolean` type."
-        )
+    if pretrained is False or pretrained is None:
+        return model
+    if pretrained is True:
+        return load_pretrained_weights(model, model_url)
+    if isinstance(pretrained, str):
+        return load_pdparams_weights(model, pretrained)
+    raise TypeError("pretrained 仅支持 False、True 或 .pdparams 文件路径")
 
 
 class GELUTanh(nn.Layer):
@@ -1203,11 +1136,6 @@ def vit_giantopt_patch16_siglip_gap_384(pretrained=False, class_num=1000, use_ss
     return model
 
 
-MODEL_URLS["naflexvit_base_patch16_siglip"] = "https://huggingface.co/timm/naflexvit_base_patch16_siglip.v2_webli/resolve/main/model.safetensors"
-MODEL_URLS["naflexvit_so400m_patch16_siglip"] = "https://huggingface.co/timm/naflexvit_so400m_patch16_siglip.v2_webli/resolve/main/model.safetensors"
-MODEL_URLS["naflexvit_base_patch16_gap"] = "https://huggingface.co/timm/naflexvit_base_patch16_gap.e300_s576_in1k/resolve/main/model.safetensors"
-MODEL_URLS["naflexvit_base_patch16_par_gap"] = "https://huggingface.co/timm/naflexvit_base_patch16_par_gap.e300_s576_in1k/resolve/main/model.safetensors"
-MODEL_URLS["naflexvit_base_patch16_parfac_gap"] = "https://huggingface.co/timm/naflexvit_base_patch16_parfac_gap.e300_s576_in1k/resolve/main/model.safetensors"
 
 
 class NaFlexEmbeds(nn.Layer):
