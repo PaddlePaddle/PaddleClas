@@ -837,6 +837,28 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 | DSNet_small | 0.8196    | 0.9596    | -                | -                | -                 | 3.5      | 23.0      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_small_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DSNet_small_infer.tar) |
 | DSNet_base  | 0.8175    | 0.9522    | -                | -                | -                 | 8.4      | 49.3      | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/DSNet_base_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/DSNet_base_infer.tar) |
 
+<a name="MambaVision"></a>
+
+## MambaVision 系列
+
+MambaVision 提供 11 个模型规格，模型介绍、配置和使用方法请参考：[MambaVision 系列模型文档](MambaVision.md)。预训练权重可从 [AI Studio MambaVision 模型空间](https://aistudio.baidu.com/modelsdetail/51615) 下载。
+
+| 模型 | Top-1 Acc | Top-5 Acc | 分辨率 | Params(M) | 预训练模型 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| MambaVision_T | 0.82176 | 0.96172 | 224 | 31.8 | [下载链接](https://aistudio.baidu.com/modelsdetail/51615) |
+| MambaVision_T2 | 0.82636 | 0.96272 | 224 | 35.1 | [下载链接](https://aistudio.baidu.com/modelsdetail/51615) |
+| MambaVision_S | 0.83232 | 0.96502 | 224 | 50.1 | [下载链接](https://aistudio.baidu.com/modelsdetail/51615) |
+| MambaVision_B | 0.84204 | 0.96848 | 224 | 97.7 | [下载链接](https://aistudio.baidu.com/modelsdetail/51615) |
+| MambaVision_B_21K | 0.84876 | 0.97478 | 224 | 97.7 | [下载链接](https://aistudio.baidu.com/modelsdetail/51615) |
+| MambaVision_L | 0.84954 | 0.97078 | 224 | 227.9 | [下载链接](https://aistudio.baidu.com/modelsdetail/51615) |
+| MambaVision_L_21K | 0.86140 | 0.97968 | 224 | 227.9 | [下载链接](https://aistudio.baidu.com/modelsdetail/51615) |
+| MambaVision_L2 | 0.85282 | 0.97160 | 224 | 241.5 | [下载链接](https://aistudio.baidu.com/modelsdetail/51615) |
+| MambaVision_L2_512_21K | 0.87114 | 0.98256 | 512 | 241.5 | [下载链接](https://aistudio.baidu.com/modelsdetail/51615) |
+| MambaVision_L3_256_21K | 0.87294 | 0.98318 | 256 | 739.6 | [下载链接](https://aistudio.baidu.com/modelsdetail/51615) |
+| MambaVision_L3_512_21K | 0.87822 | 0.98452 | 512 | 739.6 | [下载链接](https://aistudio.baidu.com/modelsdetail/51615) |
+
+> 以上指标使用转换后的 PaddlePaddle 权重在 ImageNet-1K 验证集上评估，用于验证转换前后的前向一致性，不代表使用 PaddlePaddle 从头训练复现论文精度。
+
 <a name="Transformer_lite"></a>
 
 ### 4.2 轻量级模型
