@@ -335,6 +335,12 @@ from .model_zoo.fastvit import FastViT_T8, FastViT_T12, FastViT_SA12, FastViT_SA
 from .model_zoo.edgenext import EdgeNeXt_XX_Small, EdgeNeXt_X_Small, EdgeNeXt_Small, EdgeNeXt_Base
 from .model_zoo.swiftformer import SwiftFormer_XS, SwiftFormer_S, SwiftFormer_L1, SwiftFormer_L3
 
+from .model_zoo.mambavision import (
+    MambaVision_T, MambaVision_T2, MambaVision_S, MambaVision_B,
+    MambaVision_B_21K, MambaVision_L, MambaVision_L_21K, MambaVision_L2,
+    MambaVision_L2_512_21K, MambaVision_L3_256_21K,
+    MambaVision_L3_512_21K)
+
 
 # help whl get all the models' api (class type) and components' api (func type)
 def get_apis():
