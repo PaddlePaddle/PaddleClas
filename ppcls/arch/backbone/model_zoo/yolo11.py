@@ -21,7 +21,28 @@ import paddle.nn as nn
 
 from ....utils.save_load import load_dygraph_pretrain
 
-MODEL_URLS = {}
+MODEL_URLS = {
+    "YOLO11_cls_n": (
+        "https://git.aistudio.baidu.com/api/v1/repos/PaddleClas/yolo11/media/"
+        "YOLO11_cls_n_pretrained.pdparams"
+    ),
+    "YOLO11_cls_s": (
+        "https://git.aistudio.baidu.com/api/v1/repos/PaddleClas/yolo11/media/"
+        "YOLO11_cls_s_pretrained.pdparams"
+    ),
+    "YOLO11_cls_m": (
+        "https://git.aistudio.baidu.com/api/v1/repos/PaddleClas/yolo11/media/"
+        "YOLO11_cls_m_pretrained.pdparams"
+    ),
+    "YOLO11_cls_l": (
+        "https://git.aistudio.baidu.com/api/v1/repos/PaddleClas/yolo11/media/"
+        "YOLO11_cls_l_pretrained.pdparams"
+    ),
+    "YOLO11_cls_x": (
+        "https://git.aistudio.baidu.com/api/v1/repos/PaddleClas/yolo11/media/"
+        "YOLO11_cls_x_pretrained.pdparams"
+    ),
+}
 
 __all__ = [
     "YOLO11_cls_n",
