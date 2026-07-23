@@ -1,4 +1,4 @@
-# copyright (c) 2026 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2026 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,16 +13,13 @@
 # limitations under the License.
 
 # reference:
-# ../pytorch-image-models/timm/models/naflexvit.py
+# https://github.com/huggingface/pytorch-image-models/blob/8d0f79effa3dbc922afbfb431fbadd4648938de7/timm/models/naflexvit.py
 
 from __future__ import absolute_import, division, print_function
-
-import math
 
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.base.dygraph.base import in_to_static_mode
 from paddle.nn.initializer import Constant, Normal, TruncatedNormal
 
 from ....utils.save_load import load_dygraph_pretrain
@@ -45,12 +42,6 @@ token_normal_ = Normal(std=1e-6)
 
 def to_2tuple(x):
     return (x, x) if isinstance(x, int) else tuple(x)
-
-
-def gelu_erf(x):
-    x_fp64 = x.astype("float64")
-    y = 0.5 * x_fp64 * (1.0 + paddle.erf(x_fp64 / math.sqrt(2.0)))
-    return y.astype(x.dtype)
 
 
 def batch_patchify(x, patch_size, pad=False):
@@ -94,26 +85,13 @@ class Mlp(TheseusLayer):
         hidden_features = hidden_features or in_features
         out_features = out_features or in_features
         self.fc1 = nn.Linear(in_features, hidden_features)
+        self.act = nn.GELU()
         self.fc2 = nn.Linear(hidden_features, out_features)
         self.drop = nn.Dropout(drop)
 
     def forward(self, x):
-        if not in_to_static_mode():
-            x_fp64 = x.astype("float64")
-            fc1_w = self.fc1.weight.astype("float64")
-            x_fp64 = paddle.matmul(x_fp64, fc1_w)
-            if self.fc1.bias is not None:
-                x_fp64 = x_fp64 + self.fc1.bias.astype("float64")
-            x_fp64 = gelu_erf(x_fp64)
-            x_fp64 = self.drop(x_fp64.astype(x.dtype)).astype("float64")
-            fc2_w = self.fc2.weight.astype("float64")
-            x_fp64 = paddle.matmul(x_fp64, fc2_w)
-            if self.fc2.bias is not None:
-                x_fp64 = x_fp64 + self.fc2.bias.astype("float64")
-            x = self.drop(x_fp64.astype(x.dtype))
-            return x
         x = self.fc1(x)
-        x = gelu_erf(x)
+        x = self.act(x)
         x = self.drop(x)
         x = self.fc2(x)
         x = self.drop(x)
@@ -265,13 +243,11 @@ class NaFlexEmbeds(TheseusLayer):
                 interp_size = [max(grid_size), max(grid_size)]
             else:
                 interp_size = list(grid_size)
-            use_antialias = paddle.get_device().startswith("gpu")
             pos = F.interpolate(
                 self.pos_embed.transpose([0, 3, 1, 2]).astype("float64"),
                 size=interp_size,
                 mode=self.pos_embed_interp_mode,
                 align_corners=False,
-                antialias=use_antialias,
             )
             pos = pos[:, :, : grid_size[0], : grid_size[1]]
             pos = pos.flatten(2).transpose([0, 2, 1]).astype(x.dtype)
@@ -452,6 +428,11 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         return
     if pretrained is True:
+        if not model_url:
+            raise ValueError(
+                "No pretrained weights are available for this NaFlexViT model. "
+                "Please pass a local weights path to `pretrained`."
+            )
         load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
     elif isinstance(pretrained, str):
         load_dygraph_pretrain(model, pretrained)
