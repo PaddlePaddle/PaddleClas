@@ -27,9 +27,18 @@ from ..base.theseus_layer import TheseusLayer
 from .vision_transformer import DropPath
 
 MODEL_URLS = {
-    "naflexvit_base_patch16_gap": "",
-    "naflexvit_base_patch16_par_gap": "",
-    "naflexvit_base_patch16_parfac_gap": "",
+    "naflexvit_base_patch16_gap": (
+        "https://git.aistudio.baidu.com/api/v1/repos/PaddleClas/NaFlexViT/media/"
+        "naflexvit_base_patch16_gap_pretrained.pdparams"
+    ),
+    "naflexvit_base_patch16_par_gap": (
+        "https://git.aistudio.baidu.com/api/v1/repos/PaddleClas/NaFlexViT/media/"
+        "naflexvit_base_patch16_par_gap_pretrained.pdparams"
+    ),
+    "naflexvit_base_patch16_parfac_gap": (
+        "https://git.aistudio.baidu.com/api/v1/repos/PaddleClas/NaFlexViT/media/"
+        "naflexvit_base_patch16_parfac_gap_pretrained.pdparams"
+    ),
 }
 
 __all__ = list(MODEL_URLS.keys())
