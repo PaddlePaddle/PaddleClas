@@ -28,7 +28,10 @@ from ....utils.save_load import load_dygraph_pretrain
 
 MODEL_URLS = {
     "GhostNetV3_x0_5": "",
-    "GhostNetV3_x1_0": "",
+    "GhostNetV3_x1_0": (
+        "https://git.aistudio.baidu.com/api/v1/repos/PaddleClas/GhostNet-V3/"
+        "media/GhostNetV3_x1_0_pretrained.pdparams"
+    ),
     "GhostNetV3_x1_3": "",
     "GhostNetV3_x1_6": "",
 }
