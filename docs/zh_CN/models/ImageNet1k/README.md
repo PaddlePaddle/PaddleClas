@@ -35,9 +35,11 @@
     - [VAN](#VAN)
     - [PeleeNet](#PeleeNet)
     - [CSPNet](#CSPNet)
+    - [YOLO26 系列](#YOLO26)
     - [其他模型](#Others)
   - [3.2 轻量级模型](#CNN_lite)
     - [移动端系列](#Mobile)
+    - [MobileOne 系列](#MobileOne)
     - [PP-LCNet & PP-LCNetV2 系列](#PPLCNet)
 - [四、Transformer 系列模型](#Transformer_based)
   - [4.1 服务器端模型](#Transformer_server)
@@ -52,15 +54,17 @@
     - [NextViT 系列](#NextViT)
     - [UniFormer 系列](#UniFormer)
     - [DSNet 系列](#DSNet)
+    - [FastViT 系列](#FastViT)
   - [4.2 轻量级模型](#Transformer_lite)
     - [MobileViT 系列](#MobileViT)
+    - [SwiftFormer 系列](#SwiftFormer)
 - [五、参考文献](#reference)
 
 <a name="Overview"></a>
 
 ## 一、模型库概览图
 
-基于 ImageNet1k 分类数据集，PaddleClas 支持 37 个系列分类网络结构以及对应的 217 个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
+基于 ImageNet1k 分类数据集，PaddleClas 支持 40 个系列分类网络结构以及对应的 231 个图像分类预训练模型，训练技巧、每个系列网络结构的简单介绍和性能评估将在相应章节展现，下面所有的速度指标评估环境如下：
 * Arm CPU 的评估环境基于骁龙 855(SD855)。
 * Intel CPU 的评估环境基于 Intel(R) Xeon(R) Gold 6148。
 * GPU 评估环境基于 V100 机器，在 FP32+TensorRT 配置下运行 2100 次测得（去除前 100 次的 warmup 时间）。
@@ -508,6 +512,20 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 | ---------- | --------- | --------- | ---------------- | ---------------- | -------- | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | CSPDarkNet53 | 0.7725 | 0.9355  | 2.80 | 5.43 | 9.48 | 5.041 | 27.678 | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/CSPDarkNet53_pretrained.pdparams) | [下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/CSPDarkNet53_infer.tar) |
 
+<a name="YOLO26"></a>
+
+## YOLO26 系列
+
+YOLO26 系列模型的精度指标如下表所示，更多介绍可以参考：[YOLO26 系列模型文档](YOLO26.md)。
+
+| 模型 | Top-1 Acc | Top-5 Acc | Reference<br>Top-1 Acc | Reference<br>Top-5 Acc | FLOPs(G) | Params(M) | 预训练模型下载地址 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| YOLO26n-cls | 0.715 | 0.901 | 0.714 | 0.901 | 0.5 | 2.8 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26n-cls.pdparams) |
+| YOLO26s-cls | 0.759 | 0.929 | 0.760 | 0.929 | 1.6 | 6.7 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26s-cls.pdparams) |
+| YOLO26m-cls | 0.780 | 0.942 | 0.781 | 0.942 | 4.9 | 11.6 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26m-cls.pdparams) |
+| YOLO26l-cls | 0.791 | 0.946 | 0.790 | 0.946 | 6.2 | 14.1 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26l-cls.pdparams) |
+| YOLO26x-cls | 0.799 | 0.950 | 0.799 | 0.950 | 13.6 | 29.6 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/yolo26x-cls.pdparams) |
+
 <a name="Others"></a>
 
 ## 其他模型
@@ -577,6 +595,25 @@ RegNet 系列模型的精度、速度指标如下表所示，更多关于该系�
 | ESNet_x0_5 | 0.6882 | 0.8804 |6.45|4.42|3.35| 67.31 | 3.25 | 13 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x0_5_pretrained.pdparams)               |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ESNet_x0_5_infer.tar)               |
 | ESNet_x0_75 | 0.7224 | 0.9045 |9.59|6.28|4.52| 123.74 | 3.87 | 15 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x0_75_pretrained.pdparams)               |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ESNet_x0_75_infer.tar)               |
 | ESNet_x1_0 | 0.7392 | 0.9140 |13.67|8.71|5.97| 197.33 | 4.64 | 18 |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/legendary_models/ESNet_x1_0_pretrained.pdparams)               |[下载链接](https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/inference/ESNet_x1_0_infer.tar)               |
+
+<a name="MobileOne"></a>
+
+## MobileOne 系列 <sup>[[53](#ref53)]</sup>
+
+MobileOne 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[MobileOne 系列模型文档](MobileOne.md)。
+
+| 模型          | Top-1 Acc | Top-5 Acc | FLOPs(M) | Params(M) | <span style="white-space:nowrap;">模型大小(M)</span> | 预训练模型下载地址 | inference模型下载地址 |
+|----------------|-----------|-----------|----------|-----------|-----------------------------------|-----------------------------------|-----------------------------------|
+| MobileOne_S0   | 0.7140    | -         | 279      | 2.08      | 8.3                               | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s0_paddle.pdparams) | -                                 |
+| MobileOne_S0_unfused   | 0.7140    | -         | 1088.5   | 5.38      | 21.5                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s0_unfused_paddle.pdparams) | -                                 |
+| MobileOne_S1   | 0.7590    | -         | 831      | 4.76      | 19.1                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s1_paddle.pdparams) | -                                 |
+| MobileOne_S1_unfused   | 0.7590    | -         | 858.5    | 4.89      | 19.6                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s1_unfused_paddle.pdparams) | -                                 |
+| MobileOne_S2   | 0.7740    | -         | 1306     | 7.81      | 31.2                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s2_paddle.pdparams) | -                                 |
+| MobileOne_S2_unfused   | 0.7740    | -         | 1338.6   | 7.97      | 31.9                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s2_unfused_paddle.pdparams) | -                                 |
+| MobileOne_S3   | 0.7810    | -         | 1905     | 10.08     | 40.3                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s3_paddle.pdparams) | -                                 |
+| MobileOne_S3_unfused   | 0.7810    | -         | 1944.0   | 10.28     | 41.1                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s3_unfused_paddle.pdparams) | -                                 |
+| MobileOne_S4   | 0.7940    | -         | 2991     | 14.84     | 59.4                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s4_paddle.pdparams) | -                                 |
+| MobileOne_S4_unfused   | 0.7940    | -         | 3040.9   | 15.08     | 60.3                              | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/mobileone_s4_unfused_paddle.pdparams) | -                                 |
 
 <a name="PPLCNet"></a>
 
@@ -829,6 +866,20 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 | MobileViTv3_x0_75  | 0.7626 | 0.9308 | - | - | - | 1064.48 | 3.00 | [下载链接]() | [下载链接]() |
 | MobileViTv3_x1_0   | 0.7838 | 0.9421 | - | - | - | 1875.96 | 5.14 | [下载链接]() | [下载链接]() |
 
+<a name="SwiftFormer"></a>
+
+## SwiftFormer 系列 <sup>[[54](#ref54)]</sup>
+
+SwiftFormer 系列模型的精度、速度指标如下表所示，更多关于该系列的模型介绍可以参考：[SwiftFormer 系列模型文档](SwiftFormer.md)。
+
+| Models           | Top1 | Top5 | Reference<br>top1 | Reference<br>top5 | FLOPs<br>(G) | Params<br>(M) | 预训练模型下载地址 |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| SwiftFormer_XS    | 0.7561 | 0.9238 | 0.757 | - | 0.611 | 3.5 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_XS_paddle.pdparams) |
+| SwiftFormer_S     | 0.7841 | 0.9393 | 0.785 | - | 0.995 | 6.1 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_S_paddle.pdparams) |
+| SwiftFormer_L1    | 0.8091 | 0.9528 | 0.809 | - | 1.609 | 12.1 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_L1_paddle.pdparams) |
+| SwiftFormer_L3    | 0.8300 | 0.9617 | 0.830 | - | 4.029 | 28.5 | [下载链接](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/SwiftFormer_L3_paddle.pdparams) |
+
+
 <a name='reference'></a>
 
 ## 五、参考文献
@@ -937,3 +988,7 @@ TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE.
 <a name="ref51">[51]</a>Sachin Mehta and Mohammad Rastegari. Separable Self-attention for Mobile Vision Transformers
 
 <a name="ref52">[52]</a>Wadekar, Shakti N. and Chaurasia, Abhishek. MobileViTv3: Mobile-Friendly Vision Transformer with Simple and Effective Fusion of Local, Global and Input Features
+
+<a name="ref53">[53]</a>MobileOne: An Improved One millisecond Mobile Backbone. arXiv:2206.04040.
+
+<a name="ref54">[54]</a>Abdelrahman Shaker, Muhammad Maaz, Hanoona Rasheed, Salman Khan, Ming-Hsuan Yang, Fahad Shahbaz Khan. SwiftFormer: Efficient Additive Attention for Transformer-based Real-time Mobile Vision Applications.
