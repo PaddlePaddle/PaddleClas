@@ -40,6 +40,13 @@ from .legendary_models.mobilenet_v4 import (
     MobileNetV4_hybrid_medium,
     MobileNetV4_hybrid_large,
 )
+from .legendary_models.mobilenet_v5 import (
+    MobileNetV5_300M,
+    MobileNetV5_300m,
+    MobileNetV5_300M_enc,
+    MobileNetV5_300M_enc_cls,
+    MobileNetV5_base,
+)
 from .model_zoo.fasternet import (
     FasterNet_T0,
     FasterNet_T1,
@@ -49,6 +56,13 @@ from .model_zoo.fasternet import (
     FasterNet_L,
 )
 from .model_zoo.starnet import StarNet_S1, StarNet_S2, StarNet_S3, StarNet_S4
+from .model_zoo.mobileone import (
+    MobileOne_S0,
+    MobileOne_S1,
+    MobileOne_S2,
+    MobileOne_S3,
+    MobileOne_S4,
+)
 from .legendary_models.resnet import (
     ResNet18,
     ResNet18_vd,
@@ -210,7 +224,20 @@ from .model_zoo.regnet import (
     RegNetX_12GF,
     RegNetX_16GF,
     RegNetX_32GF,
+    RegNetY_200,
+    RegNetY_400,
+    RegNetY_600,
+    RegNetY_800,
+    RegNetY_1600,
+    RegNetY_3200,
+    RegNetY_4000,
+    RegNetY_6400,
+    RegNetY_8000,
+    RegNetY_12000,
+    RegNetY_16000,
+    RegNetY_32000,
 )
+from .model_zoo.yolo26 import YOLO26n, YOLO26s, YOLO26m, YOLO26l, YOLO26x
 from .model_zoo.vision_transformer import (
     ViT_small_patch16_224,
     ViT_base_patch16_224,
@@ -234,6 +261,16 @@ from .model_zoo.distilled_vision_transformer import (
     DeiT_base_distilled_patch16_224,
     DeiT_base_patch16_384,
     DeiT_base_distilled_patch16_384,
+)
+from .model_zoo.deit3_vision_transformer import (
+    DeiT3_small_patch16_224,
+    DeiT3_base_patch16_384,
+    DeiT3_small_patch16_384,
+    DeiT3_large_patch16_384,
+    DeiT3_base_patch16_224,
+    DeiT3_huge_patch14_224,
+    DeiT3_medium_patch16_224,
+    DeiT3_large_patch16_224,
 )
 from .legendary_models.swin_transformer import (
     SwinTransformer_tiny_patch4_window7_224,
@@ -337,6 +374,14 @@ from .model_zoo.convnext import (
     ConvNeXt_base_384,
     ConvNeXt_large_224,
     ConvNeXt_large_384,
+    ConvNeXtV2_atto,
+    ConvNeXtV2_femto,
+    ConvNeXtV2_pico,
+    ConvNeXtV2_nano,
+    ConvNeXtV2_tiny,
+    ConvNeXtV2_base,
+    ConvNeXtV2_large,
+    ConvNeXtV2_huge,
 )
 from .model_zoo.nextvit import (
     NextViT_small_224,
@@ -378,6 +423,23 @@ from .model_zoo.mobilevit_v3 import (
     MobileViTV3_x1_0,
 )
 from .model_zoo.svtrnet import SVTR_tiny, SVTR_base, SVTR_large
+from .model_zoo.efficientformer_v2 import (
+    EfficientFormerV2,
+    EfficientFormerV2_S0,
+    EfficientFormerV2_S1,
+    EfficientFormerV2_S2,
+    EfficientFormerV2_L,
+)
+from .model_zoo.mvitv2 import (
+    MViTv2_tiny,
+    MViTv2_small,
+    MViTv2_base,
+    MViTv2_large,
+    MViTv2_small_cls,
+    MViTv2_base_cls,
+    MViTv2_large_cls,
+    MViTv2_huge_cls,
+)
 
 from .variant_models.resnet_variant import ResNet50_last_stage_stride1
 from .variant_models.resnet_variant import ResNet50_adaptive_max_pool2d
@@ -410,6 +472,35 @@ from .model_zoo.uniformer import (
     UniFormer_small_plus_dim64,
     UniFormer_base,
     UniFormer_base_ls,
+)
+from .model_zoo.efficientvit import (
+    Efficientvit_B0,
+    Efficientvit_B1,
+    Efficientvit_B2,
+    Efficientvit_B3,
+    Efficientvit_L1,
+    Efficientvit_L2,
+    Efficientvit_L3,
+)
+from .model_zoo.fastvit import (
+    FastViT_T8,
+    FastViT_T12,
+    FastViT_SA12,
+    FastViT_SA24,
+    FastViT_SA36,
+    FastViT_MA36,
+)
+from .model_zoo.edgenext import (
+    EdgeNeXt_XX_Small,
+    EdgeNeXt_X_Small,
+    EdgeNeXt_Small,
+    EdgeNeXt_Base,
+)
+from .model_zoo.swiftformer import (
+    SwiftFormer_XS,
+    SwiftFormer_S,
+    SwiftFormer_L1,
+    SwiftFormer_L3,
 )
 
 
