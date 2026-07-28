@@ -2,7 +2,7 @@
 # This config supports ImageNet-style training, evaluation, and inference for MetaCLIP-B/16.
 Global:
   checkpoints: null
-  pretrained_model: null  # e.g. ./weights/metaclip_b16.pdparams
+  pretrained_model: null  # e.g. ./weights/MetaCLIP_B_16_pretrained.pdparams
   output_dir: ./output/
   device: gpu
   save_interval: 10
@@ -31,7 +31,7 @@ AMP:
 
 # model architecture
 Arch:
-  name: MetaCLIP
+  name: MetaCLIP_B_16
   img_size: 224
   patch_size: 16
   in_chans: 3

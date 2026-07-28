@@ -106,3 +106,20 @@ class MetaCLIP(nn.Layer):
 
         x = self.norm(x)
         return x
+
+
+def MetaCLIP_B_16(**kwargs):
+    model_kwargs = dict(
+        img_size=224,
+        patch_size=16,
+        in_chans=3,
+        embed_dim=768,
+        depth=12,
+        num_heads=12,
+        mlp_ratio=4.0,
+        qkv_bias=True,
+        pre_norm=True,
+    )
+    model_kwargs.update(kwargs)
+    model = MetaCLIP(**model_kwargs)
+    return model
