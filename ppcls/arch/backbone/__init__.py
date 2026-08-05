@@ -224,6 +224,54 @@ from .model_zoo.regnet import (
     RegNetX_12GF,
     RegNetX_16GF,
     RegNetX_32GF,
+)
+from .model_zoo.vision_transformer import (
+    ViT_small_patch16_224,
+    ViT_base_patch16_224,
+    ViT_base_patch16_384,
+    ViT_base_patch32_384,
+    ViT_large_patch16_224,
+    ViT_large_patch16_384,
+    ViT_large_patch32_384,
+)
+from .model_zoo.distilled_vision_transformer import (
+    DeiT_tiny_patch16_224,
+    DeiT_small_patch16_224,
+    DeiT_base_patch16_224,
+    DeiT_tiny_distilled_patch16_224,
+    DeiT_small_distilled_patch16_224,
+    DeiT_base_distilled_patch16_224,
+    DeiT_base_patch16_384,
+    DeiT_base_distilled_patch16_384,
+)
+from .legendary_models.swin_transformer import (
+    SwinTransformer_tiny_patch4_window7_224,
+    SwinTransformer_small_patch4_window7_224,
+    SwinTransformer_base_patch4_window7_224,
+    SwinTransformer_base_patch4_window12_384,
+    SwinTransformer_large_patch4_window7_224,
+    SwinTransformer_large_patch4_window12_384,
+)
+from .model_zoo.swin_transformer_v2 import (
+    SwinTransformerV2_tiny_patch4_window8_256,
+    SwinTransformerV2_small_patch4_window8_256,
+    SwinTransformerV2_base_patch4_window8_256,
+    SwinTransformerV2_tiny_patch4_window16_256,
+    SwinTransformerV2_small_patch4_window16_256,
+    SwinTransformerV2_base_patch4_window16_256,
+    SwinTransformerV2_base_patch4_window24_384,
+    SwinTransformerV2_large_patch4_window16_256,
+    SwinTransformerV2_large_patch4_window24_384,
+)
+from .model_zoo.cswin_transformer import (
+    CSWinTransformer_tiny_224,
+    CSWinTransformer_small_224,
+    CSWinTransformer_base_224,
+    CSWinTransformer_large_224,
+    CSWinTransformer_base_384,
+    CSWinTransformer_large_384,
+)
+from .model_zoo.regnet import RegNetX_200MF, RegNetX_400MF, RegNetX_600MF, RegNetX_800MF, RegNetX_1600MF, RegNetX_3200MF, RegNetX_4GF, RegNetX_6400MF, RegNetX_8GF, RegNetX_12GF, RegNetX_16GF, RegNetX_32GF, RegNetY_200, RegNetY_400, RegNetY_600, RegNetY_800, RegNetY_1600, RegNetY_3200, RegNetY_4000, RegNetY_6400, RegNetY_8000, RegNetY_12000, RegNetY_16000, RegNetY_32000
     RegNetY_200,
     RegNetY_400,
     RegNetY_600,
@@ -391,6 +439,9 @@ from .model_zoo.nextvit import (
     NextViT_base_384,
     NextViT_large_384,
 )
+from .model_zoo.foundation_vit import CLIP_vit_base_patch32_224, CLIP_vit_base_patch16_224, CLIP_vit_large_patch14_336, CLIP_vit_large_patch14_224, BEiTv2_vit_base_patch16_224, BEiTv2_vit_large_patch16_224, CAE_vit_base_patch16_224, EVA_vit_giant_patch14, MOCOV3_vit_small, MOCOV3_vit_base, MAE_vit_huge_patch14, MAE_vit_large_patch16, MAE_vit_base_patch16
+from .model_zoo.convnext import  ConvNeXt_tiny, ConvNeXt_small, ConvNeXt_base_224, ConvNeXt_base_384, ConvNeXt_large_224, ConvNeXt_large_384, ConvNeXtV2_atto, ConvNeXtV2_femto, ConvNeXtV2_pico, ConvNeXtV2_nano, ConvNeXtV2_tiny, ConvNeXtV2_base, ConvNeXtV2_large, ConvNeXtV2_huge
+from .model_zoo.nextvit import NextViT_small_224, NextViT_base_224, NextViT_large_224, NextViT_small_384, NextViT_base_384, NextViT_large_384
 from .model_zoo.cae import cae_base_patch16_224, cae_large_patch16_224
 from .model_zoo.cvt import CvT_13_224, CvT_13_384, CvT_21_224, CvT_21_384, CvT_W24_384
 from .model_zoo.micronet import MicroNet_M0, MicroNet_M1, MicroNet_M2, MicroNet_M3
@@ -473,6 +524,18 @@ from .model_zoo.uniformer import (
     UniFormer_base,
     UniFormer_base_ls,
 )
+from .model_zoo.yolo11 import (
+    YOLO11_cls_n,
+    YOLO11_cls_s,
+    YOLO11_cls_m,
+    YOLO11_cls_l,
+    YOLO11_cls_x,
+)
+from .model_zoo.uniformer import UniFormer_small, UniFormer_small_plus, UniFormer_small_plus_dim64, UniFormer_base, UniFormer_base_ls
+from .model_zoo.efficientvit import Efficientvit_B0, Efficientvit_B1, Efficientvit_B2, Efficientvit_B3, Efficientvit_L1, Efficientvit_L2, Efficientvit_L3
+from .model_zoo.fastvit import FastViT_T8, FastViT_T12, FastViT_SA12, FastViT_SA24, FastViT_SA36, FastViT_MA36
+from .model_zoo.edgenext import EdgeNeXt_XX_Small, EdgeNeXt_X_Small, EdgeNeXt_Small, EdgeNeXt_Base
+from .model_zoo.swiftformer import SwiftFormer_XS, SwiftFormer_S, SwiftFormer_L1, SwiftFormer_L3
 from .model_zoo.efficientvit import (
     Efficientvit_B0,
     Efficientvit_B1,
