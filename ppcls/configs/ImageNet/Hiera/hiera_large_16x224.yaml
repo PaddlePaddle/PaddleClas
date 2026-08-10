@@ -1,0 +1,126 @@
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output/
+  device: gpu
+  save_interval: 1
+  eval_during_train: True
+  eval_interval: 1
+  epochs: 120
+  print_batch_step: 10
+  use_visualdl: False
+  image_shape: [3, 16, 224, 224]
+  save_inference_dir: ./inference
+
+AMP:
+  use_amp: False
+  use_fp16_test: False
+  scale_loss: 128.0
+  use_dynamic_loss_scaling: True
+  use_promote: False
+  level: O1
+
+Arch:
+  name: hiera_large_16x224
+  class_num: 400
+  pretrained: True
+  checkpoint: mae_k400_ft_k400
+
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+  Eval:
+    - CELoss:
+        weight: 1.0
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  lr:
+    name: Piecewise
+    learning_rate: 0.1
+    decay_epochs: [30, 60, 90]
+    values: [0.1, 0.01, 0.001, 0.0001]
+  regularizer:
+    name: L2
+    coeff: 0.0001
+
+DataLoader:
+  Train:
+    dataset:
+      name: VideoDataset
+      image_root: ./video_test_data/train/
+      cls_label_path: ./video_test_data/reverse_video_search.csv
+      num_seg: 16
+      transform_ops:
+        - DecodeVideo:
+        - ResizeVideo:
+            resize_short: 256
+        - RandCropVideo:
+            size: 224
+        - RandFlipVideo:
+            flip_code: 1
+        - NormalizeVideo:
+            scale: 1.0/255.0
+            mean: [0.45, 0.45, 0.45]
+            std: [0.225, 0.225, 0.225]
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 8
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+  Eval:
+    dataset:
+      name: VideoDataset
+      image_root: ./video_test_data/test/
+      cls_label_path: ./video_test_data/reverse_video_search.csv
+      num_seg: 16
+      transform_ops:
+        - DecodeVideo:
+        - ResizeVideo:
+            resize_short: 256
+        - CenterCropVideo:
+            size: 224
+        - NormalizeVideo:
+            scale: 1.0/255.0
+            mean: [0.45, 0.45, 0.45]
+            std: [0.225, 0.225, 0.225]
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 8
+      drop_last: False
+      shuffle: False
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+Infer:
+  infer_imgs: video_test_data/test/trimming_trees/dxe9LkBB4Q8.mp4
+  batch_size: 1
+  transforms:
+    - DecodeVideo:
+    - ResizeVideo:
+        resize_short: 256
+    - CenterCropVideo:
+        size: 224
+    - NormalizeVideo:
+        scale: 1.0/255.0
+        mean: [0.45, 0.45, 0.45]
+        std: [0.225, 0.225, 0.225]
+  PostProcess:
+    name: Topk
+    topk: 5
+    class_id_map_file: k400_classes.txt
+
+Metric:
+  Train:
+    - TopkAcc:
+        topk: [1, 5]
+  Eval:
+    - TopkAcc:
+        topk: [1, 5]

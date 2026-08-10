@@ -21,6 +21,18 @@ from .legendary_models.mobilenet_v1 import (
     MobileNetV1_x0_75,
     MobileNetV1,
 )
+from .hiera import (
+    hiera_tiny_224,
+    hiera_small_224,
+    hiera_base_224,
+    hiera_base_plus_224,
+    hiera_large_224,
+    hiera_huge_224,
+    hiera_base_16x224,
+    hiera_base_plus_16x224,
+    hiera_large_16x224,
+    hiera_huge_16x224,
+)
 from .legendary_models.mobilenet_v3 import (
     MobileNetV3_small_x0_35,
     MobileNetV3_small_x0_5,
