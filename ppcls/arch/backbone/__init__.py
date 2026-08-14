@@ -532,6 +532,7 @@ from .model_zoo.yolo11 import (
     YOLO11_cls_x,
 )
 from .model_zoo.uniformer import UniFormer_small, UniFormer_small_plus, UniFormer_small_plus_dim64, UniFormer_base, UniFormer_base_ls
+from .model_zoo.eva02 import EVA02_tiny_patch14_336, EVA02_small_patch14_336, EVA02_base_patch14_448, EVA02_large_patch14_448
 from .model_zoo.efficientvit import Efficientvit_B0, Efficientvit_B1, Efficientvit_B2, Efficientvit_B3, Efficientvit_L1, Efficientvit_L2, Efficientvit_L3
 from .model_zoo.fastvit import FastViT_T8, FastViT_T12, FastViT_SA12, FastViT_SA24, FastViT_SA36, FastViT_MA36
 from .model_zoo.edgenext import EdgeNeXt_XX_Small, EdgeNeXt_X_Small, EdgeNeXt_Small, EdgeNeXt_Base
