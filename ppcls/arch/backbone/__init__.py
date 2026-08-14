@@ -566,6 +566,12 @@ from .model_zoo.swiftformer import (
     SwiftFormer_L3,
 )
 
+from .model_zoo.mambavision import (
+    MambaVision_T, MambaVision_T2, MambaVision_S, MambaVision_B,
+    MambaVision_B_21K, MambaVision_L, MambaVision_L_21K, MambaVision_L2,
+    MambaVision_L2_512_21K, MambaVision_L3_256_21K,
+    MambaVision_L3_512_21K)
+
 
 # help whl get all the models' api (class type) and components' api (func type)
 def get_apis():
