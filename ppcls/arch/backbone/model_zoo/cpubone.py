@@ -1,21 +1,14 @@
-"""CPUBone backbone implemented in Paddle.
+"""CPUBone backbone, migrated from timm 1.0.29 (timm/models/cpubone.py).
 
-Migrated from timm 1.0.29 (timm/models/cpubone.py), original implementation:
-https://github.com/altair199797/CPUBone.
-
-State dict keys match timm native checkpoints. timm GroupNorm1 is expressed
-as GroupNorm(num_groups=1); fused SDPA is replaced by an equivalent manual
-attention; norm/act layers are fixed to BatchNorm2D/Hardswish as in every
-released variant. Top-level class inherits TheseusLayer so the PaddleClas
-pruning/quantization pipeline applies.
+Original implementation: https://github.com/altair199797/CPUBone.
+State dict keys match timm native checkpoints.
 """
-
-from typing import Dict, List, Optional, Tuple
 
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
+from ....utils.save_load import load_dygraph_pretrain
 from ..base.theseus_layer import TheseusLayer
 
 __all__ = [
@@ -24,8 +17,7 @@ __all__ = [
     'CPUBone_b2_bfrobust', 'CPUBone_b2pt5_dwnorm', 'CPUBone_b3',
 ]
 
-# Official BOS hosting is not available yet; pass a local converted
-# .pdparams path via pretrained=<path> instead of pretrained=True.
+# kept empty until official hosting is available; use pretrained=<local .pdparams path>
 MODEL_URLS = {
     "CPUBone_nano": "",
     "CPUBone_t0": "",
@@ -58,8 +50,7 @@ def _check_global_pool(global_pool):
 
 
 def get_same_padding(kernel_size, stride=1):
-    # kernel_size 2 at stride 1 needs an asymmetric left/top pad of 1,
-    # signalled by -1 and handled in ConvLayer with ZeroPad2D.
+    # -1 signals an asymmetric left/top pad of 1, handled in ConvLayer.
     if kernel_size == 2:
         return 0 if stride == 2 else -1
     assert kernel_size % 2 > 0, "kernel size should be odd number"
@@ -83,23 +74,6 @@ class DropPath(nn.Layer):
 
     def forward(self, x):
         return drop_path(x, self.drop_prob, self.training)
-
-
-def remap_legacy_state_dict(state_dict):
-    """Remap keys of original-repo (non-timm) checkpoints to this layout."""
-    remapped = {}
-    for k, v in state_dict.items():
-        k = k.replace(".conv_proj.0.", ".conv_proj.conv.")
-        k = k.replace(".conv_proj.1.", ".conv_proj.norm.")
-        k = k.replace(".pwise.0.", ".pwise.")
-        k = k.replace("head.op_list.0.", "head.in_conv.")
-        k = k.replace("head.op_list.2.", "head.pre_classifier.")
-        k = k.replace("head.op_list.3.", "head.classifier.")
-        k = k.replace("backbone.input_stem.", "stem.")
-        k = k.replace("backbone.stages.", "stages.")
-        k = k.replace(".op_list.", ".")
-        remapped[k] = v
-    return remapped
 
 
 class LinearLayer(nn.Layer):
@@ -281,13 +255,7 @@ class FusedMBConv(nn.Layer):
 
 
 class ConvAttention(nn.Layer):
-    """Conv-style attention: depthwise downsample, 1x1 qkv projection,
-    multi-head softmax attention, then upsample back and crop.
-
-    Manual attention replaces fused SDPA (numerically equal in fp32).
-    Paddle F.pad / ZeroPad2D tuple order matches torch
-    (left, right, top, bottom), verified by tests.
-    """
+    """Manual attention replaces fused SDPA (numerically equal in fp32)."""
 
     def __init__(self,
                  input_dim,
@@ -365,9 +333,7 @@ class ConvAttention(nn.Layer):
         xout = self.conv_proj(x)
         xout = self.pwise(xout)
 
-        N = xout.shape[0]
-        h = xout.shape[2]
-        w = xout.shape[3]
+        N, _, h, w = xout.shape
         qkv = xout.reshape([N, self.num_heads, self.num_keys * self.head_dim, h * w])
         qkv = qkv.transpose([0, 1, 3, 2])
         q, k, v = qkv.chunk(3, axis=3)
@@ -484,7 +450,6 @@ class ClsHead(nn.Layer):
             else nn.Identity())
 
     def reset(self, num_classes, global_pool=None):
-        """Reset the classifier head, mirroring timm's reset interface."""
         if global_pool is not None:
             _check_global_pool(global_pool)
             self.pool_type = global_pool
@@ -722,35 +687,13 @@ class CPUBone(TheseusLayer):
         return x
 
 
-def checkpoint_filter_fn(state_dict, model):
-    """Adapt legacy checkpoints; timm native checkpoints pass through."""
-    if 'stem.0.conv.weight' in state_dict:
-        return state_dict
-
-    sd = remap_legacy_state_dict(state_dict)
-    if getattr(model, 'local_mbconv_norm', None) == 'all':
-        bias_keys = [k for k in sd if k.endswith((
-            '.inverted_conv.conv.bias', '.depth_conv.conv.bias',
-            '.inverted_conv.conv.1.bias', '.depth_conv.conv.1.bias',
-        ))]
-        for k in bias_keys:
-            norm_key = k.replace('.conv.1.bias', '.norm.running_mean')
-            norm_key = norm_key.replace('.conv.bias', '.norm.running_mean')
-            if norm_key in sd:
-                sd[norm_key] = sd[norm_key] - sd[k]
-            del sd[k]
-    return sd
-
-
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
-    from ppcls.utils import save_load
-
     if pretrained is False:
         pass
     elif pretrained is True:
-        save_load.load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
+        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
     elif isinstance(pretrained, str):
-        save_load.load_dygraph_pretrain(model, pretrained)
+        load_dygraph_pretrain(model, pretrained)
     else:
         raise RuntimeError(
             "pretrained type is not available. Please use `string` or `boolean` type."
@@ -766,8 +709,7 @@ def _create_cpubone(arch_args, variant, pretrained=False, **kwargs):
     return model
 
 
-# All released checkpoints use the fastit/grouping=2/smallk_only_lasts/
-# lose_transpose combination, i.e. the flags below.
+# flags decoded from the released checkpoints (fastit/grouping/smallk/nearest)
 _ARCH_ARGS = dict(
     fused_conv=True,
     fused_downsample=True,
