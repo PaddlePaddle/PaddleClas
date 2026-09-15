@@ -277,7 +277,19 @@ from .model_zoo.cswin_transformer import (
     CSWinTransformer_base_384,
     CSWinTransformer_large_384,
 )
-from .model_zoo.regnet import RegNetX_200MF, RegNetX_400MF, RegNetX_600MF, RegNetX_800MF, RegNetX_1600MF, RegNetX_3200MF, RegNetX_4GF, RegNetX_6400MF, RegNetX_8GF, RegNetX_12GF, RegNetX_16GF, RegNetX_32GF, RegNetY_200, RegNetY_400, RegNetY_600, RegNetY_800, RegNetY_1600, RegNetY_3200, RegNetY_4000, RegNetY_6400, RegNetY_8000, RegNetY_12000, RegNetY_16000, RegNetY_32000
+from .model_zoo.regnet import (
+    RegNetX_200MF,
+    RegNetX_400MF,
+    RegNetX_600MF,
+    RegNetX_800MF,
+    RegNetX_1600MF,
+    RegNetX_3200MF,
+    RegNetX_4GF,
+    RegNetX_6400MF,
+    RegNetX_8GF,
+    RegNetX_12GF,
+    RegNetX_16GF,
+    RegNetX_32GF,
     RegNetY_200,
     RegNetY_400,
     RegNetY_600,
@@ -570,6 +582,12 @@ from .model_zoo.swiftformer import (
     SwiftFormer_S,
     SwiftFormer_L1,
     SwiftFormer_L3,
+)
+from .model_zoo.shvit import (
+    SHViT_S1,
+    SHViT_S2,
+    SHViT_S3,
+    SHViT_S4,
 )
 
 
