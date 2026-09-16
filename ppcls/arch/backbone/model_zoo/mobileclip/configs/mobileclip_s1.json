@@ -1,0 +1,18 @@
+{
+    "embed_dim": 512,
+    "image_cfg": {
+        "image_size": 256,
+        "model_name": "mci1"
+    },
+    "text_cfg": {
+        "context_length": 77,
+        "vocab_size": 49408,
+        "dim": 512,
+        "ffn_multiplier_per_layer": 4.0,
+        "n_heads_per_layer": 8,
+        "n_transformer_layers": 12,
+        "norm_layer": "layer_norm_fp32",
+        "causal_masking": false,
+        "model_name": "base"
+    }
+}
