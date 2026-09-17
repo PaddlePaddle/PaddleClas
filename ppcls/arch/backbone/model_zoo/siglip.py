@@ -12,25 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import ssl
-import urllib
-import math
-import numpy as np
-from typing import Optional, Tuple, Union, Dict
+from typing import Tuple
 
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle import ParamAttr
-from paddle.nn.initializer import Constant
-
-try:
-    from ppcls.utils import load_dygraph_pretrain
-    HAS_PPCLS = True
-except ImportError:
-    HAS_PPCLS = False
-    load_dygraph_pretrain = None 
+from ....utils.save_load import load_dygraph_pretrain
 
 
 MODEL_URLS = {
@@ -39,116 +26,19 @@ MODEL_URLS = {
     "vit_large_patch16_siglip_256": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/vit_large_patch16_siglip_256_pretrained.pdparams",
 }
 
-
-def download_weight(url, model_name=None, max_retries=3):
-    """Download weight file from URL with SSL fix and retry mechanism"""
-    cache_dir = os.path.expanduser("~/.cache/paddle/siglip_weights")
-    
-    filename = url.rsplit("/", 1)[-1]
-    if not filename.endswith(".pdparams"):
-        raise ValueError("线上权重地址必须指向 .pdparams 文件")
-    filepath = os.path.join(cache_dir, filename)
-    
-    if os.path.exists(filepath):
-        print(f"  Weight file already exists: {filepath}")
-        return filepath
-    
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    
-    print(f"  Downloading weight from: {url}")
-    print(f"  Saving to: {filepath}")
-    
-    ssl_context = ssl.create_default_context()
-    ssl_context.check_hostname = False
-    ssl_context.verify_mode = ssl.CERT_NONE
-    
-    for attempt in range(max_retries):
-        try:
-            if attempt > 0:
-                print(f"  Retry attempt {attempt + 1}/{max_retries}...")
-            
-            try:
-                import requests
-                response = requests.get(url, stream=True, verify=False, timeout=60)
-                response.raise_for_status()
-                
-                total_size = int(response.headers.get('content-length', 0))
-                downloaded = 0
-                
-                with open(filepath, 'wb') as f:
-                    for chunk in response.iter_content(chunk_size=8192):
-                        if chunk:
-                            f.write(chunk)
-                            downloaded += len(chunk)
-                            if total_size > 0:
-                                progress = downloaded / total_size * 100
-                                print(f"\r  Downloading: {progress:.1f}%", end="", flush=True)
-                
-                print(f"\n  Download completed!")
-                return filepath
-                
-            except ImportError:
-                def _create_ssl_opener():
-                    https_handler = urllib.request.HTTPSHandler(context=ssl_context)
-                    opener = urllib.request.build_opener(https_handler)
-                    return opener
-                
-                opener = _create_ssl_opener()
-                urllib.request.install_opener(opener)
-                urllib.request.urlretrieve(url, filepath)
-                print(f"  Download completed!")
-                return filepath
-                
-        except Exception as e:
-            if attempt < max_retries - 1:
-                print(f"  Download failed: {e}")
-                print(f"  Retrying in 2 seconds...")
-                import time
-                time.sleep(2)
-            else:
-                raise RuntimeError(f"Failed to download weight after {max_retries} attempts: {e}")
-    
-    return filepath
-
-
-def load_pdparams_weights(model, filepath):
-    if not filepath.endswith(".pdparams"):
-        raise ValueError("只支持 Paddle .pdparams 权重文件")
-    state_dict = paddle.load(filepath)
-    if isinstance(state_dict, dict) and "state_dict" in state_dict:
-        state_dict = state_dict["state_dict"]
-    elif isinstance(state_dict, dict) and "model" in state_dict:
-        state_dict = state_dict["model"]
-    expected = model.state_dict()
-    missing = sorted(set(expected) - set(state_dict))
-    unexpected = sorted(set(state_dict) - set(expected))
-    mismatched = [
-        key for key in expected
-        if key in state_dict and expected[key].shape != state_dict[key].shape
-    ]
-    if missing or unexpected or mismatched:
-        raise RuntimeError(
-            f".pdparams 与模型结构不匹配：缺失={missing}，多余={unexpected}，形状不符={mismatched}"
-        )
-    incompatible = model.set_state_dict(state_dict, use_structured_name=True)
-    if incompatible[0] or incompatible[1]:
-        raise RuntimeError(f".pdparams 加载失败：{incompatible}")
-    return model
-
-
-def load_pretrained_weights(model, url):
-    weight_path = download_weight(url)
-    return load_pdparams_weights(model, weight_path)
-
+__all__ = list(MODEL_URLS.keys())
 
 def _load_pretrained(pretrained, model, model_url, use_ssld=False):
-    if pretrained is False or pretrained is None:
-        return model
-    if pretrained is True:
-        return load_pretrained_weights(model, model_url)
-    if isinstance(pretrained, str):
-        return load_pdparams_weights(model, pretrained)
-    raise TypeError("pretrained 仅支持 False、True 或 .pdparams 文件路径")
+    if pretrained is False:
+        pass
+    elif pretrained is True:
+        load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
+    elif isinstance(pretrained, str):
+        load_dygraph_pretrain(model, pretrained)
+    else:
+        raise RuntimeError(
+            "pretrained type is not available. Please use `string` or `boolean` type."
+        )
 
 
 class GELUTanh(nn.Layer):
@@ -489,7 +379,6 @@ class SigLIPVisionTransformer(nn.Layer):
         x = self.head(x)
         return x
 
-
 def vit_base_patch32_siglip_256(pretrained=False, class_num=1000, use_ssld=False, **kwargs):
     model = SigLIPVisionTransformer(
         img_size=256,
@@ -678,6 +567,7 @@ def vit_so400m_patch14_siglip_378(pretrained=False, class_num=1000, use_ssld=Fal
     )
     _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch14_siglip_378"], use_ssld=use_ssld)
     return model
+
 
 
 def vit_so400m_patch14_siglip_384(pretrained=False, class_num=1000, use_ssld=False, **kwargs):
@@ -870,6 +760,7 @@ def vit_base_patch16_siglip_gap_384(pretrained=False, class_num=1000, use_ssld=F
     return model
 
 
+
 def vit_base_patch16_siglip_gap_512(pretrained=False, class_num=1000, use_ssld=False, **kwargs):
     model = SigLIPVisionTransformer(
         img_size=512,
@@ -1041,6 +932,7 @@ def vit_so400m_patch14_siglip_gap_896(pretrained=False, class_num=1000, use_ssld
     return model
 
 
+
 def vit_so400m_patch16_siglip_gap_256(pretrained=False, class_num=1000, use_ssld=False, **kwargs):
     model = SigLIPVisionTransformer(
         img_size=256,
@@ -1134,6 +1026,7 @@ def vit_giantopt_patch16_siglip_gap_384(pretrained=False, class_num=1000, use_ss
     )
     _load_pretrained(pretrained, model, MODEL_URLS["vit_giantopt_patch16_siglip_gap_384"], use_ssld=use_ssld)
     return model
+
 
 
 
@@ -1284,6 +1177,7 @@ class NaFlexEmbeds(nn.Layer):
         x = self.pos_drop(x)
 
         return x, grid_size
+
 
 
 class NaFlexSigLIPVisionTransformer(nn.Layer):
@@ -1470,6 +1364,7 @@ def naflexvit_base_patch16_par_gap(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
+
 def naflexvit_base_patch16_parfac_gap(pretrained=False, use_ssld=False, **kwargs):
     model = NaFlexSigLIPVisionTransformer(
         patch_size=16,
@@ -1491,4 +1386,3 @@ def naflexvit_base_patch16_parfac_gap(pretrained=False, use_ssld=False, **kwargs
     )
     _load_pretrained(pretrained, model, MODEL_URLS["naflexvit_base_patch16_parfac_gap"], use_ssld=use_ssld)
     return model
-
