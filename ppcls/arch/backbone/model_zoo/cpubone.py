@@ -1,8 +1,19 @@
-"""CPUBone backbone, migrated from timm 1.0.29 (timm/models/cpubone.py).
+# copyright (c) 2026 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-Original implementation: https://github.com/altair199797/CPUBone.
-State dict keys match timm native checkpoints.
-"""
+# reference: https://github.com/huggingface/pytorch-image-models/blob/v1.0.29/timm/models/cpubone.py
+# reference: https://github.com/altair199797/CPUBone
 
 import paddle
 import paddle.nn as nn
@@ -17,17 +28,16 @@ __all__ = [
     'CPUBone_b2_bfrobust', 'CPUBone_b2pt5_dwnorm', 'CPUBone_b3',
 ]
 
-# kept empty until official hosting is available; use pretrained=<local .pdparams path>
 MODEL_URLS = {
-    "CPUBone_nano": "",
-    "CPUBone_t0": "",
-    "CPUBone_s0": "",
-    "CPUBone_b0_bfrobust": "",
-    "CPUBone_b1_bfrobust": "",
-    "CPUBone_b1_dwnorm": "",
-    "CPUBone_b2_bfrobust": "",
-    "CPUBone_b2pt5_dwnorm": "",
-    "CPUBone_b3": "",
+    "CPUBone_nano": "http://127.0.0.1/models/cpubone/CPUBone_nano.pdparams",
+    "CPUBone_t0": "http://127.0.0.1/models/cpubone/CPUBone_t0.pdparams",
+    "CPUBone_s0": "http://127.0.0.1/models/cpubone/CPUBone_s0.pdparams",
+    "CPUBone_b0_bfrobust": "http://127.0.0.1/models/cpubone/CPUBone_b0_bfrobust.pdparams",
+    "CPUBone_b1_bfrobust": "http://127.0.0.1/models/cpubone/CPUBone_b1_bfrobust.pdparams",
+    "CPUBone_b1_dwnorm": "http://127.0.0.1/models/cpubone/CPUBone_b1_dwnorm.pdparams",
+    "CPUBone_b2_bfrobust": "http://127.0.0.1/models/cpubone/CPUBone_b2_bfrobust.pdparams",
+    "CPUBone_b2pt5_dwnorm": "http://127.0.0.1/models/cpubone/CPUBone_b2pt5_dwnorm.pdparams",
+    "CPUBone_b3": "http://127.0.0.1/models/cpubone/CPUBone_b3.pdparams",
 }
 
 _LOCAL_MBCONV_NORM_MODES = {
@@ -39,10 +49,8 @@ _LOCAL_MBCONV_NORM_MODES = {
 
 
 def _check_local_mbconv_norm(local_mbconv_norm):
-    if local_mbconv_norm not in _LOCAL_MBCONV_NORM_MODES:
-        raise ValueError(
-            'Invalid local_mbconv_norm={!r}; expected one of {}.'.format(
-                local_mbconv_norm, tuple(_LOCAL_MBCONV_NORM_MODES)))
+    assert local_mbconv_norm in _LOCAL_MBCONV_NORM_MODES, \
+        "local_mbconv_norm must be one of {}".format(tuple(_LOCAL_MBCONV_NORM_MODES))
 
 
 def _check_global_pool(global_pool):
