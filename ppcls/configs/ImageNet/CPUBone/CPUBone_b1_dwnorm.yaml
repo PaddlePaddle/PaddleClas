@@ -96,7 +96,7 @@ DataLoader:
             to_rgb: True
             channel_first: False
         - ResizeImage:
-            resize_short: 269
+            resize_short: 256
         - CropImage:
             size: 256
         - NormalizeImage:

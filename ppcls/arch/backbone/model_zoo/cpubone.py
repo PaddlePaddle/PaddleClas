@@ -708,12 +708,12 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def _create_cpubone(arch_args, variant, pretrained=False, **kwargs):
+def _create_cpubone(arch_args, variant, pretrained=False, use_ssld=False, **kwargs):
     """class_num is framework-reserved; explicit kwargs override variant defaults."""
     if "class_num" in kwargs:
         kwargs["num_classes"] = kwargs.pop("class_num")
     model = CPUBone(**dict(arch_args, **kwargs))
-    _load_pretrained(pretrained, model, MODEL_URLS[variant])
+    _load_pretrained(pretrained, model, MODEL_URLS[variant], use_ssld=use_ssld)
     return model
 
 
@@ -730,17 +730,17 @@ _ARCH_ARGS = dict(
 
 def CPUBone_nano(pretrained=False, use_ssld=False, **kwargs):
     model_args = dict(_ARCH_ARGS, width_list=[12, 24, 48, 96, 192], depth_list=[0, 1, 1, 1, 2])
-    return _create_cpubone(model_args, "CPUBone_nano", pretrained=pretrained, **kwargs)
+    return _create_cpubone(model_args, "CPUBone_nano", pretrained=pretrained, use_ssld=use_ssld, **kwargs)
 
 
 def CPUBone_t0(pretrained=False, use_ssld=False, **kwargs):
     model_args = dict(_ARCH_ARGS, width_list=[12, 24, 48, 96, 192], depth_list=[0, 1, 1, 2, 3])
-    return _create_cpubone(model_args, "CPUBone_t0", pretrained=pretrained, **kwargs)
+    return _create_cpubone(model_args, "CPUBone_t0", pretrained=pretrained, use_ssld=use_ssld, **kwargs)
 
 
 def CPUBone_s0(pretrained=False, use_ssld=False, **kwargs):
     model_args = dict(_ARCH_ARGS, width_list=[14, 28, 56, 112, 224], depth_list=[0, 1, 1, 2, 3])
-    return _create_cpubone(model_args, "CPUBone_s0", pretrained=pretrained, **kwargs)
+    return _create_cpubone(model_args, "CPUBone_s0", pretrained=pretrained, use_ssld=use_ssld, **kwargs)
 
 
 def CPUBone_b0_bfrobust(pretrained=False, use_ssld=False, **kwargs):
@@ -750,7 +750,7 @@ def CPUBone_b0_bfrobust(pretrained=False, use_ssld=False, **kwargs):
         depth_list=[0, 1, 1, 3, 4],
         local_mbconv_norm='all',
     )
-    return _create_cpubone(model_args, "CPUBone_b0_bfrobust", pretrained=pretrained, **kwargs)
+    return _create_cpubone(model_args, "CPUBone_b0_bfrobust", pretrained=pretrained, use_ssld=use_ssld, **kwargs)
 
 
 def _cpubone_b1_args(local_mbconv_norm='all'):
@@ -765,12 +765,12 @@ def _cpubone_b1_args(local_mbconv_norm='all'):
 
 def CPUBone_b1_bfrobust(pretrained=False, use_ssld=False, **kwargs):
     model_args = _cpubone_b1_args()
-    return _create_cpubone(model_args, "CPUBone_b1_bfrobust", pretrained=pretrained, **kwargs)
+    return _create_cpubone(model_args, "CPUBone_b1_bfrobust", pretrained=pretrained, use_ssld=use_ssld, **kwargs)
 
 
 def CPUBone_b1_dwnorm(pretrained=False, use_ssld=False, **kwargs):
     model_args = _cpubone_b1_args(local_mbconv_norm='depth_proj')
-    return _create_cpubone(model_args, "CPUBone_b1_dwnorm", pretrained=pretrained, **kwargs)
+    return _create_cpubone(model_args, "CPUBone_b1_dwnorm", pretrained=pretrained, use_ssld=use_ssld, **kwargs)
 
 
 def CPUBone_b2_bfrobust(pretrained=False, use_ssld=False, **kwargs):
@@ -783,7 +783,7 @@ def CPUBone_b2_bfrobust(pretrained=False, use_ssld=False, **kwargs):
         drop_path_rate=0.1,
         local_mbconv_norm='all',
     )
-    return _create_cpubone(model_args, "CPUBone_b2_bfrobust", pretrained=pretrained, **kwargs)
+    return _create_cpubone(model_args, "CPUBone_b2_bfrobust", pretrained=pretrained, use_ssld=use_ssld, **kwargs)
 
 
 def CPUBone_b2pt5_dwnorm(pretrained=False, use_ssld=False, **kwargs):
@@ -795,7 +795,7 @@ def CPUBone_b2pt5_dwnorm(pretrained=False, use_ssld=False, **kwargs):
         downsample_expand_ratios=(6, 6, 6, 6),
         local_mbconv_norm='depth_proj',
     )
-    return _create_cpubone(model_args, "CPUBone_b2pt5_dwnorm", pretrained=pretrained, **kwargs)
+    return _create_cpubone(model_args, "CPUBone_b2pt5_dwnorm", pretrained=pretrained, use_ssld=use_ssld, **kwargs)
 
 
 def CPUBone_b3(pretrained=False, use_ssld=False, **kwargs):
@@ -806,4 +806,4 @@ def CPUBone_b3(pretrained=False, use_ssld=False, **kwargs):
         stem_expand_ratio=4,
         downsample_expand_ratios=(6, 6, 6, 6),
     )
-    return _create_cpubone(model_args, "CPUBone_b3", pretrained=pretrained, **kwargs)
+    return _create_cpubone(model_args, "CPUBone_b3", pretrained=pretrained, use_ssld=use_ssld, **kwargs)
