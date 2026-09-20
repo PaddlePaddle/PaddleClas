@@ -33,7 +33,7 @@ fpgm_export:null
 distill_export:null
 export1:null
 export2:null
-pretrained_model_url:http://127.0.0.1/models/cpubone/CPUBone_nano.pdparams
+pretrained_model_url:https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/CPUBone_nano.pdparams
 infer_model:../inference/
 infer_export:null
 infer_quant:Fasle

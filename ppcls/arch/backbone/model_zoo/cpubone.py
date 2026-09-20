@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# reference: https://github.com/huggingface/pytorch-image-models/blob/v1.0.29/timm/models/cpubone.py
 # reference: https://github.com/altair199797/CPUBone
 
 import paddle
@@ -29,15 +28,15 @@ __all__ = [
 ]
 
 MODEL_URLS = {
-    "CPUBone_nano": "http://127.0.0.1/models/cpubone/CPUBone_nano.pdparams",
-    "CPUBone_t0": "http://127.0.0.1/models/cpubone/CPUBone_t0.pdparams",
-    "CPUBone_s0": "http://127.0.0.1/models/cpubone/CPUBone_s0.pdparams",
-    "CPUBone_b0_bfrobust": "http://127.0.0.1/models/cpubone/CPUBone_b0_bfrobust.pdparams",
-    "CPUBone_b1_bfrobust": "http://127.0.0.1/models/cpubone/CPUBone_b1_bfrobust.pdparams",
-    "CPUBone_b1_dwnorm": "http://127.0.0.1/models/cpubone/CPUBone_b1_dwnorm.pdparams",
-    "CPUBone_b2_bfrobust": "http://127.0.0.1/models/cpubone/CPUBone_b2_bfrobust.pdparams",
-    "CPUBone_b2pt5_dwnorm": "http://127.0.0.1/models/cpubone/CPUBone_b2pt5_dwnorm.pdparams",
-    "CPUBone_b3": "http://127.0.0.1/models/cpubone/CPUBone_b3.pdparams",
+    "CPUBone_nano": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/CPUBone_nano.pdparams",
+    "CPUBone_t0": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/CPUBone_t0.pdparams",
+    "CPUBone_s0": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/CPUBone_s0.pdparams",
+    "CPUBone_b0_bfrobust": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/CPUBone_b0_bfrobust.pdparams",
+    "CPUBone_b1_bfrobust": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/CPUBone_b1_bfrobust.pdparams",
+    "CPUBone_b1_dwnorm": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/CPUBone_b1_dwnorm.pdparams",
+    "CPUBone_b2_bfrobust": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/CPUBone_b2_bfrobust.pdparams",
+    "CPUBone_b2pt5_dwnorm": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/CPUBone_b2pt5_dwnorm.pdparams",
+    "CPUBone_b3": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/CPUBone_b3.pdparams",
 }
 
 _LOCAL_MBCONV_NORM_MODES = {
