@@ -27,11 +27,11 @@ PaddleClas 当前实现的是 YOLO26 的图像分类版本，结构与 Ultralyti
 
 ### 1.2 模型指标
 
-下表中 `Reference` 指标来自 Ultralytics 官方 ImageNet 分类结果；`PaddleClas` 指标为本仓库按官方预处理复现的结果。当前已完整复现 `YOLO26n-cls`，其它 scale 可使用同一转换脚本生成 Paddle 权重后评估。
+下表中 `Reference` 指标来自 Ultralytics 官方 ImageNet 分类结果；`PaddleClas` 指标为本仓库按官方预处理复现的结果。
 
 | Models | Top1 | Top5 | Reference<br>Top1 | Reference<br>Top5 | FLOPs<br>(B) | Params<br>(M) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| YOLO26n-cls | 0.714 | 0.901 | 0.714 | 0.901 | 0.5 | 2.8 |
+| YOLO26n-cls | 0.715 | 0.901 | 0.714 | 0.901 | 0.5 | 2.8 |
 | YOLO26s-cls | 0.759 | 0.929 | 0.760 | 0.929 | 1.6 | 6.7 |
 | YOLO26m-cls | 0.780 | 0.942 | 0.781 | 0.942 | 4.9 | 11.6 |
 | YOLO26l-cls | 0.791 | 0.946 | 0.790 | 0.946 | 6.2 | 14.1 |
