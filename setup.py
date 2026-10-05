@@ -14,7 +14,6 @@
 
 from setuptools import setup
 
-
 setup(
     packages=['paddleclas'],
     package_dir={'paddleclas': ''},
