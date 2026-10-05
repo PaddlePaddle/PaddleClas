@@ -230,6 +230,18 @@ from .model_zoo.regnet import (
     RegNetX_12GF,
     RegNetX_16GF,
     RegNetX_32GF,
+    RegNetY_200,
+    RegNetY_400,
+    RegNetY_600,
+    RegNetY_800,
+    RegNetY_1600,
+    RegNetY_3200,
+    RegNetY_4000,
+    RegNetY_6400,
+    RegNetY_8000,
+    RegNetY_12000,
+    RegNetY_16000,
+    RegNetY_32000,
 )
 from .model_zoo.vision_transformer import (
     ViT_small_patch16_224,
@@ -276,20 +288,6 @@ from .model_zoo.cswin_transformer import (
     CSWinTransformer_large_224,
     CSWinTransformer_base_384,
     CSWinTransformer_large_384,
-)
-from .model_zoo.regnet import RegNetX_200MF, RegNetX_400MF, RegNetX_600MF, RegNetX_800MF, RegNetX_1600MF, RegNetX_3200MF, RegNetX_4GF, RegNetX_6400MF, RegNetX_8GF, RegNetX_12GF, RegNetX_16GF, RegNetX_32GF, RegNetY_200, RegNetY_400, RegNetY_600, RegNetY_800, RegNetY_1600, RegNetY_3200, RegNetY_4000, RegNetY_6400, RegNetY_8000, RegNetY_12000, RegNetY_16000, RegNetY_32000
-    RegNetY_200,
-    RegNetY_400,
-    RegNetY_600,
-    RegNetY_800,
-    RegNetY_1600,
-    RegNetY_3200,
-    RegNetY_4000,
-    RegNetY_6400,
-    RegNetY_8000,
-    RegNetY_12000,
-    RegNetY_16000,
-    RegNetY_32000,
 )
 from .model_zoo.yolo26 import YOLO26n, YOLO26s, YOLO26m, YOLO26l, YOLO26x
 from .model_zoo.vision_transformer import (
