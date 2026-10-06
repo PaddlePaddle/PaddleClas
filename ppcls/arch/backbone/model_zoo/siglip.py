@@ -20,11 +20,18 @@ import paddle.nn.functional as F
 from ....utils.save_load import load_dygraph_pretrain
 
 
-MODEL_URLS = {
+class _ModelURLs(dict):
+    """Return no checkpoint URL for architecture-only model variants."""
+
+    def __missing__(self, key):
+        return None
+
+
+MODEL_URLS = _ModelURLs({
     "vit_base_patch16_siglip_256": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/vit_base_patch16_siglip_256_pretrained.pdparams",
     "vit_base_patch32_siglip_256": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/vit_base_patch32_siglip_256_pretrained.pdparams",
     "vit_large_patch16_siglip_256": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/vit_large_patch16_siglip_256_pretrained.pdparams",
-}
+})
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -32,6 +39,12 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
     elif pretrained is True:
+        if model_url is None:
+            raise ValueError(
+                "No official pretrained checkpoint is registered for this "
+                "SigLIP variant. Set pretrained=False or provide a local "
+                "checkpoint path."
+            )
         load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
     elif isinstance(pretrained, str):
         load_dygraph_pretrain(model, pretrained)
@@ -64,6 +77,9 @@ class AttentionPoolLatent(nn.Layer):
     ):
         super().__init__()
         out_features = out_features or in_features
+        if out_features % num_heads != 0:
+            raise ValueError(
+                "out_features must be divisible by num_heads")
         self.num_heads = num_heads
         self.head_dim = out_features // num_heads
         self.scale = self.head_dim ** -0.5
@@ -155,6 +171,9 @@ class Attention(nn.Layer):
         proj_drop: float = 0.0,
     ):
         super().__init__()
+        if dim % num_heads != 0:
+            raise ValueError(
+                f"dim ({dim}) must be divisible by num_heads ({num_heads})")
         self.num_heads = num_heads
         self.head_dim = dim // num_heads
         self.scale = self.head_dim ** -0.5
@@ -285,6 +304,8 @@ class SigLIPVisionTransformer(nn.Layer):
         class_num: int = 1000,
     ):
         super().__init__()
+        if global_pool not in {'map', 'avg', 'max'}:
+            raise ValueError(f"Unsupported global_pool: {global_pool}")
         self.class_token = class_token
         self.global_pool = global_pool
         self.embed_dim = embed_dim
@@ -368,8 +389,12 @@ class SigLIPVisionTransformer(nn.Layer):
         if self.global_pool == 'map':
             x = self.attn_pool(x)
         elif self.global_pool == 'avg':
+            if self.class_token:
+                x = x[:, 1:]
             x = x.mean(axis=1)
         elif self.global_pool == 'max':
+            if self.class_token:
+                x = x[:, 1:]
             x = x.max(axis=1)
         
         return x
@@ -379,21 +404,29 @@ class SigLIPVisionTransformer(nn.Layer):
         x = self.head(x)
         return x
 
+
+def _build_siglip_vision_transformer(defaults, overrides):
+    """Build a SigLIP model while allowing config values to override defaults."""
+    model_kwargs = defaults.copy()
+    model_kwargs.update(overrides)
+    return SigLIPVisionTransformer(**model_kwargs)
+
+
 def vit_base_patch32_siglip_256(pretrained=False, class_num=1000, use_ssld=False, **kwargs):
-    model = SigLIPVisionTransformer(
-        img_size=256,
-        patch_size=32,
-        embed_dim=768,
-        depth=12,
-        num_heads=12,
-        mlp_ratio=4.,
-        qkv_bias=True,
-        global_pool='map',
-        class_token=False,
-        class_num=class_num,
-        act_layer=GELUTanh,
-        **kwargs
-    )
+    model = _build_siglip_vision_transformer(
+        dict(
+            img_size=256,
+            patch_size=32,
+            embed_dim=768,
+            depth=12,
+            num_heads=12,
+            mlp_ratio=4.,
+            qkv_bias=True,
+            global_pool='map',
+            class_token=False,
+            class_num=class_num,
+            act_layer=GELUTanh,
+        ), kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["vit_base_patch32_siglip_256"], use_ssld=use_ssld)
     return model
 
@@ -418,20 +451,20 @@ def vit_base_patch16_siglip_224(pretrained=False, class_num=1000, use_ssld=False
 
 
 def vit_base_patch16_siglip_256(pretrained=False, class_num=1000, use_ssld=False, **kwargs):
-    model = SigLIPVisionTransformer(
-        img_size=256,
-        patch_size=16,
-        embed_dim=768,
-        depth=12,
-        num_heads=12,
-        mlp_ratio=4.,
-        qkv_bias=True,
-        global_pool='map',
-        class_token=False,
-        class_num=class_num,
-        act_layer=nn.GELU,
-        **kwargs
-    )
+    model = _build_siglip_vision_transformer(
+        dict(
+            img_size=256,
+            patch_size=16,
+            embed_dim=768,
+            depth=12,
+            num_heads=12,
+            mlp_ratio=4.,
+            qkv_bias=True,
+            global_pool='map',
+            class_token=False,
+            class_num=class_num,
+            act_layer=nn.GELU,
+        ), kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["vit_base_patch16_siglip_256"], use_ssld=use_ssld)
     return model
 
@@ -475,20 +508,20 @@ def vit_base_patch16_siglip_512(pretrained=False, class_num=1000, use_ssld=False
 
 
 def vit_large_patch16_siglip_256(pretrained=False, class_num=1000, use_ssld=False, **kwargs):
-    model = SigLIPVisionTransformer(
-        img_size=256,
-        patch_size=16,
-        embed_dim=1024,
-        depth=24,
-        num_heads=16,
-        mlp_ratio=4.,
-        qkv_bias=True,
-        global_pool='map',
-        class_token=False,
-        class_num=class_num,
-        act_layer=nn.GELU,
-        **kwargs
-    )
+    model = _build_siglip_vision_transformer(
+        dict(
+            img_size=256,
+            patch_size=16,
+            embed_dim=1024,
+            depth=24,
+            num_heads=16,
+            mlp_ratio=4.,
+            qkv_bias=True,
+            global_pool='map',
+            class_token=False,
+            class_num=class_num,
+            act_layer=nn.GELU,
+        ), kwargs)
     _load_pretrained(pretrained, model, MODEL_URLS["vit_large_patch16_siglip_256"], use_ssld=use_ssld)
     return model
 
@@ -1114,26 +1147,24 @@ class NaFlexEmbeds(nn.Layer):
             pos_embed_x = self.pos_embed_x
 
             if target_h != orig_h:
-                pos_embed_y_nchw = pos_embed_y.transpose([0, 2, 1]).unsqueeze(-1)
                 pos_embed_y_interp = F.interpolate(
-                    pos_embed_y_nchw,
-                    size=target_h,
+                    pos_embed_y.transpose([0, 2, 1]),
+                    size=[target_h],
                     mode='linear',
                     align_corners=False,
                 )
-                pos_embed_y = pos_embed_y_interp.squeeze(-1).transpose([0, 2, 1])
+                pos_embed_y = pos_embed_y_interp.transpose([0, 2, 1])
 
             if target_w != orig_w:
-                pos_embed_x_nchw = pos_embed_x.transpose([0, 2, 1]).unsqueeze(-1)
                 pos_embed_x_interp = F.interpolate(
-                    pos_embed_x_nchw,
-                    size=target_w,
+                    pos_embed_x.transpose([0, 2, 1]),
+                    size=[target_w],
                     mode='linear',
                     align_corners=False,
                 )
-                pos_embed_x = pos_embed_x_interp.squeeze(-1).transpose([0, 2, 1])
+                pos_embed_x = pos_embed_x_interp.transpose([0, 2, 1])
 
-            pos_embed = pos_embed_y + pos_embed_x
+            pos_embed = pos_embed_y.unsqueeze(2) + pos_embed_x.unsqueeze(1)
             pos_embed_flat = pos_embed.reshape([1, target_h * target_w, C])
 
         elif self.pos_embed_type == 'learned':
