@@ -1,15 +1,9 @@
-import sys
 import os
 import warnings
 import paddle
 
-sys.path.insert(0, ".")
-sys.path.insert(0, "..")
-from paddle_utils import *
-
 warnings.filterwarnings("ignore")
 
-# 切换到脚本所在目录，保证 ./weights、./imagenet_official、./video_test_data 等相对路径可用。
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import numpy as np
@@ -17,29 +11,11 @@ from PIL import Image
 from tqdm import tqdm
 import inspect
 import math
-from functools import partial
+from functools import partial, wraps
 from typing import Callable, Dict, List, Optional, Tuple, Type, Union
 
 
 # Embedded Hiera implementation (merged from hiera/hfhub.py, hiera/hiera_utils.py, hiera/hiera.py).
-class PyTorchModelHubMixin:
-    error_str: str = (
-        'This feature requires "huggingface-hub >= 0.21.0" to be installed.'
-    )
-
-    @classmethod
-    def from_pretrained(cls, *args, **kwdargs):
-        raise RuntimeError(cls.error_str)
-
-    @classmethod
-    def save_pretrained(cls, *args, **kwdargs):
-        raise RuntimeError(cls.error_str)
-
-    @classmethod
-    def push_to_hub(cls, *args, **kwdargs):
-        raise RuntimeError(cls.error_str)
-
-
 def has_config(func):
     signature = inspect.signature(func)
 
@@ -59,111 +35,84 @@ def has_config(func):
     return wrapper
 
 
-PADDLE_WEIGHTS_DIR = "./weights"
-
 PADDLE_WEIGHTS_MAP = {
     "hiera_tiny_224": {
         "mae_in1k_ft_in1k": "hiera_tiny_224_mae_in1k_ft_in1k.pdparams",
-        "mae_in1k": "hiera_tiny_224_mae_in1k.pdparams",
     },
     "hiera_small_224": {
         "mae_in1k_ft_in1k": "hiera_small_224_mae_in1k_ft_in1k.pdparams",
-        "mae_in1k": "hiera_small_224_mae_in1k.pdparams",
     },
     "hiera_base_224": {
         "mae_in1k_ft_in1k": "hiera_base_224_mae_in1k_ft_in1k.pdparams",
-        "mae_in1k": "hiera_base_224_mae_in1k.pdparams",
     },
     "hiera_base_plus_224": {
         "mae_in1k_ft_in1k": "hiera_base_plus_224_mae_in1k_ft_in1k.pdparams",
-        "mae_in1k": "hiera_base_plus_224_mae_in1k.pdparams",
     },
     "hiera_large_224": {
         "mae_in1k_ft_in1k": "hiera_large_224_mae_in1k_ft_in1k.pdparams",
-        "mae_in1k": "hiera_large_224_mae_in1k.pdparams",
     },
     "hiera_huge_224": {
         "mae_in1k_ft_in1k": "hiera_huge_224_mae_in1k_ft_in1k.pdparams",
-        "mae_in1k": "hiera_huge_224_mae_in1k.pdparams",
     },
     "hiera_base_16x224": {
         "mae_k400_ft_k400": "hiera_base_16x224_mae_k400_ft_k400.pdparams",
-        "mae_k400": "hiera_base_16x224_mae_k400.pdparams",
     },
     "hiera_base_plus_16x224": {
         "mae_k400_ft_k400": "hiera_base_plus_16x224_mae_k400_ft_k400.pdparams",
-        "mae_k400": "hiera_base_plus_16x224_mae_k400.pdparams",
     },
     "hiera_large_16x224": {
         "mae_k400_ft_k400": "hiera_large_16x224_mae_k400_ft_k400.pdparams",
-        "mae_k400": "hiera_large_16x224_mae_k400.pdparams",
     },
     "hiera_huge_16x224": {
         "mae_k400_ft_k400": "hiera_huge_16x224_mae_k400_ft_k400.pdparams",
-        "mae_k400": "hiera_huge_16x224_mae_k400.pdparams",
     },
 }
 
 
+MODEL_URLS = {
+    "hiera_tiny_224_mae_in1k_ft_in1k.pdparams":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_tiny_224_mae_in1k_ft_in1k.pdparams",
+    "hiera_small_224_mae_in1k_ft_in1k.pdparams":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_small_224_mae_in1k_ft_in1k.pdparams",
+    "hiera_base_224_mae_in1k_ft_in1k.pdparams":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_base_224_mae_in1k_ft_in1k.pdparams",
+    "hiera_base_plus_224_mae_in1k_ft_in1k.pdparams":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_base_plus_224_mae_in1k_ft_in1k.pdparams",
+    "hiera_large_224_mae_in1k_ft_in1k.pdparams":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_large_224_mae_in1k_ft_in1k.pdparams",
+    "hiera_huge_224_mae_in1k_ft_in1k.pdparams":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_huge_224_mae_in1k_ft_in1k.pdparams",
+    "hiera_base_16x224_mae_k400_ft_k400.pdparams":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_base_16x224_mae_k400_ft_k400.pdparams",
+    "hiera_base_plus_16x224_mae_k400_ft_k400.pdparams":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_base_plus_16x224_mae_k400_ft_k400.pdparams",
+    "hiera_large_16x224_mae_k400_ft_k400.pdparams":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_large_16x224_mae_k400_ft_k400.pdparams",
+    "hiera_huge_16x224_mae_k400_ft_k400.pdparams":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_huge_16x224_mae_k400_ft_k400.pdparams",
+}
+
+
 def load_paddle_weights(model_name: str, checkpoint: str) -> Dict:
-    """Load Paddle weights from local file."""
+    """Load Paddle weights, downloading and caching them from MODEL_URLS if needed."""
     if model_name not in PADDLE_WEIGHTS_MAP:
         return None
-    
+
     checkpoint_map = PADDLE_WEIGHTS_MAP[model_name]
     if checkpoint not in checkpoint_map:
         return None
-    
+
     weight_file = checkpoint_map[checkpoint]
-    weight_path = os.path.join(PADDLE_WEIGHTS_DIR, weight_file)
-    
-    if os.path.exists(weight_path):
-        print(f"Loading Paddle weights from: {weight_path}")
-        return paddle.load(weight_path)
-    
-    raise FileNotFoundError(f"Paddle weights not found: {weight_path}")
+    url = MODEL_URLS.get(weight_file)
+    if url is None:
+        raise FileNotFoundError(
+            f"No pretrained weights available for: {weight_file}")
 
+    from paddle.utils.download import get_weights_path_from_url
+    weight_path = get_weights_path_from_url(url)
 
-def load_pytorch_weights(url: str) -> Dict:
-    """Load PyTorch weights and convert to PaddlePaddle format."""
-    try:
-        import torch
-        import urllib.request
-    except ImportError:
-        raise ImportError("PyTorch is required to load PyTorch weights. Please install it with: pip install torch")
-    
-    cache_dir = os.path.expanduser("~/.cache/paddle/hub/checkpoints")
-    os.makedirs(cache_dir, exist_ok=True)
-    
-    filename = url.split("/")[-1]
-    cached_file = os.path.join(cache_dir, filename)
-    
-    if not os.path.exists(cached_file):
-        print(f"Downloading: {url} to {cached_file}")
-        urllib.request.urlretrieve(url, cached_file)
-    
-    state_dict = torch.load(cached_file, map_location="cpu", weights_only=False)
-    if isinstance(state_dict, dict):
-        if "model_state" in state_dict:
-            state_dict = state_dict["model_state"]
-        elif "state_dict" in state_dict:
-            state_dict = state_dict["state_dict"]
-    
-    paddle_state_dict = {}
-    for key, value in state_dict.items():
-        if hasattr(value, "numpy"):
-            tensor_value = paddle.to_tensor(value.detach().numpy())
-        elif isinstance(value, np.ndarray):
-            tensor_value = paddle.to_tensor(value)
-        else:
-            tensor_value = value
-        
-        if "mlp.fc" in key and key.endswith(".weight") and len(tensor_value.shape) == 2:
-            tensor_value = tensor_value.T
-        
-        paddle_state_dict[key] = tensor_value
-    
-    return paddle_state_dict
+    print(f"Loading Paddle weights from: {weight_path}")
+    return paddle.load(weight_path)
 
 
 def pretrained_model(checkpoints: Dict[str, str], default: str = None) -> Callable:
@@ -172,6 +121,7 @@ def pretrained_model(checkpoints: Dict[str, str], default: str = None) -> Callab
     def inner(model_func: Callable) -> Callable:
         model_name = model_func.__name__
         
+        @wraps(model_func)
         def model_def(
             pretrained: bool = False,
             checkpoint: str = default,
@@ -540,7 +490,7 @@ class PatchEmbed(paddle.nn.Module):
         return x
 
 
-class Hiera(paddle.nn.Module, PyTorchModelHubMixin):
+class Hiera(paddle.nn.Module):
     @has_config
     def __init__(
         self,
@@ -742,8 +692,7 @@ class Hiera(paddle.nn.Module, PyTorchModelHubMixin):
 
 @pretrained_model(
     {
-        "mae_in1k_ft_in1k": "https://dl.fbaipublicfiles.com/hiera/hiera_tiny_224.pth",
-        "mae_in1k": "https://dl.fbaipublicfiles.com/hiera/mae_hiera_tiny_224.pth",
+        "mae_in1k_ft_in1k": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_tiny_224_mae_in1k_ft_in1k.pdparams",
     },
     default="mae_in1k_ft_in1k",
 )
@@ -753,8 +702,7 @@ def hiera_tiny_224(**kwdargs):
 
 @pretrained_model(
     {
-        "mae_in1k_ft_in1k": "https://dl.fbaipublicfiles.com/hiera/hiera_small_224.pth",
-        "mae_in1k": "https://dl.fbaipublicfiles.com/hiera/mae_hiera_small_224.pth",
+        "mae_in1k_ft_in1k": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_small_224_mae_in1k_ft_in1k.pdparams",
     },
     default="mae_in1k_ft_in1k",
 )
@@ -764,8 +712,7 @@ def hiera_small_224(**kwdargs):
 
 @pretrained_model(
     {
-        "mae_in1k_ft_in1k": "https://dl.fbaipublicfiles.com/hiera/hiera_base_224.pth",
-        "mae_in1k": "https://dl.fbaipublicfiles.com/hiera/mae_hiera_base_224.pth",
+        "mae_in1k_ft_in1k": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_base_224_mae_in1k_ft_in1k.pdparams",
     },
     default="mae_in1k_ft_in1k",
 )
@@ -775,8 +722,7 @@ def hiera_base_224(**kwdargs):
 
 @pretrained_model(
     {
-        "mae_in1k_ft_in1k": "https://dl.fbaipublicfiles.com/hiera/hiera_base_plus_224.pth",
-        "mae_in1k": "https://dl.fbaipublicfiles.com/hiera/mae_hiera_base_plus_224.pth",
+        "mae_in1k_ft_in1k": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_base_plus_224_mae_in1k_ft_in1k.pdparams",
     },
     default="mae_in1k_ft_in1k",
 )
@@ -786,8 +732,7 @@ def hiera_base_plus_224(**kwdargs):
 
 @pretrained_model(
     {
-        "mae_in1k_ft_in1k": "https://dl.fbaipublicfiles.com/hiera/hiera_large_224.pth",
-        "mae_in1k": "https://dl.fbaipublicfiles.com/hiera/mae_hiera_large_224.pth",
+        "mae_in1k_ft_in1k": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_large_224_mae_in1k_ft_in1k.pdparams",
     },
     default="mae_in1k_ft_in1k",
 )
@@ -797,8 +742,7 @@ def hiera_large_224(**kwdargs):
 
 @pretrained_model(
     {
-        "mae_in1k_ft_in1k": "https://dl.fbaipublicfiles.com/hiera/hiera_huge_224.pth",
-        "mae_in1k": "https://dl.fbaipublicfiles.com/hiera/mae_hiera_huge_224.pth",
+        "mae_in1k_ft_in1k": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_huge_224_mae_in1k_ft_in1k.pdparams",
     },
     default="mae_in1k_ft_in1k",
 )
@@ -808,8 +752,7 @@ def hiera_huge_224(**kwdargs):
 
 @pretrained_model(
     {
-        "mae_k400_ft_k400": "https://dl.fbaipublicfiles.com/hiera/hiera_base_16x224.pth",
-        "mae_k400": "https://dl.fbaipublicfiles.com/hiera/mae_hiera_base_16x224.pth",
+        "mae_k400_ft_k400": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_base_16x224_mae_k400_ft_k400.pdparams",
     },
     default="mae_k400_ft_k400",
 )
@@ -829,8 +772,7 @@ def hiera_base_16x224(num_classes: int = 400, **kwdargs):
 
 @pretrained_model(
     {
-        "mae_k400_ft_k400": "https://dl.fbaipublicfiles.com/hiera/hiera_base_plus_16x224.pth",
-        "mae_k400": "https://dl.fbaipublicfiles.com/hiera/mae_hiera_base_plus_16x224.pth",
+        "mae_k400_ft_k400": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_base_plus_16x224_mae_k400_ft_k400.pdparams",
     },
     default="mae_k400_ft_k400",
 )
@@ -842,8 +784,7 @@ def hiera_base_plus_16x224(**kwdargs):
 
 @pretrained_model(
     {
-        "mae_k400_ft_k400": "https://dl.fbaipublicfiles.com/hiera/hiera_large_16x224.pth",
-        "mae_k400": "https://dl.fbaipublicfiles.com/hiera/mae_hiera_large_16x224.pth",
+        "mae_k400_ft_k400": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_large_16x224_mae_k400_ft_k400.pdparams",
     },
     default="mae_k400_ft_k400",
 )
@@ -855,8 +796,7 @@ def hiera_large_16x224(**kwdargs):
 
 @pretrained_model(
     {
-        "mae_k400_ft_k400": "https://dl.fbaipublicfiles.com/hiera/hiera_huge_16x224.pth",
-        "mae_k400": "https://dl.fbaipublicfiles.com/hiera/mae_hiera_huge_16x224.pth",
+        "mae_k400_ft_k400": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/hiera_huge_16x224_mae_k400_ft_k400.pdparams",
     },
     default="mae_k400_ft_k400",
 )

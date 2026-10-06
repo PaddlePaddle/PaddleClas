@@ -21,7 +21,7 @@ from .legendary_models.mobilenet_v1 import (
     MobileNetV1_x0_75,
     MobileNetV1,
 )
-from .hiera import (
+from .model_zoo.hiera import (
     hiera_tiny_224,
     hiera_small_224,
     hiera_base_224,
