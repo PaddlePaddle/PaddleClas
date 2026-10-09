@@ -200,8 +200,8 @@ index_root/            # 库存储目录
 |-- image_list.txt     # 图像列表，每行：image_path label。由前端生成及修改，后端只读
 |-- images             # 图像存储目录，由前端生成及增删查等操作。后端只读
 |   |-- md5.jpg
-|   |-- md5.jpg  
-|   |-- ……  
+|   |-- md5.jpg
+|   |-- ……
 |-- features.pkl       # 建库之后，保存的embedding向量，后端生成，前端无需操作
 |-- index              # 真正的生成的index库存储目录，后端生成及操作，前端无需操作。
 |   |-- vector.index   # faiss生成的索引库
