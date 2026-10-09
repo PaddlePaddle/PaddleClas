@@ -24,7 +24,10 @@ class IndexPathPolicy:
             raise ValueError("The allowed index directory must exist")
 
     def within(self, root, path):
-        root = os.path.realpath(root)
+        # Roots are already canonicalized at startup or by gallery_root.
+        # Resolving them again could silently move the boundary if a directory
+        # is subsequently replaced by a symlink.
+        root = os.path.abspath(root)
         try:
             resolved = os.path.realpath(path)
             if os.path.commonpath([root, resolved]) != root:

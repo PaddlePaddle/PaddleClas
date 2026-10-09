@@ -31,6 +31,8 @@ import cv2
 import socket
 import json
 import operator
+from functools import wraps
+from threading import RLock
 """
 完整的index库如下:
 root_path/            # 库存储目录
@@ -79,12 +81,13 @@ class ShiTuIndexManager(object):
             pickle.dump(data, fd)
 
     def _load_index(self):
-        self.index = faiss.read_index(
+        index = faiss.read_index(
             self.path_policy.file_path(self.root_path, self.index_path))
-        self.id_map = self._load_pickle(
+        id_map = self._load_pickle(
             os.path.join(self.root_path, self.id_map_path))
-        self.features = self._load_pickle(
+        features = self._load_pickle(
             os.path.join(self.root_path, self.features_path))
+        self.index, self.id_map, self.features = index, id_map, features
 
     def _save_index(self, index, id_map, features):
         faiss.write_index(
@@ -101,6 +104,9 @@ class ShiTuIndexManager(object):
             pass
         else:
             self.root_path = root_path
+            self.index = None
+            self.id_map = None
+            self.features = None
             if not os.path.exists(index_path):
                 os.mkdir(index_path)
             if image_list_path is not None:
@@ -164,10 +170,10 @@ class ShiTuIndexManager(object):
         image_list = self.path_policy.file_path(image_root, image_list)
         if not os.path.exists(image_list):
             return "Image list file does not exist"
-        if index_method.lower() not in ["hnsw32", "ivf", "flat"]:
+        index_methods = {"hnsw32": "HNSW32", "ivf": "IVF", "flat": "Flat"}
+        if index_method.lower() not in index_methods:
             return "The index method Only support: HNSW32, IVF, Flat"
-        self._update_path(image_root, image_list)
-
+        index_method = index_methods[index_method.lower()]
         # get image_paths
         image_root = image_root if image_root is not None else self.root_path
         gallery_images, gallery_docs, image_ids = self._split_datafile(
@@ -182,23 +188,25 @@ class ShiTuIndexManager(object):
             index_method,
             faiss.METRIC_INNER_PRODUCT,
         )
-        self.index = faiss.IndexIDMap2(index)
+        index = faiss.IndexIDMap2(index)
         features = self._cal_featrue(gallery_images)
-        self.index.train(features)
+        index.train(features)
         index_ids = np.arange(0, len(gallery_images)).astype(np.int64)
-        self.index.add_with_ids(features, index_ids)
+        index.add_with_ids(features, index_ids)
 
-        self.id_map = dict()
+        id_map = dict()
         for i, d in zip(list(index_ids), gallery_docs):
-            self.id_map[i] = d
+            id_map[i] = d
 
-        self.features = {
+        feature_data = {
             "features": features,
             "index_method": index_method,
             "image_ids": image_ids,
             "index_ids": index_ids.tolist(),
         }
-        self._save_index(self.index, self.id_map, self.features)
+        self._update_path(image_root, image_list)
+        self._save_index(index, id_map, feature_data)
+        self.index, self.id_map, self.features = index, id_map, feature_data
 
     def open_index(self, root_path: str, image_list_path: str) -> str:
         root_path = self.path_policy.gallery_root(root_path)
@@ -288,7 +296,7 @@ class ShiTuIndexManager(object):
         self.id_map.clear()
         for i, d in zip(ids, id_map_values):
             self.id_map[i] = d
-        self.features["index_ids"] = ids
+        self.features["index_ids"] = ids.tolist()
 
 
 index_token = os.environ.get("PADDLECLAS_INDEX_TOKEN")
@@ -311,9 +319,22 @@ def require_index_token(
 
 
 app = FastAPI(dependencies=[Depends(require_index_token)])
+index_operation_lock = RLock()
+
+
+def serialized_index_operation(operation):
+    """Keep the shared manager's gallery and index state consistent."""
+
+    @wraps(operation)
+    def locked_operation(*args, **kwargs):
+        with index_operation_lock:
+            return operation(*args, **kwargs)
+
+    return locked_operation
 
 
 @app.get("/new_index")
+@serialized_index_operation
 def new_index(
     image_list_path: str,
     index_method: str = "HNSW32",
@@ -343,6 +364,7 @@ def new_index(
 
 
 @app.get("/open_index")
+@serialized_index_operation
 def open_index(index_root_path: str, image_list_path: str):
     result = ""
     try:
@@ -358,6 +380,7 @@ def open_index(index_root_path: str, image_list_path: str):
 
 
 @app.get("/update_index")
+@serialized_index_operation
 def update_index(image_list_path: str, index_root_path: str = None):
     result = ""
     try:
