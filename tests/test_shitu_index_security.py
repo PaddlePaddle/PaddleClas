@@ -176,6 +176,41 @@ class IndexSecurityTests(unittest.TestCase):
         sibling.mkdir()
         self.assert_blocked("image_list.txt", root=sibling)
 
+    def test_replacing_allowed_root_symlink_cannot_rebase_policy(self):
+        self.allowed.rename(self.base / "original-galleries")
+        self.allowed.symlink_to(self.base, target_is_directory=True)
+        self.assert_blocked("secret.txt", root=self.allowed)
+
+    def test_concurrent_requests_do_not_interleave_manager_operations(self):
+        from concurrent.futures import ThreadPoolExecutor
+        import threading
+        import time
+
+        active = 0
+        peak = 0
+        counter_lock = threading.Lock()
+
+        def operation(*args, **kwargs):
+            nonlocal active, peak
+            with counter_lock:
+                active += 1
+                peak = max(peak, active)
+            try:
+                time.sleep(0.02)
+                return ""
+            finally:
+                with counter_lock:
+                    active -= 1
+
+        with mock.patch.object(self.manager, "open_index", side_effect=operation):
+            with ThreadPoolExecutor(max_workers=8) as executor:
+                responses = list(
+                    executor.map(lambda _: self.request("/open_index"), range(8))
+                )
+        self.assertEqual(peak, 1)
+        for response in responses:
+            self.assertEqual(self.error(response), "")
+
     def test_list_symlink_escape(self):
         (self.gallery / "linked.txt").symlink_to(self.secret)
         self.assert_blocked("linked.txt")
@@ -321,12 +356,15 @@ class IndexSecurityTests(unittest.TestCase):
         with mock.patch.dict(os.environ, {}, clear=True), mock.patch.dict(
             sys.modules, {"psutil": mock.MagicMock()}
         ), mock.patch.object(
-            sys, "argv", ["index_manager.py", "-c", "config.yaml"]
+            sys, "argv", ["index_manager.py", "-c", "config with spaces.yaml"]
         ), mock.patch(
             "subprocess.Popen"
         ) as popen:
             runpy.run_path(str(SERVICE_DIR / "index_manager.py"), run_name="__main__")
         self.assertEqual(popen.call_count, 2)
+        self.assertEqual(popen.call_args_list[0].args[0][0], sys.executable)
+        self.assertEqual(popen.call_args_list[1].args[0][0], sys.executable)
+        self.assertIn("config with spaces.yaml", popen.call_args_list[0].args[0])
         server_env = popen.call_args_list[0].kwargs["env"]
         client_env = popen.call_args_list[1].kwargs["env"]
         self.assertEqual(server_env, client_env)
