@@ -19,7 +19,6 @@ import psutil
 import time
 import secrets
 import socket
-
 """
 完整的index库如下:
 root_path/            # 库存储目录
@@ -44,9 +43,8 @@ if __name__ == "__main__":
         port = sys.argv[4]
     else:
         port = 8000
-    assert (
-        int(port) > 1024 and int(port) < 65536
-    ), "The port should be bigger than 1024 and \
+    assert (int(port) > 1024
+            and int(port) < 65536), "The port should be bigger than 1024 and \
             smaller than 65536"
 
     try:
@@ -54,16 +52,14 @@ if __name__ == "__main__":
     except:
         ip = "127.0.0.1"
     server_cmd = "python server.py -c {} -o ip={} -o port={}".format(
-        yaml_path, ip, port
-    )
+        yaml_path, ip, port)
     process_env = os.environ.copy()
     if not process_env.get("PADDLECLAS_INDEX_TOKEN"):
         process_env["PADDLECLAS_INDEX_TOKEN"] = secrets.token_urlsafe(32)
     process_env.setdefault("PADDLECLAS_INDEX_ROOT", os.getcwd())
     server_proc = subprocess.Popen(shlex.split(server_cmd), env=process_env)
     client_proc = subprocess.Popen(
-        ["python", "client.py", "{} {}".format(ip, port)], env=process_env
-    )
+        ["python", "client.py", "{} {}".format(ip, port)], env=process_env)
     try:
         while psutil.Process(client_proc.pid).status() == "running":
             time.sleep(0.5)

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """HTTP and filesystem regression tests; inference dependencies are mocked.
 
 Run with: python -m unittest discover -s tests -p test_shitu_index_security.py
@@ -31,7 +30,8 @@ from unittest import mock
 import numpy as np
 from fastapi.testclient import TestClient
 
-SERVICE_DIR = Path(__file__).resolve().parents[1] / "deploy/shitu_index_manager"
+SERVICE_DIR = Path(
+    __file__).resolve().parents[1] / "deploy/shitu_index_manager"
 
 
 def load_server(source=None):
@@ -49,19 +49,16 @@ def load_server(source=None):
             "cv2",
         )
     }
-    spec = importlib.util.spec_from_file_location(
-        "shitu_security_server", SERVICE_DIR / "server.py"
-    )
+    spec = importlib.util.spec_from_file_location("shitu_security_server",
+                                                  SERVICE_DIR / "server.py")
     module = importlib.util.module_from_spec(spec)
     with mock.patch.dict(sys.modules, dependencies), mock.patch.object(
-        sys, "path", [str(SERVICE_DIR)] + sys.path
-    ):
+            sys, "path", [str(SERVICE_DIR)] + sys.path):
         if source is None:
             spec.loader.exec_module(module)
         else:
-            exec(
-                compile(source, str(SERVICE_DIR / "server.py"), "exec"), module.__dict__
-            )
+            exec(compile(source, str(SERVICE_DIR / "server.py"), "exec"),
+                 module.__dict__)
     return module
 
 
@@ -77,7 +74,8 @@ class IndexSecurityTests(unittest.TestCase):
         self.gallery.mkdir()
         (self.gallery / "images").mkdir()
         self.image_list = self.gallery / "image_list.txt"
-        self.image_list.write_text("images/item.jpg item label\n", encoding="utf-8")
+        self.image_list.write_text("images/item.jpg item label\n",
+                                   encoding="utf-8")
         self.secret = self.base / "secret.txt"
         self.marker = "PRIVATE_TEST_MARKER"
         self.secret.write_text(self.marker + "\n", encoding="utf-8")
@@ -91,9 +89,14 @@ class IndexSecurityTests(unittest.TestCase):
         self.env.start()
         self.addCleanup(self.env.stop)
         self.server = load_server()
-        self.manager = self.server.ShiTuIndexManager(
-            {"Global": {"batch_size": 1}, "IndexProcess": {"embedding_size": 2}}
-        )
+        self.manager = self.server.ShiTuIndexManager({
+            "Global": {
+                "batch_size": 1
+            },
+            "IndexProcess": {
+                "embedding_size": 2
+            }
+        })
         self.server.manager = self.manager
         self.client = TestClient(self.server.app)
         self.addCleanup(self.client.close)
@@ -129,10 +132,9 @@ class IndexSecurityTests(unittest.TestCase):
         for endpoint in ("/open_index", "/new_index", "/update_index"):
             with self.subTest(endpoint=endpoint, path=str(path)):
                 with mock.patch(
-                    "builtins.open",
-                    side_effect=AssertionError(
-                        "An invalid request must not read a file"
-                    ),
+                        "builtins.open",
+                        side_effect=AssertionError(
+                            "An invalid request must not read a file"),
                 ) as file_open:
                     response = self.request(endpoint, path, root=root)
                 self.assertTrue(self.error(response))
@@ -142,19 +144,18 @@ class IndexSecurityTests(unittest.TestCase):
     def test_anonymous_requests_are_rejected_before_file_access(self):
         for endpoint in ("/open_index", "/new_index", "/update_index"):
             with self.subTest(endpoint=endpoint), mock.patch(
-                "builtins.open"
-            ) as file_open:
+                    "builtins.open") as file_open:
                 self.assertEqual(
-                    self.request(endpoint, self.secret, headers={}).status_code, 401
-                )
+                    self.request(endpoint, self.secret,
+                                 headers={}).status_code, 401)
                 file_open.assert_not_called()
 
     def test_wrong_token_is_rejected(self):
         for header in ("Bearer wrong-token", "Basic test-only-token"):
             self.assertEqual(
-                self.request(
-                    "/open_index", headers={"Authorization": header}
-                ).status_code,
+                self.request("/open_index", headers={
+                    "Authorization": header
+                }).status_code,
                 401,
             )
 
@@ -186,7 +187,8 @@ class IndexSecurityTests(unittest.TestCase):
         self.assert_blocked("secret.txt", root=linked)
 
     def test_index_directory_symlink_escape(self):
-        (self.gallery / "index").symlink_to(self.base, target_is_directory=True)
+        (self.gallery / "index").symlink_to(self.base,
+                                            target_is_directory=True)
         self.assert_blocked("image_list.txt")
 
     def test_invalid_list_never_echoes_contents(self):
@@ -215,21 +217,24 @@ class IndexSecurityTests(unittest.TestCase):
             ("/update_index", "update_index"),
         ):
             with self.subTest(endpoint=endpoint), mock.patch.object(
-                self.manager, method, side_effect=RuntimeError(self.marker)
-            ):
+                    self.manager, method,
+                    side_effect=RuntimeError(self.marker)):
                 response = self.request(endpoint)
                 self.assertTrue(self.error(response))
                 self.assertNotIn(self.marker, response.text)
 
     def test_image_path_escape_is_rejected(self):
-        self.image_list.write_text(str(self.secret) + " label\n", encoding="utf-8")
+        self.image_list.write_text(str(self.secret) + " label\n",
+                                   encoding="utf-8")
         with self.assertRaises(ValueError):
-            self.manager._split_datafile(str(self.image_list), str(self.gallery))
+            self.manager._split_datafile(str(self.image_list),
+                                         str(self.gallery))
 
     def test_image_symlink_escape_is_rejected(self):
         (self.gallery / "images/item.jpg").symlink_to(self.secret)
         with self.assertRaises(ValueError):
-            self.manager._split_datafile(str(self.image_list), str(self.gallery))
+            self.manager._split_datafile(str(self.image_list),
+                                         str(self.gallery))
 
     def test_valid_relative_and_absolute_list_paths(self):
         for path in ("image_list.txt", str(self.image_list)):
@@ -242,8 +247,7 @@ class IndexSecurityTests(unittest.TestCase):
 
     def test_valid_list_parsing_preserves_labels_and_ids(self):
         paths, docs, ids = self.manager._split_datafile(
-            str(self.image_list), str(self.gallery)
-        )
+            str(self.image_list), str(self.gallery))
         self.assertEqual(paths, [str(self.gallery / "images/item.jpg")])
         self.assertEqual(docs, ["images/item.jpg item label"])
         self.assertEqual(ids, ["item"])
@@ -280,18 +284,20 @@ class IndexSecurityTests(unittest.TestCase):
 
     def load_http_client(self):
         spec = importlib.util.spec_from_file_location(
-            "shitu_security_client", SERVICE_DIR / "mod/index_http_client.py"
-        )
+            "shitu_security_client", SERVICE_DIR / "mod/index_http_client.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         pool = mock.Mock()
 
         def request(method, url, headers):
             response = self.client.request(method, url, headers=headers)
-            return SimpleNamespace(data=response.content, status=response.status_code)
+            return SimpleNamespace(data=response.content,
+                                   status=response.status_code)
 
         pool.request.side_effect = request
-        with mock.patch.object(module.urllib3, "PoolManager", return_value=pool):
+        with mock.patch.object(module.urllib3,
+                               "PoolManager",
+                               return_value=pool):
             return module.IndexHttpClient("testserver", 8000)
 
     def test_client_sends_token_and_decodes_server_response(self):
@@ -302,30 +308,29 @@ class IndexSecurityTests(unittest.TestCase):
         )
 
     def test_client_handles_authentication_error(self):
-        with mock.patch.dict(os.environ, {"PADDLECLAS_INDEX_TOKEN": "wrong-token"}):
+        with mock.patch.dict(os.environ,
+                             {"PADDLECLAS_INDEX_TOKEN": "wrong-token"}):
             client = self.load_http_client()
         self.assertEqual(
-            client.open_index(str(self.gallery), "image_list.txt"), "Unauthorized"
-        )
+            client.open_index(str(self.gallery), "image_list.txt"),
+            "Unauthorized")
 
     def test_client_without_token_handles_authentication_error(self):
         with mock.patch.dict(os.environ, {}, clear=True):
             client = self.load_http_client()
         self.assertEqual(
-            client.open_index(str(self.gallery), "image_list.txt"), "Unauthorized"
-        )
+            client.open_index(str(self.gallery), "image_list.txt"),
+            "Unauthorized")
 
     def test_launcher_shares_generated_token_with_client(self):
         import runpy
 
         with mock.patch.dict(os.environ, {}, clear=True), mock.patch.dict(
-            sys.modules, {"psutil": mock.MagicMock()}
-        ), mock.patch.object(
-            sys, "argv", ["index_manager.py", "-c", "config.yaml"]
-        ), mock.patch(
-            "subprocess.Popen"
-        ) as popen:
-            runpy.run_path(str(SERVICE_DIR / "index_manager.py"), run_name="__main__")
+                sys.modules, {"psutil": mock.MagicMock()}), mock.patch.object(
+                    sys, "argv", ["index_manager.py", "-c", "config.yaml"
+                                  ]), mock.patch("subprocess.Popen") as popen:
+            runpy.run_path(str(SERVICE_DIR / "index_manager.py"),
+                           run_name="__main__")
         self.assertEqual(popen.call_count, 2)
         server_env = popen.call_args_list[0].kwargs["env"]
         client_env = popen.call_args_list[1].kwargs["env"]

@@ -31,7 +31,6 @@ import cv2
 import socket
 import json
 import operator
-
 """
 完整的index库如下:
 root_path/            # 库存储目录
@@ -51,8 +50,7 @@ class ShiTuIndexManager(object):
 
     def __init__(self, config):
         self.path_policy = IndexPathPolicy(
-            os.environ.get("PADDLECLAS_INDEX_ROOT", os.getcwd())
-        )
+            os.environ.get("PADDLECLAS_INDEX_ROOT", os.getcwd()))
         self.root_path = None
         self.image_list_path = "image_list.txt"
         self.image_dir = "images"
@@ -82,19 +80,19 @@ class ShiTuIndexManager(object):
 
     def _load_index(self):
         self.index = faiss.read_index(
-            self.path_policy.file_path(self.root_path, self.index_path)
-        )
-        self.id_map = self._load_pickle(os.path.join(self.root_path, self.id_map_path))
+            self.path_policy.file_path(self.root_path, self.index_path))
+        self.id_map = self._load_pickle(
+            os.path.join(self.root_path, self.id_map_path))
         self.features = self._load_pickle(
-            os.path.join(self.root_path, self.features_path)
-        )
+            os.path.join(self.root_path, self.features_path))
 
     def _save_index(self, index, id_map, features):
         faiss.write_index(
-            index, self.path_policy.file_path(self.root_path, self.index_path)
-        )
-        self._save_pickle(os.path.join(self.root_path, self.id_map_path), id_map)
-        self._save_pickle(os.path.join(self.root_path, self.features_path), features)
+            index, self.path_policy.file_path(self.root_path, self.index_path))
+        self._save_pickle(os.path.join(self.root_path, self.id_map_path),
+                          id_map)
+        self._save_pickle(os.path.join(self.root_path, self.features_path),
+                          features)
 
     def _update_path(self, root_path, image_list_path=None):
         root_path = self.path_policy.gallery_root(root_path)
@@ -120,17 +118,14 @@ class ShiTuIndexManager(object):
                 image = image[:, :, ::-1]
                 batch_images.append(image)
                 cnt += 1
-            if cnt % self.config["Global"]["batch_size"] == 0 or (idx + 1) == len(
-                image_list
-            ):
+            if cnt % self.config["Global"]["batch_size"] == 0 or (
+                    idx + 1) == len(image_list):
                 if len(batch_images) == 0:
                     continue
                 batch_results = self.predictor.predict(batch_images)
-                featrures = (
-                    batch_results
-                    if featrures is None
-                    else np.concatenate((featrures, batch_results), axis=0)
-                )
+                featrures = (batch_results
+                             if featrures is None else np.concatenate(
+                                 (featrures, batch_results), axis=0))
                 batch_images = []
         return featrures
 
@@ -151,8 +146,8 @@ class ShiTuIndexManager(object):
                 text_num = len(line)
                 if text_num < 2:
                     raise ValueError(
-                        "Invalid image list format at line {}".format(line_number)
-                    )
+                        "Invalid image list format at line {}".format(
+                            line_number))
                 image_file = self.path_policy.file_path(image_root, line[0])
 
                 gallery_images.append(image_file)
@@ -161,9 +156,10 @@ class ShiTuIndexManager(object):
 
         return gallery_images, gallery_docs, gallery_ids
 
-    def create_index(
-        self, image_list: str, index_method: str = "HNSW32", image_root: str = None
-    ):
+    def create_index(self,
+                     image_list: str,
+                     index_method: str = "HNSW32",
+                     image_root: str = None):
         image_root = self.path_policy.gallery_root(image_root)
         image_list = self.path_policy.file_path(image_root, image_list)
         if not os.path.exists(image_list):
@@ -175,16 +171,12 @@ class ShiTuIndexManager(object):
         # get image_paths
         image_root = image_root if image_root is not None else self.root_path
         gallery_images, gallery_docs, image_ids = self._split_datafile(
-            image_list, image_root
-        )
+            image_list, image_root)
 
         # gernerate index
         if index_method == "IVF":
-            index_method = (
-                index_method
-                + str(min(max(int(len(gallery_images) // 32), 2), 65536))
-                + ",Flat"
-            )
+            index_method = (index_method + str(
+                min(max(int(len(gallery_images) // 32), 2), 65536)) + ",Flat")
         index = faiss.index_factory(
             self.config["IndexProcess"]["embedding_size"],
             index_method,
@@ -210,13 +202,14 @@ class ShiTuIndexManager(object):
 
     def open_index(self, root_path: str, image_list_path: str) -> str:
         root_path = self.path_policy.gallery_root(root_path)
-        image_list_path = self.path_policy.file_path(root_path, image_list_path)
+        image_list_path = self.path_policy.file_path(root_path,
+                                                     image_list_path)
         self._update_path(root_path)
         _, _, image_ids = self._split_datafile(image_list_path, root_path)
         if all(
-            os.path.exists(self.path_policy.file_path(root_path, path))
-            for path in (self.index_path, self.id_map_path, self.features_path)
-        ):
+                os.path.exists(self.path_policy.file_path(root_path, path))
+                for path in (self.index_path, self.id_map_path,
+                             self.features_path)):
             self._update_path(root_path)
             self._load_index()
             if operator.eq(set(image_ids), set(self.features["image_ids"])):
@@ -228,18 +221,18 @@ class ShiTuIndexManager(object):
 
     def update_index(self, image_list: str, image_root: str = None) -> str:
         image_root = self.path_policy.gallery_root(
-            image_root if image_root is not None else self.root_path
-        )
+            image_root if image_root is not None else self.root_path)
         image_list = self.path_policy.file_path(image_root, image_list)
         if self.root_path is not None and image_root != self.root_path:
             return "Please open the index directory before updating it"
         if self.index and self.id_map and self.features:
             image_paths, image_docs, image_ids = self._split_datafile(
-                image_list, image_root if image_root is not None else self.root_path
-            )
+                image_list,
+                image_root if image_root is not None else self.root_path)
 
             # for add image
-            add_ids = list(set(image_ids).difference(set(self.features["image_ids"])))
+            add_ids = list(
+                set(image_ids).difference(set(self.features["image_ids"])))
             add_indexes = [i for i, x in enumerate(image_ids) if x in add_ids]
             add_image_paths = [image_paths[i] for i in add_indexes]
             add_image_docs = [image_docs[i] for i in add_indexes]
@@ -248,8 +241,7 @@ class ShiTuIndexManager(object):
 
             # delete images
             delete_ids = list(
-                set(self.features["image_ids"]).difference(set(image_ids))
-            )
+                set(self.features["image_ids"]).difference(set(image_ids)))
             self._delete_index(delete_ids)
             self._save_index(self.index, self.id_map, self.features)
             return ""
@@ -260,17 +252,15 @@ class ShiTuIndexManager(object):
         if len(image_ids) == 0:
             return
         featrures = self._cal_featrue(image_list)
-        index_ids = (
-            np.arange(0, len(image_list)) + max(self.id_map.keys()) + 1
-        ).astype(np.int64)
+        index_ids = (np.arange(0, len(image_list)) + max(self.id_map.keys()) +
+                     1).astype(np.int64)
         self.index.add_with_ids(featrures, index_ids)
 
         for i, d in zip(index_ids, image_docs):
             self.id_map[i] = d
 
         self.features["features"] = np.concatenate(
-            [self.features["features"], featrures], axis=0
-        )
+            [self.features["features"], featrures], axis=0)
         self.features["image_ids"].extend(image_ids)
         self.features["index_ids"].extend(index_ids.tolist())
 
@@ -278,17 +268,19 @@ class ShiTuIndexManager(object):
         if len(image_ids) == 0:
             return
         indexes = [
-            i for i, x in enumerate(self.features["image_ids"]) if x in image_ids
+            i for i, x in enumerate(self.features["image_ids"])
+            if x in image_ids
         ]
-        self.features["features"] = np.delete(
-            self.features["features"], indexes, axis=0
-        )
-        self.features["image_ids"] = np.delete(
-            np.asarray(self.features["image_ids"]), indexes, axis=0
-        ).tolist()
-        index_ids = np.delete(
-            np.asarray(self.features["index_ids"]), indexes, axis=0
-        ).tolist()
+        self.features["features"] = np.delete(self.features["features"],
+                                              indexes,
+                                              axis=0)
+        self.features["image_ids"] = np.delete(np.asarray(
+            self.features["image_ids"]),
+                                               indexes,
+                                               axis=0).tolist()
+        index_ids = np.delete(np.asarray(self.features["index_ids"]),
+                              indexes,
+                              axis=0).tolist()
         id_map_values = [self.id_map[i] for i in index_ids]
         self.index.reset()
         ids = np.arange(0, len(id_map_values)).astype(np.int64)
@@ -304,13 +296,13 @@ bearer_auth = HTTPBearer(auto_error=False)
 
 
 def require_index_token(
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_auth),
-):
+        credentials: HTTPAuthorizationCredentials = Depends(bearer_auth), ):
     if not index_token:
-        raise HTTPException(status_code=503, detail="Index service is not configured")
+        raise HTTPException(status_code=503,
+                            detail="Index service is not configured")
     if credentials is None or not secrets.compare_digest(
-        credentials.credentials.encode("utf-8"), index_token.encode("utf-8")
-    ):
+            credentials.credentials.encode("utf-8"),
+            index_token.encode("utf-8")):
         raise HTTPException(
             status_code=401,
             detail="Unauthorized",
@@ -332,18 +324,16 @@ def new_index(
     try:
         index_root_path = manager.path_policy.gallery_root(index_root_path)
         image_list_path = manager.path_policy.file_path(
-            index_root_path, image_list_path
-        )
-        index_path = manager.path_policy.file_path(
-            index_root_path, "index/vector.index"
-        )
-        id_map_path = manager.path_policy.file_path(index_root_path, "index/id_map.pkl")
+            index_root_path, image_list_path)
+        index_path = manager.path_policy.file_path(index_root_path,
+                                                   "index/vector.index")
+        id_map_path = manager.path_policy.file_path(index_root_path,
+                                                    "index/id_map.pkl")
 
-        if not (os.path.exists(index_path) and os.path.exists(id_map_path)) or force:
-            result = (
-                manager.create_index(image_list_path, index_method, index_root_path)
-                or ""
-            )
+        if not (os.path.exists(index_path)
+                and os.path.exists(id_map_path)) or force:
+            result = (manager.create_index(image_list_path, index_method,
+                                           index_root_path) or "")
         else:
             result = "There already is an index in this directory"
     except Exception:
@@ -358,8 +348,7 @@ def open_index(index_root_path: str, image_list_path: str):
     try:
         index_root_path = manager.path_policy.gallery_root(index_root_path)
         image_list_path = manager.path_policy.file_path(
-            index_root_path, image_list_path
-        )
+            index_root_path, image_list_path)
         result = manager.open_index(index_root_path, image_list_path)
     except Exception:
         result = "Unable to open index. Check the directory and image list."
@@ -373,14 +362,12 @@ def update_index(image_list_path: str, index_root_path: str = None):
     result = ""
     try:
         index_root_path = manager.path_policy.gallery_root(
-            index_root_path if index_root_path is not None else manager.root_path
-        )
+            index_root_path if index_root_path is not None else manager.
+            root_path)
         image_list_path = manager.path_policy.file_path(
-            index_root_path, image_list_path
-        )
-        result = manager.update_index(
-            image_list=image_list_path, image_root=index_root_path
-        )
+            index_root_path, image_list_path)
+        result = manager.update_index(image_list=image_list_path,
+                                      image_root=index_root_path)
     except Exception:
         result = "Unable to update index. Check the directory and image list."
     data = {"error_message": result}
@@ -401,10 +388,11 @@ def Server(app, host, port):
 if __name__ == "__main__":
     if not index_token:
         raise RuntimeError(
-            "Set PADDLECLAS_INDEX_TOKEN before starting the index service"
-        )
+            "Set PADDLECLAS_INDEX_TOKEN before starting the index service")
     args = config.parse_args()
-    model_config = config.get_config(args.config, overrides=args.override, show=True)
+    model_config = config.get_config(args.config,
+                                     overrides=args.override,
+                                     show=True)
     manager = ShiTuIndexManager(model_config)
     ip = model_config.get("ip", None)
     port = model_config.get("port", None)

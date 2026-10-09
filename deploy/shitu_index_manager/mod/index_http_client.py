@@ -30,9 +30,7 @@ class IndexHttpClient:
         if index_method not in ["HNSW32", "FLAT", "IVF"]:
             raise Exception(
                 "index_method 必须是 HNSW32, FLAT, IVF，实际值为：{}".format(
-                    index_method
-                )
-            )
+                    index_method))
         params = {
             "image_list_path": image_list_path,
             "index_root_path": index_root_path,
