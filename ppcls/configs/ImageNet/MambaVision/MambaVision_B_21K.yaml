@@ -1,0 +1,120 @@
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output/
+  device: gpu
+  save_interval: 1
+  eval_during_train: false
+  epochs: 300
+  print_batch_step: 10
+  use_visualdl: false
+  image_shape: [3, 224, 224]
+  to_static: false
+  seed: 2026
+
+AMP:
+  use_amp: false
+  use_fp16_test: false
+  scale_loss: 1.0
+  use_dynamic_loss_scaling: true
+  level: O1
+
+Arch:
+  name: MambaVision_B_21K
+  class_num: 1000
+  scan_impl: parallel
+
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+
+Optimizer:
+  name: AdamW
+  lr:
+    name: Constant
+    learning_rate: 1.0e-4
+  weight_decay: 0.01
+  one_dim_param_no_weight_decay: true
+
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: true
+            channel_first: false
+        - RandCropImage:
+            size: 224
+        - RandFlipImage:
+            flip_code: 1
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 8
+      drop_last: false
+      shuffle: true
+    loader:
+      num_workers: 4
+      use_shared_memory: false
+
+  Eval:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: true
+            channel_first: false
+        - ResizeImage:
+            resize_short: 224
+        - CropImage:
+            size: 224
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 8
+      drop_last: false
+      shuffle: false
+    loader:
+      num_workers: 4
+      use_shared_memory: false
+
+Infer:
+  infer_imgs: docs/images/inference_deployment/whl_demo.jpg
+  batch_size: 1
+  transforms:
+    - DecodeImage:
+        to_rgb: true
+        channel_first: false
+    - ResizeImage:
+        resize_short: 224
+    - CropImage:
+        size: 224
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+        order: ''
+    - ToCHWImage:
+  PostProcess:
+    name: Topk
+    topk: 5
+    class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
+
+Metric:
+  Eval:
+    - TopkAcc:
+        topk: [1, 5]
