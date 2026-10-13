@@ -13,12 +13,15 @@
 # limitations under the License.
 import os
 import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets
 import mod.mainwindow
+from mod.path_security import IndexPathPolicy
 
-from paddleclas.deploy.utils import config, logger
+from paddleclas.deploy.utils import config
 from paddleclas.deploy.python.predict_rec import RecPredictor
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+import secrets
 import uvicorn
 import numpy as np
 import faiss
@@ -28,7 +31,9 @@ import cv2
 import socket
 import json
 import operator
-from multiprocessing import Process
+from functools import wraps
+from threading import RLock
+
 """
 完整的index库如下:
 root_path/            # 库存储目录
@@ -45,7 +50,11 @@ root_path/            # 库存储目录
 
 
 class ShiTuIndexManager(object):
+
     def __init__(self, config):
+        self.path_policy = IndexPathPolicy(
+            os.environ.get("PADDLECLAS_INDEX_ROOT", os.getcwd())
+        )
         self.root_path = None
         self.image_list_path = "image_list.txt"
         self.image_dir = "images"
@@ -59,39 +68,47 @@ class ShiTuIndexManager(object):
         self.predictor = RecPredictor(config)
 
     def _load_pickle(self, path):
+        path = self.path_policy.file_path(self.root_path, path)
         if os.path.exists(path):
-            return pickle.load(open(path, 'rb'))
+            with open(path, "rb") as fd:
+                return pickle.load(fd)
         else:
             return None
 
     def _save_pickle(self, path, data):
+        path = self.path_policy.file_path(self.root_path, path)
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, 'wb') as fd:
+        with open(path, "wb") as fd:
             pickle.dump(data, fd)
 
     def _load_index(self):
-        self.index = faiss.read_index(
-            os.path.join(self.root_path, self.index_path))
-        self.id_map = self._load_pickle(
-            os.path.join(self.root_path, self.id_map_path))
-        self.features = self._load_pickle(
-            os.path.join(self.root_path, self.features_path))
+        index = faiss.read_index(
+            self.path_policy.file_path(self.root_path, self.index_path)
+        )
+        id_map = self._load_pickle(os.path.join(self.root_path, self.id_map_path))
+        features = self._load_pickle(os.path.join(self.root_path, self.features_path))
+        self.index, self.id_map, self.features = index, id_map, features
 
     def _save_index(self, index, id_map, features):
-        faiss.write_index(index, os.path.join(self.root_path, self.index_path))
-        self._save_pickle(
-            os.path.join(self.root_path, self.id_map_path), id_map)
-        self._save_pickle(
-            os.path.join(self.root_path, self.features_path), features)
+        faiss.write_index(
+            index, self.path_policy.file_path(self.root_path, self.index_path)
+        )
+        self._save_pickle(os.path.join(self.root_path, self.id_map_path), id_map)
+        self._save_pickle(os.path.join(self.root_path, self.features_path), features)
 
     def _update_path(self, root_path, image_list_path=None):
+        root_path = self.path_policy.gallery_root(root_path)
+        index_path = self.path_policy.file_path(root_path, "index")
         if root_path == self.root_path:
             pass
         else:
             self.root_path = root_path
-            if not os.path.exists(os.path.join(root_path, "index")):
-                os.mkdir(os.path.join(root_path, "index"))
+            self.index = None
+            self.id_map = None
+            self.features = None
+            if not os.path.exists(index_path):
+                os.mkdir(index_path)
             if image_list_path is not None:
                 self.image_list_path = image_list_path
 
@@ -107,32 +124,40 @@ class ShiTuIndexManager(object):
                 image = image[:, :, ::-1]
                 batch_images.append(image)
                 cnt += 1
-            if cnt % self.config["Global"]["batch_size"] == 0 or (
-                    idx + 1) == len(image_list):
+            if cnt % self.config["Global"]["batch_size"] == 0 or (idx + 1) == len(
+                image_list
+            ):
                 if len(batch_images) == 0:
                     continue
                 batch_results = self.predictor.predict(batch_images)
-                featrures = batch_results if featrures is None else np.concatenate(
-                    (featrures, batch_results), axis=0)
+                featrures = (
+                    batch_results
+                    if featrures is None
+                    else np.concatenate((featrures, batch_results), axis=0)
+                )
                 batch_images = []
         return featrures
 
     def _split_datafile(self, data_file, image_root):
-        '''
+        """
         data_file: image path and info, which can be splitted by spacer
         image_root: image path root
         delimiter: delimiter
-        '''
+        """
         gallery_images = []
         gallery_docs = []
         gallery_ids = []
-        with open(data_file, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-            for _, ori_line in enumerate(lines):
+        image_root = self.path_policy.gallery_root(image_root)
+        data_file = self.path_policy.file_path(image_root, data_file)
+        with open(data_file, "r", encoding="utf-8") as f:
+            for line_number, ori_line in enumerate(f, 1):
                 line = ori_line.strip().split()
                 text_num = len(line)
-                assert text_num >= 2, f"line({ori_line}) must be splitted into at least 2 parts, but got {text_num}"
-                image_file = os.path.join(image_root, line[0])
+                if text_num < 2:
+                    raise ValueError(
+                        "Invalid image list format at line {}".format(line_number)
+                    )
+                image_file = self.path_policy.file_path(image_root, line[0])
 
                 gallery_images.append(image_file)
                 gallery_docs.append(ori_line.strip())
@@ -140,70 +165,87 @@ class ShiTuIndexManager(object):
 
         return gallery_images, gallery_docs, gallery_ids
 
-    def create_index(self,
-                     image_list: str,
-                     index_method: str="HNSW32",
-                     image_root: str=None):
+    def create_index(
+        self, image_list: str, index_method: str = "HNSW32", image_root: str = None
+    ):
+        image_root = self.path_policy.gallery_root(image_root)
+        image_list = self.path_policy.file_path(image_root, image_list)
         if not os.path.exists(image_list):
-            return "{} is not exist".format(image_list)
-        if index_method.lower() not in ['hnsw32', 'ivf', 'flat']:
+            return "Image list file does not exist"
+        index_methods = {"hnsw32": "HNSW32", "ivf": "IVF", "flat": "Flat"}
+        if index_method.lower() not in index_methods:
             return "The index method Only support: HNSW32, IVF, Flat"
-        self._update_path(os.path.dirname(image_list), image_list)
-
+        index_method = index_methods[index_method.lower()]
         # get image_paths
         image_root = image_root if image_root is not None else self.root_path
         gallery_images, gallery_docs, image_ids = self._split_datafile(
-            image_list, image_root)
+            image_list, image_root
+        )
 
         # gernerate index
         if index_method == "IVF":
-            index_method = index_method + str(
-                min(max(int(len(gallery_images) // 32), 2), 65536)) + ",Flat"
+            index_method = (
+                index_method
+                + str(min(max(int(len(gallery_images) // 32), 2), 65536))
+                + ",Flat"
+            )
         index = faiss.index_factory(
-            self.config["IndexProcess"]["embedding_size"], index_method,
-            faiss.METRIC_INNER_PRODUCT)
-        self.index = faiss.IndexIDMap2(index)
+            self.config["IndexProcess"]["embedding_size"],
+            index_method,
+            faiss.METRIC_INNER_PRODUCT,
+        )
+        index = faiss.IndexIDMap2(index)
         features = self._cal_featrue(gallery_images)
-        self.index.train(features)
+        index.train(features)
         index_ids = np.arange(0, len(gallery_images)).astype(np.int64)
-        self.index.add_with_ids(features, index_ids)
+        index.add_with_ids(features, index_ids)
 
-        self.id_map = dict()
+        id_map = dict()
         for i, d in zip(list(index_ids), gallery_docs):
-            self.id_map[i] = d
+            id_map[i] = d
 
-        self.features = {
+        feature_data = {
             "features": features,
             "index_method": index_method,
             "image_ids": image_ids,
-            "index_ids": index_ids.tolist()
+            "index_ids": index_ids.tolist(),
         }
-        self._save_index(self.index, self.id_map, self.features)
+        self._update_path(image_root, image_list)
+        self._save_index(index, id_map, feature_data)
+        self.index, self.id_map, self.features = index, id_map, feature_data
 
     def open_index(self, root_path: str, image_list_path: str) -> str:
+        root_path = self.path_policy.gallery_root(root_path)
+        image_list_path = self.path_policy.file_path(root_path, image_list_path)
         self._update_path(root_path)
         _, _, image_ids = self._split_datafile(image_list_path, root_path)
-        if os.path.exists(os.path.join(self.root_path, self.index_path)) and \
-                os.path.exists(os.path.join(self.root_path, self.id_map_path)) and \
-                os.path.exists(os.path.join(self.root_path, self.features_path)):
+        if all(
+            os.path.exists(self.path_policy.file_path(root_path, path))
+            for path in (self.index_path, self.id_map_path, self.features_path)
+        ):
             self._update_path(root_path)
             self._load_index()
-            if operator.eq(set(image_ids), set(self.features['image_ids'])):
+            if operator.eq(set(image_ids), set(self.features["image_ids"])):
                 return ""
             else:
                 return "The image list is different from index, Please update index"
         else:
             return "File not exist: features.pkl, vector.index, id_map.pkl"
 
-    def update_index(self, image_list: str, image_root: str=None) -> str:
+    def update_index(self, image_list: str, image_root: str = None) -> str:
+        image_root = self.path_policy.gallery_root(
+            image_root if image_root is not None else self.root_path
+        )
+        image_list = self.path_policy.file_path(image_root, image_list)
+        if self.root_path is not None and image_root != self.root_path:
+            return "Please open the index directory before updating it"
         if self.index and self.id_map and self.features:
             image_paths, image_docs, image_ids = self._split_datafile(
-                image_list, image_root
-                if image_root is not None else self.root_path)
+                image_list, image_root if image_root is not None else self.root_path
+            )
 
             # for add image
-            add_ids = list(
-                set(image_ids).difference(set(self.features["image_ids"])))
+            add_ids = list(set(image_ids).difference(set(self.features["image_ids"])))
             add_indexes = [i for i, x in enumerate(image_ids) if x in add_ids]
             add_image_paths = [image_paths[i] for i in add_indexes]
             add_image_docs = [image_docs[i] for i in add_indexes]
@@ -212,7 +254,8 @@ class ShiTuIndexManager(object):
 
             # delete images
             delete_ids = list(
-                set(self.features["image_ids"]).difference(set(image_ids)))
+                set(self.features["image_ids"]).difference(set(image_ids))
+            )
             self._delete_index(delete_ids)
             self._save_index(self.index, self.id_map, self.features)
             return ""
@@ -231,84 +274,136 @@ class ShiTuIndexManager(object):
         for i, d in zip(index_ids, image_docs):
             self.id_map[i] = d
 
-        self.features['features'] = np.concatenate(
-            [self.features['features'], featrures], axis=0)
-        self.features['image_ids'].extend(image_ids)
-        self.features['index_ids'].extend(index_ids.tolist())
+        self.features["features"] = np.concatenate(
+            [self.features["features"], featrures], axis=0
+        )
+        self.features["image_ids"].extend(image_ids)
+        self.features["index_ids"].extend(index_ids.tolist())
 
     def _delete_index(self, image_ids: List):
         if len(image_ids) == 0:
             return
         indexes = [
-            i for i, x in enumerate(self.features['image_ids'])
-            if x in image_ids
+            i for i, x in enumerate(self.features["image_ids"]) if x in image_ids
         ]
         self.features["features"] = np.delete(
-            self.features["features"], indexes, axis=0)
+            self.features["features"], indexes, axis=0
+        )
         self.features["image_ids"] = np.delete(
-            np.asarray(self.features["image_ids"]), indexes, axis=0).tolist()
+            np.asarray(self.features["image_ids"]), indexes, axis=0
+        ).tolist()
         index_ids = np.delete(
-            np.asarray(self.features["index_ids"]), indexes, axis=0).tolist()
+            np.asarray(self.features["index_ids"]), indexes, axis=0
+        ).tolist()
         id_map_values = [self.id_map[i] for i in index_ids]
         self.index.reset()
         ids = np.arange(0, len(id_map_values)).astype(np.int64)
-        self.index.add_with_ids(self.features['features'], ids)
+        self.index.add_with_ids(self.features["features"], ids)
         self.id_map.clear()
         for i, d in zip(ids, id_map_values):
             self.id_map[i] = d
-        self.features["index_ids"] = ids
+        self.features["index_ids"] = ids.tolist()
 
 
-app = FastAPI()
+index_token = os.environ.get("PADDLECLAS_INDEX_TOKEN")
+bearer_auth = HTTPBearer(auto_error=False)
+
+
+def require_index_token(
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_auth),
+):
+    if not index_token:
+        raise HTTPException(status_code=503, detail="Index service is not configured")
+    if credentials is None or not secrets.compare_digest(
+        credentials.credentials.encode("utf-8"), index_token.encode("utf-8")
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+app = FastAPI(dependencies=[Depends(require_index_token)])
+index_operation_lock = RLock()
+
+
+def serialized_index_operation(operation):
+    """Keep the shared manager's gallery and index state consistent."""
+
+    @wraps(operation)
+    def locked_operation(*args, **kwargs):
+        with index_operation_lock:
+            return operation(*args, **kwargs)
+
+    return locked_operation
 
 
 @app.get("/new_index")
-def new_index(image_list_path: str,
-              index_method: str="HNSW32",
-              index_root_path: str=None,
-              force: bool=False):
+@serialized_index_operation
+def new_index(
+    image_list_path: str,
+    index_method: str = "HNSW32",
+    index_root_path: str = None,
+    force: bool = False,
+):
     result = ""
     try:
-        if index_root_path is not None:
-            image_list_path = os.path.join(index_root_path, image_list_path)
-        index_path = os.path.join(index_root_path, "index", "vector.index")
-        id_map_path = os.path.join(index_root_path, "index", "id_map.pkl")
+        index_root_path = manager.path_policy.gallery_root(index_root_path)
+        image_list_path = manager.path_policy.file_path(
+            index_root_path, image_list_path
+        )
+        index_path = manager.path_policy.file_path(
+            index_root_path, "index/vector.index"
+        )
+        id_map_path = manager.path_policy.file_path(index_root_path, "index/id_map.pkl")
 
-        if not (os.path.exists(index_path) and
-                os.path.exists(id_map_path)) or force:
-            manager.create_index(image_list_path, index_method,
-                                 index_root_path)
+        if not (os.path.exists(index_path) and os.path.exists(id_map_path)) or force:
+            result = (
+                manager.create_index(image_list_path, index_method, index_root_path)
+                or ""
+            )
         else:
-            result = "There alrealy has index in {}".format(index_root_path)
-    except Exception as e:
-        result = e.__str__()
+            result = "There already is an index in this directory"
+    except Exception:
+        result = "Unable to create index. Check the directory and image list."
     data = {"error_message": result}
     return json.dumps(data).encode()
 
 
 @app.get("/open_index")
+@serialized_index_operation
 def open_index(index_root_path: str, image_list_path: str):
     result = ""
     try:
-        image_list_path = os.path.join(index_root_path, image_list_path)
+        index_root_path = manager.path_policy.gallery_root(index_root_path)
+        image_list_path = manager.path_policy.file_path(
+            index_root_path, image_list_path
+        )
         result = manager.open_index(index_root_path, image_list_path)
-    except Exception as e:
-        result = e.__str__()
+    except Exception:
+        result = "Unable to open index. Check the directory and image list."
 
     data = {"error_message": result}
     return json.dumps(data).encode()
 
 
 @app.get("/update_index")
-def update_index(image_list_path: str, index_root_path: str=None):
+@serialized_index_operation
+def update_index(image_list_path: str, index_root_path: str = None):
     result = ""
     try:
-        if index_root_path is not None:
-            image_list_path = os.path.join(index_root_path, image_list_path)
+        index_root_path = manager.path_policy.gallery_root(
+            index_root_path if index_root_path is not None else manager.root_path
+        )
+        image_list_path = manager.path_policy.file_path(
+            index_root_path, image_list_path
+        )
         result = manager.update_index(
-            image_list=image_list_path, image_root=index_root_path)
-    except Exception as e:
-        result = e.__str__()
+            image_list=image_list_path, image_root=index_root_path
+        )
+    except Exception:
+        result = "Unable to update index. Check the directory and image list."
     data = {"error_message": result}
     return json.dumps(data).encode()
 
@@ -324,17 +419,20 @@ def Server(app, host, port):
     uvicorn.run(app, host=host, port=port)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    if not index_token:
+        raise RuntimeError(
+            "Set PADDLECLAS_INDEX_TOKEN before starting the index service"
+        )
     args = config.parse_args()
-    model_config = config.get_config(
-        args.config, overrides=args.override, show=True)
+    model_config = config.get_config(args.config, overrides=args.override, show=True)
     manager = ShiTuIndexManager(model_config)
-    ip = model_config.get('ip', None)
-    port = model_config.get('port', None)
+    ip = model_config.get("ip", None)
+    port = model_config.get("port", None)
     if ip is None or port is None:
         try:
             ip = socket.gethostbyname(socket.gethostname())
         except:
-            ip = '127.0.0.1'
+            ip = "127.0.0.1"
         port = 8000
     Server(app, ip, port)
