@@ -12,6 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if not __package__:
+    from os.path import dirname, abspath
+    __path__ = [dirname(abspath(__file__))]
+    __package__ = 'paddleclas'
+    import sys
+    _m = sys.modules['paddleclas']
+    _m.__path__ = __path__
+    _m.__package__ = __package__
+
 import os
 from typing import Union, Generator
 import argparse
