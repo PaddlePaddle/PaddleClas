@@ -37,7 +37,7 @@ inference_model_url:null
 infer_model:../inference/
 infer_export:null
 infer_quant:Fasle
-inference:python/predict_cls.py -c configs/inference_cls.yaml -o PreProcess.transform_ops.0.ResizeImage.resize_short=292 -o PreProcess.transform_ops.1.CropImage.size=256 -o PreProcess.transform_ops.0.ResizeImage.interpolation=bicubic -o PreProcess.transform_ops.0.ResizeImage.backend=pil -o PreProcess.transform_ops.2.NormalizeImage.scale=0.00392156862745098
+inference:python/predict_cls.py -c configs/inference_cls.yaml -o PreProcess.transform_ops.0.ResizeImage.resize_short=292 -o PreProcess.transform_ops.1.CropImage.size=256 -o PreProcess.transform_ops.0.ResizeImage.interpolation=bicubic -o PreProcess.transform_ops.0.ResizeImage.backend=pil -o PreProcess.transform_ops.2.NormalizeImage.scale=0.00392156862745098 -o "PreProcess.transform_ops.0.ResizeImage.rounding='floor'" -o "PreProcess.transform_ops.1.CropImage.rounding='round'"
 -o Global.use_gpu:True|False
 -o Global.enable_mkldnn:True|False
 -o Global.cpu_num_threads:1|6

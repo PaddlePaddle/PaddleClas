@@ -99,14 +99,12 @@ DataLoader:
       cls_label_path: ./dataset/ILSVRC2012/val_list.txt
       transform_ops:
         - DecodeImage:
-            to_rgb: True
-            channel_first: False
+            to_np: False
             backend: pil
-        - ResizeImage:
-            resize_short: 292
+        - Resize:
+            size: 292
             interpolation: bicubic
-            backend: pil
-        - CropImage:
+        - CenterCrop:
             size: 256
         - NormalizeImage:
             scale: 1.0/255.0
@@ -127,14 +125,12 @@ Infer:
   batch_size: 10
   transforms:
     - DecodeImage:
-        to_rgb: True
-        channel_first: False
+        to_np: False
         backend: pil
-    - ResizeImage:
-        resize_short: 292
+    - Resize:
+        size: 292
         interpolation: bicubic
-        backend: pil
-    - CropImage:
+    - CenterCrop:
         size: 256
     - NormalizeImage:
         scale: 1.0/255.0

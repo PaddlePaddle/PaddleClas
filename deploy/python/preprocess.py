@@ -158,7 +158,11 @@ class ResizeImage(object):
                  resize_short=None,
                  interpolation=None,
                  backend="cv2",
-                 return_numpy=True):
+                 return_numpy=True,
+                 rounding="round"):
+        if rounding not in ("round", "floor"):
+            raise OperatorParamError('rounding must be "round" or "floor"')
+        self.rounding = rounding
         if resize_short is not None and resize_short > 0:
             self.resize_short = resize_short
             self.w = None
@@ -185,9 +189,15 @@ class ResizeImage(object):
             img_w, img_h = img.size
 
         if self.resize_short is not None:
-            percent = float(self.resize_short) / min(img_w, img_h)
-            w = int(round(img_w * percent))
-            h = int(round(img_h * percent))
+            # Some pretrained pipelines floor resize dimensions.
+            if self.rounding == "floor":
+                short = min(img_w, img_h)
+                w = int(self.resize_short * img_w / short)
+                h = int(self.resize_short * img_h / short)
+            else:
+                percent = float(self.resize_short) / min(img_w, img_h)
+                w = int(round(img_w * percent))
+                h = int(round(img_h * percent))
         else:
             w = self.w
             h = self.h
@@ -197,7 +207,10 @@ class ResizeImage(object):
 class CropImage(object):
     """ crop image """
 
-    def __init__(self, size):
+    def __init__(self, size, rounding="floor"):
+        if rounding not in ("floor", "round"):
+            raise OperatorParamError('rounding must be "floor" or "round"')
+        self.rounding = rounding
         if type(size) is int:
             self.size = (size, size)
         else:
@@ -212,8 +225,13 @@ class CropImage(object):
                 f"The size({h}, {w}) of CropImage must be greater than size({img_h}, {img_w}) of image. Please check image original size and size of ResizeImage if used."
             )
 
-        w_start = (img_w - w) // 2
-        h_start = (img_h - h) // 2
+        # Some pretrained pipelines round center-crop offsets.
+        if self.rounding == "round":
+            w_start = int(round((img_w - w) / 2.0))
+            h_start = int(round((img_h - h) / 2.0))
+        else:
+            w_start = (img_w - w) // 2
+            h_start = (img_h - h) // 2
 
         w_end = w_start + w
         h_end = h_start + h
