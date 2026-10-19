@@ -23,14 +23,14 @@ from ..base.theseus_layer import TheseusLayer
 from ....utils.save_load import load_dygraph_pretrain
 
 MODEL_URLS = {
-    "EfficientViM_M1": "",
-    "EfficientViM_M2": "",
-    "EfficientViM_M3": "",
-    "EfficientViM_M4": "",
-    "EfficientViM_M1_Dist": "",
-    "EfficientViM_M2_Dist": "",
-    "EfficientViM_M3_Dist": "",
-    "EfficientViM_M4_Dist": "",
+    "EfficientViM_M1": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/efficientvim_m1.e300_in1k.pdparams",
+    "EfficientViM_M2": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/efficientvim_m2.e300_in1k.pdparams",
+    "EfficientViM_M3": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/efficientvim_m3.e300_in1k.pdparams",
+    "EfficientViM_M4": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/efficientvim_m4.e300_in1k.pdparams",
+    "EfficientViM_M1_Dist": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/efficientvim_m1_dist.in1k.pdparams",
+    "EfficientViM_M2_Dist": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/efficientvim_m2_dist.in1k.pdparams",
+    "EfficientViM_M3_Dist": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/efficientvim_m3_dist.in1k.pdparams",
+    "EfficientViM_M4_Dist": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/efficientvim_m4_dist.in1k.pdparams",
 }
 
 
