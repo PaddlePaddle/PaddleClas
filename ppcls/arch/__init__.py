@@ -1,19 +1,20 @@
-#copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import copy
 import importlib
+import paddle
 import paddle.nn as nn
 from paddle.jit import to_static
 from paddle.static import InputSpec
@@ -55,19 +56,47 @@ def build_model(config, mode="train"):
     return arch
 
 
+def _resolve_cinn_backend(config):
+    """Map `Global.use_cinn` to the `backend` argument of `paddle.jit.to_static`.
+
+    - use_cinn=True:  backend="CINN". Paddle's backend guard turns on prim
+      decomposition and FLAGS_use_cinn for the compiled program, so no extra
+      FLAGS_* environment variables are needed.
+    - use_cinn=False: backend=None, i.e. plain dy2static on PHI kernels.
+    - not set:        keep paddle's own default (unchanged legacy behavior).
+    """
+    use_cinn = config["Global"].get("use_cinn", None)
+    if use_cinn is None:
+        return {}
+    if not use_cinn:
+        return {"backend": None}
+    if not paddle.is_compiled_with_cinn():
+        logger.warning(
+            "Global.use_cinn=True but the installed paddle is not compiled "
+            "with CINN, fall back to dy2static without CINN."
+        )
+        return {"backend": None}
+    return {"backend": "CINN"}
+
+
 def apply_to_static(config, model, is_rec):
-    support_to_static = config['Global'].get('to_static', False)
+    # CINN works on the static graph, so use_cinn implies to_static.
+    use_cinn = config["Global"].get("use_cinn", False)
+    support_to_static = config["Global"].get("to_static", False) or use_cinn
 
     if support_to_static:
         specs = None
-        if 'image_shape' in config['Global']:
-            specs = [InputSpec([None] + config['Global']['image_shape'])]
+        if "image_shape" in config["Global"]:
+            specs = [InputSpec([None] + config["Global"]["image_shape"])]
             specs[0].stop_gradient = True
             if is_rec:
-                specs.append(InputSpec([None, 1], 'int64', stop_gradient=True))
-        model = to_static(model, input_spec=specs)
-        logger.info("Successfully to apply @to_static with specs: {}".format(
-            specs))
+                specs.append(InputSpec([None, 1], "int64", stop_gradient=True))
+        backend_kwargs = _resolve_cinn_backend(config)
+        model = to_static(model, input_spec=specs, **backend_kwargs)
+        logger.info(
+            "Successfully to apply @to_static with specs: {}, "
+            "backend: {}".format(specs, backend_kwargs.get("backend", "default"))
+        )
     return model
 
 
@@ -77,7 +106,7 @@ class RecModel(TheseusLayer):
         backbone_config = config["Backbone"]
         backbone_name = backbone_config.pop("name")
         self.backbone = eval(backbone_name)(**backbone_config)
-        self.head_feature_from = config.get('head_feature_from', 'neck')
+        self.head_feature_from = config.get("head_feature_from", "neck")
 
         if "BackboneStopLayer" in config:
             backbone_stop_layer = config["BackboneStopLayer"]["name"]
@@ -94,29 +123,27 @@ class RecModel(TheseusLayer):
             self.head = None
 
     def forward(self, x, label=None):
-        
+
         out = dict()
         x = self.backbone(x)
         out["backbone"] = x
         if self.neck is not None:
             feat = self.neck(x)
             out["neck"] = feat
-        out["features"] = out['neck'] if self.neck else x
+        out["features"] = out["neck"] if self.neck else x
         if self.head is not None:
-            if self.head_feature_from == 'backbone':
-                y = self.head(out['backbone'], label)
-            elif self.head_feature_from == 'neck':
-                y = self.head(out['features'], label)
+            if self.head_feature_from == "backbone":
+                y = self.head(out["backbone"], label)
+            elif self.head_feature_from == "neck":
+                y = self.head(out["features"], label)
             out["logits"] = y
         return out
 
 
 class DistillationModel(nn.Layer):
-    def __init__(self,
-                 models=None,
-                 pretrained_list=None,
-                 freeze_params_list=None,
-                 **kargs):
+    def __init__(
+        self, models=None, pretrained_list=None, freeze_params_list=None, **kargs
+    ):
         super().__init__()
         assert isinstance(models, list)
         self.model_list = []
@@ -143,8 +170,7 @@ class DistillationModel(nn.Layer):
         if pretrained_list is not None:
             for idx, pretrained in enumerate(pretrained_list):
                 if pretrained is not None:
-                    load_dygraph_pretrain(
-                        self.model_name_list[idx], path=pretrained)
+                    load_dygraph_pretrain(self.model_name_list[idx], path=pretrained)
 
     def forward(self, x, label=None):
         result_dict = dict()
@@ -157,11 +183,9 @@ class DistillationModel(nn.Layer):
 
 
 class AttentionModel(DistillationModel):
-    def __init__(self,
-                 models=None,
-                 pretrained_list=None,
-                 freeze_params_list=None,
-                 **kargs):
+    def __init__(
+        self, models=None, pretrained_list=None, freeze_params_list=None, **kargs
+    ):
         super().__init__(models, pretrained_list, freeze_params_list, **kargs)
 
     def forward(self, x, label=None):
