@@ -1,4 +1,4 @@
-# copyright (c) 2024 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2026 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -649,7 +649,8 @@ class RepMixer(nn.Layer):
         self.norm.reparameterize()
 
         if isinstance(self.layer_scale, LayerScale2d):
-            w = self.mixer.id_tensor + self.layer_scale.gamma.unsqueeze(0) * (
+            gamma = self.layer_scale.gamma.reshape([-1, 1, 1, 1])
+            w = self.mixer.id_tensor + gamma * (
                     self.mixer.reparam_conv.weight - self.norm.reparam_conv.weight
             )
             b = paddle.squeeze(self.layer_scale.gamma) * (

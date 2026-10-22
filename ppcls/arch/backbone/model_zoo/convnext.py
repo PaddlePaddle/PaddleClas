@@ -348,14 +348,15 @@ class GRN(nn.Layer):
             default_initializer=zeros_)
 
     def forward(self, x):
+        # Keep the spatial L2 norm gradient finite at zero.
         if self.channels_last:
-            gx = paddle.sqrt((x * x).sum(axis=[1, 2], keepdim=True))
+            gx = paddle.linalg.norm(x, p="fro", axis=[1, 2], keepdim=True)
             nx = gx / (gx.mean(axis=-1, keepdim=True) + self.eps)
             w = self.gamma.reshape([1, 1, 1, -1])
             b = self.beta.reshape([1, 1, 1, -1])
             return x + b + w * (x * nx)
         else:
-            gx = paddle.sqrt((x * x).sum(axis=[2, 3], keepdim=True))
+            gx = paddle.linalg.norm(x, p="fro", axis=[2, 3], keepdim=True)
             nx = gx / (gx.mean(axis=1, keepdim=True) + self.eps)
             w = self.gamma.reshape([1, -1, 1, 1])
             b = self.beta.reshape([1, -1, 1, 1])
