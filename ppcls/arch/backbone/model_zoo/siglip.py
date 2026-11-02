@@ -20,18 +20,11 @@ import paddle.nn.functional as F
 from ....utils.save_load import load_dygraph_pretrain
 
 
-class _ModelURLs(dict):
-    """Return no checkpoint URL for architecture-only model variants."""
-
-    def __missing__(self, key):
-        return None
-
-
-MODEL_URLS = _ModelURLs({
+MODEL_URLS = {
     "vit_base_patch16_siglip_256": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/vit_base_patch16_siglip_256_pretrained.pdparams",
     "vit_base_patch32_siglip_256": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/vit_base_patch32_siglip_256_pretrained.pdparams",
     "vit_large_patch16_siglip_256": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/vit_large_patch16_siglip_256_pretrained.pdparams",
-})
+}
 
 __all__ = list(MODEL_URLS.keys())
 
@@ -39,12 +32,6 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
     if pretrained is False:
         pass
     elif pretrained is True:
-        if model_url is None:
-            raise ValueError(
-                "No official pretrained checkpoint is registered for this "
-                "SigLIP variant. Set pretrained=False or provide a local "
-                "checkpoint path."
-            )
         load_dygraph_pretrain(model, model_url, use_ssld=use_ssld)
     elif isinstance(pretrained, str):
         load_dygraph_pretrain(model, pretrained)
@@ -357,7 +344,6 @@ class SigLIPVisionTransformer(nn.Layer):
         self._init_weights()
     
     def _init_weights(self):
-        """Initialize weights following timm's approach"""
         for name, m in self.named_sublayers():
             if isinstance(m, nn.Linear):
                 nn.initializer.TruncatedNormal(std=0.02)(m.weight)
@@ -427,7 +413,7 @@ def vit_base_patch32_siglip_256(pretrained=False, class_num=1000, use_ssld=False
             class_num=class_num,
             act_layer=GELUTanh,
         ), kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_base_patch32_siglip_256"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_base_patch32_siglip_256"), use_ssld=use_ssld)
     return model
 
 
@@ -446,7 +432,7 @@ def vit_base_patch16_siglip_224(pretrained=False, class_num=1000, use_ssld=False
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_base_patch16_siglip_224"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_base_patch16_siglip_224"), use_ssld=use_ssld)
     return model
 
 
@@ -465,7 +451,7 @@ def vit_base_patch16_siglip_256(pretrained=False, class_num=1000, use_ssld=False
             class_num=class_num,
             act_layer=nn.GELU,
         ), kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_base_patch16_siglip_256"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_base_patch16_siglip_256"), use_ssld=use_ssld)
     return model
 
 
@@ -484,7 +470,7 @@ def vit_base_patch16_siglip_384(pretrained=False, class_num=1000, use_ssld=False
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_base_patch16_siglip_384"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_base_patch16_siglip_384"), use_ssld=use_ssld)
     return model
 
 
@@ -503,7 +489,7 @@ def vit_base_patch16_siglip_512(pretrained=False, class_num=1000, use_ssld=False
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_base_patch16_siglip_512"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_base_patch16_siglip_512"), use_ssld=use_ssld)
     return model
 
 
@@ -522,7 +508,7 @@ def vit_large_patch16_siglip_256(pretrained=False, class_num=1000, use_ssld=Fals
             class_num=class_num,
             act_layer=nn.GELU,
         ), kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_large_patch16_siglip_256"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_large_patch16_siglip_256"), use_ssld=use_ssld)
     return model
 
 
@@ -541,7 +527,7 @@ def vit_large_patch16_siglip_384(pretrained=False, class_num=1000, use_ssld=Fals
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_large_patch16_siglip_384"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_large_patch16_siglip_384"), use_ssld=use_ssld)
     return model
 
 
@@ -560,7 +546,7 @@ def vit_large_patch16_siglip_512(pretrained=False, class_num=1000, use_ssld=Fals
         act_layer=GELUTanh,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_large_patch16_siglip_512"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_large_patch16_siglip_512"), use_ssld=use_ssld)
     return model
 
 
@@ -579,7 +565,7 @@ def vit_so400m_patch14_siglip_224(pretrained=False, class_num=1000, use_ssld=Fal
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch14_siglip_224"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch14_siglip_224"), use_ssld=use_ssld)
     return model
 
 
@@ -598,7 +584,7 @@ def vit_so400m_patch14_siglip_378(pretrained=False, class_num=1000, use_ssld=Fal
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch14_siglip_378"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch14_siglip_378"), use_ssld=use_ssld)
     return model
 
 
@@ -618,7 +604,7 @@ def vit_so400m_patch14_siglip_384(pretrained=False, class_num=1000, use_ssld=Fal
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch14_siglip_384"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch14_siglip_384"), use_ssld=use_ssld)
     return model
 
 
@@ -637,7 +623,7 @@ def vit_so400m_patch16_siglip_256(pretrained=False, class_num=1000, use_ssld=Fal
         act_layer=GELUTanh,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch16_siglip_256"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch16_siglip_256"), use_ssld=use_ssld)
     return model
 
 
@@ -656,7 +642,7 @@ def vit_so400m_patch16_siglip_384(pretrained=False, class_num=1000, use_ssld=Fal
         act_layer=GELUTanh,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch16_siglip_384"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch16_siglip_384"), use_ssld=use_ssld)
     return model
 
 
@@ -675,7 +661,7 @@ def vit_so400m_patch16_siglip_512(pretrained=False, class_num=1000, use_ssld=Fal
         act_layer=GELUTanh,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch16_siglip_512"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch16_siglip_512"), use_ssld=use_ssld)
     return model
 
 
@@ -694,7 +680,7 @@ def vit_giantopt_patch16_siglip_256(pretrained=False, class_num=1000, use_ssld=F
         act_layer=GELUTanh,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_giantopt_patch16_siglip_256"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_giantopt_patch16_siglip_256"), use_ssld=use_ssld)
     return model
 
 
@@ -713,7 +699,7 @@ def vit_giantopt_patch16_siglip_384(pretrained=False, class_num=1000, use_ssld=F
         act_layer=GELUTanh,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_giantopt_patch16_siglip_384"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_giantopt_patch16_siglip_384"), use_ssld=use_ssld)
     return model
 
 
@@ -732,7 +718,7 @@ def vit_base_patch32_siglip_gap_256(pretrained=False, class_num=1000, use_ssld=F
         act_layer=GELUTanh,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_base_patch32_siglip_gap_256"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_base_patch32_siglip_gap_256"), use_ssld=use_ssld)
     return model
 
 
@@ -751,7 +737,7 @@ def vit_base_patch16_siglip_gap_224(pretrained=False, class_num=1000, use_ssld=F
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_base_patch16_siglip_gap_224"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_base_patch16_siglip_gap_224"), use_ssld=use_ssld)
     return model
 
 
@@ -770,7 +756,7 @@ def vit_base_patch16_siglip_gap_256(pretrained=False, class_num=1000, use_ssld=F
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_base_patch16_siglip_gap_256"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_base_patch16_siglip_gap_256"), use_ssld=use_ssld)
     return model
 
 
@@ -789,7 +775,7 @@ def vit_base_patch16_siglip_gap_384(pretrained=False, class_num=1000, use_ssld=F
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_base_patch16_siglip_gap_384"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_base_patch16_siglip_gap_384"), use_ssld=use_ssld)
     return model
 
 
@@ -809,7 +795,7 @@ def vit_base_patch16_siglip_gap_512(pretrained=False, class_num=1000, use_ssld=F
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_base_patch16_siglip_gap_512"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_base_patch16_siglip_gap_512"), use_ssld=use_ssld)
     return model
 
 
@@ -828,7 +814,7 @@ def vit_large_patch16_siglip_gap_256(pretrained=False, class_num=1000, use_ssld=
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_large_patch16_siglip_gap_256"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_large_patch16_siglip_gap_256"), use_ssld=use_ssld)
     return model
 
 
@@ -847,7 +833,7 @@ def vit_large_patch16_siglip_gap_384(pretrained=False, class_num=1000, use_ssld=
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_large_patch16_siglip_gap_384"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_large_patch16_siglip_gap_384"), use_ssld=use_ssld)
     return model
 
 
@@ -866,7 +852,7 @@ def vit_large_patch16_siglip_gap_512(pretrained=False, class_num=1000, use_ssld=
         act_layer=GELUTanh,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_large_patch16_siglip_gap_512"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_large_patch16_siglip_gap_512"), use_ssld=use_ssld)
     return model
 
 
@@ -885,7 +871,7 @@ def vit_so400m_patch14_siglip_gap_224(pretrained=False, class_num=1000, use_ssld
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch14_siglip_gap_224"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch14_siglip_gap_224"), use_ssld=use_ssld)
     return model
 
 
@@ -904,7 +890,7 @@ def vit_so400m_patch14_siglip_gap_378(pretrained=False, class_num=1000, use_ssld
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch14_siglip_gap_378"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch14_siglip_gap_378"), use_ssld=use_ssld)
     return model
 
 
@@ -923,7 +909,7 @@ def vit_so400m_patch14_siglip_gap_384(pretrained=False, class_num=1000, use_ssld
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch14_siglip_gap_384"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch14_siglip_gap_384"), use_ssld=use_ssld)
     return model
 
 
@@ -942,7 +928,7 @@ def vit_so400m_patch14_siglip_gap_448(pretrained=False, class_num=1000, use_ssld
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch14_siglip_gap_448"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch14_siglip_gap_448"), use_ssld=use_ssld)
     return model
 
 
@@ -961,7 +947,7 @@ def vit_so400m_patch14_siglip_gap_896(pretrained=False, class_num=1000, use_ssld
         act_layer=nn.GELU,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch14_siglip_gap_896"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch14_siglip_gap_896"), use_ssld=use_ssld)
     return model
 
 
@@ -981,7 +967,7 @@ def vit_so400m_patch16_siglip_gap_256(pretrained=False, class_num=1000, use_ssld
         act_layer=GELUTanh,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch16_siglip_gap_256"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch16_siglip_gap_256"), use_ssld=use_ssld)
     return model
 
 
@@ -1000,7 +986,7 @@ def vit_so400m_patch16_siglip_gap_384(pretrained=False, class_num=1000, use_ssld
         act_layer=GELUTanh,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch16_siglip_gap_384"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch16_siglip_gap_384"), use_ssld=use_ssld)
     return model
 
 
@@ -1019,7 +1005,7 @@ def vit_so400m_patch16_siglip_gap_512(pretrained=False, class_num=1000, use_ssld
         act_layer=GELUTanh,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_so400m_patch16_siglip_gap_512"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_so400m_patch16_siglip_gap_512"), use_ssld=use_ssld)
     return model
 
 
@@ -1038,7 +1024,7 @@ def vit_giantopt_patch16_siglip_gap_256(pretrained=False, class_num=1000, use_ss
         act_layer=GELUTanh,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_giantopt_patch16_siglip_gap_256"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_giantopt_patch16_siglip_gap_256"), use_ssld=use_ssld)
     return model
 
 
@@ -1057,7 +1043,7 @@ def vit_giantopt_patch16_siglip_gap_384(pretrained=False, class_num=1000, use_ss
         act_layer=GELUTanh,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["vit_giantopt_patch16_siglip_gap_384"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("vit_giantopt_patch16_siglip_gap_384"), use_ssld=use_ssld)
     return model
 
 
@@ -1329,7 +1315,7 @@ def naflexvit_base_patch16_siglip(pretrained=False, use_ssld=False, **kwargs):
         reg_tokens=0,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["naflexvit_base_patch16_siglip"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("naflexvit_base_patch16_siglip"), use_ssld=use_ssld)
     return model
 
 
@@ -1348,7 +1334,7 @@ def naflexvit_so400m_patch16_siglip(pretrained=False, use_ssld=False, **kwargs):
         reg_tokens=0,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["naflexvit_so400m_patch16_siglip"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("naflexvit_so400m_patch16_siglip"), use_ssld=use_ssld)
     return model
 
 
@@ -1369,7 +1355,7 @@ def naflexvit_base_patch16_gap(pretrained=False, use_ssld=False, **kwargs):
         init_values=1e-5,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["naflexvit_base_patch16_gap"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("naflexvit_base_patch16_gap"), use_ssld=use_ssld)
     return model
 
 
@@ -1391,7 +1377,7 @@ def naflexvit_base_patch16_par_gap(pretrained=False, use_ssld=False, **kwargs):
         pos_embed_ar_preserving=True,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["naflexvit_base_patch16_par_gap"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("naflexvit_base_patch16_par_gap"), use_ssld=use_ssld)
     return model
 
 
@@ -1415,5 +1401,5 @@ def naflexvit_base_patch16_parfac_gap(pretrained=False, use_ssld=False, **kwargs
         pos_embed_ar_preserving=True,
         **kwargs
     )
-    _load_pretrained(pretrained, model, MODEL_URLS["naflexvit_base_patch16_parfac_gap"], use_ssld=use_ssld)
+    _load_pretrained(pretrained, model, MODEL_URLS.get("naflexvit_base_patch16_parfac_gap"), use_ssld=use_ssld)
     return model
