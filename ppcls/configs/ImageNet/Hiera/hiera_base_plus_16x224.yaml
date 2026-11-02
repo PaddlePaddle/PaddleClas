@@ -50,11 +50,12 @@ DataLoader:
   Train:
     dataset:
       name: VideoDataset
-      image_root: ./video_test_data/train/
-      cls_label_path: ./video_test_data/reverse_video_search.csv
-      num_seg: 16
+      image_root: ./dataset/K400/train/
+      cls_label_path: ./dataset/K400/reverse_video_search.csv
+      label_map_file: ppcls/utils/k400_label_list.txt
       transform_ops:
         - DecodeVideo:
+            num_seg: 16
         - ResizeVideo:
             resize_short: 256
         - RandCropVideo:
@@ -76,11 +77,11 @@ DataLoader:
   Eval:
     dataset:
       name: VideoDataset
-      image_root: ./video_test_data/test/
-      cls_label_path: ./video_test_data/reverse_video_search.csv
-      num_seg: 16
+      image_root: ./dataset/K400/test/
+      label_map_file: ppcls/utils/k400_label_list.txt
       transform_ops:
         - DecodeVideo:
+            num_seg: 16
         - ResizeVideo:
             resize_short: 256
         - CenterCropVideo:
@@ -99,10 +100,11 @@ DataLoader:
       use_shared_memory: True
 
 Infer:
-  infer_imgs: video_test_data/test/trimming_trees/dxe9LkBB4Q8.mp4
+  infer_imgs: ./dataset/K400/test/trimming_trees/dxe9LkBB4Q8.mp4
   batch_size: 1
   transforms:
     - DecodeVideo:
+        num_seg: 16
     - ResizeVideo:
         resize_short: 256
     - CenterCropVideo:
@@ -114,7 +116,7 @@ Infer:
   PostProcess:
     name: Topk
     topk: 5
-    class_id_map_file: k400_classes.txt
+    class_id_map_file: ppcls/utils/k400_label_list.txt
 
 Metric:
   Train:
