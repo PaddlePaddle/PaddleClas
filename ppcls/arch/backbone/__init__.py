@@ -707,6 +707,14 @@ from .model_zoo.swiftformer import (
     SwiftFormer_L1,
     SwiftFormer_L3,
 )
+from .model_zoo.lowformer import (
+    LowFormer_b0,
+    LowFormer_b1,
+    LowFormer_b15,
+    LowFormer_b3,
+    LowFormer_e1,
+    LowFormer_e2,
+    LowFormer_e3,
 from .model_zoo.efficientvit import (
     Efficientvit_B0,
     Efficientvit_B1,
