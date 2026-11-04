@@ -330,6 +330,11 @@ from .model_zoo.naflexvit import (
     naflexvit_base_patch16_par_gap,
     naflexvit_base_patch16_parfac_gap,
 )
+from .model_zoo.csatv2 import (
+    CSATv2_512,
+    CSATv2_21m_512,
+    CSATv2_21m_640,
+)
 from .model_zoo.distilled_vision_transformer import (
     DeiT_tiny_patch16_224,
     DeiT_small_patch16_224,
