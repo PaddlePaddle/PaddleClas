@@ -104,6 +104,7 @@ class PatchEmbed(nn.Layer):
 class MetaCLIP(nn.Layer):
     def __init__(self, img_size=224, patch_size=16, in_chans=3, class_num=1000, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4., qkv_bias=True, pre_norm=True):
         super().__init__()
+        self.class_num = class_num
         self.patch_embed = PatchEmbed(img_size=img_size, patch_size=patch_size, in_chans=in_chans, embed_dim=embed_dim)
         num_patches = (img_size // patch_size) ** 2
 

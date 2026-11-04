@@ -31,6 +31,8 @@ AMP:
 # model architecture
 Arch:
   name: MetaCLIP_B_16
+  class_num: 1000
+  pretrained: True
   img_size: 224
   patch_size: 16
   in_chans: 3
