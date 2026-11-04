@@ -1,0 +1,62 @@
+===========================train_params===========================
+model_name:MambaVision_T
+python:python
+gpu_list:0
+-o Global.device:gpu
+-o Global.auto_cast:null
+-o Global.epochs:lite_train_lite_infer=1|whole_train_whole_infer=300
+-o Global.output_dir:./output/
+-o DataLoader.Train.sampler.batch_size:1
+-o Global.pretrained_model:null
+train_model_name:latest
+train_infer_img_dir:./dataset/ILSVRC2012/val
+-o Global.iter_per_epoch:1
+##
+trainer:norm_train|to_static_train
+norm_train:test_tipc/mambavision_train.py -c ppcls/configs/ImageNet/MambaVision/MambaVision_T.yaml -o Global.seed=2026 -o DataLoader.Train.sampler.shuffle=False -o DataLoader.Train.loader.num_workers=0 -o DataLoader.Train.loader.use_shared_memory=False -o Global.eval_during_train=False -o Global.save_interval=1
+pact_train:null
+fpgm_train:null
+distill_train:null
+to_static_train:-o Global.to_static=True
+null:null
+##
+===========================eval_params===========================
+eval:null
+null:null
+##
+===========================infer_params==========================
+-o Global.save_inference_dir:./inference
+-o Global.pretrained_model:
+norm_export:tools/export_model.py -c ppcls/configs/ImageNet/MambaVision/MambaVision_T.yaml
+quant_export:null
+fpgm_export:null
+distill_export:null
+kl_quant:null
+export2:null
+pretrained_model_url:null
+infer_model:../inference/
+infer_export:True
+infer_quant:False
+inference:../test_tipc/mambavision_predict.py -c configs/inference_cls.yaml
+-o Global.use_gpu:False
+-o Global.enable_mkldnn:False
+-o Global.cpu_num_threads:1
+-o Global.batch_size:1
+-o Global.use_tensorrt:False
+-o Global.use_fp16:False
+-o Global.inference_model_dir:../inference
+-o Global.infer_imgs:../dataset/ILSVRC2012/val/n01440764/ILSVRC2012_val_00000293.JPEG
+-o Global.save_log_path:null
+-o Global.benchmark:False
+-o Global.ir_optim:False
+null:null
+===========================train_benchmark_params==========================
+batch_size:32
+fp_items:fp32
+epoch:1
+model_type:norm_train|to_static_train
+num_workers:4
+--profiler_options:batch_range=[10,20];state=GPU;tracer_option=Default;profile_path=model.profile
+flags:FLAGS_eager_delete_tensor_gb=0.0;FLAGS_fraction_of_gpu_memory_to_use=0.90
+===========================infer_benchmark_params==========================
+random_infer_input:[{float32,[3,224,224]}]
