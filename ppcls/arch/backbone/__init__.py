@@ -749,6 +749,16 @@ from .model_zoo.swiftformer import (
     SwiftFormer_L1,
     SwiftFormer_L3,
 )
+from .model_zoo.cpubone import (
+    CPUBone_nano,
+    CPUBone_t0,
+    CPUBone_s0,
+    CPUBone_b0_bfrobust,
+    CPUBone_b1_bfrobust,
+    CPUBone_b1_dwnorm,
+    CPUBone_b2_bfrobust,
+    CPUBone_b2pt5_dwnorm,
+    CPUBone_b3,
 from .model_zoo.shvit import (
     SHViT_S1,
     SHViT_S2,
