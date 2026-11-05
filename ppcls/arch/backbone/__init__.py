@@ -639,6 +639,14 @@ from .model_zoo.uniformer import (
     UniFormer_base,
     UniFormer_base_ls,
 )
+from .model_zoo.iformer import (
+    iformer_small,
+    iformer_small_384,
+    iformer_base,
+    iformer_base_384,
+    iformer_large,
+    iformer_large_384,
+)
 from .model_zoo.yolo11 import (
     YOLO11_cls_n,
     YOLO11_cls_s,
