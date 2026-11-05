@@ -50,6 +50,12 @@ from ppcls.data.preprocess.ops.operators import RandomRotation
 from ppcls.data.preprocess.ops.operators import Padv2
 from ppcls.data.preprocess.ops.operators import RandomRot90
 from ppcls.data.preprocess.ops.operators import PCALighting
+from ppcls.data.preprocess.ops.video_operators import DecodeVideo
+from ppcls.data.preprocess.ops.video_operators import ResizeVideo
+from ppcls.data.preprocess.ops.video_operators import RandCropVideo
+from ppcls.data.preprocess.ops.video_operators import CenterCropVideo
+from ppcls.data.preprocess.ops.video_operators import RandFlipVideo
+from ppcls.data.preprocess.ops.video_operators import NormalizeVideo
 from .ops.operators import format_data
 from paddle.vision.transforms import Pad as Pad_paddle_vision
 
