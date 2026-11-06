@@ -1,0 +1,51 @@
+# GhostNetV3-x1.0 CINN 复现
+
+单卡完整分类模型、FP32、关闭 TF32，无 AMP；官方预训练权重。两端加载相同权重与数据，训练 AdamW lr=1e-5、weight_decay=0.01，batch=16、输入224×224；预处理为ImageNet mean/std。原生 BatchNorm 保留，其余使用默认 CINN 分解，不额外保留 Linear。
+
+## 环境
+
+两端均显式设置 drop_rate=0.0，与历史对齐实验一致，不把随机 dropout 差异计入 CINN 比较。
+
+本地验证环境：V100S 32GB、Python3.10.20、Paddle3.5.0.dev20260722（08de6be508389d5277b02e78fbc8742f1ed78160，编译CUDA12.6）、numpy1.26.4；安装对应 Paddle GPU 包和 PaddleClas requirements。
+
+
+## 数据与权重
+
+data/data.npz 为历史 ImageNet100 子集的前320张训练和16张验证图片，已预处理成RGB224，来源与选择见data/manifest.json。须遵守原数据集使用条款。默认1个epoch共20步，是交付入口快速验证，不是完整收敛测试。历史长跑数据为3200/800图片，若复现历史长跑，须另备对应 data.npz 与 manifest.json，设置 DATA_DIR；不可把本目录的小子集结果当作历史长跑结果。
+
+权重暂不上传。外部 CHECKPOINT_DIR 下提供 initial.pdparams 和 inference.pdparams，本次两者均为相同官方预训练权重，不使用各端分别训练后的权重作推理对齐。大小和SHA256见asset_manifest.json；入口自动校验打包数据及权重。外部DATA_DIR由使用者选择，训练记录其manifest哈希。
+
+## 运行
+
+历史完整子集的文件列表、预处理、标签映射及 data.npz 大小/SHA256 见 外部资源包 full_dataset_reference.json；该较大的数据文件不包含在本次快速测试包内。
+
+```bash
+export CINN_RESOURCE_DIR=/path/to/ghostnetv3-resources
+export CHECKPOINT_DIR=/path/to/local-weights
+export PYTHON_BIN=/path/to/python
+bash tests/cinn/ghostnetv3/run_model.sh
+bash tests/cinn/ghostnetv3/run_model_cinn.sh
+# 如需长跑，先准备原始3200/800数据集：
+MODE=dynamic DATA_DIR=/path/to/full-subset EPOCHS=30 RESULTS_DIR=results/full bash tests/cinn/ghostnetv3/train.sh
+MODE=cinn DATA_DIR=/path/to/full-subset EPOCHS=30 RESULTS_DIR=results/full bash tests/cinn/ghostnetv3/train.sh
+MODE=dynamic RESULTS_DIR=results/infer1 bash tests/cinn/ghostnetv3/infer.sh
+MODE=cinn RESULTS_DIR=results/infer1 bash tests/cinn/ghostnetv3/infer.sh
+```
+
+GPU_ID默认0。重复运行必须指定新的RESULTS_DIR，拒绝覆盖旧目录。train.sh支持RESUME指定可信训练状态（不要跨两端混用）。run_model.py负责调用train_impl.py或infer_impl.py；所有入口在本目录中自包含，不依赖个人绝对路径。
+
+## 测量与验证
+
+训练记录每步loss、train_ms及每epoch验证，输出config/environment、final权重和训练状态。独立推理以固定验证batch前向，预热5次后计时50次，GPU同步，排除预处理、H2D和首次编译；保存logits.npy与inference.json。CINN日志必须存在编译标志。
+
+吞吐提升=(动态图ms/CINNms-1)×100%；FPS=batch×1000/ms。该短测只验证入口及固定权重数值，不能证明完整收敛或将一次短测当作稳定性能结论。运行产物和权重均不提交Git。
+
+2026-10-07 交付入口回归通过：两端各1 epoch/20步，loss均有限，最大绝对差2.38e-5；共同权重独立推理logits最大绝对差7.63e-6。单次短测动态/CINN分别82.186/44.117ms，仅用于入口验证，不替代历史长程材料。
+
+## Official repository entry
+
+2026-11-06 local entry regression on develop c37ec6b with the two missing import-list parentheses fixed: both modes completed one epoch (20 steps) and independent inference. Loss max difference 4.10e-5; same-checkpoint logits max difference 7.63e-6. This is a short entry regression, not a new convergence run.
+
+Training and inference implementation is shared in tests/cinn/_shared/; keep that directory when copying this entry.
+
+Import PaddleClas from this checkout; no historical import-syntax patch is applied. External resources are not included: CINN_RESOURCE_DIR must contain the data/ and assets/ files in asset_manifest.json. CHECKPOINT_DIR supplies the matching weights. Obtain these from the contributor; public download links will be maintained later. Follow the source dataset license. Historical measurements above are not new convergence results for this checkout.
