@@ -670,12 +670,48 @@ from .model_zoo.maxxvit import (
     CoAtNet_rmlp_2_rw_224,
     CoAtNet_rmlp_nano_rw_224,
 )
-from .model_zoo.uniformer import UniFormer_small, UniFormer_small_plus, UniFormer_small_plus_dim64, UniFormer_base, UniFormer_base_ls
-from .model_zoo.eva02 import EVA02_tiny_patch14_336, EVA02_small_patch14_336, EVA02_base_patch14_448, EVA02_large_patch14_448
-from .model_zoo.efficientvit import Efficientvit_B0, Efficientvit_B1, Efficientvit_B2, Efficientvit_B3, Efficientvit_L1, Efficientvit_L2, Efficientvit_L3
-from .model_zoo.fastvit import FastViT_T8, FastViT_T12, FastViT_SA12, FastViT_SA24, FastViT_SA36, FastViT_MA36
-from .model_zoo.edgenext import EdgeNeXt_XX_Small, EdgeNeXt_X_Small, EdgeNeXt_Small, EdgeNeXt_Base
-from .model_zoo.swiftformer import SwiftFormer_XS, SwiftFormer_S, SwiftFormer_L1, SwiftFormer_L3
+from .model_zoo.uniformer import (
+    UniFormer_small,
+    UniFormer_small_plus,
+    UniFormer_small_plus_dim64,
+    UniFormer_base,
+    UniFormer_base_ls,
+)
+from .model_zoo.eva02 import (
+    EVA02_tiny_patch14_336,
+    EVA02_small_patch14_336,
+    EVA02_base_patch14_448,
+    EVA02_large_patch14_448,
+)
+from .model_zoo.efficientvit import (
+    Efficientvit_B0,
+    Efficientvit_B1,
+    Efficientvit_B2,
+    Efficientvit_B3,
+    Efficientvit_L1,
+    Efficientvit_L2,
+    Efficientvit_L3,
+)
+from .model_zoo.fastvit import (
+    FastViT_T8,
+    FastViT_T12,
+    FastViT_SA12,
+    FastViT_SA24,
+    FastViT_SA36,
+    FastViT_MA36,
+)
+from .model_zoo.edgenext import (
+    EdgeNeXt_XX_Small,
+    EdgeNeXt_X_Small,
+    EdgeNeXt_Small,
+    EdgeNeXt_Base,
+)
+from .model_zoo.swiftformer import (
+    SwiftFormer_XS,
+    SwiftFormer_S,
+    SwiftFormer_L1,
+    SwiftFormer_L3,
+)
 from .model_zoo.uniformer import (
     UniFormer_small,
     UniFormer_small_plus,
@@ -720,6 +756,7 @@ from .model_zoo.lowformer import (
     LowFormer_e1,
     LowFormer_e2,
     LowFormer_e3,
+)
 from .model_zoo.efficientvit import (
     Efficientvit_B0,
     Efficientvit_B1,
@@ -759,6 +796,7 @@ from .model_zoo.cpubone import (
     CPUBone_b2_bfrobust,
     CPUBone_b2pt5_dwnorm,
     CPUBone_b3,
+)
 from .model_zoo.shvit import (
     SHViT_S1,
     SHViT_S2,

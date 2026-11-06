@@ -1,0 +1,26 @@
+[
+  {
+    "kind": "weight",
+    "file": "initial.pdparams",
+    "bytes": 330614632,
+    "sha256": "3f6f59864290814914985a794999224db4dfd6b752f253fb782cc595f2de8f56"
+  },
+  {
+    "kind": "weight",
+    "file": "inference.pdparams",
+    "bytes": 330614632,
+    "sha256": "3f6f59864290814914985a794999224db4dfd6b752f253fb782cc595f2de8f56"
+  },
+  {
+    "kind": "asset",
+    "file": "data/data.npz",
+    "bytes": 42046185,
+    "sha256": "e3f15a9a6c0df9ed046d48d19f2f7824fd050aff23b2e9addfc39829f45032ac"
+  },
+  {
+    "kind": "asset",
+    "file": "data/manifest.json",
+    "bytes": 16663,
+    "sha256": "2b9041e06ef9865c751bfff166abdb7c0923d81009017ecdf862a54dafebb339"
+  }
+]
