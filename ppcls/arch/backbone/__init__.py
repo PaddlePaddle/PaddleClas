@@ -180,6 +180,9 @@ from .model_zoo.resnest import (
     ResNeSt269,
 )
 from .model_zoo.googlenet import GoogLeNet
+
+from .model_zoo.siglip import vit_base_patch16_siglip_256,vit_base_patch32_siglip_256,vit_large_patch16_siglip_256
+
 from .model_zoo.mobilenet_v2 import (
     MobileNetV2_x0_25,
     MobileNetV2_x0_5,
@@ -712,6 +715,7 @@ from .model_zoo.swiftformer import (
     SwiftFormer_L1,
     SwiftFormer_L3,
 )
+from .model_zoo.metaclip import MetaCLIP_B_16
 from .model_zoo.uniformer import (
     UniFormer_small,
     UniFormer_small_plus,
