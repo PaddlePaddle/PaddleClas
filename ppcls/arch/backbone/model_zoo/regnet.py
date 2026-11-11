@@ -24,8 +24,8 @@ import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
+from paddle.nn import Conv2D, BatchNorm, Linear
+from paddle.nn import AdaptiveAvgPool2D
 from paddle.nn.initializer import Uniform
 import math
 
@@ -56,6 +56,30 @@ MODEL_URLS = {
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_16GF_pretrained.pdparams",
     "RegNetX_32GF":
     "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph/RegNetX_32GF_pretrained.pdparams",
+    "RegNetY_200":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/regnety_002.pdparams",
+    "RegNetY_400":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/regnety_004.pdparams",
+    "RegNetY_600":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/regnety_006.pdparams",
+    "RegNetY_800":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/regnety_008.pdparams",
+    "RegNetY_1600":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/regnety_016.pdparams",
+    "RegNetY_3200":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/regnety_032.pdparams",
+    "RegNetY_4000":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/regnety_040.pdparams",
+    "RegNetY_6400":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/regnety_064.pdparams",
+    "RegNetY_8000":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/regnety_080.pdparams",
+    "RegNetY_12000":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/regnety_120.pdparams",
+    "RegNetY_16000":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/regnety_160.pdparams",
+    "RegNetY_32000":
+    "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_pretrained_model/regnety_320.pdparams",
 }
 
 __all__ = list(MODEL_URLS.keys())
@@ -147,9 +171,7 @@ class BottleneckBlock(nn.Layer):
                  name=None):
         super(BottleneckBlock, self).__init__()
 
-        # Compute the bottleneck width
         w_b = int(round(num_filters * bm))
-        # Compute the number of groups
         num_gs = w_b // gw
         self.se_on = se_on
         self.conv0 = ConvBNLayer(
@@ -169,11 +191,11 @@ class BottleneckBlock(nn.Layer):
             act="relu",
             name=name + "_branch2b")
         if se_on:
-            w_se = int(round(num_channels * se_r))
+            # timm: se_channels = int(round(in_chs * se_ratio))
+            mid_channels = int(round(num_channels * se_r))
             self.se_block = SELayer(
                 num_channels=w_b,
-                num_filters=w_b,
-                reduction_ratio=w_se,
+                mid_channels=mid_channels,
                 name=name + "_branch2se")
         self.conv2 = ConvBNLayer(
             num_channels=w_b,
@@ -210,41 +232,36 @@ class BottleneckBlock(nn.Layer):
 
 
 class SELayer(nn.Layer):
-    def __init__(self, num_channels, num_filters, reduction_ratio, name=None):
+    """Squeeze-and-Excitation layer.
+    # Original: timm.layers.SEModule
+    """
+
+    def __init__(self, num_channels, mid_channels, name=None):
         super(SELayer, self).__init__()
 
         self.pool2d_gap = AdaptiveAvgPool2D(1)
-
-        self._num_channels = num_channels
-
-        med_ch = int(num_channels / reduction_ratio)
-        stdv = 1.0 / math.sqrt(num_channels * 1.0)
-        self.squeeze = Linear(
+        # timm: self.fc1 = nn.Conv2d(channels, rd_channels, 1, bias=True)
+        self.conv_reduce = Conv2D(
             num_channels,
-            med_ch,
-            weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv), name=name + "_sqz_weights"),
-            bias_attr=ParamAttr(name=name + "_sqz_offset"))
-
-        stdv = 1.0 / math.sqrt(med_ch * 1.0)
-        self.excitation = Linear(
-            med_ch,
-            num_filters,
-            weight_attr=ParamAttr(
-                initializer=Uniform(-stdv, stdv), name=name + "_exc_weights"),
-            bias_attr=ParamAttr(name=name + "_exc_offset"))
+            mid_channels,
+            1,
+            weight_attr=ParamAttr(name=name + "_reduce_w"),
+            bias_attr=ParamAttr(name=name + "_reduce_b"))
+        # timm: self.fc2 = nn.Conv2d(rd_channels, channels, 1, bias=True)
+        self.conv_expand = Conv2D(
+            mid_channels,
+            num_channels,
+            1,
+            weight_attr=ParamAttr(name=name + "_expand_w"),
+            bias_attr=ParamAttr(name=name + "_expand_b"))
 
     def forward(self, input):
-        pool = self.pool2d_gap(input)
-        pool = paddle.reshape(pool, shape=[-1, self._num_channels])
-        squeeze = self.squeeze(pool)
-        squeeze = F.relu(squeeze)
-        excitation = self.excitation(squeeze)
-        excitation = F.sigmoid(excitation)
-        excitation = paddle.reshape(
-            excitation, shape=[-1, self._num_channels, 1, 1])
-        out = input * excitation
-        return out
+        x = self.pool2d_gap(input)
+        x = self.conv_reduce(x)
+        x = F.relu(x)
+        x = self.conv_expand(x)
+        x = F.sigmoid(x)
+        return input * x
 
 
 class RegNet(nn.Layer):
@@ -260,26 +277,15 @@ class RegNet(nn.Layer):
                  class_num=1000):
         super(RegNet, self).__init__()
 
-        # Generate RegNet ws per block
-        b_ws, num_s, max_s, ws_cont = generate_regnet(w_a, w_0, w_m, d, q)
-        # Convert to per stage format
+        b_ws, num_s, _, _ = generate_regnet(w_a, w_0, w_m, d, q)
         ws, ds = get_stages_from_blocks(b_ws, b_ws)
-        # Generate group widths and bot muls
         gws = [group_w for _ in range(num_s)]
         bms = [bot_mul for _ in range(num_s)]
-        # Adjust the compatibility of ws and gws
         ws, gws = adjust_ws_gs_comp(ws, bms, gws)
-        # Use the same stride for each stage
         ss = [2 for _ in range(num_s)]
-        # Use SE for RegNetY
         se_r = 0.25
-        # Construct the model
-        # Group params by stage
         stage_params = list(zip(ds, ws, ss, bms, gws))
-        # Construct the stem
-        stem_type = "simple_stem_in"
         stem_w = 32
-        block_type = "res_bottleneck_block"
 
         self.conv = ConvBNLayer(
             num_channels=3,
@@ -295,10 +301,8 @@ class RegNet(nn.Layer):
             shortcut = False
             for i in range(d):
                 num_channels = stem_w if block == i == 0 else in_channels
-                # Stride apply to the first block of the stage
                 b_stride = stride if i == 0 else 1
-                conv_name = "s" + str(block + 1) + "_b" + str(i +
-                                                              1)  # chr(97 + i)
+                conv_name = "s" + str(block + 1) + "_b" + str(i + 1)
                 bottleneck_block = self.add_sublayer(
                     conv_name,
                     BottleneckBlock(
@@ -316,9 +320,7 @@ class RegNet(nn.Layer):
                 shortcut = True
 
         self.pool2d_avg = AdaptiveAvgPool2D(1)
-
         self.pool2d_avg_channels = w_out
-
         stdv = 1.0 / math.sqrt(self.pool2d_avg_channels * 1.0)
 
         self.out = Linear(
@@ -528,4 +530,211 @@ def RegNetX_32GF(pretrained=False, use_ssld=False, **kwargs):
         **kwargs)
     _load_pretrained(
         pretrained, model, MODEL_URLS["RegNetX_32GF"], use_ssld=use_ssld)
+    return model
+
+
+# RegNetY models (with SE, se_on=True, se_r=0.25)
+# Original: timm model_cfgs regnety_*
+
+def RegNetY_200(pretrained=False, use_ssld=False, **kwargs):
+    # timm: regnety_002=RegNetCfg(w0=24, wa=36.44, wm=2.49, group_size=8, depth=13, se_ratio=0.25)
+    model = RegNet(
+        w_a=36.44,
+        w_0=24,
+        w_m=2.49,
+        d=13,
+        group_w=8,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_200"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_400(pretrained=False, use_ssld=False, **kwargs):
+    # timm: regnety_004=RegNetCfg(w0=48, wa=27.89, wm=2.09, group_size=8, depth=16, se_ratio=0.25)
+    model = RegNet(
+        w_a=27.89,
+        w_0=48,
+        w_m=2.09,
+        d=16,
+        group_w=8,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_400"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_600(pretrained=False, use_ssld=False, **kwargs):
+    # timm: regnety_006=RegNetCfg(w0=48, wa=32.54, wm=2.32, group_size=16, depth=15, se_ratio=0.25)
+    model = RegNet(
+        w_a=32.54,
+        w_0=48,
+        w_m=2.32,
+        d=15,
+        group_w=16,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_600"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_800(pretrained=False, use_ssld=False, **kwargs):
+    # timm: regnety_008=RegNetCfg(w0=56, wa=38.84, wm=2.4, group_size=16, depth=14, se_ratio=0.25)
+    model = RegNet(
+        w_a=38.84,
+        w_0=56,
+        w_m=2.4,
+        d=14,
+        group_w=16,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_800"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_1600(pretrained=False, use_ssld=False, **kwargs):
+    # timm: regnety_016=RegNetCfg(w0=48, wa=20.71, wm=2.65, group_size=24, depth=27, se_ratio=0.25)
+    model = RegNet(
+        w_a=20.71,
+        w_0=48,
+        w_m=2.65,
+        d=27,
+        group_w=24,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_1600"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_3200(pretrained=False, use_ssld=False, **kwargs):
+    # timm: regnety_032=RegNetCfg(w0=80, wa=42.63, wm=2.66, group_size=24, depth=21, se_ratio=0.25)
+    model = RegNet(
+        w_a=42.63,
+        w_0=80,
+        w_m=2.66,
+        d=21,
+        group_w=24,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_3200"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_4000(pretrained=False, use_ssld=False, **kwargs):
+    # timm: regnety_040=RegNetCfg(w0=96, wa=31.41, wm=2.24, group_size=64, depth=22, se_ratio=0.25)
+    model = RegNet(
+        w_a=31.41,
+        w_0=96,
+        w_m=2.24,
+        d=22,
+        group_w=64,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_4000"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_6400(pretrained=False, use_ssld=False, **kwargs):
+    # timm: regnety_064=RegNetCfg(w0=112, wa=33.22, wm=2.27, group_size=72, depth=25, se_ratio=0.25)
+    model = RegNet(
+        w_a=33.22,
+        w_0=112,
+        w_m=2.27,
+        d=25,
+        group_w=72,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_6400"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_8000(pretrained=False, use_ssld=False, **kwargs):
+    # timm: regnety_080=RegNetCfg(w0=192, wa=76.82, wm=2.19, group_size=56, depth=17, se_ratio=0.25)
+    model = RegNet(
+        w_a=76.82,
+        w_0=192,
+        w_m=2.19,
+        d=17,
+        group_w=56,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_8000"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_12000(pretrained=False, use_ssld=False, **kwargs):
+    # timm: regnety_120=RegNetCfg(w0=168, wa=73.36, wm=2.37, group_size=112, depth=19, se_ratio=0.25)
+    model = RegNet(
+        w_a=73.36,
+        w_0=168,
+        w_m=2.37,
+        d=19,
+        group_w=112,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_12000"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_16000(pretrained=False, use_ssld=False, **kwargs):
+    # timm: regnety_160=RegNetCfg(w0=200, wa=106.23, wm=2.48, group_size=112, depth=18, se_ratio=0.25)
+    model = RegNet(
+        w_a=106.23,
+        w_0=200,
+        w_m=2.48,
+        d=18,
+        group_w=112,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_16000"], use_ssld=use_ssld)
+    return model
+
+
+def RegNetY_32000(pretrained=False, use_ssld=False, **kwargs):
+    # timm: regnety_320=RegNetCfg(w0=232, wa=115.89, wm=2.53, group_size=232, depth=20, se_ratio=0.25)
+    model = RegNet(
+        w_a=115.89,
+        w_0=232,
+        w_m=2.53,
+        d=20,
+        group_w=232,
+        bot_mul=1.0,
+        q=8,
+        se_on=True,
+        **kwargs)
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["RegNetY_32000"], use_ssld=use_ssld)
     return model

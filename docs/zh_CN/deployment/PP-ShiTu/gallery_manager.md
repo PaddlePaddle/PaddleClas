@@ -156,6 +156,24 @@ cp ../configs/inference_drink.yaml .
 python index_manager.py -c inference_drink.yaml
 ```
 
+索引服务仅允许访问 `PADDLECLAS_INDEX_ROOT` 指定的目录及其子目录；未设置时使用服务启动时的当前工作目录。请将图像库保存在该目录内。已有图像库位于其他位置时，启动前设置允许的父目录，例如：
+
+```shell
+export PADDLECLAS_INDEX_ROOT=/srv/shitu/galleries
+python index_manager.py -c inference_drink.yaml
+```
+
+允许目录必须已存在，请使用专用图像库目录，不要设置为系统根目录或包含敏感文件的目录。列表文件、列表中的图像路径及索引文件都必须位于所选图像库内，目录外的绝对路径、`..` 穿越和符号链接会被拒绝。图像库及其父目录应由可信用户管理，避免文件校验期间被其他用户修改。
+
+桌面启动器会自动生成随机访问令牌并传递给服务和客户端。单独运行 `server.py` 或 `client.py` 时，需要为两者设置相同的 `PADDLECLAS_INDEX_TOKEN`。服务未配置令牌时拒绝启动，三个索引管理接口均要求 `Authorization: Bearer <token>`，不接受匿名请求。通过网络使用时请配合 HTTPS 代理保护令牌。
+
+```shell
+export PADDLECLAS_INDEX_TOKEN="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+python server.py -c inference_drink.yaml
+```
+
+接口错误只返回通用提示，不返回文件原文或底层异常内容。
+
 运行成功后，会自动跳转到工具界面，可以按照如下步骤，生成新的index库。
 
 1. 点击菜单栏`新建图像库`，会提示打开一个文件夹，此时请创建一个**新的文件夹**，并打开。如在`${PaddleClas}/deploy/shitu_index_manager`下新建一个`drink_index`文件夹
@@ -182,8 +200,8 @@ index_root/            # 库存储目录
 |-- image_list.txt     # 图像列表，每行：image_path label。由前端生成及修改，后端只读
 |-- images             # 图像存储目录，由前端生成及增删查等操作。后端只读
 |   |-- md5.jpg
-|   |-- md5.jpg  
-|   |-- ……  
+|   |-- md5.jpg
+|   |-- ……
 |-- features.pkl       # 建库之后，保存的embedding向量，后端生成，前端无需操作
 |-- index              # 真正的生成的index库存储目录，后端生成及操作，前端无需操作。
 |   |-- vector.index   # faiss生成的索引库
