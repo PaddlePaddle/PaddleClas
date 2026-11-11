@@ -4,6 +4,8 @@
 
 ## 环境
 
+初始权重及断点恢复均通过共享 `strict_set_state_dict` 检查键集合、张量形状和加载返回值；不兼容时明确报错，不依赖 `assert`。校验单测可在仓库根目录执行：`python -O -m unittest discover -s tests/cinn/_shared -p test_checkpoint_utils.py -v`。
+
 本地验证环境：V100S 32GB、Python3.10.20、Paddle3.5.0.dev20260722（08de6be508389d5277b02e78fbc8742f1ed78160，编译CUDA12.6）、numpy1.26.4；安装对应 Paddle GPU 包和 PaddleClas requirements。
 
 

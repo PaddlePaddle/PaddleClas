@@ -34,8 +34,7 @@ cmd = [
     "--output",
     a.output,
 ]
-if "ghostnetv3" != "yolo11":
-    cmd += ["--model", "ghostnetv3"]
+cmd += ["--model", "ghostnetv3"]
 if a.task == "train":
     os.environ["TRAIN_CHECKPOINT"] = a.checkpoint
     cmd += [

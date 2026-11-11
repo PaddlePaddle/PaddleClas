@@ -34,8 +34,7 @@ cmd = [
     "--output",
     a.output,
 ]
-if "naflexvit" != "yolo11":
-    cmd += ["--model", "naflexvit"]
+cmd += ["--model", "naflexvit"]
 if a.task == "train":
     os.environ["TRAIN_CHECKPOINT"] = a.checkpoint
     cmd += [

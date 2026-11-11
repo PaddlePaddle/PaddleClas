@@ -60,6 +60,8 @@ os.environ["FLAGS_use_cinn"] = str(args.mode == "cinn").lower()
 os.environ["OMP_NUM_THREADS"] = "1"
 root = Path(__file__).parent
 sys.path.insert(0, os.environ["PADDLECLAS_DIR"])
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "_shared"))
+from checkpoint_utils import strict_set_state_dict
 import numpy as np
 import paddle
 from paddle.base import core
@@ -108,16 +110,15 @@ model = factories[args.model](pretrained=False, drop_rate=0.0)
 if not checkpoint.is_file():
     raise FileNotFoundError(checkpoint)
 state = paddle.load(str(checkpoint))
-assert state.keys() == model.state_dict().keys(), "Checkpoint keys mismatch"
-assert all(
-    tuple(state[k].shape) == tuple(v.shape) for k, v in model.state_dict().items()
-)
-model.set_state_dict(state)
+strict_set_state_dict(model, state)
 optimizer = paddle.optimizer.AdamW(
     learning_rate=1e-5, weight_decay=0.01, parameters=model.parameters()
 )
 batch = 16
-assert len(tx) % batch == 0 and len(vx) % batch == 0
+if not len(tx) or not len(vx) or len(tx) % batch or len(vx) % batch:
+    raise ValueError(
+        f"Train/validation sample counts must be positive multiples of batch size {batch}"
+    )
 if args.mode == "cinn":
     model = paddle.jit.to_static(
         model,
@@ -219,7 +220,7 @@ if args.resume:
             raise ValueError(f"Resume mismatch: {key}")
     if saved["policy"] != policy:
         raise ValueError("Resume compiler policy mismatch")
-    model.set_state_dict(saved["model"])
+    strict_set_state_dict(model, saved["model"])
     optimizer.set_state_dict(saved["optimizer"])
     start_epoch = saved["epoch"]
     if args.epochs <= start_epoch:

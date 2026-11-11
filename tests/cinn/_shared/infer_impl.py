@@ -36,6 +36,8 @@ args.output.mkdir(parents=True, exist_ok=False)
 os.environ["NVIDIA_TF32_OVERRIDE"] = "0"
 os.environ["FLAGS_cudnn_deterministic"] = "true"
 sys.path.insert(0, os.environ["PADDLECLAS_DIR"])
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "_shared"))
+from checkpoint_utils import strict_set_state_dict
 import numpy as np
 import paddle
 from paddle.base import core
@@ -60,8 +62,7 @@ model = {
     "mobilenetv5": MobileNetV5_base,
 }[args.model](pretrained=False, drop_rate=0.0)
 state = paddle.load(str(args.checkpoint))
-assert state.keys() == model.state_dict().keys()
-model.set_state_dict(state)
+strict_set_state_dict(model, state)
 model.eval()
 if args.mode == "cinn":
     model = paddle.jit.to_static(model, full_graph=True, backend="CINN")
