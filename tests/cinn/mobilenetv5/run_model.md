@@ -15,7 +15,7 @@
 
 data/data.npz 为历史 ImageNet100 子集的前320张训练和16张验证图片，已预处理成RGB224，来源与选择见data/manifest.json。须遵守原数据集使用条款。默认1个epoch共20步，是交付入口快速验证，不是完整收敛测试。历史长跑数据为3200/800图片，若复现历史长跑，须另备对应 data.npz 与 manifest.json，设置 DATA_DIR；不可把本目录的小子集结果当作历史长跑结果。
 
-权重暂不上传。外部 CHECKPOINT_DIR 下提供 initial.pdparams 和 inference.pdparams，本次两者均为相同原始随机权重，不使用各端分别训练后的权重作推理对齐。大小和SHA256见asset_manifest.json；入口自动校验打包数据及权重。外部DATA_DIR由使用者选择，训练记录其manifest哈希。
+CINN 测试权重已托管到下述星河模型库。外部 CHECKPOINT_DIR 下提供 initial.pdparams 和 inference.pdparams，本次两者均为相同原始随机权重，不使用各端分别训练后的权重作推理对齐。大小和SHA256见asset_manifest.json；入口自动校验打包数据及权重。外部DATA_DIR由使用者选择，训练记录其manifest哈希。
 
 ## 运行
 
@@ -50,4 +50,14 @@ GPU_ID默认0。重复运行必须指定新的RESULTS_DIR，拒绝覆盖旧目�
 
 Training and inference implementation is shared in tests/cinn/_shared/; keep that directory when copying this entry.
 
-Import PaddleClas from this checkout; no historical import-syntax patch is applied. External resources are not included: CINN_RESOURCE_DIR must contain the data/ and assets/ files in asset_manifest.json. CHECKPOINT_DIR supplies the matching weights. Obtain these from the contributor; public download links will be maintained later. Follow the source dataset license. Historical measurements above are not new convergence results for this checkout.
+Import PaddleClas from this checkout; no historical import-syntax patch is applied. External resources are not included: CINN_RESOURCE_DIR must contain the data/ and assets/ files in asset_manifest.json. CHECKPOINT_DIR supplies the matching weights. Download checkpoints using the links below; other assets still need to be obtained from the contributor. Follow the source dataset license. Historical measurements above are not new convergence results for this checkout.
+
+## CINN checkpoint downloads
+
+Model library: [PaddleClas/MobileNet-V5](https://aistudio.baidu.com/modelsdetail/45706/space).
+
+- [initial.pdparams](https://git.aistudio.baidu.com/api/v1/repos/PaddleClas/MobileNet-V5/media/cinn%2Fmobilenetv5%2Fcheckpoint%2Finitial.pdparams): common training initialization for dynamic and CINN runs.
+- [inference.pdparams](https://git.aistudio.baidu.com/api/v1/repos/PaddleClas/MobileNet-V5/media/cinn%2Fmobilenetv5%2Fcheckpoint%2Finference.pdparams): the same checkpoint must be used for both independent inference runs.
+- [checkpoint_manifest.json](https://git.aistudio.baidu.com/api/v1/repos/PaddleClas/MobileNet-V5/media/cinn%2Fmobilenetv5%2Fcheckpoint_manifest.json): file sizes, SHA256 and test scope.
+
+Save the two weight files under `CHECKPOINT_DIR`. The existing `asset_manifest.json` pins their hashes; do not substitute other weights from the model library. These are framework-test checkpoints, not a new task-quality evaluation. Configuration/tokenizer/data assets are separate and are not supplied by these weight downloads.
