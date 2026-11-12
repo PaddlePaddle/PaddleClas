@@ -724,6 +724,7 @@ from .model_zoo.lowformer import (
     LowFormer_e1,
     LowFormer_e2,
     LowFormer_e3,
+)
 from .model_zoo.efficientvit import (
     Efficientvit_B0,
     Efficientvit_B1,
@@ -763,6 +764,7 @@ from .model_zoo.cpubone import (
     CPUBone_b2_bfrobust,
     CPUBone_b2pt5_dwnorm,
     CPUBone_b3,
+)
 from .model_zoo.shvit import (
     SHViT_S1,
     SHViT_S2,
