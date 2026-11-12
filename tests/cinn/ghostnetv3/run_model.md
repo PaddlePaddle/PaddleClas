@@ -52,6 +52,37 @@ Training and inference implementation is shared in tests/cinn/_shared/; keep tha
 
 Import PaddleClas from this checkout; no historical import-syntax patch is applied. External resources are not included: CINN_RESOURCE_DIR must contain the data/ and assets/ files in asset_manifest.json. CHECKPOINT_DIR supplies the matching weights. Download checkpoints using the links below; other assets still need to be obtained from the contributor. Follow the source dataset license. Historical measurements above are not new convergence results for this checkout.
 
+## Rebuild the exact image test data
+
+The image subset comes from ImageNet/ILSVRC2012. Obtain authorized access under the
+[ImageNet terms](https://www.image-net.org/download.php); this PR does not redistribute
+image pixels. Checkpoints are public, and the sample filenames are included in this repository.
+No private contributor bundle is required if you have the matching source archives.
+
+The preparation script uses the original 1000-class labels and RGB short-edge-224 bilinear
+resize plus center crop. It reconstructs the historical NPZ serialization and checks the
+**original** size/SHA256 before saving; it never changes the reference hash or silently
+substitutes random images. Tested with NumPy 1.26.4, Pillow 12.3.0 and SciPy 1.15.3.
+
+```bash
+# Use a new output directory. Obtain these three archives through authorized access.
+export CINN_RESOURCE_DIR=/path/to/new-ghostnetv3-resources
+python tests/cinn/_shared/prepare_imagenet_subset.py \\
+  --train-archive /path/to/imagenet100.zip \\
+  --val-archive /path/to/ILSVRC2012_img_val.tar \\
+  --devkit /path/to/ILSVRC2012_devkit_t12.tar.gz \\
+  --selection tests/cinn/_shared/imagenet_selection.json \\
+  --asset-manifest tests/cinn/ghostnetv3/asset_manifest.json \\
+  --layout classification --output "$CINN_RESOURCE_DIR"
+# CHECKPOINT_DIR contains the public initial.pdparams and inference.pdparams.
+python tests/cinn/ghostnetv3/verify_assets.py "$CHECKPOINT_DIR"
+```
+
+Archive requirements: the training ZIP contains the `imagenet100/<WNID>/<filename>`
+paths listed in the selection JSON; validation uses the original ILSVRC2012 filenames.
+Missing or different source images fail explicitly. This preparation needs CPU only and
+is not a new convergence/performance evaluation.
+
 ## CINN checkpoint downloads
 
 Model library: [PaddleClas/GhostNet-V3](https://aistudio.baidu.com/modelsdetail/51935/space).
