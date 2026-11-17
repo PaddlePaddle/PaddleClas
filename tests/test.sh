@@ -412,7 +412,7 @@ else
                 eval $cmd
                 status_check $? "${cmd}" "${status_log}"
 
-                set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/${$model_name}/${train_model_name}")
+                set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/${model_name}/${train_model_name}")
                 # save norm trained models to set pretrain for pact training and fpgm training 
                 if [ ${trainer} = ${trainer_norm} ]; then
                     load_norm_train_model=${set_eval_pretrain}
