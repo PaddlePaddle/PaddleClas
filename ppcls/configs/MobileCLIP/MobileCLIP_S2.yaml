@@ -1,0 +1,125 @@
+# MobileCLIP uses RGB inputs in [0, 1].
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./output/
+  device: gpu
+  save_interval: 1
+  eval_during_train: true
+  eval_interval: 1
+  epochs: 10
+  print_batch_step: 10
+  use_visualdl: false
+  image_shape: [3, 256, 256]
+  save_inference_dir: ./inference
+Arch:
+  name: MobileCLIP_S2
+  class_num: 1000
+  pretrained: false
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+        epsilon: 0.1
+  Eval:
+    - CELoss:
+        weight: 1.0
+Optimizer:
+  name: AdamW
+  beta1: 0.9
+  beta2: 0.999
+  epsilon: 1.0e-08
+  weight_decay: 0.01
+  lr:
+    name: Cosine
+    learning_rate: 0.0001
+    eta_min: 1.0e-06
+    warmup_epoch: 1
+    warmup_start_lr: 1.0e-06
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/train_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: true
+            channel_first: false
+        - RandCropImage:
+            size: 256
+            interpolation: bilinear
+            backend: pil
+        - RandFlipImage:
+            flip_code: 1
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.0, 0.0, 0.0]
+            std: [1.0, 1.0, 1.0]
+            order: ''
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 32
+      drop_last: true
+      shuffle: true
+    loader:
+      num_workers: 4
+      use_shared_memory: true
+  Eval:
+    dataset:
+      name: ImageNetDataset
+      image_root: ./dataset/ILSVRC2012/
+      cls_label_path: ./dataset/ILSVRC2012/val_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: true
+            channel_first: false
+        - ResizeImage:
+            resize_short: 256
+            interpolation: bilinear
+            backend: pil
+        - CropImage:
+            size: 256
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.0, 0.0, 0.0]
+            std: [1.0, 1.0, 1.0]
+            order: ''
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 32
+      drop_last: false
+      shuffle: false
+    loader:
+      num_workers: 4
+      use_shared_memory: true
+Infer:
+  infer_imgs: docs/images/inference_deployment/whl_demo.jpg
+  batch_size: 10
+  transforms:
+    - DecodeImage:
+        to_rgb: true
+        channel_first: false
+    - ResizeImage:
+        resize_short: 256
+        interpolation: bilinear
+        backend: pil
+    - CropImage:
+        size: 256
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.0, 0.0, 0.0]
+        std: [1.0, 1.0, 1.0]
+        order: ''
+    - ToCHWImage: null
+  PostProcess:
+    name: Topk
+    topk: 5
+    class_id_map_file: ppcls/utils/imagenet1k_label_list.txt
+Metric:
+  Train:
+    - TopkAcc:
+        topk: [1, 5]
+  Eval:
+    - TopkAcc:
+        topk: [1, 5]

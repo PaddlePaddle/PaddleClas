@@ -54,6 +54,7 @@
     - [DSNet 系列](#DSNet)
   - [4.2 轻量级模型](#Transformer_lite)
     - [MobileViT 系列](#MobileViT)
+    - [MobileCLIP 系列](#MobileCLIP)
 - [五、参考文献](#reference)
 
 <a name="Overview"></a>
@@ -828,6 +829,12 @@ DeiT（Data-efficient Image Transformers）系列模型的精度、速度指标�
 | MobileViTv3_x0_5   | 0.7200 | 0.9083 | - | - | - |  481.33 | 1.43 | [下载链接]() | [下载链接]() |
 | MobileViTv3_x0_75  | 0.7626 | 0.9308 | - | - | - | 1064.48 | 3.00 | [下载链接]() | [下载链接]() |
 | MobileViTv3_x1_0   | 0.7838 | 0.9421 | - | - | - | 1875.96 | 5.14 | [下载链接]() | [下载链接]() |
+
+<a name="MobileCLIP"></a>
+
+## MobileCLIP 系列
+
+支持 MobileCLIP v1 S0、S1、S2、B 和 B-LT 的图文前向对齐及 ImageNet 分类训练入口。五套官方权重的 CPU float32 图文 Logits 最大绝对误差均小于 `1e-4`。详细转换、训练检查和实测结果见 [MobileCLIP 文档](MobileCLIP.md)。
 
 <a name='reference'></a>
 
