@@ -73,6 +73,7 @@ from .model_zoo.hardnet import HarDNet68, HarDNet85, HarDNet39_ds, HarDNet68_ds
 from .model_zoo.cspnet import CSPDarkNet53
 from .model_zoo.pvt_v2 import PVT_V2_B0, PVT_V2_B1, PVT_V2_B2_Linear, PVT_V2_B2, PVT_V2_B3, PVT_V2_B4, PVT_V2_B5
 from .model_zoo.mobilevit import MobileViT_XXS, MobileViT_XS, MobileViT_S
+from .model_zoo.mobileclip import MobileCLIP_S0, MobileCLIP_S1, MobileCLIP_S2, MobileCLIP_B, MobileCLIP_B_LT
 from .model_zoo.repvgg import RepVGG_A0, RepVGG_A1, RepVGG_A2, RepVGG_B0, RepVGG_B1, RepVGG_B2, RepVGG_B1g2, RepVGG_B1g4, RepVGG_B2g4, RepVGG_B3, RepVGG_B3g4, RepVGG_D2se
 from .model_zoo.van import VAN_B0, VAN_B1, VAN_B2, VAN_B3
 from .model_zoo.peleenet import PeleeNet

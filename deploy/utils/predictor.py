@@ -60,8 +60,10 @@ class Predictor(object):
         if (major_v == 0 and minor_v == 0) or (major_v >= 3):
             config = Config(inference_model_dir, model_prefix)
         else:
-            model_file = os.path.join(inference_model_dir, f"{model_prefix}.pdmodel")
-            params_file = os.path.join(inference_model_dir, f"{model_prefix}.pdiparams")
+            model_file = os.path.join(inference_model_dir,
+                                      f"{model_prefix}.pdmodel")
+            params_file = os.path.join(inference_model_dir,
+                                       f"{model_prefix}.pdiparams")
             config = Config(model_file, params_file)
 
         if args.get("use_gpu", False):
@@ -85,8 +87,7 @@ class Predictor(object):
             config.enable_new_ir(True)
             config.enable_new_executor(True)
             kPirGcuPasses = gcu_passes.inference_passes(
-                use_pir=True, name="PaddleClas"
-            )
+                use_pir=True, name="PaddleClas")
             config.enable_custom_passes(kPirGcuPasses, True)
         else:
             config.disable_gpu()
@@ -116,7 +117,9 @@ class Predictor(object):
                 min_subgraph_size=30,
                 use_calib_mode=False)
 
-        config.enable_memory_optim()
+        if not os.path.isfile(
+                os.path.join(inference_model_dir, f"{model_prefix}.json")):
+            config.enable_memory_optim()
         # use zero copy
         config.switch_use_feed_fetch_ops(False)
         predictor = create_predictor(config)
