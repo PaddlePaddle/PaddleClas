@@ -185,7 +185,7 @@ else
     export Count=0
     USE_GPU_KEY=(${train_use_gpu_value})
     for gpu in ${gpu_list[*]}; do
-        train_use_gpu=${USE_GPU_KEY[Count]}
+        train_use_gpu=${USE_GPU_KEY[Count]:-${USE_GPU_KEY[0]}}
         Count=$(($Count + 1))
         ips=""
         if [ ${gpu} = "-1" ]; then
@@ -242,7 +242,11 @@ else
                 set_pretrain=$(func_set_params "${pretrain_model_key}" "${pretrain_model_value}")
                 set_batchsize=$(func_set_params "${train_batch_key}" "${train_batch_value}")
                 set_train_params1=$(func_set_params "${train_param_key1}" "${train_param_value1}")
-                set_use_gpu=$(func_set_params "${train_use_gpu_key}" "${train_use_gpu_value}")
+                set_use_gpu=$(func_set_params "${train_use_gpu_key}" "${train_use_gpu}")
+                set_print_mem_info="-o Global.print_mem_info=False"
+                if [ "${train_use_gpu}" = "gpu" ]; then
+                    set_print_mem_info="-o Global.print_mem_info=True"
+                fi
                 if [ ${#ips} -le 15 ]; then
                     # if length of ips >= 15, then it is seen as multi-machine
                     # 15 is the min length of ips info for multi-machine: 0.0.0.0,0.0.0.0
@@ -264,11 +268,11 @@ else
                 set_save_model=$(func_set_params "${save_model_key}" "${save_log}")
                 log_rank="-o Global.log_ranks=0,1,2,3,4,5,6,7"
                 if [ ${#gpu} -le 2 ]; then # train with cpu or single gpu
-                    cmd="${python} ${run_train} ${set_use_gpu} ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} -o Global.print_mem_info=True "
+                    cmd="${python} ${run_train} ${set_use_gpu} ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} ${set_print_mem_info} "
                 elif [ ${#ips} -le 15 ]; then # train with multi-gpu
-                    cmd="${python} -m paddle.distributed.launch --devices=${gpu} ${run_train} ${set_use_gpu} ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} -o Global.print_mem_info=True ${log_rank}"
+                    cmd="${python} -m paddle.distributed.launch --devices=${gpu} ${run_train} ${set_use_gpu} ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} ${set_print_mem_info} ${log_rank}"
                 else # train with multi-machine
-                    cmd="${python} -m paddle.distributed.launch --ips=${ips} --devices=${gpu} ${run_train} ${set_use_gpu} ${set_save_model} ${set_pretrain} ${set_epoch} ${set_autocast} ${set_batchsize} ${set_train_params1} -o Global.print_mem_info=True ${log_rank}"
+                    cmd="${python} -m paddle.distributed.launch --ips=${ips} --devices=${gpu} ${run_train} ${set_use_gpu} ${set_save_model} ${set_pretrain} ${set_epoch} ${set_autocast} ${set_batchsize} ${set_train_params1} ${set_print_mem_info} ${log_rank}"
                 fi
                 # run train
                 # export FLAGS_cudnn_deterministic=True
@@ -281,19 +285,19 @@ else
                 fi
 
                 eval $cmd
+                last_status=$?
+                train_output_dir="${save_log}/${model_name}"
                 if [[ $model_name == *GeneralRecognition* ]] || [[ $model_name == *MetaBIN_ResNet50* ]]; then
-                    eval "cat ${save_log}/RecModel/train.log >> ${save_log}.log"
-                else
-                    eval "cat ${save_log}/${model_name}/train.log >> ${save_log}.log"
+                    train_output_dir="${save_log}/RecModel"
                 fi
-                status_check $? "${cmd}" "${status_log}" "${model_name}" "${save_log}.log"
+                if [ ! -f "${train_output_dir}/train.log" ]; then
+                    train_output_dir="${save_log}"
+                fi
+                cat "${train_output_dir}/train.log" >> "${save_log}.log"
+                status_check $last_status "${cmd}" "${status_log}" "${model_name}" "${save_log}.log"
                 sleep 5
 
-                if [[ $model_name == *GeneralRecognition* ]] || [[ $model_name == *MetaBIN_ResNet50* ]]; then
-                    set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/RecModel/${train_model_name}")
-                else
-                    set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/${model_name}/${train_model_name}")
-                fi
+                set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${train_output_dir}/${train_model_name}")
                 # save norm trained models to set pretrain for pact training and fpgm training
                 if [[ ${trainer} = ${trainer_norm}  ||  ${trainer} = ${pact_key} ]]; then
                     load_norm_train_model=${set_eval_pretrain}
@@ -311,14 +315,10 @@ else
                 if [ ${run_export} != "null" ]; then
                     # run export model
                     save_infer_path="${save_log}"
-                    if [[ $model_name == *GeneralRecognition* ]] || [[ $model_name == *MetaBIN_ResNet50* ]]; then
-                        set_eval_pretrain=$(func_set_params "${pretrain_model_key}" "${save_log}/RecModel/${train_model_name}")
-                    else
-                        set_export_weight=$(func_set_params "${export_weight}" "${save_log}/${model_name}/${train_model_name}")
-                    fi
+                    set_export_weight=$(func_set_params "${export_weight}" "${train_output_dir}/${train_model_name}")
                     set_save_infer_key=$(func_set_params "${save_infer_key}" "${save_infer_path}")
                     export_log_path="${LOG_PATH}/${trainer}_gpus_${gpu}_autocast_${autocast}_nodes_${nodes}_export.log"
-                    export_cmd="${python} ${run_export} ${set_export_weight} ${set_save_infer_key} > ${export_log_path} 2>&1"
+                    export_cmd="${python} ${run_export} ${set_use_gpu} ${set_export_weight} ${set_save_infer_key} > ${export_log_path} 2>&1"
                     eval $export_cmd
                     status_check $? "${export_cmd}" "${status_log}" "${model_name}" "${export_log_path}"
 
