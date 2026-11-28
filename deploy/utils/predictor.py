@@ -13,11 +13,6 @@
 # limitations under the License.
 import platform
 import os
-import argparse
-import base64
-import shutil
-import cv2
-import numpy as np
 
 import paddle
 from paddle.inference import Config
@@ -32,10 +27,12 @@ class Predictor(object):
         self.args = args
         if self.args.get("use_onnx", False):
             self.predictor, self.config = self.create_onnx_predictor(
-                args, inference_model_dir)
+                args, inference_model_dir
+            )
         else:
             self.predictor, self.config = self.create_paddle_predictor(
-                args, inference_model_dir)
+                args, inference_model_dir
+            )
 
     def predict(self, image):
         raise NotImplementedError
@@ -45,14 +42,14 @@ class Predictor(object):
             inference_model_dir = args.inference_model_dir
         if "inference_int8.pdiparams" in os.listdir(inference_model_dir):
             model_prefix = "inference_int8"
-            assert args.get(
-                "use_fp16", False
-            ) is False, "fp16 mode is not supported for int8 model inference, please set use_fp16 as False during inference."
+            assert (
+                args.get("use_fp16", False) is False
+            ), "fp16 mode is not supported for int8 model inference, please set use_fp16 as False during inference."
         else:
             model_prefix = "inference"
-            assert args.get(
-                "use_int8", False
-            ) is False, "int8 mode is not supported for fp32 model inference, please set use_int8 as False during inference."
+            assert (
+                args.get("use_int8", False) is False
+            ), "int8 mode is not supported for fp32 model inference, please set use_int8 as False during inference."
 
         # NOTE: paddle support to PIR mode after v2.6.0
         major_v, minor_v, _ = paddle.__version__.split(".")[:3]
@@ -67,11 +64,11 @@ class Predictor(object):
         if args.get("use_gpu", False):
             config.enable_use_gpu(args.gpu_mem, 0)
         elif args.get("use_npu", False):
-            config.enable_custom_device('npu')
+            config.enable_custom_device("npu")
         elif args.get("use_xpu", False):
             config.enable_xpu()
         elif args.get("use_mlu", False):
-            config.enable_custom_device('mlu')
+            config.enable_custom_device("mlu")
         elif args.get("use_gcu", False):
             assert paddle.device.is_compiled_with_custom_device("gcu"), (
                 "Config use_gcu cannot be set as True while your paddle "
@@ -80,13 +77,12 @@ class Predictor(object):
                 "\t2. Set use_gcu as False in config file to run model on CPU."
             )
             import paddle_custom_device.gcu.passes as gcu_passes
+
             gcu_passes.setUp()
             config.enable_custom_device("gcu")
             config.enable_new_ir(True)
             config.enable_new_executor(True)
-            kPirGcuPasses = gcu_passes.inference_passes(
-                use_pir=True, name="PaddleClas"
-            )
+            kPirGcuPasses = gcu_passes.inference_passes(use_pir=True, name="PaddleClas")
             config.enable_custom_passes(kPirGcuPasses, True)
         else:
             config.disable_gpu()
@@ -114,7 +110,13 @@ class Predictor(object):
                 max_batch_size=args.batch_size,
                 workspace_size=1 << 30,
                 min_subgraph_size=30,
-                use_calib_mode=False)
+                use_calib_mode=False,
+            )
+
+        if args.get("use_cinn", False):
+            # CINN in Paddle Inference requires a PIR inference model
+            # (exported with paddle>=3.0 and Global.export_with_pir=True).
+            config.enable_cinn()
 
         config.enable_memory_optim()
         # use zero copy
@@ -125,6 +127,7 @@ class Predictor(object):
 
     def create_onnx_predictor(self, args, inference_model_dir=None):
         import onnxruntime as ort
+
         if inference_model_dir is None:
             inference_model_dir = args.inference_model_dir
         model_file = os.path.join(inference_model_dir, "inference.onnx")
@@ -136,6 +139,8 @@ class Predictor(object):
         else:
             config.intra_op_num_threads = args.cpu_num_threads
             if args.ir_optim:
-                config.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+                config.graph_optimization_level = (
+                    ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+                )
         predictor = ort.InferenceSession(model_file, sess_options=config)
         return predictor, config
